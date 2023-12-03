@@ -1,6 +1,0 @@
-@CVC.API_HostAddress = http://localhost:5110
-
-GET {{CVC.API_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

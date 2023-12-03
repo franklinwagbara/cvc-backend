@@ -1,0 +1,11 @@
+﻿@{
+    if (User != null && User.Identity.IsAuthenticated)
+    {
+        if (User.IsInRole("Company"))
+            Layout = "_CompanyLayout";
+        else
+            Layout = "_ElaLayout";
+    }
+    else
+        Layout = "_Layout";
+}

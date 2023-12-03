@@ -1,0 +1,96 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  /*margin-bottom: 60px;*/
+}
+.compHeader {
+    margin-top: -10em;
+    position: relative;
+    margin-bottom: 15em !important;
+    padding: 0 20px 10px 40px;
+    color: whitesmoke !important;
+}
+.bg1 {
+    background-color: #1C352D;
+    min-height: 350px;
+    padding-bottom: 5em;
+    margin-bottom: 9em;
+    color: floralwhite;
+    border-radius: 5px;
+    overflow: auto;
+}
+.dTile {
+    padding: 35px 5px;
+    height: 70px;
+    display: inline-block;
+    font-weight: 300;
+    min-width: 200px;
+    margin: 10px 0;
+    /*float: right;*/
+}
+    .dTile .tileHead {
+        text-align: center;
+        padding: 15px 0;
+        background-color: rgba(255, 255, 255, 0.25);
+        border-radius: 5px 5px 0 0;
+    }
+
+        .dTile .tileHead h1 {
+            /*font-size: 76px;*/
+            font-size: 5.2em;
+            font-weight: 700;
+        }
+/*
+        .dTile .tileHead.exp {
+            background-color: orange;
+            color: #fc6161;
+        }*/
+
+    .dTile .tileBase {
+        text-align: center;
+        border-radius: 0 0 5px 5px;
+        background-color: rgba(0, 0, 0, 0.5);
+        padding: 10px 5px;
+        height: 70px;
+    }
+
+        .dTile .tileBase p {
+            font-size: 16px;
+            margin-bottom: 0;
+        }
+
+    .dTile:hover {
+        cursor: default;
+    }
+
+        .dTile:hover .tileHead {
+            background-color: rgba(255, 234, 0, 0.42);
+        }
+
+        .dTile:hover .tileBase {
+            background-color: rgba(87, 80, 0, 0.55);
+        }
+.welcome{
+    display: inline-block;
+    margin-top: 5em;
+}
+.pageTitle{
+    padding: 2em;
+}

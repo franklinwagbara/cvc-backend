@@ -1,0 +1,5 @@
+2023-08-10T10:37:43.2752215+01:00 [ERR] () An error Data is Null. This method or property cannot be called on Null values. occured while trying to generate extra payment RRR for this application by drayprogrammer45@yahoo.com
+2023-08-10T10:43:47.3895716+01:00 [INF] () Creation of payment split for application with reference:214081023102725(Dammie Newworks Marshal Ltd) by drayprogrammer45@yahoo.com
+2023-08-10T10:43:47.5642749+01:00 [ERR] () An error An error occurred while saving the entity changes. See the inner exception for details. occured while trying to generate extra payment RRR for this application by drayprogrammer45@yahoo.com
+2023-08-10T10:47:13.4962007+01:00 [INF] () Creation of payment split for application with reference:214081023102725(Dammie Newworks Marshal Ltd) by drayprogrammer45@yahoo.com
+2023-08-10T10:47:53.8105983+01:00 [INF] () Payment table updated with RRR: 290796614625 by drayprogrammer45@yahoo.com
