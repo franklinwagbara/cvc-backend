@@ -1,0 +1,183 @@
+2023-08-17T11:48:15.6569797+02:00 [INF] () Creation of payment split for application with reference:214081623121410(Dammie Newworks Marshal) by drayprogrammer45@yahoo.com
+2023-08-17T11:48:16.0222100+02:00 [INF] () Payment table updated with RRR: 170796676903 by drayprogrammer45@yahoo.com
+2023-08-17T12:08:32.7627470+02:00 [INF] () Creation of payment split for application with reference:214081723120523(Dammie Newworks Marshal) by drayprogrammer45@yahoo.com
+2023-08-17T12:08:32.8273487+02:00 [INF] () Payment table updated with RRR: 160796677167 by drayprogrammer45@yahoo.com
+2023-08-17T12:23:40.7406238+02:00 [INF] () Creation of payment split for application with reference:214081723121748(Dammie Newworks Marshal) by drayprogrammer45@yahoo.com
+2023-08-17T12:23:40.7969454+02:00 [INF] () Payment table updated with RRR: 150796677360 by drayprogrammer45@yahoo.com
+2023-08-17T12:45:01.9153311+02:00 [INF] () Creation of payment split for application with reference:214081723123846(Dammie Newworks Marshal) by drayprogrammer45@yahoo.com
+2023-08-17T12:45:01.9653292+02:00 [INF] () Payment table updated with RRR: 210796677594 by drayprogrammer45@yahoo.com
+2023-08-17T13:16:04.1484641+02:00 [INF] () Creation of payment split for application with reference:214081723131205(Dammie Newworks Marshal) by drayprogrammer45@yahoo.com
+2023-08-17T13:16:04.2192577+02:00 [INF] () Payment table updated with RRR: 230796677986 by drayprogrammer45@yahoo.com
+2023-08-17T13:28:53.2025026+02:00 [ERR] () An error was generated for warning 'Microsoft.EntityFrameworkCore.Query.InvalidIncludePathError': Unable to find navigation 'LGA' specified in string based include path 'Application.Facility.LGA.State'. This exception can be suppressed or logged by passing event ID 'CoreEventId.InvalidIncludePathError' to the 'ConfigureWarnings' method in 'DbContext.OnConfiguring' or 'AddDbContext'. 
+  
+    at Microsoft.EntityFrameworkCore.Diagnostics.EventDefinition`2.Log[TLoggerCategory](IDiagnosticsLogger`1 logger, TParam1 arg1, TParam2 arg2)
+   at Microsoft.EntityFrameworkCore.Diagnostics.CoreLoggerExtensions.InvalidIncludePathError(IDiagnosticsLogger`1 diagnostics, String navigationChain, String navigationName)
+   at Microsoft.EntityFrameworkCore.Query.Internal.NavigationExpandingExpressionVisitor.ProcessInclude(NavigationExpansionExpression source, Expression expression, Boolean thenInclude, Boolean setLoaded)
+   at Microsoft.EntityFrameworkCore.Query.Internal.NavigationExpandingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at Microsoft.EntityFrameworkCore.Query.Internal.NavigationExpandingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at Microsoft.EntityFrameworkCore.Query.Internal.NavigationExpandingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at Microsoft.EntityFrameworkCore.Query.Internal.NavigationExpandingExpressionVisitor.Expand(Expression query)
+   at Microsoft.EntityFrameworkCore.Query.QueryTranslationPreprocessor.Process(Expression query)
+   at Microsoft.EntityFrameworkCore.Query.QueryCompilationContext.CreateQueryExecutor[TResult](Expression query)
+   at Microsoft.EntityFrameworkCore.Storage.Database.CompileQuery[TResult](Expression query, Boolean async)
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.CompileQueryCore[TResult](IDatabase database, Expression query, IModel model, Boolean async)
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.<>c__DisplayClass12_0`1.<ExecuteAsync>b__0()
+   at Microsoft.EntityFrameworkCore.Query.Internal.CompiledQueryCache.GetOrAddQuery[TResult](Object cacheKey, Func`1 compiler)
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.ExecuteAsync[TResult](Expression query, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.Internal.EntityQueryProvider.ExecuteAsync[TResult](Expression expression, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ExecuteAsync[TSource,TResult](MethodInfo operatorMethodInfo, IQueryable`1 source, Expression expression, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ExecuteAsync[TSource,TResult](MethodInfo operatorMethodInfo, IQueryable`1 source, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstOrDefaultAsync[TSource](IQueryable`1 source, CancellationToken cancellationToken)
+   at Bunkering.Access.DAL.Repository`1.FirstOrDefaultAsync(Expression`1 expression, String includeProperties)
+   at Bunkering.Access.Services.PaymentService.ConfirmPayment(Int32 id) in C:\Users\anyan\Documents\Visual Studio 2022\Projects\BUNKERING\BunkeringBEnd\Bunkering.Access\Services\PaymentService.cs:line 143
+2023-08-17T13:32:04.7601403+02:00 [ERR] () Data is Null. This method or property cannot be called on Null values. 
+  
+    at Microsoft.Data.SqlClient.SqlBuffer.ThrowIfNull()
+   at Microsoft.Data.SqlClient.SqlBuffer.get_Int32()
+   at Microsoft.Data.SqlClient.SqlDataReader.GetInt32(Int32 i)
+   at lambda_method390(Closure, QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+   at Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)
+   at Bunkering.Access.DAL.Repository`1.FirstOrDefaultAsync(Expression`1 expression, String includeProperties)
+   at Bunkering.Access.Services.PaymentService.ConfirmPayment(Int32 id)
+2023-08-17T13:32:41.5874267+02:00 [ERR] () An error was generated for warning 'Microsoft.EntityFrameworkCore.Query.InvalidIncludePathError': Unable to find navigation 'Payments' specified in string based include path 'Payments'. This exception can be suppressed or logged by passing event ID 'CoreEventId.InvalidIncludePathError' to the 'ConfigureWarnings' method in 'DbContext.OnConfiguring' or 'AddDbContext'. 
+  
+    at Microsoft.EntityFrameworkCore.Diagnostics.EventDefinition`2.Log[TLoggerCategory](IDiagnosticsLogger`1 logger, TParam1 arg1, TParam2 arg2)
+   at Microsoft.EntityFrameworkCore.Diagnostics.CoreLoggerExtensions.InvalidIncludePathError(IDiagnosticsLogger`1 diagnostics, String navigationChain, String navigationName)
+   at Microsoft.EntityFrameworkCore.Query.Internal.NavigationExpandingExpressionVisitor.ProcessInclude(NavigationExpansionExpression source, Expression expression, Boolean thenInclude, Boolean setLoaded)
+   at Microsoft.EntityFrameworkCore.Query.Internal.NavigationExpandingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at Microsoft.EntityFrameworkCore.Query.Internal.NavigationExpandingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at Microsoft.EntityFrameworkCore.Query.Internal.NavigationExpandingExpressionVisitor.Expand(Expression query)
+   at Microsoft.EntityFrameworkCore.Query.QueryTranslationPreprocessor.Process(Expression query)
+   at Microsoft.EntityFrameworkCore.Query.QueryCompilationContext.CreateQueryExecutor[TResult](Expression query)
+   at Microsoft.EntityFrameworkCore.Storage.Database.CompileQuery[TResult](Expression query, Boolean async)
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.CompileQueryCore[TResult](IDatabase database, Expression query, IModel model, Boolean async)
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.<>c__DisplayClass12_0`1.<ExecuteAsync>b__0()
+   at Microsoft.EntityFrameworkCore.Query.Internal.CompiledQueryCache.GetOrAddQuery[TResult](Object cacheKey, Func`1 compiler)
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.ExecuteAsync[TResult](Expression query, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.Internal.EntityQueryProvider.ExecuteAsync[TResult](Expression expression, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ExecuteAsync[TSource,TResult](MethodInfo operatorMethodInfo, IQueryable`1 source, Expression expression, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ExecuteAsync[TSource,TResult](MethodInfo operatorMethodInfo, IQueryable`1 source, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstOrDefaultAsync[TSource](IQueryable`1 source, CancellationToken cancellationToken)
+   at Bunkering.Access.DAL.Repository`1.FirstOrDefaultAsync(Expression`1 expression, String includeProperties)
+   at Bunkering.Access.Services.PaymentService.ConfirmPayment(Int32 id)
+2023-08-17T13:32:48.2876377+02:00 [ERR] () Data is Null. This method or property cannot be called on Null values. 
+  
+    at Microsoft.Data.SqlClient.SqlBuffer.ThrowIfNull()
+   at Microsoft.Data.SqlClient.SqlBuffer.get_Int32()
+   at Microsoft.Data.SqlClient.SqlDataReader.GetInt32(Int32 i)
+   at lambda_method436(Closure, QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+   at Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)
+   at Bunkering.Access.DAL.Repository`1.FirstOrDefaultAsync(Expression`1 expression, String includeProperties)
+   at Bunkering.Access.Services.PaymentService.ConfirmPayment(Int32 id)
+2023-08-17T13:33:52.2483876+02:00 [ERR] () Data is Null. This method or property cannot be called on Null values. 
+  
+    at Microsoft.Data.SqlClient.SqlBuffer.ThrowIfNull()
+   at Microsoft.Data.SqlClient.SqlBuffer.get_Int32()
+   at Microsoft.Data.SqlClient.SqlDataReader.GetInt32(Int32 i)
+   at lambda_method436(Closure, QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+   at Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)
+   at Bunkering.Access.DAL.Repository`1.FirstOrDefaultAsync(Expression`1 expression, String includeProperties)
+   at Bunkering.Access.Services.PaymentService.ConfirmPayment(Int32 id)
+2023-08-17T13:34:15.2813595+02:00 [ERR] () Data is Null. This method or property cannot be called on Null values. 
+  
+    at Microsoft.Data.SqlClient.SqlBuffer.ThrowIfNull()
+   at Microsoft.Data.SqlClient.SqlBuffer.get_Int32()
+   at Microsoft.Data.SqlClient.SqlDataReader.GetInt32(Int32 i)
+   at lambda_method447(Closure, QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+   at Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)
+   at Bunkering.Access.DAL.Repository`1.FirstOrDefaultAsync(Expression`1 expression, String includeProperties)
+   at Bunkering.Access.Services.PaymentService.ConfirmPayment(Int32 id)
+2023-08-17T13:36:26.1063772+02:00 [ERR] () Data is Null. This method or property cannot be called on Null values. 
+  
+    at Microsoft.Data.SqlClient.SqlBuffer.ThrowIfNull()
+   at Microsoft.Data.SqlClient.SqlBuffer.get_Int32()
+   at Microsoft.Data.SqlClient.SqlDataReader.GetInt32(Int32 i)
+   at lambda_method459(Closure, QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+   at Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)
+   at Bunkering.Access.DAL.Repository`1.FirstOrDefaultAsync(Expression`1 expression, String includeProperties)
+   at Bunkering.Access.Services.PaymentService.ConfirmPayment(Int32 id)
+2023-08-17T13:36:48.4784210+02:00 [ERR] () Data is Null. This method or property cannot be called on Null values. 
+  
+    at Microsoft.Data.SqlClient.SqlBuffer.ThrowIfNull()
+   at Microsoft.Data.SqlClient.SqlBuffer.get_Int32()
+   at Microsoft.Data.SqlClient.SqlDataReader.GetInt32(Int32 i)
+   at lambda_method459(Closure, QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+   at Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)
+   at Bunkering.Access.DAL.Repository`1.FirstOrDefaultAsync(Expression`1 expression, String includeProperties)
+   at Bunkering.Access.Services.PaymentService.ConfirmPayment(Int32 id)
+2023-08-17T13:48:37.1634322+02:00 [ERR] () An error occurred while saving the entity changes. See the inner exception for details. 
+ Microsoft.Data.SqlClient.SqlException (0x80131904): Cannot insert the value NULL into column 'AppReceiptId', table 'BUNKERING1.dbo.Payments'; column does not allow nulls. UPDATE fails.
+   at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at Microsoft.Data.SqlClient.SqlDataReader.TryHasMoreRows(Boolean& moreRows)
+   at Microsoft.Data.SqlClient.SqlDataReader.TryReadInternal(Boolean setTimeout, Boolean& more)
+   at Microsoft.Data.SqlClient.SqlDataReader.ReadAsyncExecute(Task task, Object state)
+   at Microsoft.Data.SqlClient.SqlDataReader.InvokeAsyncCall[T](SqlDataReaderAsyncCallContext`1 context)
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.ConsumeResultSetWithRowsAffectedOnlyAsync(Int32 commandIndex, RelationalDataReader reader, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.ConsumeAsync(RelationalDataReader reader, CancellationToken cancellationToken)
+ClientConnectionId:16c08fc8-8800-4f9e-a67a-edeaa8949521
+Error Number:515,State:2,Class:16 
+    at Microsoft.EntityFrameworkCore.Update.AffectedCountModificationCommandBatch.ConsumeAsync(RelationalDataReader reader, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.SqlServer.Update.Internal.SqlServerModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(IList`1 entriesToSave, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(StateManager stateManager, Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+   at Bunkering.Core.Data.ApplicationContext.SaveChangesAsync(String userId) in C:\Users\anyan\Documents\Visual Studio 2022\Projects\BUNKERING\BunkeringBEnd\Bunkering.Core\Data\ApplicationContext.cs:line 66
+   at Bunkering.Access.DAL.UnitOfWork.SaveChangesAsync(String userId) in C:\Users\anyan\Documents\Visual Studio 2022\Projects\BUNKERING\BunkeringBEnd\Bunkering.Access\DAL\UnitOfWork.cs:line 59
+   at Bunkering.Access.Services.PaymentService.ConfirmPayment(Int32 id) in C:\Users\anyan\Documents\Visual Studio 2022\Projects\BUNKERING\BunkeringBEnd\Bunkering.Access\Services\PaymentService.cs:line 169
+2023-08-17T13:51:54.9102904+02:00 [INF] () "Getting payment for company application -:214081723131205 by  - 8/17/2023 1:51:54 PM
+2023-08-17T13:57:26.0719289+02:00 [ERR] () Invalid column name 'OrderId'. 
+  
+    at Microsoft.Data.SqlClient.SqlCommand.<>c.<ExecuteDbDataReaderAsync>b__208_0(Task`1 result)
+   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.InitializeReaderAsync(AsyncEnumerator enumerator, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+   at Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)
+   at Bunkering.Access.DAL.Repository`1.FirstOrDefaultAsync(Expression`1 expression, String includeProperties) in C:\Users\anyan\Documents\Visual Studio 2022\Projects\BUNKERING\BunkeringBEnd\Bunkering.Access\DAL\Repository.cs:line 70
+   at Bunkering.Access.Services.PaymentService.ConfirmPayment(Int32 id, String orderId) in C:\Users\anyan\Documents\Visual Studio 2022\Projects\BUNKERING\BunkeringBEnd\Bunkering.Access\Services\PaymentService.cs:line 143
+2023-08-17T14:11:18.0177764+02:00 [INF] () Creation of payment split for application with reference:214081723140739(Dammie Newworks Marshal) by drayprogrammer45@yahoo.com
+2023-08-17T14:11:18.1077630+02:00 [INF] () Payment table updated with RRR: 220796678495 by drayprogrammer45@yahoo.com
+2023-08-17T14:14:37.1796141+02:00 [INF] () "Getting payment for company application -:214081723140739 by  - 8/17/2023 2:14:37 PM
+2023-08-17T15:42:13.9989931+02:00 [INF] () "Getting payment for company application -:214081723140739 bydrayprogrammer45@yahoo.com  - 8/17/2023 3:42:13 PM
+2023-08-17T16:07:27.2016740+02:00 [INF] () "Getting payment for company application -:214081723131205 bydrayprogrammer45@yahoo.com  - 8/17/2023 4:07:27 PM
+2023-08-17T16:07:45.3963560+02:00 [INF] () "Getting payment for company application -:214081723123846 bydrayprogrammer45@yahoo.com  - 8/17/2023 4:07:45 PM
+2023-08-17T16:08:03.1121486+02:00 [INF] () "Getting payment for company application -:214081723121748 bydrayprogrammer45@yahoo.com  - 8/17/2023 4:08:03 PM
+2023-08-17T16:08:20.5517221+02:00 [INF] () "Getting payment for company application -:214081723120523 bydrayprogrammer45@yahoo.com  - 8/17/2023 4:08:20 PM
+2023-08-17T16:08:40.7208915+02:00 [INF] () "Getting payment for company application -:214081623121410 bydrayprogrammer45@yahoo.com  - 8/17/2023 4:08:40 PM
+2023-08-17T16:08:55.5276245+02:00 [INF] () "Getting payment for company application -:214081523130221 bydrayprogrammer45@yahoo.com  - 8/17/2023 4:08:55 PM
+2023-08-17T16:10:27.3860500+02:00 [INF] () "Getting payment for company application -:214081523130221 bydrayprogrammer45@yahoo.com  - 8/17/2023 4:10:27 PM
+2023-08-17T16:14:06.2316012+02:00 [INF] () "Getting payment for company application -:214081523130221 bydrayprogrammer45@yahoo.com  - 8/17/2023 4:14:06 PM
+2023-08-17T16:36:10.7526490+02:00 [INF] () "Getting payment for company application -:214081523130221 bydrayprogrammer45@yahoo.com  - 8/17/2023 4:36:10 PM
+2023-08-17T16:42:15.8387264+02:00 [INF] () "Getting payment for company application -:214081523130221 bydrayprogrammer45@yahoo.com  - 8/17/2023 4:42:15 PM
+2023-08-17T16:43:26.4891839+02:00 [INF] () "Getting payment for company application -:214081523130221 bydrayprogrammer45@yahoo.com  - 8/17/2023 4:43:26 PM

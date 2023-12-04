@@ -1,0 +1,28 @@
+2023-10-30T15:23:13.1674796+01:00 [ERR] () Nullable object must have a value.
+
+   at System.Nullable`1.get_Value()
+   at Bunkering.Access.Services.AppService.CreateFacility(ApplictionViewModel model, ApplicationUser user) in C:\Users\anyan\Documents\Visual Studio 2022\Projects\BUNKERING\BunkeringBEnd\Bunkering.Access\Services\AppService.cs:line 64
+2023-10-30T15:28:03.7133399+01:00 [ERR] () Nullable object must have a value.
+
+   at System.Nullable`1.get_Value()
+   at Bunkering.Access.Services.AppService.CreateFacility(ApplictionViewModel model, ApplicationUser user) in C:\Users\anyan\Documents\Visual Studio 2022\Projects\BUNKERING\BunkeringBEnd\Bunkering.Access\Services\AppService.cs:line 64
+2023-10-30T15:28:40.3408211+01:00 [ERR] () Nullable object must have a value.
+
+   at System.Nullable`1.get_Value()
+   at Bunkering.Access.Services.AppService.CreateFacility(ApplictionViewModel model, ApplicationUser user) in C:\Users\anyan\Documents\Visual Studio 2022\Projects\BUNKERING\BunkeringBEnd\Bunkering.Access\Services\AppService.cs:line 64
+2023-10-30T15:31:10.1598358+01:00 [ERR] () Nullable object must have a value.
+
+   at System.Nullable`1.get_Value()
+   at Bunkering.Access.Services.AppService.CreateFacility(ApplictionViewModel model, ApplicationUser user) in C:\Users\anyan\Documents\Visual Studio 2022\Projects\BUNKERING\BunkeringBEnd\Bunkering.Access\Services\AppService.cs:line 64
+2023-10-30T15:32:30.6742570+01:00 [ERR] () Nullable object must have a value.
+
+   at System.Nullable`1.get_Value()
+   at Bunkering.Access.Services.AppService.CreateFacility(ApplictionViewModel model, ApplicationUser user) in C:\Users\anyan\Documents\Visual Studio 2022\Projects\BUNKERING\BunkeringBEnd\Bunkering.Access\Services\AppService.cs:line 64
+2023-10-30T15:35:54.9340781+01:00 [ERR] () Nullable object must have a value.
+
+   at System.Nullable`1.get_Value()
+   at Bunkering.Access.Services.AppService.CreateFacility(ApplictionViewModel model, ApplicationUser user) in C:\Users\anyan\Documents\Visual Studio 2022\Projects\BUNKERING\BunkeringBEnd\Bunkering.Access\Services\AppService.cs:line 64
+2023-10-30T15:39:01.1977148+01:00 [ERR] () Nullable object must have a value.
+
+   at System.Nullable`1.get_Value()
+   at Bunkering.Access.Services.AppService.CreateFacility(ApplictionViewModel model, ApplicationUser user) in C:\Users\anyan\Documents\Visual Studio 2022\Projects\BUNKERING\BunkeringBEnd\Bunkering.Access\Services\AppService.cs:line 64
