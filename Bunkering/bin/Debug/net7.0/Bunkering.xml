@@ -1013,41 +1013,5 @@
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
         </member>
-        <member name="T:Bunkering.Migrations.initial">
-            <inheritdoc />
-        </member>
-        <member name="M:Bunkering.Migrations.initial.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="M:Bunkering.Migrations.initial.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="M:Bunkering.Migrations.initial.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="T:Bunkering.Migrations.datetimeuser">
-            <inheritdoc />
-        </member>
-        <member name="M:Bunkering.Migrations.datetimeuser.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="M:Bunkering.Migrations.datetimeuser.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="M:Bunkering.Migrations.datetimeuser.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="T:Bunkering.Migrations.facsource">
-            <inheritdoc />
-        </member>
-        <member name="M:Bunkering.Migrations.facsource.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="M:Bunkering.Migrations.facsource.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
-            <inheritdoc />
-        </member>
-        <member name="M:Bunkering.Migrations.facsource.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
-            <inheritdoc />
-        </member>
     </members>
 </doc>

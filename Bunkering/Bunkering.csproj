@@ -9,9 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Pages\**" />
     <Compile Remove="ViewModels\**" />
+    <Content Remove="Pages\**" />
     <Content Remove="ViewModels\**" />
+    <EmbeddedResource Remove="Pages\**" />
     <EmbeddedResource Remove="ViewModels\**" />
+    <None Remove="Pages\**" />
     <None Remove="ViewModels\**" />
   </ItemGroup>
 
@@ -31,6 +35,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.8" />
     <PackageReference Include="Rotativa.AspNetCore" Version="1.2.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
@@ -38,7 +46,6 @@
 
   <ItemGroup>
     <Folder Include="ApiLogs\" />
-    <Folder Include="Pages\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -67,7 +67,7 @@ builder.Services.AddSwaggerGen(options =>
 	options.SwaggerDoc("v1", new OpenApiInfo
 	{
 		Version = "v1",
-		Title = "Bunkering API",
+		Title = "CVC API",
 		Description = "Authorized Tasks API using JWT Authentication and refresh Tokens",
 		TermsOfService = new Uri("https://nmdpra.gov.ng"),
 		Contact = new OpenApiContact
@@ -135,7 +135,7 @@ RotativaConfiguration.Setup(builder.Environment.WebRootPath);
 app.UseSwagger();
 app.UseSwaggerUI(x =>
 {
-	x.SwaggerEndpoint("/swagger/v1/swagger.json", "Bunkering Api");
+	x.SwaggerEndpoint("/swagger/v1/swagger.json", "CVC Api");
 });
 
 app.UseCors(x => x

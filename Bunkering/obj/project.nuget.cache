@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "vNuwCnP10QJio+Kk8Itldj6dpuYpODe6BHRlCqGLzURuqmyttQnGL9zZyleWVpf9ng3SsSQRMrT80YjXZadyIw==",
+  "dgSpecHash": "70bJr0mFIJ8/6mprQq3/DEliHW39Tp5foUW6xOkIFUVI1cYD49CC6iNev3j7Ed5K+45xx3CRJXe78SJ9bLSXvQ==",
   "success": true,
   "projectFilePath": "C:\\BrandOne\\CVC\\Bunkering\\Bunkering.csproj",
   "expectedPackageFiles": [
@@ -128,6 +128,7 @@
     "C:\\Users\\DABERECHI\\.nuget\\packages\\microsoft.entityframeworkcore.design\\7.0.2\\microsoft.entityframeworkcore.design.7.0.2.nupkg.sha512",
     "C:\\Users\\DABERECHI\\.nuget\\packages\\microsoft.entityframeworkcore.relational\\7.0.2\\microsoft.entityframeworkcore.relational.7.0.2.nupkg.sha512",
     "C:\\Users\\DABERECHI\\.nuget\\packages\\microsoft.entityframeworkcore.sqlserver\\7.0.2\\microsoft.entityframeworkcore.sqlserver.7.0.2.nupkg.sha512",
+    "C:\\Users\\DABERECHI\\.nuget\\packages\\microsoft.entityframeworkcore.tools\\7.0.2\\microsoft.entityframeworkcore.tools.7.0.2.nupkg.sha512",
     "C:\\Users\\DABERECHI\\.nuget\\packages\\microsoft.extensions.apidescription.server\\3.0.0\\microsoft.extensions.apidescription.server.3.0.0.nupkg.sha512",
     "C:\\Users\\DABERECHI\\.nuget\\packages\\microsoft.extensions.caching.abstractions\\7.0.0\\microsoft.extensions.caching.abstractions.7.0.0.nupkg.sha512",
     "C:\\Users\\DABERECHI\\.nuget\\packages\\microsoft.extensions.caching.memory\\7.0.0\\microsoft.extensions.caching.memory.7.0.0.nupkg.sha512",
