@@ -5,18 +5,20 @@
     [VesselTypeId] INT             NOT NULL,
     [Name]         NVARCHAR (MAX)  NOT NULL,
     [IMONumber]    NVARCHAR (MAX)  NOT NULL,
-    [CallSIgn]     NVARCHAR (MAX)  NOT NULL,
-    [Flag]         NVARCHAR (MAX)  NOT NULL,
-    [YearOfBuild]  INT             NOT NULL,
-    [PlaceOfBuild] NVARCHAR (MAX)  NOT NULL,
+    [CallSIgn]     NVARCHAR (MAX)  NULL,
+    [Flag]         NVARCHAR (MAX)  NULL,
+    [YearOfBuild]  INT             NULL,
+    [PlaceOfBuild] NVARCHAR (MAX)  NULL,
     [IsLicensed]   BIT             NOT NULL,
-    [DeadWeight]   DECIMAL (18, 2) NOT NULL,
-    [Capacity]     DECIMAL (18, 2) NOT NULL,
-    [Operator]     NVARCHAR (MAX)  NOT NULL,
+    [DeadWeight]   DECIMAL (18, 2) NULL,
+    [Capacity]     DECIMAL (18, 2) NULL,
+    [Operator]     NVARCHAR (MAX)  NULL,
     CONSTRAINT [PK_Facilities] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_Facilities_Companies_CompanyId] FOREIGN KEY ([CompanyId]) REFERENCES [dbo].[Companies] ([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_Facilities_VesselTypes_VesselTypeId] FOREIGN KEY ([VesselTypeId]) REFERENCES [dbo].[VesselTypes] ([Id]) ON DELETE CASCADE
 );
+
+
 
 
 

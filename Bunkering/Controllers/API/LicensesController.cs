@@ -9,7 +9,7 @@ using System.Net;
 namespace Bunkering.Controllers.API
 {
 	[Authorize]
-	[Route("api/bunkering/[controller]")]
+	[Route("api/[controller]")]
 	[ApiController]
 	public class LicensesController : ResponseController
 	{

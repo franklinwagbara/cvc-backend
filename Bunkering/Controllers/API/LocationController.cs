@@ -8,7 +8,7 @@ namespace Bunkering.Controllers.API
 {
 	[AllowAnonymous]
 	[ApiController]
-	[Route("api/bunkering/[controller]")]
+	[Route("api/[controller]")]
 	public class LocationController : ResponseController
 	{
 		private readonly LocationService _locationService;

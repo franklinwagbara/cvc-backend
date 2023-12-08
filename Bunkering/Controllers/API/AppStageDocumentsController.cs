@@ -9,7 +9,7 @@ namespace Bunkering.Controllers.API
 {
 	[Authorize]
 	[ApiController]
-	[Route("api/bunkering/[controller]")]
+	[Route("api/[controller]")]
 	public class AppStageDocumentsController : ResponseController
 	{
 		private readonly AppStageDocService _appDocService;

@@ -8,7 +8,7 @@ namespace Bunkering.Controllers.API
 {
 	[Authorize]
 	[ApiController]
-	[Route("api/bunkering/[controller]")]
+	[Route("api/[controller]")]
 	public class CompanyController : ResponseController
 	{
 		private readonly CompanyService _companySrevice;

@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 namespace Bunkering.Controllers.API
 {
 	[Authorize]
-	[Route("api/bunkering/[controller]")]
+	[Route("api/[controller]")]
 	[ApiController]
 	public class PaymentController : ResponseController
 	{

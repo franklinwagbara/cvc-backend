@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bunkering.Controllers.API
 {
-    [Route("api/bunkering/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class InspectionController : ControllerBase
     {
