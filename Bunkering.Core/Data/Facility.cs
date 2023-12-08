@@ -19,15 +19,15 @@ namespace Bunkering.Core.Data
         public string IMONumber { get; set; }
         public string CallSIgn { get; set; }
         public string Flag { get; set; }
-        public int YearOfBuild { get; set; }
+        public int? YearOfBuild { get; set; }
         public string PlaceOfBuild { get; set; }
         public bool IsLicensed { get; set; }
 		[ForeignKey(nameof(CompanyId))]
 		public Company Company { get; set; }
 		[ForeignKey(nameof(VesselTypeId))]
 		public VesselType VesselType { get; set; }
-		public decimal DeadWeight { get; set; }
-		public decimal Capacity { get; set; }
+		public decimal? DeadWeight { get; set; }
+		public decimal? Capacity { get; set; }
 		public string Operator { get; set; }
 		public virtual ICollection<FacilitySource> FacilitySources { get; set; }
 		public ICollection<Tank> Tanks { get; set; }
