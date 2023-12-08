@@ -100,6 +100,74 @@ namespace Bunkering.Access.Services
 
         }
 
+
+        //method to get all states
+        public async Task<ApiResponse> GetAllStatesInNigeria()
+        {
+            try
+            {
+                int? countryId = (await unitOfWork_.Country.GetAll()).FirstOrDefault(x => x.Name.Contains("Nigeria"))?.Id;
+
+                if (countryId == null)
+                {
+                    response = new ApiResponse
+                    {
+                        Success = false,
+                        StatusCode = HttpStatusCode.BadRequest,
+                        Message = "Nigeria is not configured as a country on the system"
+                    };
+
+                }
+
+                //get states from db
+                var allStates = (await unitOfWork_.State.GetAll()).Where(x => x.CountryId == countryId).Select(s => new StatesViewModel
+                {
+                    Name = s.Name,
+                    Code = s.Code,
+                    Id = s.Id,
+                    CountryID = s.CountryId,
+                    CountryName = s.Name
+                }).OrderBy(a => a.Name);
+
+                if (allStates != null)
+                {
+                    response = new ApiResponse()
+                    {
+                        Message = "Success",
+                        StatusCode = HttpStatusCode.OK,
+                        Success = true,
+                        Data = allStates.ToArray()
+                    };
+
+
+                }
+                else
+                {
+                    response = new ApiResponse
+                    {
+                        Success = false,
+                        StatusCode = HttpStatusCode.BadRequest,
+                        Message = "Invalid Data Call"
+                    };
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                response = new ApiResponse
+                {
+                    Message = ex.Message,
+                    StatusCode = HttpStatusCode.InternalServerError,
+                };
+            }
+
+
+            return response;
+
+
+        }
+
         public async Task<ApiResponse> GetLocalGov()
 
         {
