@@ -114,6 +114,7 @@ namespace Bunkering.Access.Services
             {
                 //querying the database to retrieve a user along with their associated roles
                 var user = _userManager.Users.Include(ur => ur.UserRoles).ThenInclude(r => r.Role).FirstOrDefault(x => x.Email.Equals(User));
+                var prodExist = _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(model.ProductId));
                 //var user = _userManager.Users.Include(c => c.Company).FirstOrDefault(x => x.Email.ToLower().Equals(User.Identity.Name));
                 if ((await _unitOfWork.Application.Find(x => x.Facility.Name.ToLower().Equals(model.FacilityName.ToLower())
                          && x.Facility.VesselTypeId.Equals(model.VesselTypeId) && x.UserId.Equals(user.Id), "Facility")).Any())
@@ -123,8 +124,9 @@ namespace Bunkering.Access.Services
                         StatusCode = HttpStatusCode.Found,
                         Success = false
                     };
-                else
+                else if (prodExist == null)
                 {
+
                     var facility = await CreateFacility(model, user);
                     if (facility != null)
                     {
@@ -153,6 +155,8 @@ namespace Bunkering.Access.Services
                             Data = new { appId = app.Id },
                             Success = true
                         };
+
+
                     }
                     else
                         _response = new ApiResponse
@@ -161,8 +165,19 @@ namespace Bunkering.Access.Services
                             StatusCode = HttpStatusCode.BadRequest,
                             Success = false
                         };
-
                 }
+                else
+                {
+
+                    _response = new ApiResponse
+                    {
+                        Message = "unable to proceed, product does not exist",
+                        StatusCode = HttpStatusCode.NotFound,
+                        Success = false
+                    };
+                }
+
+
             }
             catch (Exception ex)
             {
