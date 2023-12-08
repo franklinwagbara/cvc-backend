@@ -366,3 +366,16 @@ MigrationBackup/
 FodyWeavers.xsd
 /Bunkering.Database/Bunkering.Database.jfm
 /Bunkering.Database/Bunkering.Database.dbmdl
+/Bunkering/obj/Debug/net7.0/Bunkering.AssemblyInfo.cs
+/Bunkering/obj/Debug/net7.0/Bunkering.AssemblyInfoInputs.cache
+/Bunkering/obj/Debug/net7.0/Bunkering.assets.cache
+/Bunkering/obj/Debug/net7.0/Bunkering.csproj.AssemblyReference.cache
+/Bunkering/obj/Debug/net7.0/Bunkering.GeneratedMSBuildEditorConfig.editorconfig
+/Bunkering.Access/obj/Debug/net7.0/Bunkering.Access.AssemblyInfo.cs
+/Bunkering.Access/obj/Debug/net7.0/Bunkering.Access.AssemblyInfoInputs.cache
+/Bunkering.Access/obj/Debug/net7.0/Bunkering.Access.assets.cache
+/Bunkering.Access/obj/Debug/net7.0/Bunkering.Access.csproj.AssemblyReference.cache
+/Bunkering.Access/obj/Debug/net7.0/Bunkering.Access.GeneratedMSBuildEditorConfig.editorconfig
+/Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.assets.cache
+/Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.GeneratedMSBuildEditorConfig.editorconfig
+/Bunkering.Database/obj/Debug/Bunkering.Database.sqlproj.AssemblyReference.cache
