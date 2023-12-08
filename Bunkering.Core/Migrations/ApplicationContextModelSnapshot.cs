@@ -82,6 +82,9 @@ namespace Bunkering.Core.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("DeportStateId")
+                        .HasColumnType("int");
+
                     b.Property<string>("DischargePort")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

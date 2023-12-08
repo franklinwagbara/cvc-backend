@@ -19,12 +19,15 @@
     [MarketerName]      NVARCHAR (MAX) CONSTRAINT [DF__Applicati__Marke__2645B050] DEFAULT (N'') NOT NULL,
     [ProductId]         INT            CONSTRAINT [DF__Applicati__Produ__2739D489] DEFAULT ((0)) NOT NULL,
     [VesselName]        NVARCHAR (MAX) CONSTRAINT [DF__Applicati__Vesse__282DF8C2] DEFAULT (N'') NOT NULL,
+    [DeportStateId]     INT            DEFAULT ((0)) NOT NULL,
     CONSTRAINT [PK_Applications] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_Applications_ApplicationTypes_ApplicationTypeId] FOREIGN KEY ([ApplicationTypeId]) REFERENCES [dbo].[ApplicationTypes] ([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_Applications_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [dbo].[AspNetUsers] ([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_Applications_Facilities_FacilityId] FOREIGN KEY ([FacilityId]) REFERENCES [dbo].[Facilities] ([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_Applications_WorkFlows_FlowId] FOREIGN KEY ([FlowId]) REFERENCES [dbo].[WorkFlows] ([Id])
 );
+
+
 
 
 
