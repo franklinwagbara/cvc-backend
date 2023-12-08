@@ -12,7 +12,7 @@ namespace Bunkering.Controllers.API
 {
     [AllowAnonymous]
     [ApiController]
-    [Route("api/bunkering/[controller]")]
+    [Route("api/[controller]")]
 
     public class LibraryController : ResponseController
     {

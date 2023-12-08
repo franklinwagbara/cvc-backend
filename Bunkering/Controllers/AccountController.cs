@@ -15,7 +15,7 @@ using Microsoft.Extensions.Options;
 namespace Bunkering.Controllers
 {
     //[Authorize]
-    [Route("api/bunkering/[controller]")]
+    [Route("api/[controller]")]
     public class AccountController : ResponseController
     {
         private readonly UserManager<ApplicationUser> _userManager;
