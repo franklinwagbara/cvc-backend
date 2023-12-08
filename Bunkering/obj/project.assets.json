@@ -13678,43 +13678,38 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\DABERECHI\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
-    "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\": {}
+    "C:\\Users\\mahmo\\.nuget\\packages\\": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\BrandOne\\CVC\\Bunkering\\Bunkering.csproj",
+      "projectUniqueName": "C:\\Users\\mahmo\\source\\repos\\BrandOneTech\\CVCBackEnd\\Bunkering\\Bunkering.csproj",
       "projectName": "Bunkering",
-      "projectPath": "C:\\BrandOne\\CVC\\Bunkering\\Bunkering.csproj",
-      "packagesPath": "C:\\Users\\DABERECHI\\.nuget\\packages\\",
-      "outputPath": "C:\\BrandOne\\CVC\\Bunkering\\obj\\",
+      "projectPath": "C:\\Users\\mahmo\\source\\repos\\BrandOneTech\\CVCBackEnd\\Bunkering\\Bunkering.csproj",
+      "packagesPath": "C:\\Users\\mahmo\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\mahmo\\source\\repos\\BrandOneTech\\CVCBackEnd\\Bunkering\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-        "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\DABERECHI\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+        "C:\\Users\\mahmo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net7.0"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net7.0": {
           "targetAlias": "net7.0",
           "projectReferences": {
-            "C:\\BrandOne\\CVC\\Bunkering.Access\\Bunkering.Access.csproj": {
-              "projectPath": "C:\\BrandOne\\CVC\\Bunkering.Access\\Bunkering.Access.csproj"
+            "C:\\Users\\mahmo\\source\\repos\\BrandOneTech\\CVCBackEnd\\Bunkering.Access\\Bunkering.Access.csproj": {
+              "projectPath": "C:\\Users\\mahmo\\source\\repos\\BrandOneTech\\CVCBackEnd\\Bunkering.Access\\Bunkering.Access.csproj"
             }
           }
         }
@@ -13723,6 +13718,9 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "default"
       }
     },
     "frameworks": {

@@ -77,7 +77,7 @@ namespace Bunkering.Access.Services
                     PlaceOfBuild = model.PlaceOfBuild,
                     YearOfBuild = model.YearOfBuild,
                 };
-                var lga = await _unitOfWork.LGA.FirstOrDefaultAsync(x => x.State.Name.Contains("lagos"), "State");
+                var lga = await _unitOfWork.LGA.FirstOrDefaultAsync(x => x.State.Name.ToLower().Contains("lagos"), "State");
 
                 var facElps = _elps.CreateElpsFacility(new
                 {
