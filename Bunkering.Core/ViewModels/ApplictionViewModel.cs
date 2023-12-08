@@ -19,15 +19,17 @@ namespace Bunkering.Core.ViewModels
         //public decimal DeadWeight { get; set; }
         //public string Operator { get; set; }
         //public List<FacilitySourceDto> FacilitySources { get; set; }
-        //public List<TankViewModel> TankList { get; set; }
+        
 
         public string VesselName { get; set; }
         public string LoadingPort { get; set; }
         public string DischargePort { get; set; }
 
         public string MarketerName { get; set; }
-        public int ProductId { get; set; }
+        //public int ProductId { get; set; }
 
         public int DeportStateId { get; set; }
+
+        public List<TankViewModel> TankList { get; set; }
     }
 }

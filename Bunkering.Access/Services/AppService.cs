@@ -137,18 +137,17 @@ namespace Bunkering.Access.Services
                             Reference = Utils.RefrenceCode(),
                             UserId = user.Id,
                             FacilityId = facility.Id,
-                            Status = Enum.GetName(typeof(AppStatus), 1),
+                            Status = Enum.GetName(typeof(AppStatus), 0),
                             VesselName = model.VesselName,
                             LoadingPort = model.LoadingPort,
                             DischargePort = model.DischargePort,
                             MarketerName = model.MarketerName,
-                            ProductId = model.ProductId,
                             IMONumber = model.IMONumber,
                         };
                         await _unitOfWork.Application.Add(app);
                         await _unitOfWork.SaveChangesAsync(app.UserId);
                         //save app tanks
-                        //var tank = await AppTanks(model.AppTanks, facility.Id, user.Id);
+                        var tank = await AppTanks(model.TankList, facility.Id);
 
 
                         //await _flow.AppWorkFlow(app.Id, Enum.GetName(typeof(AppActions), AppActions.Initiate), "Application Created");
