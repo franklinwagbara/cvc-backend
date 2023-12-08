@@ -59,6 +59,12 @@ builder.Services.AddAuthentication(x =>
 		config.ExpireTimeSpan = TimeSpan.FromHours(1);
 		config.SlidingExpiration = true;
 	});
+builder.Services.AddAuthorization(options =>
+{
+	options.AddPolicy(PolicyConstants.COMPANY_POLICY, policy => policy.RequireRole("Company"));
+	options.AddPolicy(PolicyConstants.COMPANY_AND_ADMIN_POLICY, policy => policy.RequireRole("Company","Admin"));
+	options.AddPolicy(PolicyConstants.APPROVAL_POLICY, policy => policy.RequireRole("Inspector", "Reviewer","Ace"));
+});
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllers();
