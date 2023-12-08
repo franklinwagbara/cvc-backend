@@ -61,9 +61,9 @@ builder.Services.AddAuthentication(x =>
 	});
 builder.Services.AddAuthorization(options =>
 {
-	options.AddPolicy(PolicyConstants.COMPANY_POLICY, policy => policy.RequireRole("Company"));
-	options.AddPolicy(PolicyConstants.COMPANY_AND_ADMIN_POLICY, policy => policy.RequireRole("Company","Admin"));
-	options.AddPolicy(PolicyConstants.APPROVAL_POLICY, policy => policy.RequireRole("Inspector", "Reviewer","Ace"));
+	options.AddPolicy(PolicyConstants.COMPANY, policy => policy.RequireRole(RoleConstants.COMPANY));
+	options.AddPolicy(PolicyConstants.STAFF, policy => policy.RequireRole(RoleConstants.REVIEWER, RoleConstants.SUPERVISOR));
+	options.AddPolicy(PolicyConstants.ADMIN, policy => policy.RequireRole(RoleConstants.SUPER_ADMIN));
 });
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddEndpointsApiExplorer();
