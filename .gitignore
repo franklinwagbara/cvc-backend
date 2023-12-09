@@ -4,3 +4,7 @@
 
 /Bunkering.Database/Bunkering.Database.jfm
 /Bunkering.Database/Bunkering.Database.dbmdl
+*.cache
+*.cache
+*.vsidx
+*.cache
