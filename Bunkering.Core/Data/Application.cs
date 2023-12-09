@@ -13,7 +13,6 @@ namespace Bunkering.Core.Data
         public int ApplicationTypeId { get; set; }
         public string UserId { get; set; }
         public int FacilityId { get; set; }
-        public int ProductId { get; set; }
         public string Reference { get; set; }
         public string CurrentDeskId { get; set; }
         public string? FADStaffId { get; set; }
