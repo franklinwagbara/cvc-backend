@@ -463,3 +463,9 @@ FodyWeavers.xsd
 *.v2
 *.bin
 *.cache
+.bin
+.obj
+.cache
+.dll
+.pdb
+.suo
