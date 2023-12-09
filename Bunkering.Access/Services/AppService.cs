@@ -114,17 +114,15 @@ namespace Bunkering.Access.Services
             {
                 //querying the database to retrieve a user along with their associated roles
                 var user = _userManager.Users.Include(ur => ur.UserRoles).ThenInclude(r => r.Role).FirstOrDefault(x => x.Email.Equals(User));
-                var prodExist = _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(model.ProductId));
                 //var user = _userManager.Users.Include(c => c.Company).FirstOrDefault(x => x.Email.ToLower().Equals(User.Identity.Name));
-                if ((await _unitOfWork.Application.Find(x => x.Facility.Name.ToLower().Equals(model.FacilityName.ToLower())
-                         && x.Facility.VesselTypeId.Equals(model.VesselTypeId) && x.UserId.Equals(user.Id), "Facility")).Any())
+                if ((await _unitOfWork.Application.Find(x => x.Facility.VesselTypeId.Equals(model.VesselTypeId) && x.UserId.Equals(user.Id))).Any())
                     _response = new ApiResponse
                     {
                         Message = "There is an existing application for this facility, you are not allowed to use license the same vessel twice",
                         StatusCode = HttpStatusCode.Found,
                         Success = false
                     };
-                else if (prodExist == null)
+                else
                 {
 
                     var facility = await CreateFacility(model, user);
@@ -171,10 +169,7 @@ namespace Bunkering.Access.Services
                             Success = false
                         };
                 }
-                else
-                {
 
-                }
             }
             catch (Exception ex)
             {
