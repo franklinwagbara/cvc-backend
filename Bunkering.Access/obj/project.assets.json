@@ -4266,24 +4266,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\anyan\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\modib\\.nuget\\packages\\": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\anyan\\Documents\\Visual Studio 2022\\Projects\\CVCBackEnd\\CVCBackEnd\\Bunkering.Access\\Bunkering.Access.csproj",
+      "projectUniqueName": "C:\\Users\\modib\\Documents\\GitHub\\CVCBackEnd\\Bunkering.Access\\Bunkering.Access.csproj",
       "projectName": "Bunkering.Access",
-      "projectPath": "C:\\Users\\anyan\\Documents\\Visual Studio 2022\\Projects\\CVCBackEnd\\CVCBackEnd\\Bunkering.Access\\Bunkering.Access.csproj",
-      "packagesPath": "C:\\Users\\anyan\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\anyan\\Documents\\Visual Studio 2022\\Projects\\CVCBackEnd\\CVCBackEnd\\Bunkering.Access\\obj\\",
+      "projectPath": "C:\\Users\\modib\\Documents\\GitHub\\CVCBackEnd\\Bunkering.Access\\Bunkering.Access.csproj",
+      "packagesPath": "C:\\Users\\modib\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\modib\\Documents\\GitHub\\CVCBackEnd\\Bunkering.Access\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\anyan\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\modib\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -4291,15 +4290,14 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net7.0": {
           "targetAlias": "net7.0",
           "projectReferences": {
-            "C:\\Users\\anyan\\Documents\\Visual Studio 2022\\Projects\\CVCBackEnd\\CVCBackEnd\\Bunkering.Core\\Bunkering.Core.csproj": {
-              "projectPath": "C:\\Users\\anyan\\Documents\\Visual Studio 2022\\Projects\\CVCBackEnd\\CVCBackEnd\\Bunkering.Core\\Bunkering.Core.csproj"
+            "C:\\Users\\modib\\Documents\\GitHub\\CVCBackEnd\\Bunkering.Core\\Bunkering.Core.csproj": {
+              "projectPath": "C:\\Users\\modib\\Documents\\GitHub\\CVCBackEnd\\Bunkering.Core\\Bunkering.Core.csproj"
             }
           }
         }
@@ -4343,7 +4341,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.100\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100\\RuntimeIdentifierGraph.json"
       }
     }
   }
