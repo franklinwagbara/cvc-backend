@@ -893,7 +893,6 @@ namespace Bunkering.Core.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("ExtraPaymentId")
-                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<DateTime>("LastRetryDate")
@@ -1733,9 +1732,7 @@ namespace Bunkering.Core.Migrations
 
                     b.HasOne("Bunkering.Core.Data.ExtraPayment", "ExtraPayment")
                         .WithMany()
-                        .HasForeignKey("ExtraPaymentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ExtraPaymentId");
 
                     b.Navigation("ExtraPayment");
                 });
