@@ -13678,25 +13678,28 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\anyan\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\DABERECHI\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
+    "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\anyan\\Documents\\Visual Studio 2022\\Projects\\CVCBackEnd\\CVCBackEnd\\Bunkering\\Bunkering.csproj",
+      "projectUniqueName": "C:\\BrandOne\\CVC\\Bunkering\\Bunkering.csproj",
       "projectName": "Bunkering",
-      "projectPath": "C:\\Users\\anyan\\Documents\\Visual Studio 2022\\Projects\\CVCBackEnd\\CVCBackEnd\\Bunkering\\Bunkering.csproj",
-      "packagesPath": "C:\\Users\\anyan\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\anyan\\Documents\\Visual Studio 2022\\Projects\\CVCBackEnd\\CVCBackEnd\\Bunkering\\obj\\",
+      "projectPath": "C:\\BrandOne\\CVC\\Bunkering\\Bunkering.csproj",
+      "packagesPath": "C:\\Users\\DABERECHI\\.nuget\\packages\\",
+      "outputPath": "C:\\BrandOne\\CVC\\Bunkering\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+        "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
       ],
       "configFilePaths": [
-        "C:\\Users\\anyan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\DABERECHI\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net7.0"
@@ -13710,8 +13713,8 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "projectReferences": {
-            "C:\\Users\\anyan\\Documents\\Visual Studio 2022\\Projects\\CVCBackEnd\\CVCBackEnd\\Bunkering.Access\\Bunkering.Access.csproj": {
-              "projectPath": "C:\\Users\\anyan\\Documents\\Visual Studio 2022\\Projects\\CVCBackEnd\\CVCBackEnd\\Bunkering.Access\\Bunkering.Access.csproj"
+            "C:\\BrandOne\\CVC\\Bunkering.Access\\Bunkering.Access.csproj": {
+              "projectPath": "C:\\BrandOne\\CVC\\Bunkering.Access\\Bunkering.Access.csproj"
             }
           }
         }
@@ -13778,7 +13781,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.100\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100\\RuntimeIdentifierGraph.json"
       }
     }
   }

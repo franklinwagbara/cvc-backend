@@ -77,7 +77,7 @@ namespace Bunkering.Access.Services
                     //PlaceOfBuild = model.PlaceOfBuild,
                     //YearOfBuild = model.YearOfBuild,
                 };
-                var lga = await _unitOfWork.LGA.FirstOrDefaultAsync(x => x.State.Name.Contains("lagos"), "State");
+                var lga = await _unitOfWork.LGA.FirstOrDefaultAsync(x => x.State.Name.ToLower().Contains("lagos"), "State");
 
                 var facElps = _elps.CreateElpsFacility(new
                 {
@@ -377,7 +377,7 @@ namespace Bunkering.Access.Services
                             AppReceiptId = "",
                             RRR = "",
                             TransactionId = "",
-                            TxnMessage = "Payment initiated"
+                            TxnMessage = "Payment initiated",
                         };
                         await _unitOfWork.Payment.Add(payment);
                         await _unitOfWork.SaveChangesAsync(user.Id);
