@@ -1,4 +1,4 @@
-﻿#################################################################################
+#################################################################################
 ##This .gitignore file was automatically created by Microsoft(R) Visual Studio.##
 #################################################################################
 ## Ignore Visual Studio temporary files, build results, and
@@ -440,3 +440,8 @@ FodyWeavers.xsd
 /.vs/Bunkering/v17/fileList.bin
 /.vs/ProjectEvaluation/bunkering.metadata.v7.bin
 /.vs/ProjectEvaluation/bunkering.projects.v7.bin
+/Bunkering/bin/Debug/net7.0/appsettings.json
+/Bunkering/bin/Debug/net7.0/Bunkering.xml
+/Bunkering.Database/obj/Debug/Bunkering.Database.dll
+/Bunkering.Database/obj/Debug/Bunkering.Database.pdb
+/Bunkering.Database/obj/Debug/Bunkering.Database.sqlproj.FileListAbsolute.txt

@@ -10,8 +10,9 @@ namespace Bunkering.Core.Data
 	public class Application
 	{
 		public int Id { get; set; }
-		public int ApplicationTypeId { get; set; }
-		public string UserId { get; set; }
+		public int? ApplicationTypeId { get; set; }
+        public int DeportStateId { get; set; } = 0;
+        public string UserId { get; set; }
 		public int FacilityId { get; set; }
 		public string Reference { get; set; }
 		public string CurrentDeskId { get; set; }
@@ -24,7 +25,15 @@ namespace Bunkering.Core.Data
 		public bool IsDeleted { get; set; }
 		public int? FlowId { get; set; }
 
-		[ForeignKey("UserId")]
+		public string VesselName { get; set; }
+		public string IMONumber { get; set; }
+		public string LoadingPort {  get; set; }
+		public string DischargePort {get; set; }
+
+        public string MarketerName { get; set; }
+        public int? ProductId { get; set; }
+
+        [ForeignKey("UserId")]
 		public ApplicationUser User { get; set; }
 		[ForeignKey("FacilityId")]
 		public Facility Facility { get; set; }

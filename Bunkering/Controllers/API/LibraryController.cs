@@ -12,7 +12,7 @@ namespace Bunkering.Controllers.API
 {
     [AllowAnonymous]
     [ApiController]
-    [Route("api/bunkering/[controller]")]
+    [Route("api/[controller]")]
 
     public class LibraryController : ResponseController
     {
@@ -52,6 +52,29 @@ namespace Bunkering.Controllers.API
         [HttpGet]
         public async Task<IActionResult> GetStates() => Response(await libraryService.GetAllStates());
 
+
+        /// <summary>
+        /// This endpoint is used to get all states
+        /// </summary>
+        /// <returns>Returns a success message</returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// GET: api/location/states
+        /// 
+        /// </remarks>
+        /// <response code="200">Returns a success message </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Produces("application/json")]
+        [Route("StatesInNigeria")]
+        [HttpGet]
+        public async Task<IActionResult> GetStatesInNigeria() => Response(await libraryService.GetAllStatesInNigeria());
 
         //public async Task<IActionResult> GetStates()
         //{

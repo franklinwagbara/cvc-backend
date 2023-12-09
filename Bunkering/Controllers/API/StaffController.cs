@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Bunkering.Controllers.API
 {
 	//[Authorize]
-	[Route("api/bunkering/[controller]")]
+	[Route("api/[controller]")]
 	[ApiController]
 	public class StaffController : ResponseController
 	{
