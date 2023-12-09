@@ -1,25 +1,27 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\anyan\\Documents\\Visual Studio 2022\\Projects\\CVCBackEnd\\CVCBackEnd\\Bunkering.Core\\Bunkering.Core.csproj": {}
+    "C:\\BrandOne\\CVC\\Bunkering.Core\\Bunkering.Core.csproj": {}
   },
   "projects": {
-    "C:\\Users\\anyan\\Documents\\Visual Studio 2022\\Projects\\CVCBackEnd\\CVCBackEnd\\Bunkering.Core\\Bunkering.Core.csproj": {
+    "C:\\BrandOne\\CVC\\Bunkering.Core\\Bunkering.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\anyan\\Documents\\Visual Studio 2022\\Projects\\CVCBackEnd\\CVCBackEnd\\Bunkering.Core\\Bunkering.Core.csproj",
+        "projectUniqueName": "C:\\BrandOne\\CVC\\Bunkering.Core\\Bunkering.Core.csproj",
         "projectName": "Bunkering.Core",
-        "projectPath": "C:\\Users\\anyan\\Documents\\Visual Studio 2022\\Projects\\CVCBackEnd\\CVCBackEnd\\Bunkering.Core\\Bunkering.Core.csproj",
-        "packagesPath": "C:\\Users\\anyan\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\anyan\\Documents\\Visual Studio 2022\\Projects\\CVCBackEnd\\CVCBackEnd\\Bunkering.Core\\obj\\",
+        "projectPath": "C:\\BrandOne\\CVC\\Bunkering.Core\\Bunkering.Core.csproj",
+        "packagesPath": "C:\\Users\\DABERECHI\\.nuget\\packages\\",
+        "outputPath": "C:\\BrandOne\\CVC\\Bunkering.Core\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+          "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
         ],
         "configFilePaths": [
-          "C:\\Users\\anyan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\DABERECHI\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net7.0"
@@ -92,7 +94,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.100\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100\\RuntimeIdentifierGraph.json"
         }
       }
     }

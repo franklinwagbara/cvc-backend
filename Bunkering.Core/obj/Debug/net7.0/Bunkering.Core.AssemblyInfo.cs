@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Bunkering.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c92808f495a974c2351d7f4cd20182e30e12f60a")]
 [assembly: System.Reflection.AssemblyProductAttribute("Bunkering.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Bunkering.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
