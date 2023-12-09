@@ -463,3 +463,6 @@ FodyWeavers.xsd
 *.cache
 *.cache
 *.editorconfig
+/Bunkering.Database/obj/Debug/Bunkering.Database.sqlproj.FileListAbsolute.txt
+/Bunkering.Database/bin/Debug/Bunkering.Database.sql
+/Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.GeneratedMSBuildEditorConfig.editorconfig
