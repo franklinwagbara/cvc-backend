@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Buner.Controllers.API
 {
     [AllowAnonymous]
-    [Route("api/bunkering/[controller]")]
+    [Route("api/[controller]")]
     public class AuthController : ResponseController
     {
         private readonly IHttpContextAccessor _httpContextAccessor;

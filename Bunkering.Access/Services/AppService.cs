@@ -63,32 +63,32 @@ namespace Bunkering.Access.Services
             {
                 var facility = new Facility
                 {
-                    Name = model.FacilityName,
+                    Name = model.VesselName,
                     CompanyId = user.CompanyId.Value,
                     VesselTypeId = model.VesselTypeId,
-                    Capacity = model.Capacity,
-                    DeadWeight = model.DeadWeight,
-                    Operator = model.Operator,
-                    FacilitySources = _mapper.Map<List<FacilitySource>>(model.FacilitySources),
-                    Tanks = _mapper.Map<List<Tank>>(model.TankList),
-                    CallSIgn = model.CallSIgn,
-                    Flag = model.Flag,
+                    //Capacity = model.Capacity,
+                    //DeadWeight = model.DeadWeight,
+                    //Operator = model.Operator,
+                    //FacilitySources = _mapper.Map<List<FacilitySource>>(model.FacilitySources),
+                    //Tanks = _mapper.Map<List<Tank>>(model.TankList),
+                    //CallSIgn = model.CallSIgn,
+                    //Flag = model.Flag,
                     IMONumber = model.IMONumber,
-                    PlaceOfBuild = model.PlaceOfBuild,
-                    YearOfBuild = model.YearOfBuild,
+                    //PlaceOfBuild = model.PlaceOfBuild,
+                    //YearOfBuild = model.YearOfBuild,
                 };
                 var lga = await _unitOfWork.LGA.FirstOrDefaultAsync(x => x.State.Name.Contains("lagos"), "State");
 
                 var facElps = _elps.CreateElpsFacility(new
                 {
-                    Name = model.FacilityName,
-                    StreetAddress = $"{model.FacilityName} - {user.ElpsId}",
+                    Name = model.VesselName,
+                    StreetAddress = $"{model.VesselName} - {user.ElpsId}",
                     CompanyId = user.ElpsId,
                     DateAdded = DateTime.UtcNow.AddHours(1),
                     City = lga.Name,
                     lga.StateId,
                     LGAId = lga.Id,
-                    FacilityType = "Bunkering Facility",
+                    FacilityType = "CVC Facility",
                     FacilityDocuments = (string)null,
                     Id = (string)null
                 })?.Parse<Dictionary<string, object>>();
@@ -132,21 +132,26 @@ namespace Bunkering.Access.Services
                     {
                         var app = new Application
                         {
-                            ApplicationTypeId = model.ApplicationTypeId,
+                            //ApplicationTypeId = model.ApplicationTypeId,
                             CreatedDate = DateTime.UtcNow.AddHours(1),
                             CurrentDeskId = user.Id,
                             Reference = Utils.RefrenceCode(),
                             UserId = user.Id,
                             FacilityId = facility.Id,
                             Status = Enum.GetName(typeof(AppStatus), 0),
+                            VesselName = model.VesselName,
+                            LoadingPort = model.LoadingPort,
+                            DischargePort = model.DischargePort,
+                            MarketerName = model.MarketerName,
+                            IMONumber = model.IMONumber,
                         };
                         await _unitOfWork.Application.Add(app);
                         await _unitOfWork.SaveChangesAsync(app.UserId);
                         //save app tanks
-                        //var tank = await AppTanks(model.AppTanks, facility.Id, user.Id);
+                        var tank = await AppTanks(model.TankList, facility.Id);
 
 
-                        await _flow.AppWorkFlow(app.Id, Enum.GetName(typeof(AppActions), AppActions.Initiate), "Application Created");
+                        //await _flow.AppWorkFlow(app.Id, Enum.GetName(typeof(AppActions), AppActions.Initiate), "Application Created");
 
                         _response = new ApiResponse
                         {
@@ -169,15 +174,7 @@ namespace Bunkering.Access.Services
                 else
                 {
 
-                    _response = new ApiResponse
-                    {
-                        Message = "unable to proceed, product does not exist",
-                        StatusCode = HttpStatusCode.NotFound,
-                        Success = false
-                    };
                 }
-
-
             }
             catch (Exception ex)
             {

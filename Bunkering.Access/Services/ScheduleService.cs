@@ -65,7 +65,7 @@ namespace Bunkering.Access.Services
                             appointment.ApprovedBy = user.Id;
                         }
 
-                        var schFlow = await _flow.GetWorkFlow(Enum.GetName(typeof(AppActions), AppActions.ScheduleInspection), user, app.ApplicationTypeId, app.Facility.VesselTypeId);
+                        var schFlow = await _flow.GetWorkFlow(Enum.GetName(typeof(AppActions), AppActions.ScheduleInspection), user, app.Facility.VesselTypeId);
                         if (schFlow != null)
                         {
                             var nextUser = await _flow.GetNextStaff(model.ApplicationId, Enum.GetName(typeof(AppActions), AppActions.ScheduleInspection), schFlow, user);
@@ -162,8 +162,8 @@ namespace Bunkering.Access.Services
                 if (appointment != null)
                 {
                     var schFlow = model.Act.Equals(Enum.GetName(typeof(AppActions), AppActions.ApproveInspection))
-                        ? await _flow.GetWorkFlow(Enum.GetName(typeof(AppActions), AppActions.ApproveInspection), user, appointment.Application.Facility.VesselTypeId, appointment.Application.ApplicationTypeId)
-                        : await _flow.GetWorkFlow(Enum.GetName(typeof(AppActions), AppActions.RejectInspection), user, appointment.Application.Facility.VesselTypeId, appointment.Application.ApplicationTypeId);
+                        ? await _flow.GetWorkFlow(Enum.GetName(typeof(AppActions), AppActions.ApproveInspection), user, appointment.Application.Facility.VesselTypeId)
+                        : await _flow.GetWorkFlow(Enum.GetName(typeof(AppActions), AppActions.RejectInspection), user, appointment.Application.Facility.VesselTypeId);
                     if (schFlow != null)
                     {
                         var nextUser = model.Act.Equals(Enum.GetName(typeof(AppActions), AppActions.ApproveInspection))
@@ -318,7 +318,7 @@ namespace Bunkering.Access.Services
                 var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(model.ApplicationId), "User,Facility");
                 if (appointment != null)
                 {
-                    var schFlow = await _flow.GetWorkFlow(Enum.GetName(typeof(AppActions), AppActions.AcceptInspection), user, app.ApplicationTypeId, app.Facility.VesselTypeId);
+                    var schFlow = await _flow.GetWorkFlow(Enum.GetName(typeof(AppActions), AppActions.AcceptInspection), user, app.Facility.VesselTypeId);
                     if (schFlow != null)
                     {
                         var nextUser = _userManager.Users.Include(ur => ur.UserRoles).ThenInclude(r => r.Role).FirstOrDefault(x => x.Id.Equals(appointment.ScheduledBy));

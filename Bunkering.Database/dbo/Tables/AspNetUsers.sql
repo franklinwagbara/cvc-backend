@@ -10,6 +10,9 @@
     [CreatedBy]            NVARCHAR (MAX)     NOT NULL,
     [CreatedOn]            DATETIME2 (7)      NOT NULL,
     [LastLogin]            DATETIME2 (7)      NULL,
+    [IsDeleted]            BIT                NOT NULL,
+    [LocationId]           INT                NULL,
+    [OfficeId]             INT                NULL,
     [UserName]             NVARCHAR (256)     NULL,
     [NormalizedUserName]   NVARCHAR (256)     NULL,
     [Email]                NVARCHAR (256)     NULL,
@@ -24,11 +27,13 @@
     [LockoutEnd]           DATETIMEOFFSET (7) NULL,
     [LockoutEnabled]       BIT                NOT NULL,
     [AccessFailedCount]    INT                NOT NULL,
-    [IsDeleted]            BIT                DEFAULT (CONVERT([bit],(0))) NOT NULL,
-    [LocationId]           INT                NULL,
-    [OfficeId]             INT                NULL,
-    CONSTRAINT [PK_AspNetUsers] PRIMARY KEY CLUSTERED ([Id] ASC)
+    CONSTRAINT [PK_AspNetUsers] PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [FK_AspNetUsers_Companies_CompanyId] FOREIGN KEY ([CompanyId]) REFERENCES [dbo].[Companies] ([Id]),
+    CONSTRAINT [FK_AspNetUsers_Locations_LocationId] FOREIGN KEY ([LocationId]) REFERENCES [dbo].[Locations] ([Id]),
+    CONSTRAINT [FK_AspNetUsers_Offices_OfficeId] FOREIGN KEY ([OfficeId]) REFERENCES [dbo].[Offices] ([Id])
 );
+
+
 
 
 
@@ -60,4 +65,14 @@ CREATE NONCLUSTERED INDEX [IX_AspNetUsers_CompanyId]
 GO
 CREATE UNIQUE NONCLUSTERED INDEX [UserNameIndex]
     ON [dbo].[AspNetUsers]([NormalizedUserName] ASC) WHERE ([NormalizedUserName] IS NOT NULL);
+
+
+GO
+CREATE NONCLUSTERED INDEX [IX_AspNetUsers_OfficeId]
+    ON [dbo].[AspNetUsers]([OfficeId] ASC);
+
+
+GO
+CREATE NONCLUSTERED INDEX [IX_AspNetUsers_LocationId]
+    ON [dbo].[AspNetUsers]([LocationId] ASC);
 
