@@ -370,3 +370,4 @@ FodyWeavers.xsd
 *.pdb
 *.cache
 *.dll
+/Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.AssemblyInfo.cs
