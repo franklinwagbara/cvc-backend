@@ -54,3 +54,13 @@ C:\BrandOne\CVC\Bunkering.Database\bin\Debug\Bunkering.Database.pdb
 C:\BrandOne\CVC\Bunkering.Database\obj\Debug\Bunkering.Database.sqlproj.AssemblyReference.cache
 C:\BrandOne\CVC\Bunkering.Database\obj\Debug\Bunkering.Database.dll
 C:\BrandOne\CVC\Bunkering.Database\obj\Debug\Bunkering.Database.pdb
+C:\Users\modib\Documents\GitHub\CVCBackEnd\Bunkering.Database\bin\Debug\Bunkering.Database.dacpac
+C:\Users\modib\Documents\GitHub\CVCBackEnd\Bunkering.Database\bin\Debug\Bunkering.Database.dll
+C:\Users\modib\Documents\GitHub\CVCBackEnd\Bunkering.Database\bin\Debug\Bunkering.Database.pdb
+C:\Users\modib\Documents\GitHub\CVCBackEnd\Bunkering.Database\obj\Debug\Bunkering.Database.sqlproj.AssemblyReference.cache
+C:\Users\modib\Documents\GitHub\CVCBackEnd\Bunkering.Database\obj\Debug\Model.xml
+C:\Users\modib\Documents\GitHub\CVCBackEnd\Bunkering.Database\obj\Debug\refactor.xml
+C:\Users\modib\Documents\GitHub\CVCBackEnd\Bunkering.Database\obj\Debug\postdeploy.sql
+C:\Users\modib\Documents\GitHub\CVCBackEnd\Bunkering.Database\obj\Debug\predeploy.sql
+C:\Users\modib\Documents\GitHub\CVCBackEnd\Bunkering.Database\obj\Debug\Bunkering.Database.dll
+C:\Users\modib\Documents\GitHub\CVCBackEnd\Bunkering.Database\obj\Debug\Bunkering.Database.pdb
