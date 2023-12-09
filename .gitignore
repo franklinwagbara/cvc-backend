@@ -471,3 +471,11 @@ FodyWeavers.xsd
 .suo
 .vs/Bunkering/v17/.suo
 /.vs/Bunkering/v17/.suo
+/Bunkering/obj/Debug/net7.0/Bunkering.AssemblyInfo.cs
+/Bunkering/obj/Debug/net7.0/Bunkering.AssemblyInfoInputs.cache
+/Bunkering/obj/Debug/net7.0/Bunkering.csproj.AssemblyReference.cache
+/Bunkering.Access/obj/Debug/net7.0/Bunkering.Access.AssemblyInfo.cs
+/Bunkering.Access/obj/Debug/net7.0/Bunkering.Access.AssemblyInfoInputs.cache
+/Bunkering.Access/obj/Debug/net7.0/Bunkering.Access.csproj.AssemblyReference.cache
+/Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.AssemblyInfo.cs
+/Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.AssemblyInfoInputs.cache
