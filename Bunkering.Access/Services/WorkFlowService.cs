@@ -78,7 +78,7 @@ namespace Bunkering.Access.Services
 
                     if (currentUser != null)
                     {
-                        wkflow = await GetWorkFlow(action, currentUser, app.ApplicationTypeId, app.Facility.VesselTypeId);
+                        wkflow = await GetWorkFlow(action, currentUser, app.Facility.VesselTypeId);
                         if (wkflow != null) //get next processing staff
                         {
                             //if (action.ToLower().Equals("reject")
@@ -182,13 +182,13 @@ namespace Bunkering.Access.Services
             return (res, processingMsg);
         }
 
-        public async Task<WorkFlow> GetWorkFlow(string action, ApplicationUser currentuser, int apptypeid, int VesselTypeId)
+        public async Task<WorkFlow> GetWorkFlow(string action, ApplicationUser currentuser, int VesselTypeId)
         => action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Submit).ToLower()) || action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Resubmit))
             ? await _unitOfWork.Workflow.FirstOrDefaultAsync(x => x.Action.ToLower().Trim().Equals(action.ToLower().Trim())
-                    && currentuser.UserRoles.FirstOrDefault().Role.Id.Equals(x.TriggeredByRole) && x.ApplicationTypeId == apptypeid && x.VesselTypeId == VesselTypeId)
+                    && currentuser.UserRoles.FirstOrDefault().Role.Id.Equals(x.TriggeredByRole) && x.VesselTypeId == VesselTypeId)
             : await _unitOfWork.Workflow.FirstOrDefaultAsync(x => x.Action.ToLower().Trim().Equals(action.ToLower().Trim())
                     && currentuser.UserRoles.FirstOrDefault().Role.Id.Equals(x.TriggeredByRole)
-            && currentuser.LocationId == x.FromLocationId && x.ApplicationTypeId == apptypeid && x.VesselTypeId == VesselTypeId);
+            && currentuser.LocationId == x.FromLocationId && x.VesselTypeId == VesselTypeId);
 
 
 

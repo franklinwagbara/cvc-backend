@@ -71,13 +71,21 @@ namespace Bunkering.Core.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ApplicationTypeId")
+                    b.Property<int?>("ApplicationTypeId")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CurrentDeskId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DeportStateId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("DischargePort")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -93,11 +101,26 @@ namespace Bunkering.Core.Migrations
                     b.Property<int?>("FlowId")
                         .HasColumnType("int");
 
+                    b.Property<string>("IMONumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<string>("LoadingPort")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MarketerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Reference")
                         .IsRequired()
@@ -113,6 +136,10 @@ namespace Bunkering.Core.Migrations
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("VesselName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -543,23 +570,21 @@ namespace Bunkering.Core.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CallSIgn")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Capacity")
+                    b.Property<decimal?>("Capacity")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("CompanyId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("DeadWeight")
+                    b.Property<decimal?>("DeadWeight")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ElpsId")
                         .HasColumnType("int");
 
                     b.Property<string>("Flag")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IMONumber")
@@ -574,17 +599,15 @@ namespace Bunkering.Core.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Operator")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PlaceOfBuild")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("VesselTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int>("YearOfBuild")
+                    b.Property<int?>("YearOfBuild")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -870,7 +893,6 @@ namespace Bunkering.Core.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("ExtraPaymentId")
-                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<DateTime>("LastRetryDate")
@@ -1710,9 +1732,7 @@ namespace Bunkering.Core.Migrations
 
                     b.HasOne("Bunkering.Core.Data.ExtraPayment", "ExtraPayment")
                         .WithMany()
-                        .HasForeignKey("ExtraPaymentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ExtraPaymentId");
 
                     b.Navigation("ExtraPayment");
                 });

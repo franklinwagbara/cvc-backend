@@ -9,7 +9,7 @@ namespace Bunkering.Controllers
 {
 	//[Authorize]
 	[ApiController]
-	[Route("api/bunkering/[controller]")]
+	[Route("api/[controller]")]
 	public class GeneralReportController : ResponseController
 	{
 		private readonly IUnitOfWork _unitOfWork;
