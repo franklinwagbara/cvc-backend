@@ -19,4 +19,8 @@ namespace Bunkering.Core.Utils
         public const string COMPANY = "Company";
         public const string SUPER_ADMIN = "SuperAdmin";
     }
+    public static class DefaultValues
+    {
+        public const string AppName = "NOA & Vessel clearance";
+    }
 }
