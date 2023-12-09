@@ -364,6 +364,35 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+*.v2
+/Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.AssemblyInfoInputs.cache
+*.v2
+.vs/Bunkering/v17/.suo
+*.dll
+*.pdb
+*.pdb
+*.cache
+*.dll
+/Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.AssemblyInfo.cs
+*.v2
+/.vs/Bunkering/v17/.suo
+/Bunkering.Access/obj/Debug/net7.0/Bunkering.Access.AssemblyInfo.cs
+/Bunkering.Access/obj/Debug/net7.0/Bunkering.Access.AssemblyInfoInputs.cache
+/Bunkering.Access/obj/Debug/net7.0/Bunkering.Access.csproj.AssemblyReference.cache
+/Bunkering/obj/Debug/net7.0/Bunkering.AssemblyInfo.cs
+/Bunkering/obj/Debug/net7.0/Bunkering.AssemblyInfoInputs.cache
+/Bunkering/obj/Debug/net7.0/Bunkering.csproj.AssemblyReference.cache
+/Bunkering.Access/bin/Debug/net7.0/Bunkering.Access.dll
+/Bunkering.Access/bin/Debug/net7.0/Bunkering.Access.pdb
+*.dll
+*.dll
+*.dll
+*.json
+*.pdb
+*.dll
+*.txt
+*.dll
+FodyWeavers.xsd
 
 /Bunkering.Database/Bunkering.Database.jfm
 /Bunkering.Database/Bunkering.Database.dbmdl
