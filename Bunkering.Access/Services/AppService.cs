@@ -149,16 +149,30 @@ namespace Bunkering.Access.Services
                         var tank = await AppTanks(model.TankList, facility.Id);
 
 
-                        //await _flow.AppWorkFlow(app.Id, Enum.GetName(typeof(AppActions), AppActions.Initiate), "Application Created");
-
-                        _response = new ApiResponse
+                        if (tank != null)
                         {
-                            Message = "Application initiated successfully",
-                            StatusCode = HttpStatusCode.OK,
-                            Data = new { appId = app.Id },
-                            Success = true
-                        };
+                            _response = new ApiResponse
+                            {
+                                Message = "Application initiated successfully",
+                                StatusCode = HttpStatusCode.OK,
+                                Data = new { appId = app.Id },
+                                Success = true
+                            };
 
+                        }
+                        else
+                        {
+                            _response = new ApiResponse
+                            {
+                                Message = "unable to apply",
+                                StatusCode = HttpStatusCode.NotFound,
+                                Success = false
+                            };
+
+                        }
+
+
+                        //await _flow.AppWorkFlow(app.Id, Enum.GetName(typeof(AppActions), AppActions.Initiate), "Application Created");
 
                     }
                 else
