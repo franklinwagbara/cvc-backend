@@ -16,6 +16,8 @@ namespace Bunkering.Core.Data
         public decimal SerciveCharge { get; set; } = 0.0m;
 		public decimal NOAFee { get; set; } = 0.0m;
 		public decimal COQFEE { get; set; } = 0.0m;
+
+		public bool IsDeleted { get; set; } = false;
 		
 	}
 }

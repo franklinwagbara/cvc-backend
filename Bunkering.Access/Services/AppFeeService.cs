@@ -4,6 +4,7 @@ using Bunkering.Core.Migrations;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -92,28 +93,73 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
-        //public async Task<ApiResponse> EditFee(AppFee newFee, ApplicationUser user)
-        //{
-        //    var updateFee = await _unitOfWork.AppFee.FirstOrDefaultAsync(x => x.Id == newFee.Id);
+        public async Task<ApiResponse> EditFee(AppFee newFee, ApplicationUser user)
+        {
+            var updateFee = await _unitOfWork.AppFee.FirstOrDefaultAsync(x => x.Id == newFee.Id);
+            try
+            {
+                if (updateFee != null)
+                {
+                    var Fee = new AppFee
+                    {
+                        SerciveCharge = newFee.SerciveCharge,
+                        NOAFee = newFee.NOAFee,
+                        COQFEE = newFee.COQFEE,
+                        ApplicationFee = newFee.ApplicationFee,
+                        ProcessingFee = newFee.ProcessingFee
+                    };
+                    await _unitOfWork.AppFee.Add(Fee);
+                    await _unitOfWork.SaveChangesAsync(user.Id);
+                    _response = new ApiResponse
+                    {
+                        Message = "Fee was Edited successfully.",
+                        StatusCode = HttpStatusCode.OK,
+                        Success = true
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                _response = new ApiResponse
+                {
+                    Message = ex.Message,
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Success = false
+                };
+            }
 
-        //    if (updateFee != null) {
-        //        var Fee = new AppFee
-        //        {
-        //            SerciveCharge = newFee.SerciveCharge,
-        //            NOAFee = newFee.NOAFee,
-        //            COQFEE = newFee.COQFEE,
-        //            ApplicationFee = newFee.ApplicationFee,
-        //            ProcessingFee = newFee.ProcessingFee
-        //        };
-        //        await _unitOfWork.AppFee.Add(Fee);
-        //        await _unitOfWork.SaveChangesAsync(user.Id);
-        //        _response = new ApiResponse
-        //        {
-        //            Message = "Fee was Edited successfully.",
-        //            StatusCode = HttpStatusCode.OK,
-        //            Success = true
-        //        };
-        //    }
-        //}
+            return _response;
+
+        }
+
+        public async Task<ApiResponse> DeleteFee(int id)
+        {
+            var deactiveFee = await _unitOfWork.AppFee.FirstOrDefaultAsync(a => a.Id.Equals(id));
+            if (deactiveFee != null)
+            {
+                if (!deactiveFee.IsDeleted)
+                {
+                    deactiveFee.IsDeleted = true;
+                    await _unitOfWork.AppFee.Update(deactiveFee);
+
+                    _response = new ApiResponse
+                    {
+                        Data = deactiveFee,
+                        Message = "Fee has been deleted",
+                        StatusCode = HttpStatusCode.OK,
+                        Success = true
+                    };
+                }
+                _response = new ApiResponse
+                {
+                    Data = deactiveFee,
+                    Message = "Fee is already deleted",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true
+                };
+            }
+
+            return _response;
+        }
     }
 }
