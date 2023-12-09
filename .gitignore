@@ -445,3 +445,4 @@ FodyWeavers.xsd
 /Bunkering.Database/obj/Debug/Bunkering.Database.dll
 /Bunkering.Database/obj/Debug/Bunkering.Database.pdb
 /Bunkering.Database/obj/Debug/Bunkering.Database.sqlproj.FileListAbsolute.txt
+*.cache
