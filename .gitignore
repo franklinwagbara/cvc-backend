@@ -364,10 +364,13 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-<<<<<<< HEAD
-=======
+
 /Bunkering.Database/Bunkering.Database.jfm
 /Bunkering.Database/Bunkering.Database.dbmdl
+*.cache
+*.cache
+*.vsidx
+*.cache
 /Bunkering/obj/Debug/net7.0/Bunkering.AssemblyInfo.cs
 /Bunkering/obj/Debug/net7.0/Bunkering.AssemblyInfoInputs.cache
 /Bunkering/obj/Debug/net7.0/Bunkering.assets.cache
@@ -447,7 +450,14 @@ FodyWeavers.xsd
 /Bunkering.Database/obj/Debug/Bunkering.Database.dll
 /Bunkering.Database/obj/Debug/Bunkering.Database.pdb
 /Bunkering.Database/obj/Debug/Bunkering.Database.sqlproj.FileListAbsolute.txt
->>>>>>> processes_mahmoud
 *.cache
 *.v2
+*.config
+*.v2
+.vs/Bunkering/v17/.suo
 *.cache
+*.cache
+*.editorconfig
+/Bunkering.Database/obj/Debug/Bunkering.Database.sqlproj.FileListAbsolute.txt
+/Bunkering.Database/bin/Debug/Bunkering.Database.sql
+/Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.GeneratedMSBuildEditorConfig.editorconfig
