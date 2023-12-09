@@ -44,3 +44,13 @@ C:\BrandOne\CVC\Bunkering.Database\bin\Debug\Bunkering.Database.pdb
 C:\BrandOne\CVC\Bunkering.Database\obj\Debug\Bunkering.Database.sqlproj.AssemblyReference.cache
 C:\BrandOne\CVC\Bunkering.Database\obj\Debug\Bunkering.Database.dll
 C:\BrandOne\CVC\Bunkering.Database\obj\Debug\Bunkering.Database.pdb
+C:\Users\anyan\Documents\Visual Studio 2022\Projects\CVCBackEnd\CVCBackEnd\Bunkering.Database\bin\Debug\Bunkering.Database.dacpac
+C:\Users\anyan\Documents\Visual Studio 2022\Projects\CVCBackEnd\CVCBackEnd\Bunkering.Database\bin\Debug\Bunkering.Database.dll
+C:\Users\anyan\Documents\Visual Studio 2022\Projects\CVCBackEnd\CVCBackEnd\Bunkering.Database\bin\Debug\Bunkering.Database.pdb
+C:\Users\anyan\Documents\Visual Studio 2022\Projects\CVCBackEnd\CVCBackEnd\Bunkering.Database\obj\Debug\Bunkering.Database.sqlproj.AssemblyReference.cache
+C:\Users\anyan\Documents\Visual Studio 2022\Projects\CVCBackEnd\CVCBackEnd\Bunkering.Database\obj\Debug\Bunkering.Database.dll
+C:\Users\anyan\Documents\Visual Studio 2022\Projects\CVCBackEnd\CVCBackEnd\Bunkering.Database\obj\Debug\Bunkering.Database.pdb
+C:\Users\anyan\Documents\Visual Studio 2022\Projects\CVCBackEnd\CVCBackEnd\Bunkering.Database\obj\Debug\Model.xml
+C:\Users\anyan\Documents\Visual Studio 2022\Projects\CVCBackEnd\CVCBackEnd\Bunkering.Database\obj\Debug\refactor.xml
+C:\Users\anyan\Documents\Visual Studio 2022\Projects\CVCBackEnd\CVCBackEnd\Bunkering.Database\obj\Debug\postdeploy.sql
+C:\Users\anyan\Documents\Visual Studio 2022\Projects\CVCBackEnd\CVCBackEnd\Bunkering.Database\obj\Debug\predeploy.sql
