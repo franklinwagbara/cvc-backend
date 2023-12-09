@@ -363,3 +363,10 @@ MigrationBackup/
 FodyWeavers.xsd
 *.v2
 /Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.AssemblyInfoInputs.cache
+*.v2
+.vs/Bunkering/v17/.suo
+*.dll
+*.pdb
+*.pdb
+*.cache
+*.dll

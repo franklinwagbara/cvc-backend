@@ -832,3 +832,4 @@ C:\BrandOne\CVC\Bunkering\obj\Debug\net7.0\refint\Bunkering.dll
 C:\BrandOne\CVC\Bunkering\obj\Debug\net7.0\Bunkering.pdb
 C:\BrandOne\CVC\Bunkering\obj\Debug\net7.0\Bunkering.genruntimeconfig.cache
 C:\BrandOne\CVC\Bunkering\obj\Debug\net7.0\ref\Bunkering.dll
+C:\BrandOne\CVC\Bunkering\obj\Debug\net7.0\Bunkering.MvcApplicationPartsAssemblyInfo.cs
