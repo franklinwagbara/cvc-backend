@@ -364,6 +364,35 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+*.v2
+/Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.AssemblyInfoInputs.cache
+*.v2
+.vs/Bunkering/v17/.suo
+*.dll
+*.pdb
+*.pdb
+*.cache
+*.dll
+/Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.AssemblyInfo.cs
+*.v2
+/.vs/Bunkering/v17/.suo
+/Bunkering.Access/obj/Debug/net7.0/Bunkering.Access.AssemblyInfo.cs
+/Bunkering.Access/obj/Debug/net7.0/Bunkering.Access.AssemblyInfoInputs.cache
+/Bunkering.Access/obj/Debug/net7.0/Bunkering.Access.csproj.AssemblyReference.cache
+/Bunkering/obj/Debug/net7.0/Bunkering.AssemblyInfo.cs
+/Bunkering/obj/Debug/net7.0/Bunkering.AssemblyInfoInputs.cache
+/Bunkering/obj/Debug/net7.0/Bunkering.csproj.AssemblyReference.cache
+/Bunkering.Access/bin/Debug/net7.0/Bunkering.Access.dll
+/Bunkering.Access/bin/Debug/net7.0/Bunkering.Access.pdb
+*.dll
+*.dll
+*.dll
+*.json
+*.pdb
+*.dll
+*.txt
+*.dll
+FodyWeavers.xsd
 
 /Bunkering.Database/Bunkering.Database.jfm
 /Bunkering.Database/Bunkering.Database.dbmdl
@@ -461,4 +490,20 @@ FodyWeavers.xsd
 /Bunkering.Database/obj/Debug/Bunkering.Database.sqlproj.FileListAbsolute.txt
 /Bunkering.Database/bin/Debug/Bunkering.Database.sql
 /Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.GeneratedMSBuildEditorConfig.editorconfig
+/Bunkering.Access/obj/Debug/net7.0/Bunkering.Access.assets.cache
+/Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.assets.cache
+/Bunkering/obj/Debug/net7.0/Bunkering.assets.cache
+/Bunkering.Access/obj/Bunkering.Access.csproj.nuget.dgspec.json
+/Bunkering.Access/obj/Bunkering.Access.csproj.nuget.g.props
+/Bunkering.Access/obj/Debug/net7.0/Bunkering.Access.csproj.FileListAbsolute.txt
+/Bunkering.Access/obj/project.assets.json
+/Bunkering.Core/obj/Bunkering.Core.csproj.nuget.dgspec.json
+/Bunkering.Core/obj/Bunkering.Core.csproj.nuget.g.props
+/Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.csproj.FileListAbsolute.txt
+/Bunkering.Core/obj/project.assets.json
+/Bunkering/obj/Bunkering.csproj.nuget.dgspec.json
+/Bunkering/obj/Bunkering.csproj.nuget.g.props
+/Bunkering/obj/Debug/net7.0/apphost.exe
+/Bunkering/obj/Debug/net7.0/Bunkering.csproj.FileListAbsolute.txt
+/Bunkering/obj/project.assets.json
 /.vs/Bunkering/v17/.suo
