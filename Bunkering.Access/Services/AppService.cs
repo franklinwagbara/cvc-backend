@@ -114,6 +114,30 @@ namespace Bunkering.Access.Services
             {
                 //querying the database to retrieve a user along with their associated roles
                 var user = _userManager.Users.Include(ur => ur.UserRoles).ThenInclude(r => r.Role).FirstOrDefault(x => x.Email.Equals(User));
+                
+                if(user == null)
+                {
+                    return new ApiResponse
+                    {
+                        StatusCode = HttpStatusCode.Unauthorized,
+                        Message = "User is not authorised",
+                        Success = false
+                    };
+                }
+
+                // get app configuration for notice of arrival
+                var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Utils.NOA)); 
+
+                if(appType == null)
+                {
+                    return new ApiResponse
+                    {
+                        StatusCode = HttpStatusCode.NotFound,
+                        Message = "NOA not configured as application type, please contact support",
+                        Success = false
+                    };
+                }
+
                 //var user = _userManager.Users.Include(c => c.Company).FirstOrDefault(x => x.Email.ToLower().Equals(User.Identity.Name));
                 //if ((await _unitOfWork.Application.Find(x => x.Facility.VesselTypeId.Equals(model.VesselTypeId) && x.UserId.Equals(user.Id))).Any())
                 //    _response = new ApiResponse
@@ -130,7 +154,7 @@ namespace Bunkering.Access.Services
                     {
                         var app = new Application
                         {
-                            //ApplicationTypeId = model.ApplicationTypeId,
+                            ApplicationTypeId = appType.Id,
                             CreatedDate = DateTime.UtcNow.AddHours(1),
                             CurrentDeskId = user.Id,
                             Reference = Utils.RefrenceCode(),
@@ -143,6 +167,7 @@ namespace Bunkering.Access.Services
                             MarketerName = model.MarketerName,
                             IMONumber = model.IMONumber,
                         };
+
                         await _unitOfWork.Application.Add(app);
                         await _unitOfWork.SaveChangesAsync(app.UserId);
                         //save app tanks
@@ -170,8 +195,6 @@ namespace Bunkering.Access.Services
                             };
 
                         }
-
-
                         //await _flow.AppWorkFlow(app.Id, Enum.GetName(typeof(AppActions), AppActions.Initiate), "Application Created");
 
                     }
