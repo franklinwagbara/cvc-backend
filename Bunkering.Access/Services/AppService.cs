@@ -372,7 +372,7 @@ namespace Bunkering.Access.Services
                             ApplicationId = id,
                             OrderId = app.Reference,
                             BankCode = _setting.NMDPRAAccount,
-                            Description = $"Payment for Bunkering License ({app.Facility.Name})",
+                            Description = $"Payment for CVC & COQ License ({app.Facility.Name})",
                             PaymentType = "NGN",
                             Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending),
                             TransactionDate = DateTime.UtcNow.AddHours(1),
@@ -391,7 +391,7 @@ namespace Bunkering.Access.Services
                         {
                             payment.Amount = total;
                             payment.OrderId = app.Reference;
-                            payment.Description = $"Payment for Bunkering License ({app.Facility.Name})";
+                            payment.Description = $"Payment for CVC & COQ License ({app.Facility.Name})";
                             payment.Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending);
                             payment.TransactionDate = DateTime.UtcNow.AddHours(1);
 
