@@ -396,14 +396,16 @@ namespace Bunkering.Access.Services
                         Success = false
                     };
                     
-                    var fee = await _unitOfWork.AppFee.FirstOrDefaultAsync(x => x.ApplicationTypeId.Equals(app.ApplicationTypeId) && x.VesseltypeId.Equals(app.Facility.VesselTypeId));
+                    var fee = await _unitOfWork.AppFee.FirstOrDefaultAsync(x => x.ApplicationTypeId.Equals(app.ApplicationTypeId));
                     if (fee is null) return new ApiResponse()
                     {
                         StatusCode = HttpStatusCode.NotFound,
                         Message = "App fee not found",
                         Success = false
                     };
-                    var total = fee.AdministrativeFee + fee.VesselLicenseFee + fee.ApplicationFee + fee.InspectionFee + fee.AccreditationFee + fee.SerciveCharge;
+
+                    var total = fee.COQFee + fee.SerciveCharge + fee.NOAFee;
+
                     var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.ApplicationId.Equals(id));
                     if (payment == null)
                     {
@@ -451,8 +453,8 @@ namespace Bunkering.Access.Services
                         {
                             FacilityType = app.Facility.Name,
                             ApplicationType = app.ApplicationType.Name,
-                            fee.AccreditationFee,
-                            fee.ApplicationFee,
+                            fee.COQFee,
+                            fee.NOAFee,
                             fee.SerciveCharge,
                             Total = total,
                             payment.RRR,

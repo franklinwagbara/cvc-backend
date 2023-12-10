@@ -18,13 +18,13 @@ namespace Bunkering.Access.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
-        ApiResponse _response;
+        private ApiResponse _response = new ApiResponse();
         private readonly UserManager<ApplicationUser> _userManager;
-        public AppFeeService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, ApiResponse response, UserManager<ApplicationUser> userManager)
+        public AppFeeService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
-            _response = response;
+            //_response = response;
             _userManager = userManager;
         }
 
@@ -40,8 +40,9 @@ namespace Bunkering.Access.Services
                 {
                     x.Id,
                     x.SerciveCharge,
+                    x.ApplicationTypeId,
                     x.NOAFee,
-                    x.ApplicationFee,
+                    x.COQFee,
                     x.ProcessingFee
                 })
             };
@@ -59,7 +60,7 @@ namespace Bunkering.Access.Services
             };
         }
 
-        public async Task<ApiResponse> CreateFee(AppFee newFee, ApplicationUser user)
+        public async Task<ApiResponse> CreateFee(AppFee newFee)
         {
             try
             {
@@ -69,10 +70,12 @@ namespace Bunkering.Access.Services
                     ApplicationFee = newFee.ApplicationFee,
                     SerciveCharge = newFee.SerciveCharge,
                     NOAFee = newFee.NOAFee,
-                    COQFEE = newFee.COQFEE
+                    COQFee = newFee.COQFee,
+                    ApplicationTypeId = newFee.ApplicationTypeId,
+                    
                 };
                 await _unitOfWork.AppFee.Add(fee);
-                await _unitOfWork.SaveChangesAsync(user.Id);
+                await _unitOfWork.SaveChangesAsync("");
                 _response = new ApiResponse
                 {
                     Message = "Fee was added successfully.",
@@ -93,7 +96,7 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
-        public async Task<ApiResponse> EditFee(AppFee newFee, ApplicationUser user)
+        public async Task<ApiResponse> EditFee(AppFee newFee)
         {
             var updateFee = await _unitOfWork.AppFee.FirstOrDefaultAsync(x => x.Id == newFee.Id);
             try
@@ -104,12 +107,12 @@ namespace Bunkering.Access.Services
                     {
                         SerciveCharge = newFee.SerciveCharge,
                         NOAFee = newFee.NOAFee,
-                        COQFEE = newFee.COQFEE,
+                        COQFee = newFee.COQFee,
                         ApplicationFee = newFee.ApplicationFee,
                         ProcessingFee = newFee.ProcessingFee
                     };
                     await _unitOfWork.AppFee.Add(Fee);
-                    await _unitOfWork.SaveChangesAsync(user.Id);
+                    await _unitOfWork.SaveChangesAsync("");
                     _response = new ApiResponse
                     {
                         Message = "Fee was Edited successfully.",

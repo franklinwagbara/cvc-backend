@@ -48,8 +48,8 @@ namespace Bunkering.Access.Services
             {
                 var baseUrl = $"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}";
                 //var IsExtraPayment = _appSettings.IsExtraPayment;
-                var RemitaPayment_URL = $"{baseUrl}/api/bunkering/payment/Remita";
-                var ResponsePayment_URL = $"{baseUrl}/api/bunkering/payment/RemitaResponse";
+                var RemitaPayment_URL = $"{baseUrl}/api/payment/Remita";
+                var ResponsePayment_URL = $"{baseUrl}/api/payment/RemitaResponse";
                 //var FailedPayment_URL = baseUrl + _appSettings.FailedExtraPayment;
 
                 try
@@ -67,10 +67,10 @@ namespace Bunkering.Access.Services
                         {
                             if (payment != null && string.IsNullOrEmpty(payment.RRR))
                             {
-                                var fee = await _unitOfWork.AppFee.FirstOrDefaultAsync(x => x.ApplicationTypeId.Equals(app.ApplicationTypeId) && x.VesseltypeId.Equals(app.Facility.VesselTypeId));
+                                var fee = await _unitOfWork.AppFee.FirstOrDefaultAsync(x => x.ApplicationTypeId.Equals(app.ApplicationTypeId));
                                 if (fee != null)
                                 {
-                                    var total = fee.AdministrativeFee + fee.VesselLicenseFee + fee.ApplicationFee + fee.InspectionFee + fee.AccreditationFee + fee.SerciveCharge;
+                                    var total =  fee.ApplicationFee + fee.ProcessingFee + fee.COQFee + fee.SerciveCharge + fee.NOAFee;
 
                                     var request = await _elps.GeneratePaymentReference($"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}", app, total, fee.SerciveCharge);
                                     _logger.LogRequest("Creation of payment split for application with reference:" + app.Reference + "(" + app.User.Company.Name + ") by " + User, false, directory);

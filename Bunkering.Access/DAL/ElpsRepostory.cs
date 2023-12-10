@@ -527,16 +527,16 @@ namespace Bunkering.Access.DAL
 							beneficiaryAccount = _appSetting.NMDPRAAccount,
 							beneficiaryAmount = $"{(double)amountdue + ((double)serviceCharge * 0.5)}",
 							deductFeeFrom = "0"
-						},
-						new RPartner
-						{
-							lineItemsId = "2",
-							beneficiaryName = _appSetting.BOBName,
-							bankCode = _appSetting.BOBankCode,
-							beneficiaryAccount = _appSetting.BOAccount,
-							beneficiaryAmount = $"{(double)serviceCharge * 0.5}",
-							deductFeeFrom = "1"
 						}
+						//new RPartner
+						//{
+						//	lineItemsId = "2",
+						//	beneficiaryName = _appSetting.BOBName,
+						//	bankCode = _appSetting.BOBankCode,
+						//	beneficiaryAccount = _appSetting.BOAccount,
+						//	beneficiaryAmount = $"{(double)serviceCharge * 0.5}",
+						//	deductFeeFrom = "1"
+						//}
 					},
 					customFields = new List<CustomField>
 					{

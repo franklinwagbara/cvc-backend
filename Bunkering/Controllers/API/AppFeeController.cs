@@ -55,7 +55,7 @@ namespace Bunkering.Controllers.API
         /// 
         [Route("add-fee")]
         [HttpPost]
-        public async Task<IActionResult> AddFee(AppFee model, ApplicationUser user) => Response(await _appFeeService.CreateFee(model, user));
+        public async Task<IActionResult> AddFee(AppFee model) => Response(await _appFeeService.CreateFee(model));
 
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Bunkering.Controllers.API
         /// 
         [Route("edit-fee")]
         [HttpPost]
-        public async Task<IActionResult> EditFee(AppFee model, ApplicationUser user) => Response(await _appFeeService.EditFee(model, user));
+        public async Task<IActionResult> EditFee(AppFee model) => Response(await _appFeeService.EditFee(model));
 
 
         /// <summary>

@@ -10,12 +10,12 @@ namespace Bunkering.Core.Data
 	public class AppFee
 	{
 		public int Id { get; set; }
-
-		public decimal ApplicationFee { get; set; } = 0.0m;
+		public int ApplicationTypeId { get; set; }
+        public decimal ApplicationFee { get; set; } = 0.0m;
 		public decimal ProcessingFee { get; set; } = 0.0m;
         public decimal SerciveCharge { get; set; } = 0.0m;
 		public decimal NOAFee { get; set; } = 0.0m;
-		public decimal COQFEE { get; set; } = 0.0m;
+		public decimal COQFee { get; set; } = 0.0m;
 
 		public bool IsDeleted { get; set; } = false;
 		
