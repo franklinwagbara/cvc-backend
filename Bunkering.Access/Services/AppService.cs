@@ -114,6 +114,30 @@ namespace Bunkering.Access.Services
             {
                 //querying the database to retrieve a user along with their associated roles
                 var user = _userManager.Users.Include(ur => ur.UserRoles).ThenInclude(r => r.Role).FirstOrDefault(x => x.Email.Equals(User));
+                
+                if(user == null)
+                {
+                    return new ApiResponse
+                    {
+                        StatusCode = HttpStatusCode.Unauthorized,
+                        Message = "User is not authorised",
+                        Success = false
+                    };
+                }
+
+                // get app configuration for notice of arrival
+                var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Utils.NOA)); 
+
+                if(appType == null)
+                {
+                    return new ApiResponse
+                    {
+                        StatusCode = HttpStatusCode.NotFound,
+                        Message = "NOA not configured as application type, please contact support",
+                        Success = false
+                    };
+                }
+
                 //var user = _userManager.Users.Include(c => c.Company).FirstOrDefault(x => x.Email.ToLower().Equals(User.Identity.Name));
                 //if ((await _unitOfWork.Application.Find(x => x.Facility.VesselTypeId.Equals(model.VesselTypeId) && x.UserId.Equals(user.Id))).Any())
                 //    _response = new ApiResponse
@@ -130,7 +154,7 @@ namespace Bunkering.Access.Services
                     {
                         var app = new Application
                         {
-                            //ApplicationTypeId = model.ApplicationTypeId,
+                            ApplicationTypeId = appType.Id,
                             CreatedDate = DateTime.UtcNow.AddHours(1),
                             CurrentDeskId = user.Id,
                             Reference = Utils.RefrenceCode(),
@@ -143,6 +167,7 @@ namespace Bunkering.Access.Services
                             MarketerName = model.MarketerName,
                             IMONumber = model.IMONumber,
                         };
+
                         await _unitOfWork.Application.Add(app);
                         await _unitOfWork.SaveChangesAsync(app.UserId);
                         //save app tanks
@@ -170,8 +195,6 @@ namespace Bunkering.Access.Services
                             };
 
                         }
-
-
                         //await _flow.AppWorkFlow(app.Id, Enum.GetName(typeof(AppActions), AppActions.Initiate), "Application Created");
 
                     }
@@ -359,8 +382,27 @@ namespace Bunkering.Access.Services
                 try
                 {
                     var user = await _userManager.FindByEmailAsync(User);
+                    if (user is null) return new ApiResponse()
+                    {
+                        StatusCode = HttpStatusCode.Unauthorized,
+                        Message = "User not found",
+                        Success = false
+                    };
                     var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id), "ApplicationType,Facility.VesselType,Payments");
+                    if (app is null) return new ApiResponse()
+                    {
+                        StatusCode = HttpStatusCode.NotFound,
+                        Message = "application not found",
+                        Success = false
+                    };
+                    
                     var fee = await _unitOfWork.AppFee.FirstOrDefaultAsync(x => x.ApplicationTypeId.Equals(app.ApplicationTypeId) && x.VesseltypeId.Equals(app.Facility.VesselTypeId));
+                    if (fee is null) return new ApiResponse()
+                    {
+                        StatusCode = HttpStatusCode.NotFound,
+                        Message = "App fee not found",
+                        Success = false
+                    };
                     var total = fee.AdministrativeFee + fee.VesselLicenseFee + fee.ApplicationFee + fee.InspectionFee + fee.AccreditationFee + fee.SerciveCharge;
                     var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.ApplicationId.Equals(id));
                     if (payment == null)
@@ -372,7 +414,7 @@ namespace Bunkering.Access.Services
                             ApplicationId = id,
                             OrderId = app.Reference,
                             BankCode = _setting.NMDPRAAccount,
-                            Description = $"Payment for Bunkering License ({app.Facility.Name})",
+                            Description = $"Payment for CVC & COQ License ({app.Facility.Name})",
                             PaymentType = "NGN",
                             Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending),
                             TransactionDate = DateTime.UtcNow.AddHours(1),
@@ -391,7 +433,7 @@ namespace Bunkering.Access.Services
                         {
                             payment.Amount = total;
                             payment.OrderId = app.Reference;
-                            payment.Description = $"Payment for Bunkering License ({app.Facility.Name})";
+                            payment.Description = $"Payment for CVC & COQ License ({app.Facility.Name})";
                             payment.Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending);
                             payment.TransactionDate = DateTime.UtcNow.AddHours(1);
 

@@ -198,12 +198,15 @@ namespace Bunkering.Access.Services
                                 };
                         }
                         else
+                        {
                             _response = new ApiResponse
                             {
                                 Message = "Payment already completed",
                                 StatusCode = HttpStatusCode.OK,
                                 Success = true
                             };
+                        }
+                           
                     }
 
                     _logger.LogRequest($"\"Getting payment for company application -:{app.Reference}{" by"}{_contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email)} {" - "}{DateTime.Now}", false, directory);

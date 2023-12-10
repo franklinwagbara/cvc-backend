@@ -492,7 +492,7 @@ namespace Bunkering.Access.DAL
 		{
 			try
 			{
-				var docs = await _unitOfWork.FacilityTypeDocuments.Find(x => x.ApplicationType.Equals(application.ApplicationType.Name));
+				//var docs = await _unitOfWork.FacilityTypeDocuments.Find(x => x.ApplicationType.Equals(application.ApplicationType.Name));
 				// var pay = _context.PaymentLogs.FirstOrDefault(x => x.ApplicationId == application.Id);
 				// if (pay != null && !string.IsNullOrEmpty(pay.RRR))
 				// {
