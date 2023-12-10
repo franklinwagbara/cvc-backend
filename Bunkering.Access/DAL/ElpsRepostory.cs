@@ -507,16 +507,16 @@ namespace Bunkering.Access.DAL
 				var remitaObject = new
 				{
 					serviceTypeId = _appSetting.ServiceTypeId,
-					categoryName = "Bunkering",
+					categoryName = DefaultValues.AppName,
 					totalAmount = Decimal.ToInt32(totalAmount).ToString(),
 					payerName = TruncateText(application.User.Company.Name, 25),
 					payerEmail = application.User.Email,
 					serviceCharge = Decimal.ToInt32(serviceCharge).ToString(),
 					amountDue = Decimal.ToInt32(amountdue).ToString(),
 					orderId = application.Reference,
-					returnSuccessUrl = $"{baseUrl}/api/bunkering/Payment/Remita?id={application.Id}",
-					returnFailureUrl = $"{baseUrl}/api/bunkering/Payment/Remita?id={application.Id}",
-					returnBankPaymentUrl = $"{baseUrl}/api/bunkering/Payment/Remita?id={application.Id}",
+					returnSuccessUrl = $"{baseUrl}/api/Payment/Remita?id={application.Id}",
+					returnFailureUrl = $"{baseUrl}/api/Payment/Remita?id={application.Id}",
+					returnBankPaymentUrl = $"{baseUrl}/api/Payment/Remita?id={application.Id}",
 					lineItems = new List<RPartner>
 					{
 						new RPartner
@@ -568,7 +568,7 @@ namespace Bunkering.Access.DAL
 					documentTypes = (string)null,
 					applicationItems = new List<ApplicationItem>
 					{
-						new ApplicationItem { Group = "Bunkering", Name = application.Facility.Name, Description = $"{application.Facility.Name} Facility payment" },
+						new ApplicationItem { Group = DefaultValues.AppName, Name = application.Facility.Name, Description = $"{application.Facility.Name} Facility payment" },
 						new ApplicationItem { Group = "Facility Details", Name = $"{application.Facility.Name}-{application.Facility.ElpsId}", Description = application.Facility.VesselType.Name },
 						new ApplicationItem { Group = "Payment", Name = "Payment Description: ", Description = application.Payments.FirstOrDefault().Description }
 					}

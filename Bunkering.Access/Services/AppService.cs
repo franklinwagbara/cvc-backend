@@ -77,7 +77,7 @@ namespace Bunkering.Access.Services
                     //PlaceOfBuild = model.PlaceOfBuild,
                     //YearOfBuild = model.YearOfBuild,
                 };
-                var lga = await _unitOfWork.LGA.FirstOrDefaultAsync(x => x.State.Name.Contains("lagos"), "State");
+                var lga = await _unitOfWork.LGA.FirstOrDefaultAsync(x => x.State.Name.ToLower().Contains("lagos"), "State");
 
                 var facElps = _elps.CreateElpsFacility(new
                 {
@@ -115,9 +115,7 @@ namespace Bunkering.Access.Services
                 //querying the database to retrieve a user along with their associated roles
                 var user = _userManager.Users.Include(ur => ur.UserRoles).ThenInclude(r => r.Role).FirstOrDefault(x => x.Email.Equals(User));
                 //var user = _userManager.Users.Include(c => c.Company).FirstOrDefault(x => x.Email.ToLower().Equals(User.Identity.Name));
-
-                //if ((await _unitOfWork.Application.Find(x => x.VesselName.ToLower().Equals(model.VesselName.ToLower())
-                //         && x.Facility.VesselTypeId.Equals(model.VesselTypeId) && x.UserId.Equals(user.Id), "Facility")).Any())
+                //if ((await _unitOfWork.Application.Find(x => x.Facility.VesselTypeId.Equals(model.VesselTypeId) && x.UserId.Equals(user.Id))).Any())
                 //    _response = new ApiResponse
                 //    {
                 //        Message = "There is an existing application for this facility, you are not allowed to use license the same vessel twice",
@@ -126,6 +124,7 @@ namespace Bunkering.Access.Services
                 //    };
                 //else
                 //{
+
                     var facility = await CreateFacility(model, user);
                     if (facility != null)
                     {
@@ -150,25 +149,44 @@ namespace Bunkering.Access.Services
                         var tank = await AppTanks(model.TankList, facility.Id);
 
 
+                        if (tank != null)
+                        {
+                            _response = new ApiResponse
+                            {
+                                Message = "Application initiated successfully",
+                                StatusCode = HttpStatusCode.OK,
+                                Data = new { appId = app.Id },
+                                Success = true
+                            };
+
+                        }
+                        else
+                        {
+                            _response = new ApiResponse
+                            {
+                                Message = "unable to apply",
+                                StatusCode = HttpStatusCode.NotFound,
+                                Success = false
+                            };
+
+                        }
+
+
                         //await _flow.AppWorkFlow(app.Id, Enum.GetName(typeof(AppActions), AppActions.Initiate), "Application Created");
 
-                        _response = new ApiResponse
-                        {
-                            Message = "Application initiated successfully",
-                            StatusCode = HttpStatusCode.OK,
-                            Data = new { appId = app.Id },
-                            Success = true
-                        };
                     }
-                    else
-                        _response = new ApiResponse
-                        {
-                            Message = "An error occured. Pls try again.",
-                            StatusCode = HttpStatusCode.BadRequest,
-                            Success = false
-                        };
-
+                else
+                {
+                    _response = new ApiResponse
+                    {
+                        Message = "An error occured. Pls try again.",
+                        StatusCode = HttpStatusCode.BadRequest,
+                        Success = false
+                    };
+                }
+                        
                 //}
+
             }
             catch (Exception ex)
             {
@@ -354,7 +372,7 @@ namespace Bunkering.Access.Services
                             ApplicationId = id,
                             OrderId = app.Reference,
                             BankCode = _setting.NMDPRAAccount,
-                            Description = $"Payment for Bunkering License ({app.Facility.Name})",
+                            Description = $"Payment for CVC & COQ License ({app.Facility.Name})",
                             PaymentType = "NGN",
                             Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending),
                             TransactionDate = DateTime.UtcNow.AddHours(1),
@@ -362,7 +380,7 @@ namespace Bunkering.Access.Services
                             AppReceiptId = "",
                             RRR = "",
                             TransactionId = "",
-                            TxnMessage = "Payment initiated"
+                            TxnMessage = "Payment initiated",
                         };
                         await _unitOfWork.Payment.Add(payment);
                         await _unitOfWork.SaveChangesAsync(user.Id);
@@ -373,7 +391,7 @@ namespace Bunkering.Access.Services
                         {
                             payment.Amount = total;
                             payment.OrderId = app.Reference;
-                            payment.Description = $"Payment for Bunkering License ({app.Facility.Name})";
+                            payment.Description = $"Payment for CVC & COQ License ({app.Facility.Name})";
                             payment.Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending);
                             payment.TransactionDate = DateTime.UtcNow.AddHours(1);
 

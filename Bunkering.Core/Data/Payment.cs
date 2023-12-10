@@ -28,7 +28,7 @@ namespace Bunkering.Core.Data
 		public decimal NonRenewalPenalty { get; set; }
 		public string Status { get; set; }
 		[ForeignKey("ExtraPaymentId")]
-		public ExtraPayment ExtraPayment { get; set; }
+		public ExtraPayment? ExtraPayment { get; set; }
 		//[NotMapped]
 
 		//[ForeignKey(nameof(ApplicationId))]
