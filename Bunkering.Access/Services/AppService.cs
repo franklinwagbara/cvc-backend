@@ -359,8 +359,27 @@ namespace Bunkering.Access.Services
                 try
                 {
                     var user = await _userManager.FindByEmailAsync(User);
+                    if (user is null) return new ApiResponse()
+                    {
+                        StatusCode = HttpStatusCode.Unauthorized,
+                        Message = "User not found",
+                        Success = false
+                    };
                     var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id), "ApplicationType,Facility.VesselType,Payments");
+                    if (app is null) return new ApiResponse()
+                    {
+                        StatusCode = HttpStatusCode.NotFound,
+                        Message = "application not found",
+                        Success = false
+                    };
+                    
                     var fee = await _unitOfWork.AppFee.FirstOrDefaultAsync(x => x.ApplicationTypeId.Equals(app.ApplicationTypeId) && x.VesseltypeId.Equals(app.Facility.VesselTypeId));
+                    if (fee is null) return new ApiResponse()
+                    {
+                        StatusCode = HttpStatusCode.NotFound,
+                        Message = "App fee not found",
+                        Success = false
+                    };
                     var total = fee.AdministrativeFee + fee.VesselLicenseFee + fee.ApplicationFee + fee.InspectionFee + fee.AccreditationFee + fee.SerciveCharge;
                     var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.ApplicationId.Equals(id));
                     if (payment == null)
