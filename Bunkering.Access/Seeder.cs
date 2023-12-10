@@ -38,29 +38,16 @@ namespace Bunkering.Access
 		{
 			var roles = new[]
 				{
-					Roles.SuperAdmin,
-					Roles.Supervisor,
-					Roles.Reviewer,
-					Roles.Safety,
-					Roles.Account,
-					Roles.ACE,
-					Roles.ACE_STA,
-					Roles.Company,
-					Roles.ED,
-					Roles.ED_STA,
-					Roles.Support,
-					Roles.Staff,
-					Roles.Planning,
-					Roles.AD,
-					Roles.FAD,
-					Roles.GMOps,
-					Roles.Manager,
+					RoleConstants.COMPANY,
+					RoleConstants.REVIEWER,
+					RoleConstants.SUPER_ADMIN,
+					RoleConstants.SUPERVISOR
 				};
 			foreach (var role in roles)
 			{
-				var name = role.Split('|');
-				if (!await _roleManager.RoleExistsAsync(name.FirstOrDefault()))
-					await _roleManager.CreateAsync(new ApplicationRole { Name = name.FirstOrDefault(), Description = name[1] });
+				;
+				if (!await _roleManager.RoleExistsAsync(role))
+					await _roleManager.CreateAsync(new ApplicationRole { Name = role, Description = role});
 			}
 			_db.SaveChanges();
 		}
