@@ -100,7 +100,7 @@ namespace Bunkering.Access.Services
             {
                 if (updateFee != null)
                 {
-                    var Fee = new AppFee
+                    var fee = new AppFee
                     {
                         SerciveCharge = newFee.SerciveCharge,
                         NOAFee = newFee.NOAFee,
@@ -108,7 +108,7 @@ namespace Bunkering.Access.Services
                         ApplicationFee = newFee.ApplicationFee,
                         ProcessingFee = newFee.ProcessingFee
                     };
-                    await _unitOfWork.AppFee.Add(Fee);
+                    await _unitOfWork.AppFee.Update(fee);
                     await _unitOfWork.SaveChangesAsync(user.Id);
                     _response = new ApiResponse
                     {
