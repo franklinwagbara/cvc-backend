@@ -105,7 +105,7 @@ namespace Bunkering.Access.Services
 					x.CreatedBy,
 					DateCreated = x.CreatedOn,
 					x.IsActive,
-					AppCount = apps.Count(y => y.UserId.Equals(x.Id)),
+					AppCount = apps != null && apps.Count() != 0? apps.Count(y => y.UserId.Equals(x.Id)): 0,
 
 				})
 			};
