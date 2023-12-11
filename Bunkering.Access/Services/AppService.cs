@@ -154,7 +154,7 @@ namespace Bunkering.Access.Services
                     {
                         var app = new Application
                         {
-                            ApplicationTypeId = model.ApplicationTypeId,
+                            ApplicationTypeId = appType.Id,
                             CreatedDate = DateTime.UtcNow.AddHours(1),
                             CurrentDeskId = user.Id,
                             Reference = Utils.RefrenceCode(),
