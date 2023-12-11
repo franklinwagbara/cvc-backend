@@ -403,7 +403,6 @@ FodyWeavers.xsd
 /Bunkering/obj/Debug/net7.0/Bunkering.assets.cache
 /Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.GeneratedMSBuildEditorConfig.editorconfig
 /Bunkering.Access/obj/Bunkering.Access.csproj.nuget.dgspec.json
-/Bunkering.Access/Services/StaffService.cs
 /Bunkering/obj/project.assets.json
 /.vs/Bunkering/DesignTimeBuild/.dtbcache.v2
 /.vs/Bunkering/v17/fileList.bin
