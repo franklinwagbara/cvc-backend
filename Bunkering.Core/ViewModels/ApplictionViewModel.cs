@@ -5,11 +5,11 @@ namespace Bunkering.Core.ViewModels
 {
 	public class ApplictionViewModel
 	{
-		//[Display(Name = "Application Type")]
-		//public int ApplicationTypeId { get; set; }
-		//[Display(Name = "Bunker (Facility) Name")]
-		//public string FacilityName { get; set; }
-		public int VesselTypeId { get; set; }
+        //[Display(Name = "Application Type")]
+        public int ApplicationTypeId { get; set; }
+        //[Display(Name = "Bunker (Facility) Name")]
+        //public string FacilityName { get; set; }
+        public int VesselTypeId { get; set; }
         public string IMONumber { get; set; }
         //public string CallSIgn { get; set; }
         //public string Flag { get; set; }

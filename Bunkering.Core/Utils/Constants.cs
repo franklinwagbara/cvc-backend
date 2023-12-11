@@ -21,6 +21,6 @@ namespace Bunkering.Core.Utils
     }
     public static class DefaultValues
     {
-        public const string AppName = "NOA & Vessel clearance";
+        public const string AppName = "NOA & Vessel Clearance";
     }
 }
