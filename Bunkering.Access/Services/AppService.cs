@@ -130,7 +130,7 @@ namespace Bunkering.Access.Services
                     {
                         var app = new Application
                         {
-                            //ApplicationTypeId = model.ApplicationTypeId,
+                            ApplicationTypeId = model.ApplicationTypeId,
                             CreatedDate = DateTime.UtcNow.AddHours(1),
                             CurrentDeskId = user.Id,
                             Reference = Utils.RefrenceCode(),
@@ -407,11 +407,13 @@ namespace Bunkering.Access.Services
                         Success = true,
                         Data = new
                         {
+                            AppReference = app.Reference,
+                            VesselName = app.VesselName,
                             FacilityType = app.Facility.Name,
                             ApplicationType = app.ApplicationType.Name,
                             fee.AccreditationFee,
                             fee.ApplicationFee,
-                            fee.SerciveCharge,
+                            ServiceCharge = fee.SerciveCharge,
                             Total = total,
                             payment.RRR,
                             PaymentStatus = payment.Status
