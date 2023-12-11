@@ -12,8 +12,13 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bunkering.Core.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
+<<<<<<<< HEAD:Bunkering.Core/Migrations/20231211005353_new.Designer.cs
+    [Migration("20231211005353_new")]
+    partial class @new
+========
     [Migration("20231210184829_modifyAppFee")]
     partial class modifyAppFee
+>>>>>>>> bba242a9bf07d2e4d93a6db4a88d332ec0db05b4:Bunkering.Core/Migrations/20231210184829_modifyAppFee.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -67,7 +72,8 @@ namespace Bunkering.Core.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ApplicationTypeId")
+                    b.Property<int?>("ApplicationTypeId")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDate")
