@@ -508,3 +508,4 @@ FodyWeavers.xsd
 /Bunkering/obj/project.assets.json
 /.vs/Bunkering/v17/.suo
 /Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.csproj.AssemblyReference.cache
+*.v2
