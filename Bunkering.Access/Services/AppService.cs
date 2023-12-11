@@ -872,7 +872,7 @@ namespace Bunkering.Access.Services
                     VesselType = x.Facility.VesselType.Name,
                     x.Reference,
                     x.Status,
-                    PaymnetStatus = x.Payments.Count != 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted))
+                    PaymentStatus = x.Payments.Count != 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted))
                         ? "Payment confirmed" : x.Payments.Count != 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentRejected)) ? "Payment rejected" : "Payment pending",
                     RRR = x.Payments.FirstOrDefault()?.RRR,
                     CreatedDate = x.CreatedDate.ToString("MMMM dd, yyyy HH:mm:ss")
