@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bunkering.Core.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20231208135946_removeProductIdFromApplication")]
-    partial class removeProductIdFromApplication
+    [Migration("20231211012838_NewMig")]
+    partial class NewMig
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -121,9 +121,6 @@ namespace Bunkering.Core.Migrations
 
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int?>("ProductId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Reference")
                         .IsRequired()
@@ -896,7 +893,6 @@ namespace Bunkering.Core.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("ExtraPaymentId")
-                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<DateTime>("LastRetryDate")
@@ -1736,9 +1732,7 @@ namespace Bunkering.Core.Migrations
 
                     b.HasOne("Bunkering.Core.Data.ExtraPayment", "ExtraPayment")
                         .WithMany()
-                        .HasForeignKey("ExtraPaymentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ExtraPaymentId");
 
                     b.Navigation("ExtraPayment");
                 });

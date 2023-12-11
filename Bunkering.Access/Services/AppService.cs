@@ -125,56 +125,56 @@ namespace Bunkering.Access.Services
                 //else
                 //{
 
-                    var facility = await CreateFacility(model, user);
-                    if (facility != null)
+                var facility = await CreateFacility(model, user);
+                if (facility != null)
+                {
+                    var app = new Application
                     {
-                        var app = new Application
-                        {
-                            //ApplicationTypeId = model.ApplicationTypeId,
-                            CreatedDate = DateTime.UtcNow.AddHours(1),
-                            CurrentDeskId = user.Id,
-                            Reference = Utils.RefrenceCode(),
-                            UserId = user.Id,
-                            FacilityId = facility.Id,
-                            Status = Enum.GetName(typeof(AppStatus), 0),
-                            VesselName = model.VesselName,
-                            LoadingPort = model.LoadingPort,
-                            DischargePort = model.DischargePort,
-                            MarketerName = model.MarketerName,
-                            IMONumber = model.IMONumber,
-                        };
+                        //ApplicationTypeId = model.ApplicationTypeId,
+                        CreatedDate = DateTime.UtcNow.AddHours(1),
+                        CurrentDeskId = user.Id,
+                        Reference = Utils.RefrenceCode(),
+                        UserId = user.Id,
+                        FacilityId = facility.Id,
+                        Status = Enum.GetName(typeof(AppStatus), 0),
+                        VesselName = model.VesselName,
+                        LoadingPort = model.LoadingPort,
+                        DischargePort = model.DischargePort,
+                        MarketerName = model.MarketerName,
+                        IMONumber = model.IMONumber,
+                    };
+                    //save app tanks
+                    var tank = await AppTanks(model.TankList, facility.Id);
+
+                    if (tank != null)
+                    {
                         await _unitOfWork.Application.Add(app);
                         await _unitOfWork.SaveChangesAsync(app.UserId);
-                        //save app tanks
-                        var tank = await AppTanks(model.TankList, facility.Id);
 
-
-                        if (tank != null)
+                        _response = new ApiResponse
                         {
-                            _response = new ApiResponse
-                            {
-                                Message = "Application initiated successfully",
-                                StatusCode = HttpStatusCode.OK,
-                                Data = new { appId = app.Id },
-                                Success = true
-                            };
-
-                        }
-                        else
-                        {
-                            _response = new ApiResponse
-                            {
-                                Message = "unable to apply",
-                                StatusCode = HttpStatusCode.NotFound,
-                                Success = false
-                            };
-
-                        }
-
-
-                        //await _flow.AppWorkFlow(app.Id, Enum.GetName(typeof(AppActions), AppActions.Initiate), "Application Created");
+                            Message = "Application initiated successfully",
+                            StatusCode = HttpStatusCode.OK,
+                            Data = new { appId = app.Id },
+                            Success = true
+                        };
 
                     }
+                    else
+                    {
+                        _response = new ApiResponse
+                        {
+                            Message = "unable to apply",
+                            StatusCode = HttpStatusCode.NotFound,
+                            Success = false
+                        };
+
+                    }
+
+
+                    //await _flow.AppWorkFlow(app.Id, Enum.GetName(typeof(AppActions), AppActions.Initiate), "Application Created");
+
+                }
                 else
                 {
                     _response = new ApiResponse
@@ -184,7 +184,7 @@ namespace Bunkering.Access.Services
                         Success = false
                     };
                 }
-                        
+
                 //}
 
             }
