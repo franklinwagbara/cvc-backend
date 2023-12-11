@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bunkering.Core.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20231208142010_App")]
-    partial class App
+    [Migration("20231210184829_modifyAppFee")]
+    partial class modifyAppFee
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,35 +33,28 @@ namespace Bunkering.Core.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("AccreditationFee")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("AdministrativeFee")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<decimal>("ApplicationFee")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ApplicationTypeId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("InspectionFee")
+                    b.Property<decimal>("COQFee")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("NOAFee")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ProcessingFee")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("SerciveCharge")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("VesselLicenseFee")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("VesseltypeId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("ApplicationTypeId");
-
-                    b.HasIndex("VesseltypeId");
 
                     b.ToTable("AppFees");
                 });
@@ -84,6 +77,13 @@ namespace Bunkering.Core.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("DeportStateId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("DischargePort")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("FADApproved")
                         .HasColumnType("bit");
 
@@ -96,14 +96,23 @@ namespace Bunkering.Core.Migrations
                     b.Property<int?>("FlowId")
                         .HasColumnType("int");
 
+                    b.Property<string>("IMONumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<string>("LoadingPort")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MarketerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Reference")
                         .IsRequired()
@@ -119,6 +128,10 @@ namespace Bunkering.Core.Migrations
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("VesselName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -549,23 +562,21 @@ namespace Bunkering.Core.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CallSIgn")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Capacity")
+                    b.Property<decimal?>("Capacity")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("CompanyId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("DeadWeight")
+                    b.Property<decimal?>("DeadWeight")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ElpsId")
                         .HasColumnType("int");
 
                     b.Property<string>("Flag")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IMONumber")
@@ -580,17 +591,15 @@ namespace Bunkering.Core.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Operator")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PlaceOfBuild")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("VesselTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int>("YearOfBuild")
+                    b.Property<int?>("YearOfBuild")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -876,7 +885,6 @@ namespace Bunkering.Core.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("ExtraPaymentId")
-                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<DateTime>("LastRetryDate")
@@ -1497,25 +1505,6 @@ namespace Bunkering.Core.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Bunkering.Core.Data.AppFee", b =>
-                {
-                    b.HasOne("Bunkering.Core.Data.ApplicationType", "ApplicationType")
-                        .WithMany()
-                        .HasForeignKey("ApplicationTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Bunkering.Core.Data.VesselType", "VesselType")
-                        .WithMany()
-                        .HasForeignKey("VesseltypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationType");
-
-                    b.Navigation("VesselType");
-                });
-
             modelBuilder.Entity("Bunkering.Core.Data.Application", b =>
                 {
                     b.HasOne("Bunkering.Core.Data.ApplicationType", "ApplicationType")
@@ -1716,9 +1705,7 @@ namespace Bunkering.Core.Migrations
 
                     b.HasOne("Bunkering.Core.Data.ExtraPayment", "ExtraPayment")
                         .WithMany()
-                        .HasForeignKey("ExtraPaymentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ExtraPaymentId");
 
                     b.Navigation("ExtraPayment");
                 });

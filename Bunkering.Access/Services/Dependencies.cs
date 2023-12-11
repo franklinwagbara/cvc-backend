@@ -2,11 +2,10 @@
 using Bunkering.Access.IContracts;
 using Bunkering.Core.Data;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Builder;
 
 namespace Bunkering.Access.Services
 {
-	public static class Dependencies
+    public static class Dependencies
 	{
 		public static void Services(this IServiceCollection services)
 		{
@@ -29,6 +28,7 @@ namespace Bunkering.Access.Services
 			services.AddScoped<LibraryService>();
 			services.AddScoped<LocationService>();
 			services.AddScoped<OfficeService>();
-		}
+            services.AddScoped<AppFeeService>();
+        }
 	}
 }

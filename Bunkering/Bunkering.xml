@@ -4,6 +4,90 @@
         <name>Bunkering</name>
     </assembly>
     <members>
+        <member name="M:Bunkering.Controllers.API.AppFeeController.GetAllFees">
+            <summary>
+            This endpoint is used to fetch  all the Fees summary
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/application/get-all-fees
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.AppFeeController.AddFee(Bunkering.Core.Data.AppFee)">
+            <summary>
+            This endpoint is used to add new fee
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/AppFee/add-fee
+            
+            </remarks>
+            <response code="200">Returns success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+            
+        </member>
+        <member name="M:Bunkering.Controllers.API.AppFeeController.EditFee(Bunkering.Core.Data.AppFee)">
+            <summary>
+            This endpoint is used to Edit new fee
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/AppFee/edit-fee
+            
+            </remarks>
+            <response code="200">Returns success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+            
+        </member>
+        <member name="M:Bunkering.Controllers.API.AppFeeController.GetFeeById(System.Int32)">
+            <summary>
+            This endpoint is used to Get fee by Id
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/AppFee/get-fee-byId
+            
+            </remarks>
+            <response code="200">Returns success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+            
+        </member>
+        <member name="M:Bunkering.Controllers.API.AppFeeController.DeleteFee(System.Int32)">
+            <summary>
+            This endpoint is used to Delete fee by Id
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/AppFee/delete-fee
+            
+            </remarks>
+            <response code="200">Returns success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+            
+        </member>
         <member name="M:Bunkering.Controllers.API.ApplicationController.Apply(Bunkering.Core.ViewModels.ApplictionViewModel)">
             <summary>
             This endpoint is used to initiate an application 
