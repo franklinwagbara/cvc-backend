@@ -455,9 +455,10 @@ namespace Bunkering.Access.Services
                             VesselName = app.VesselName,
                             FacilityType = app.Facility.Name,
                             ApplicationType = app.ApplicationType.Name,
+                            ApplicationFee = fee.ApplicationFee,
                             fee.COQFee,
                             fee.NOAFee,
-                            fee.SerciveCharge,
+                            ServiceCharge = fee.SerciveCharge,
                             Total = total,
                             payment.RRR,
                             PaymentStatus = payment.Status
