@@ -401,3 +401,5 @@ FodyWeavers.xsd
 /Bunkering.Access/obj/Debug/net7.0/Bunkering.Access.assets.cache
 /Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.assets.cache
 /Bunkering/obj/Debug/net7.0/Bunkering.assets.cache
+*.v2
+*.bin
