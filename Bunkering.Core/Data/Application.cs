@@ -10,7 +10,7 @@ namespace Bunkering.Core.Data
     public class Application
     {
         public int Id { get; set; }
-        public int? ApplicationTypeId { get; set; }
+        public int ApplicationTypeId { get; set; }
         public int DeportStateId { get; set; } = 0;
         public string UserId { get; set; }
         public int FacilityId { get; set; }
