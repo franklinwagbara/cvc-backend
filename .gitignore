@@ -424,3 +424,5 @@ FodyWeavers.xsd
 /.vs/Bunkering/v17/.suo
 /Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.csproj.AssemblyReference.cache
 *.v2
+/Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.GeneratedMSBuildEditorConfig.editorconfig
+/.vs/Bunkering/DesignTimeBuild/.dtbcache.v2
