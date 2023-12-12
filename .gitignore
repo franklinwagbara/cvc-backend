@@ -407,3 +407,4 @@ FodyWeavers.xsd
 /.vs/Bunkering/DesignTimeBuild/.dtbcache.v2
 /.vs/Bunkering/v17/fileList.bin
 /Bunkering/bin/Debug/net7.0/appsettings.Development.json
+*.bin
