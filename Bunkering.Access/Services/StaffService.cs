@@ -117,6 +117,28 @@ namespace Bunkering.Access.Services
 			{
 				var user = await _userManager.FindByEmailAsync(User);
 				var staff = await _userManager.FindByEmailAsync(model.Email);
+				var locationExists = await _unitOfWork.Location.FirstOrDefaultAsync(l => l.Id == model.LocationId) is not null;
+				var officeExists = await _unitOfWork.Office.FirstOrDefaultAsync(l => l.Id == model.OfficeId) is not null;
+                if (!locationExists)
+                {
+					return new ApiResponse
+					{
+						Message = "location does not successfully.",
+						StatusCode = HttpStatusCode.NotFound,
+						Success = false
+					};
+                    
+                }
+                if (!officeExists)
+                {
+					return new ApiResponse
+					{
+						Message = "office does not successfully.",
+						StatusCode = HttpStatusCode.NotFound,
+						Success = false
+					};
+                    
+                }
 				if (staff == null)
 				{
 					staff = new ApplicationUser

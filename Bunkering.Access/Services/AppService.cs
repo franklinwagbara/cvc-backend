@@ -154,7 +154,7 @@ namespace Bunkering.Access.Services
                     {
                         var app = new Application
                         {
-                            ApplicationTypeId = model.ApplicationTypeId,
+                            ApplicationTypeId = appType.Id,
                             CreatedDate = DateTime.UtcNow.AddHours(1),
                             CurrentDeskId = user.Id,
                             Reference = Utils.RefrenceCode(),
@@ -174,30 +174,35 @@ namespace Bunkering.Access.Services
                         var tank = await AppTanks(model.TankList, facility.Id);
 
 
-                        if (tank != null)
-                        {
-                            _response = new ApiResponse
-                            {
-                                Message = "Application initiated successfully",
-                                StatusCode = HttpStatusCode.OK,
-                                Data = new { appId = app.Id },
-                                Success = true
-                            };
+                    if (tank != null)
+                    {
+                        await _unitOfWork.Application.Add(app);
+                        await _unitOfWork.SaveChangesAsync(app.UserId);
 
-                        }
-                        else
+                        _response = new ApiResponse
                         {
-                            _response = new ApiResponse
-                            {
-                                Message = "unable to apply",
-                                StatusCode = HttpStatusCode.NotFound,
-                                Success = false
-                            };
-
-                        }
-                        //await _flow.AppWorkFlow(app.Id, Enum.GetName(typeof(AppActions), AppActions.Initiate), "Application Created");
+                            Message = "Application initiated successfully",
+                            StatusCode = HttpStatusCode.OK,
+                            Data = new { appId = app.Id },
+                            Success = true
+                        };
 
                     }
+                    else
+                    {
+                        _response = new ApiResponse
+                        {
+                            Message = "unable to apply",
+                            StatusCode = HttpStatusCode.NotFound,
+                            Success = false
+                        };
+
+                    }
+
+
+                    //await _flow.AppWorkFlow(app.Id, Enum.GetName(typeof(AppActions), AppActions.Initiate), "Application Created");
+
+                }
                 else
                 {
                     _response = new ApiResponse
@@ -207,7 +212,7 @@ namespace Bunkering.Access.Services
                         Success = false
                     };
                 }
-                        
+
                 //}
 
             }
@@ -870,12 +875,10 @@ namespace Bunkering.Access.Services
                     CompanyName = x.User.Company.Name,
                     VesselName = x.Facility.Name,
                     VesselType = x.Facility.VesselType.Name,
-                    x.Facility.Capacity,
-                    x.Facility.DeadWeight,
                     x.Reference,
                     x.Status,
-                    PaymnetStatus = x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted))
-                        ? "Payment confirmed" : x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentRejected)) ? "Payment rejected" : "Payment pending",
+                    PaymentStatus = x.Payments.Count != 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted))
+                        ? "Payment confirmed" : x.Payments.Count != 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentRejected)) ? "Payment rejected" : "Payment pending",
                     RRR = x.Payments.FirstOrDefault()?.RRR,
                     CreatedDate = x.CreatedDate.ToString("MMMM dd, yyyy HH:mm:ss")
                 }).ToList(),
