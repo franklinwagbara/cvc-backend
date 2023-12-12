@@ -161,7 +161,7 @@ namespace Bunkering.Access.Services
                                 if (content != null)
                                 {
                                     var dic = content.Parse<Dictionary<string, string>>();
-                                    if ((!string.IsNullOrEmpty(dic.GetValue("message").ToString()) && dic.GetValue("message").ToString().Equals("successful"))
+                                    if ((!string.IsNullOrEmpty(dic.GetValue("message").ToString()) && dic.GetValue("message").ToString().Equals("Successful"))
                                         || (!string.IsNullOrEmpty(dic.GetValue("status").ToString()) && dic.GetValue("status").ToString().Equals("00")))
                                     {
                                         payment.Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted);

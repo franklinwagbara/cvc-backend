@@ -408,6 +408,12 @@ FodyWeavers.xsd
 /Bunkering.Access/obj/Debug/net7.0/Bunkering.Access.assets.cache
 /Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.assets.cache
 /Bunkering/obj/Debug/net7.0/Bunkering.assets.cache
+/Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.GeneratedMSBuildEditorConfig.editorconfig
+/Bunkering.Access/obj/Bunkering.Access.csproj.nuget.dgspec.json
+/Bunkering/obj/project.assets.json
+/.vs/Bunkering/DesignTimeBuild/.dtbcache.v2
+/.vs/Bunkering/v17/fileList.bin
+/Bunkering/bin/Debug/net7.0/appsettings.Development.json
 /Bunkering.Access/obj/Bunkering.Access.csproj.nuget.dgspec.json
 /Bunkering.Access/obj/Bunkering.Access.csproj.nuget.g.props
 /Bunkering.Access/obj/Debug/net7.0/Bunkering.Access.csproj.FileListAbsolute.txt
