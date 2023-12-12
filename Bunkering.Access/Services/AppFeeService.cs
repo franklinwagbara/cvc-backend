@@ -47,7 +47,8 @@ namespace Bunkering.Access.Services
                     x.ApplicationTypeId,
                     x.NOAFee,
                     x.COQFee,
-                    x.ProcessingFee
+                    x.ProcessingFee,
+                    x.IsDeleted
                 })
             };
         }
@@ -108,21 +109,17 @@ namespace Bunkering.Access.Services
             {
                 if (updateFee != null)
                 {
-                    var fee = new AppFee
-                    {
-                        SerciveCharge = newFee.SerciveCharge,
-                        NOAFee = newFee.NOAFee,
-                        COQFee = newFee.COQFee,
-                        ApplicationFee = newFee.ApplicationFee,
-                        ProcessingFee = newFee.ProcessingFee
-                    };
-                    await _unitOfWork.AppFee.Update(fee);
-                    await _unitOfWork.SaveChangesAsync(user.Id);
+                    updateFee.SerciveCharge = newFee.SerciveCharge;
+                    updateFee.NOAFee = newFee.NOAFee;
+                    updateFee.COQFee = newFee.COQFee;
+                    updateFee.ApplicationFee = newFee.ApplicationFee;
+                    updateFee.ProcessingFee = newFee.ProcessingFee;
+                    var success = await _unitOfWork.SaveChangesAsync(user!.Id) > 0;
                     _response = new ApiResponse
                     {
-                        Message = "Fee was Edited successfully.",
-                        StatusCode = HttpStatusCode.OK,
-                        Success = true
+                        Message = success ? "Fee was Edited successfully." : "Unable to edit fee, please try again.",
+                        StatusCode = success ? HttpStatusCode.OK : HttpStatusCode.InternalServerError,
+                        Success = success
                     };
                 }
             }
@@ -142,13 +139,14 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> DeleteFee(int id)
         {
+            var user = await _userManager.FindByEmailAsync(User);
             var deactiveFee = await _unitOfWork.AppFee.FirstOrDefaultAsync(a => a.Id == id);
             if (deactiveFee != null)
             {
                 if (!deactiveFee.IsDeleted)
                 {
                     deactiveFee.IsDeleted = true;
-                    await _unitOfWork.AppFee.Update(deactiveFee);
+                    await _unitOfWork.SaveChangesAsync(user!.Id);
 
                     _response = new ApiResponse
                     {
