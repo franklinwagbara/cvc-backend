@@ -43,7 +43,8 @@ namespace Bunkering.Access.Services
                     x.ApplicationTypeId,
                     x.NOAFee,
                     x.COQFee,
-                    x.ProcessingFee
+                    x.ProcessingFee,
+                    x.IsDeleted
                 })
             };
         }
@@ -109,14 +110,12 @@ namespace Bunkering.Access.Services
                     updateFee.COQFee = newFee.COQFee;
                     updateFee.ApplicationFee = newFee.ApplicationFee;
                     updateFee.ProcessingFee = newFee.ProcessingFee;
-                    
-                    await _unitOfWork.AppFee.Update(updateFee);
-                    await _unitOfWork.SaveChangesAsync(user.Id);
+                    var success = await _unitOfWork.SaveChangesAsync(user!.Id) > 0;
                     _response = new ApiResponse
                     {
-                        Message = "Fee was Edited successfully.",
-                        StatusCode = HttpStatusCode.OK,
-                        Success = true
+                        Message = success ? "Fee was Edited successfully." : "Unable to edit fee, please try again.",
+                        StatusCode = success ? HttpStatusCode.OK : HttpStatusCode.InternalServerError,
+                        Success = success
                     };
                 }
             }
