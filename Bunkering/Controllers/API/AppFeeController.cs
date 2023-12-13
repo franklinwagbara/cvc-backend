@@ -74,7 +74,7 @@ namespace Bunkering.Controllers.API
         /// <response code="400">Internal server error - bad request </response>
         /// 
         [Route("edit-fee")]
-        [HttpPost]
+        [HttpPut]
         public async Task<IActionResult> EditFee(AppFee model) => Response(await _appFeeService.EditFee(model));
 
 
@@ -94,7 +94,7 @@ namespace Bunkering.Controllers.API
         /// <response code="400">Internal server error - bad request </response>
         /// 
         [Route("get-fee-byId")]
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> GetFeeById(int id) => Response(await _appFeeService.GetFeeByID(id));
 
 
@@ -114,7 +114,7 @@ namespace Bunkering.Controllers.API
         /// <response code="400">Internal server error - bad request </response>
         /// 
         [Route("delete-fee")]
-        [HttpPost]
+        [HttpDelete]
         public async Task<IActionResult> DeleteFee(int id) => Response(await _appFeeService.DeleteFee(id));
 
     }
