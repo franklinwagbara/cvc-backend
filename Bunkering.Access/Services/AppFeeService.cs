@@ -1,9 +1,17 @@
 ﻿using Bunkering.Access.IContracts;
 using Bunkering.Core.Data;
+using Bunkering.Core.Migrations;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Bunkering.Access.Services
 {
@@ -13,11 +21,14 @@ namespace Bunkering.Access.Services
         private readonly IHttpContextAccessor _contextAccessor;
         private ApiResponse _response = new ApiResponse();
         private readonly UserManager<ApplicationUser> _userManager;
+
+        private string User;
         public AppFeeService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
             //_response = response;
+            User = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
             _userManager = userManager;
         }
 
@@ -91,12 +102,13 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> EditFee(AppFee newFee)
         {
+            var user = await _userManager.FindByEmailAsync(User);
             var updateFee = await _unitOfWork.AppFee.FirstOrDefaultAsync(x => x.Id == newFee.Id);
             try
             {
                 if (updateFee != null)
                 {
-                    var Fee = new AppFee
+                    var fee = new AppFee
                     {
                         SerciveCharge = newFee.SerciveCharge,
                         NOAFee = newFee.NOAFee,
@@ -104,8 +116,8 @@ namespace Bunkering.Access.Services
                         ApplicationFee = newFee.ApplicationFee,
                         ProcessingFee = newFee.ProcessingFee
                     };
-                    await _unitOfWork.AppFee.Add(Fee);
-                    await _unitOfWork.SaveChangesAsync("");
+                    await _unitOfWork.AppFee.Update(fee);
+                    await _unitOfWork.SaveChangesAsync(user.Id);
                     _response = new ApiResponse
                     {
                         Message = "Fee was Edited successfully.",
@@ -130,7 +142,7 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> DeleteFee(int id)
         {
-            var deactiveFee = await _unitOfWork.AppFee.FirstOrDefaultAsync(a => a.Id.Equals(id));
+            var deactiveFee = await _unitOfWork.AppFee.FirstOrDefaultAsync(a => a.Id == id);
             if (deactiveFee != null)
             {
                 if (!deactiveFee.IsDeleted)
@@ -146,13 +158,17 @@ namespace Bunkering.Access.Services
                         Success = true
                     };
                 }
-                _response = new ApiResponse
+                else
                 {
-                    Data = deactiveFee,
-                    Message = "Fee is already deleted",
-                    StatusCode = HttpStatusCode.OK,
-                    Success = true
-                };
+                    _response = new ApiResponse
+                    {
+                        Data = deactiveFee,
+                        Message = "Fee is already deleted",
+                        StatusCode = HttpStatusCode.OK,
+                        Success = true
+                    };
+                }
+               
             }
 
             return _response;
