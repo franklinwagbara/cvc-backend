@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\modib\\Documents\\GitHub\\CVCBackEnd\\Bunkering.Access\\Bunkering.Access.csproj": {}
+    "C:\\Users\\mahmo\\source\\repos\\BrandOneTech\\New folder\\CVCBackEnd\\Bunkering.Access\\Bunkering.Access.csproj": {}
   },
   "projects": {
-    "C:\\Users\\modib\\Documents\\GitHub\\CVCBackEnd\\Bunkering.Access\\Bunkering.Access.csproj": {
+    "C:\\Users\\mahmo\\source\\repos\\BrandOneTech\\New folder\\CVCBackEnd\\Bunkering.Access\\Bunkering.Access.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\modib\\Documents\\GitHub\\CVCBackEnd\\Bunkering.Access\\Bunkering.Access.csproj",
+        "projectUniqueName": "C:\\Users\\mahmo\\source\\repos\\BrandOneTech\\New folder\\CVCBackEnd\\Bunkering.Access\\Bunkering.Access.csproj",
         "projectName": "Bunkering.Access",
-        "projectPath": "C:\\Users\\modib\\Documents\\GitHub\\CVCBackEnd\\Bunkering.Access\\Bunkering.Access.csproj",
-        "packagesPath": "C:\\Users\\modib\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\modib\\Documents\\GitHub\\CVCBackEnd\\Bunkering.Access\\obj\\",
+        "projectPath": "C:\\Users\\mahmo\\source\\repos\\BrandOneTech\\New folder\\CVCBackEnd\\Bunkering.Access\\Bunkering.Access.csproj",
+        "packagesPath": "C:\\Users\\mahmo\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\mahmo\\source\\repos\\BrandOneTech\\New folder\\CVCBackEnd\\Bunkering.Access\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\modib\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\mahmo\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -31,8 +31,8 @@
           "net7.0": {
             "targetAlias": "net7.0",
             "projectReferences": {
-              "C:\\Users\\modib\\Documents\\GitHub\\CVCBackEnd\\Bunkering.Core\\Bunkering.Core.csproj": {
-                "projectPath": "C:\\Users\\modib\\Documents\\GitHub\\CVCBackEnd\\Bunkering.Core\\Bunkering.Core.csproj"
+              "C:\\Users\\mahmo\\source\\repos\\BrandOneTech\\New folder\\CVCBackEnd\\Bunkering.Core\\Bunkering.Core.csproj": {
+                "projectPath": "C:\\Users\\mahmo\\source\\repos\\BrandOneTech\\New folder\\CVCBackEnd\\Bunkering.Core\\Bunkering.Core.csproj"
               }
             }
           }
@@ -41,6 +41,9 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "default"
         }
       },
       "frameworks": {
@@ -80,20 +83,20 @@
         }
       }
     },
-    "C:\\Users\\modib\\Documents\\GitHub\\CVCBackEnd\\Bunkering.Core\\Bunkering.Core.csproj": {
+    "C:\\Users\\mahmo\\source\\repos\\BrandOneTech\\New folder\\CVCBackEnd\\Bunkering.Core\\Bunkering.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\modib\\Documents\\GitHub\\CVCBackEnd\\Bunkering.Core\\Bunkering.Core.csproj",
+        "projectUniqueName": "C:\\Users\\mahmo\\source\\repos\\BrandOneTech\\New folder\\CVCBackEnd\\Bunkering.Core\\Bunkering.Core.csproj",
         "projectName": "Bunkering.Core",
-        "projectPath": "C:\\Users\\modib\\Documents\\GitHub\\CVCBackEnd\\Bunkering.Core\\Bunkering.Core.csproj",
-        "packagesPath": "C:\\Users\\modib\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\modib\\Documents\\GitHub\\CVCBackEnd\\Bunkering.Core\\obj\\",
+        "projectPath": "C:\\Users\\mahmo\\source\\repos\\BrandOneTech\\New folder\\CVCBackEnd\\Bunkering.Core\\Bunkering.Core.csproj",
+        "packagesPath": "C:\\Users\\mahmo\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\mahmo\\source\\repos\\BrandOneTech\\New folder\\CVCBackEnd\\Bunkering.Core\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\modib\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\mahmo\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -113,6 +116,9 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "default"
         }
       },
       "frameworks": {

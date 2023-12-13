@@ -13678,23 +13678,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\modib\\.nuget\\packages\\": {},
+    "C:\\Users\\mahmo\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\modib\\Documents\\GitHub\\CVCBackEnd\\Bunkering\\Bunkering.csproj",
+      "projectUniqueName": "C:\\Users\\mahmo\\source\\repos\\BrandOneTech\\New folder\\CVCBackEnd\\Bunkering\\Bunkering.csproj",
       "projectName": "Bunkering",
-      "projectPath": "C:\\Users\\modib\\Documents\\GitHub\\CVCBackEnd\\Bunkering\\Bunkering.csproj",
-      "packagesPath": "C:\\Users\\modib\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\modib\\Documents\\GitHub\\CVCBackEnd\\Bunkering\\obj\\",
+      "projectPath": "C:\\Users\\mahmo\\source\\repos\\BrandOneTech\\New folder\\CVCBackEnd\\Bunkering\\Bunkering.csproj",
+      "packagesPath": "C:\\Users\\mahmo\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\mahmo\\source\\repos\\BrandOneTech\\New folder\\CVCBackEnd\\Bunkering\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\modib\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\mahmo\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -13708,8 +13708,8 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "projectReferences": {
-            "C:\\Users\\modib\\Documents\\GitHub\\CVCBackEnd\\Bunkering.Access\\Bunkering.Access.csproj": {
-              "projectPath": "C:\\Users\\modib\\Documents\\GitHub\\CVCBackEnd\\Bunkering.Access\\Bunkering.Access.csproj"
+            "C:\\Users\\mahmo\\source\\repos\\BrandOneTech\\New folder\\CVCBackEnd\\Bunkering.Access\\Bunkering.Access.csproj": {
+              "projectPath": "C:\\Users\\mahmo\\source\\repos\\BrandOneTech\\New folder\\CVCBackEnd\\Bunkering.Access\\Bunkering.Access.csproj"
             }
           }
         }
@@ -13718,6 +13718,9 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "default"
       }
     },
     "frameworks": {
