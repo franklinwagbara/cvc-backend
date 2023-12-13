@@ -99,73 +99,105 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> EditFee(AppFee newFee)
         {
-            var user = await _userManager.FindByEmailAsync(User);
-            var updateFee = await _unitOfWork.AppFee.FirstOrDefaultAsync(x => x.Id == newFee.Id);
             try
             {
-                if (updateFee != null)
+                var user = await _userManager.FindByEmailAsync(User);
+                var updateFee = await _unitOfWork.AppFee.FirstOrDefaultAsync(x => x.Id == newFee.Id);
+                try
                 {
-                    updateFee.SerciveCharge = newFee.SerciveCharge;
-                    updateFee.NOAFee = newFee.NOAFee;
-                    updateFee.COQFee = newFee.COQFee;
-                    updateFee.ApplicationFee = newFee.ApplicationFee;
-                    updateFee.ProcessingFee = newFee.ProcessingFee;
-                    var success = await _unitOfWork.SaveChangesAsync(user!.Id) > 0;
+                    if (updateFee != null)
+                    {
+                        updateFee.SerciveCharge = newFee.SerciveCharge;
+                        updateFee.NOAFee = newFee.NOAFee;
+                        updateFee.COQFee = newFee.COQFee;
+                        updateFee.ApplicationFee = newFee.ApplicationFee;
+                        updateFee.ProcessingFee = newFee.ProcessingFee;
+                        var success = await _unitOfWork.SaveChangesAsync(user!.Id) > 0;
+                        _response = new ApiResponse
+                        {
+                            Message = success ? "Fee was Edited successfully." : "Unable to edit fee, please try again.",
+                            StatusCode = success ? HttpStatusCode.OK : HttpStatusCode.InternalServerError,
+                            Success = success
+                        };
+                    }
+                }
+                catch (Exception ex)
+                {
                     _response = new ApiResponse
                     {
-                        Message = success ? "Fee was Edited successfully." : "Unable to edit fee, please try again.",
-                        StatusCode = success ? HttpStatusCode.OK : HttpStatusCode.InternalServerError,
-                        Success = success
+                        Message = ex.Message,
+                        StatusCode = HttpStatusCode.InternalServerError,
+                        Success = false
                     };
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 _response = new ApiResponse
                 {
-                    Message = ex.Message,
-                    StatusCode = HttpStatusCode.InternalServerError,
-                    Success = false
+                    Message = "You need to LogIn to Edit a Fee",
+                    StatusCode = HttpStatusCode.Unauthorized,
+                    Success = true
                 };
-            }
-
+            }    
             return _response;
-
         }
 
         public async Task<ApiResponse> DeleteFee(int id)
         {
-            var user = await _userManager.FindByEmailAsync(User);
-            var deactiveFee = await _unitOfWork.AppFee.FirstOrDefaultAsync(a => a.Id == id);
-            if (deactiveFee != null)
+            try
             {
-                if (!deactiveFee.IsDeleted)
+                var user = await _userManager.FindByEmailAsync(User);
+                if (user is null)
                 {
-                    deactiveFee.IsDeleted = true;
-                    await _unitOfWork.AppFee.Update(deactiveFee);
-                    await _unitOfWork.SaveChangesAsync(user.Id);
+                    _response = new ApiResponse
+                    {
+                        Message = "You need to LogIn to Delete a Fee",
+                        StatusCode = HttpStatusCode.Forbidden,
+                        Success = true
+                    };
+                }
+                var deactiveFee = await _unitOfWork.AppFee.FirstOrDefaultAsync(a => a.Id == id);
+                if (deactiveFee != null)
+                {
+                    if (!deactiveFee.IsDeleted)
+                    {
+                        deactiveFee.IsDeleted = true;
+                        await _unitOfWork.AppFee.Update(deactiveFee);
+                        await _unitOfWork.SaveChangesAsync(user.Id);
 
-                    _response = new ApiResponse
+                        _response = new ApiResponse
+                        {
+                            Data = deactiveFee,
+                            Message = "Fee has been deleted",
+                            StatusCode = HttpStatusCode.OK,
+                            Success = true
+                        };
+                    }
+                    else
                     {
-                        Data = deactiveFee,
-                        Message = "Fee has been deleted",
-                        StatusCode = HttpStatusCode.OK,
-                        Success = true
-                    };
+                        _response = new ApiResponse
+                        {
+                            Data = deactiveFee,
+                            Message = "Fee is already deleted",
+                            StatusCode = HttpStatusCode.OK,
+                            Success = true
+                        };
+                    }
+
                 }
-                else
-                {
-                    _response = new ApiResponse
-                    {
-                        Data = deactiveFee,
-                        Message = "Fee is already deleted",
-                        StatusCode = HttpStatusCode.OK,
-                        Success = true
-                    };
-                }
-               
+
             }
-
+            catch (Exception)
+            {
+                _response = new ApiResponse
+                {
+                    Message = "You need to LogIn to Delete a Fee",
+                    StatusCode = HttpStatusCode.Unauthorized,
+                    Success = true
+                };
+            }
+            
             return _response;
         }
     }
