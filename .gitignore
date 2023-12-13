@@ -414,9 +414,6 @@ FodyWeavers.xsd
 /.vs/Bunkering/DesignTimeBuild/.dtbcache.v2
 /.vs/Bunkering/v17/fileList.bin
 /Bunkering/bin/Debug/net7.0/appsettings.Development.json
-<<<<<<< HEAD
-*.bin
-=======
 /Bunkering.Access/obj/Bunkering.Access.csproj.nuget.dgspec.json
 /Bunkering.Access/obj/Bunkering.Access.csproj.nuget.g.props
 /Bunkering.Access/obj/Debug/net7.0/Bunkering.Access.csproj.FileListAbsolute.txt
@@ -435,7 +432,6 @@ FodyWeavers.xsd
 *.v2
 /Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.GeneratedMSBuildEditorConfig.editorconfig
 /.vs/Bunkering/DesignTimeBuild/.dtbcache.v2
->>>>>>> c62dd2340314d74d8dbea5ddffdbfbc2a19e5c28
 /Bunkering.Access/obj/Bunkering.Access.csproj.nuget.dgspec.json
 /Bunkering.Core/Migrations/20231212112113_AppFeeUpdate.Designer.cs
 /Bunkering.Core/Migrations/20231212112113_AppFeeUpdate.cs
