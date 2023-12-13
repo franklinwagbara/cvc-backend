@@ -991,6 +991,8 @@ namespace Bunkering.Access.Services
                                     app.Facility.Flag,
                                     app.Facility.CallSIgn,
                                     app.Facility.Operator,
+                                    app.DischargePort,
+                                    app.LoadingPort,
                                     Tanks = app.Facility.Tanks.Select(t => new
                                     {
                                         t.Name,
