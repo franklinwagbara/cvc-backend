@@ -112,6 +112,7 @@ namespace Bunkering.Access.Services
                         updateFee.COQFee = newFee.COQFee;
                         updateFee.ApplicationFee = newFee.ApplicationFee;
                         updateFee.ProcessingFee = newFee.ProcessingFee;
+                        updateFee.ApplicationTypeId = newFee.ApplicationTypeId;
                         var success = await _unitOfWork.SaveChangesAsync(user!.Id) > 0;
                         _response = new ApiResponse
                         {
