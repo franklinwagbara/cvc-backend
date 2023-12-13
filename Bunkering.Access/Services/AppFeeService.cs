@@ -30,12 +30,13 @@ namespace Bunkering.Access.Services
         public async Task<ApiResponse> GetAllFees()
         {
             var fees = await _unitOfWork.AppFee.GetAll();
+            var filteredFees = fees.Where(x => x.IsDeleted == false);
             return new ApiResponse
             {
                 Message = "All Fees found",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                Data = fees.Select(x => new
+                Data = filteredFees.Select(x => new 
                 {
                     x.Id,
                     x.SerciveCharge,
@@ -135,6 +136,7 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> DeleteFee(int id)
         {
+            var user = await _userManager.FindByEmailAsync(User);
             var deactiveFee = await _unitOfWork.AppFee.FirstOrDefaultAsync(a => a.Id == id);
             if (deactiveFee != null)
             {
@@ -142,6 +144,7 @@ namespace Bunkering.Access.Services
                 {
                     deactiveFee.IsDeleted = true;
                     await _unitOfWork.AppFee.Update(deactiveFee);
+                    await _unitOfWork.SaveChangesAsync(user.Id);
 
                     _response = new ApiResponse
                     {
