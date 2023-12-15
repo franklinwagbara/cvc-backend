@@ -5,7 +5,7 @@
 namespace Bunkering.Core.Migrations
 {
     /// <inheritdoc />
-    public partial class AppFeeUpdate : Migration
+    public partial class AppFeeMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
