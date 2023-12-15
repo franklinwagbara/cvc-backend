@@ -76,7 +76,7 @@ namespace Bunkering.Access.Services
                     NOAFee = newFee.NOAFee,
                     COQFee = newFee.COQFee,
                     ApplicationTypeId = newFee.ApplicationTypeId,
-                    
+
                 };
                 await _unitOfWork.AppFee.Add(fee);
                 await _unitOfWork.SaveChangesAsync("");
@@ -96,7 +96,7 @@ namespace Bunkering.Access.Services
                     Success = false
                 };
             }
-           
+
             return _response;
         }
 
@@ -168,7 +168,7 @@ namespace Bunkering.Access.Services
                         Success = true
                     };
                 }
-               
+
             }
 
             return _response;

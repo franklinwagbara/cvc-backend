@@ -70,7 +70,7 @@ namespace Bunkering.Access.Services
                                 var fee = await _unitOfWork.AppFee.FirstOrDefaultAsync(x => x.ApplicationTypeId.Equals(app.ApplicationTypeId));
                                 if (fee != null)
                                 {
-                                    var total =  fee.ApplicationFee + fee.ProcessingFee + fee.COQFee + fee.SerciveCharge + fee.NOAFee;
+                                    var total = fee.ApplicationFee + fee.ProcessingFee + fee.COQFee + fee.SerciveCharge + fee.NOAFee;
 
                                     var request = await _elps.GeneratePaymentReference($"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}", app, total, fee.SerciveCharge);
                                     _logger.LogRequest("Creation of payment split for application with reference:" + app.Reference + "(" + app.User.Company.Name + ") by " + User, false, directory);
@@ -206,7 +206,7 @@ namespace Bunkering.Access.Services
                                 Success = true
                             };
                         }
-                           
+
                     }
 
                     _logger.LogRequest($"\"Getting payment for company application -:{app.Reference}{" by"}{_contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email)} {" - "}{DateTime.Now}", false, directory);
@@ -271,6 +271,34 @@ namespace Bunkering.Access.Services
 
             return _response;
         }
+
+        public async Task<ApiResponse> GetAllPayments()
+        {
+            var payments = await _unitOfWork.vPayment.GetAll();
+            return new ApiResponse
+            {
+                Data = payments,
+                Message = "Successful",
+                StatusCode = HttpStatusCode.OK,
+                Success = true
+            };
+
+        }
+        public async Task<ApiResponse> GetPaymentById(int id)
+        {
+            var paymentById = await _unitOfWork.vPayment.FirstOrDefaultAsync(x => x.Id.Equals(id));
+
+            _response = new ApiResponse
+            {
+                Data = paymentById,
+                Message = "Successful",
+                StatusCode = HttpStatusCode.OK,
+                Success = true
+            };
+            return _response;
+        }
+
+
 
 
     }
