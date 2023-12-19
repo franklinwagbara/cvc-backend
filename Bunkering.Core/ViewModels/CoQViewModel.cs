@@ -18,8 +18,5 @@ namespace Bunkering.Core.ViewModels
         public DateTime DateCreated { get; set; } = DateTime.Now;
         public DateTime? DateModified { get; set; }
         public string CreatedBy { get; set; } = string.Empty;
-
-        public Application? Application { get; set; }
-        public Depot? Depot { get; set; }
     }
 }
