@@ -30,6 +30,7 @@ namespace Bunkering.Access.Services
             services.AddScoped<OfficeService>();
             services.AddScoped<AppFeeService>();
             services.AddScoped<JettyService>();
+            services.AddScoped<DepotOfficerService>();
             services.AddScoped<DepotService>();
             services.AddScoped<NominatedSurveyorService>();
             services.AddScoped<CoQService>();

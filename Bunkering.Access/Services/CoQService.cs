@@ -18,13 +18,13 @@ namespace Bunkering.Access.Services
         private readonly IMapper _mapper;
         private string LoginUserEmail = string.Empty;
 
-        public CoQService(IUnitOfWork unitOfWork, IHttpContextAccessor httpCxtAccessor, ApiResponse apiReponse, UserManager<ApplicationUser> userManager, IMapper mapper)
+        public CoQService(IUnitOfWork unitOfWork, IHttpContextAccessor httpCxtAccessor,  UserManager<ApplicationUser> userManager, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _httpCxtAccessor = httpCxtAccessor;
-            _apiReponse = apiReponse;
             _userManager = userManager;
             _mapper = mapper;
+            _apiReponse = new ApiResponse();
             LoginUserEmail = _httpCxtAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
         }
 
