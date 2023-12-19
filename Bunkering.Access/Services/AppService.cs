@@ -683,13 +683,24 @@ namespace Bunkering.Access.Services
                         ? await _flow.AppWorkFlow(id, Enum.GetName(typeof(AppActions), AppActions.Resubmit), "Application re-submitted")
                         : await _flow.AppWorkFlow(id, Enum.GetName(typeof(AppActions), AppActions.Submit), "Application Submitted");
                     if (submit.Item1)
+                    {
                         _response = new ApiResponse
                         {
                             Message = submit.Item2,
                             StatusCode = HttpStatusCode.OK,
                             Success = true
                         };
+                    }
+                    else
+                    {
+                        _response = new ApiResponse
+                        {
+                            Message = submit.Item2,
+                            StatusCode = HttpStatusCode.NotAcceptable,
+                            Success = false
+                        };
 
+                    }
                 }
                 else
                     _response = new ApiResponse
@@ -931,8 +942,15 @@ namespace Bunkering.Access.Services
                             s.ScheduleType,
                             ExpiryDate = s.ExpiryDate.ToString("MMM dd, yyyy HH:mm:ss")
                         });
-                        var paymentStatus = app.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted))
-                        ? "Payment confirmed" : app.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentRejected)) ? "Payment rejected" : "Payment pending";
+                        var paymentStatus = "Payment pending";
+                        if (app.Payments.FirstOrDefault()?.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted)) is true)
+                        {
+                            paymentStatus = "Payment confirmed";
+                        }
+                        else if (app.Payments.FirstOrDefault()?.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentRejected)) is true)
+                        {
+                            paymentStatus = "Payment rejected";
+                        }
 
                         var rrr = app.Payments.FirstOrDefault()?.RRR;
 
@@ -957,7 +975,7 @@ namespace Bunkering.Access.Services
                                 PaymnetStatus = paymentStatus,
                                 RRR = rrr,
                                 TotalAmount = string.Format("{0:N}", app.Payments.Sum(x => x.Amount)),
-                                PaymentDescription = app.Payments.FirstOrDefault().Description,
+                                PaymentDescription = app.Payments.FirstOrDefault()?.Description,
                                 PaymnetDate = app.Payments.FirstOrDefault()?.TransactionDate.ToString("MMM dd, yyyy HH:mm:ss"),
                                 CurrentDesk = _userManager.Users.FirstOrDefault(x => x.Id.Equals(app.CurrentDeskId))?.Email,
                                 AppHistories = histories,
@@ -973,6 +991,8 @@ namespace Bunkering.Access.Services
                                     app.Facility.Flag,
                                     app.Facility.CallSIgn,
                                     app.Facility.Operator,
+                                    app.DischargePort,
+                                    app.LoadingPort,
                                     Tanks = app.Facility.Tanks.Select(t => new
                                     {
                                         t.Name,
