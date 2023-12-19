@@ -1156,13 +1156,74 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
-        /*public async Task<ApiResponse> AllApplicationsByDepot(int id)
+        public async Task<ApiResponse> AllApplicationsByDepot(int depotId)
         {
 
-            var FOs = 
+            var applications = await  _unitOfWork.Application.Find(x => x.DeportStateId == depotId);
+            if (applications != null)
+            {
+                var filteredapps = applications.Where(x => x.IsDeleted == false);
+                _response = new ApiResponse
+                {
+                    Message = "Applications fetched successfully",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true,
+                    Data = applications.Select(x => new
+                    {
+                        x.Id,
+                        x.ApplicationType,
+                        x.Appointment,
+                        x.CreatedDate,
+                        x.CurrentDeskId,
+                        x.DeportStateId,
+                        x.Facility,
+                        x.FADApproved,
+                        x.MarketerName,
+                        x.IsDeleted
+                    })
+                };
+            }
+           
+           
 
-            FOs.Any(x => x.Id == )
+            return _response;
+        }
 
-        }*/
+        public async Task<ApiResponse> AllApplicationsInDepotByUserID(Guid userId)
+        {
+            var apps = await _unitOfWork.DepotOfficer.Find(x => x.OfficerID == userId);
+
+            var result = new List<DepotApplicationUserViewModel>();
+
+            foreach (var item in apps) {
+                var depot = await _unitOfWork.Depot.FirstOrDefaultAsync(x => x.Id == item.DepotID);
+                if (depot != null)
+                {
+                    var appDep = await _unitOfWork.Application.Find(x => x.DeportStateId == depot.Id);
+                    result.Add(new DepotApplicationUserViewModel
+                    {
+                        Id = depot.Id,
+                        Capacity = depot.Capacity,
+                        Applications = appDep,
+                        Name = depot.Name,
+                        State = depot.State,
+                        IsDeleted = depot.IsDeleted
+                    });
+                }
+               
+            }
+            _response = new ApiResponse
+            {
+                Message = "Applications fetched successfully",
+                StatusCode = HttpStatusCode.OK,
+                Success = true,
+                Data = result
+            };
+
+            return _response;
+        }
+
+
+        
     }
 }
