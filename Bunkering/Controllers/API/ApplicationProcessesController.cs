@@ -73,7 +73,7 @@ namespace Bunkering.Controllers.API
 		/// <response code="400">Internal server error - bad request </response>
 		[Route("Edit-Flow")]
 		[HttpPost]
-		public async Task<IActionResult> EditFlow(WorkFlow model) => Response(await _appProcService.EditFlow(model));
+		public async Task<IActionResult> EditFlow(WorkflowviewModel model) => Response(await _appProcService.EditFlow(model));
 
 		/// <summary>
 		/// This endpoint is used to clone an exisiting flow
