@@ -42,7 +42,7 @@ namespace Bunkering.Access.Services
                 {
                     x.ID,
                     x.OfficerID,
-                    x.DepotStateID,
+                    x.DepotID,
                     x.IsDeleted
                 })
             };
@@ -66,7 +66,7 @@ namespace Bunkering.Access.Services
             {
                 var map = new DepotFieldOfficer
                 {
-                    DepotStateID= newDepotOfficer.DepotStateID,
+                    DepotID= newDepotOfficer.DepotID,
                     OfficerID = newDepotOfficer.OfficerID
 
                 };
@@ -102,7 +102,7 @@ namespace Bunkering.Access.Services
                 {
                     if (updatMapping != null)
                     {
-                        updatMapping.DepotStateID = depot.DepotStateID;
+                        updatMapping.DepotID = depot.DepotID;
                         updatMapping.OfficerID = depot.OfficerID;
                         var success = await _unitOfWork.SaveChangesAsync(user!.Id) > 0;
                         _response = new ApiResponse

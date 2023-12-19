@@ -1155,5 +1155,14 @@ namespace Bunkering.Access.Services
 
             return _response;
         }
+
+        /*public async Task<ApiResponse> AllApplicationsByDepot(int id)
+        {
+
+            var FOs = 
+
+            FOs.Any(x => x.Id == )
+
+        }*/
     }
 }
