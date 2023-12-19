@@ -111,6 +111,7 @@
     <Build Include="dbo\Tables\Depot.sql" />
     <Build Include="dbo\Tables\Jetty.sql" />
     <Build Include="dbo\Tables\vPayment.sql" />
+    <Build Include="dbo\Tables\CoQ.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Snapshots\Bunkering.Database_20230810_10-01-52.dacpac" />

@@ -31,6 +31,7 @@ namespace Bunkering.Access.IContracts
         IValidatiionResponse ValidatiionResponse { get; }
         IWorkflow Workflow { get; }
         IVesselType VesselType { get; }
+        public ICoQ CoQ { get; }
         IvFacilityPermit vFacilityPermit { get; }
         IvAppPayment vAppPayment { get; }
         IvAppVessel vAppVessel { get; }

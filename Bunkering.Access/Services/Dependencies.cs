@@ -32,7 +32,9 @@ namespace Bunkering.Access.Services
             services.AddScoped<JettyService>();
             services.AddScoped<DepotService>();
             services.AddScoped<NominatedSurveyorService>();
+            services.AddScoped<CoQService>();
 
+            services.AddAutoMapper(typeof(MappingProfile));
         }
     }
 }
