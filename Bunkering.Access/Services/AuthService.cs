@@ -184,9 +184,9 @@ namespace Bunkering.Access.Services
 						{
 							UserId = user.Email,
 							user.ElpsId,
-							FirstName = !user.UserRoles.FirstOrDefault().Role.Name.Equals("Company") ? user.FirstName : user.Company.Name,
+							FirstName = user.UserRoles.FirstOrDefault()?.Role?.Name?.Equals("Company") is not true ? user.FirstName : user.Company.Name,
 							user.LastName,
-							UserRoles = user.UserRoles.FirstOrDefault(x => !x.Role.Name.Equals("Staff"))?.Role.Name,
+							UserRoles = user.UserRoles.FirstOrDefault(x => x.Role?.Name?.Equals("Staff") is false)?.Role?.Name,
 							user.CreatedOn,
 							user.LastLogin,
 							user.ProfileComplete,

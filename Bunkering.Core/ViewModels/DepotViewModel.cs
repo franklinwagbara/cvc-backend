@@ -11,6 +11,6 @@ namespace Bunkering.Core.ViewModels
         public int Id { get; set; }
         public string Name { get; set; }
         public string State { get; set; }
-        public string Capacity { get; set; }
+        public decimal Capacity { get; set; }
     }
 }
