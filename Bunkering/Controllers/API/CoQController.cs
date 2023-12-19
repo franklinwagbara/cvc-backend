@@ -56,6 +56,40 @@ namespace Bunkering.Controllers.API
 
 		}
 
+		[ProducesResponseType(typeof(ApiResponse), 200)]
+		[ProducesResponseType(typeof(ApiResponse), 404)]
+		[ProducesResponseType(typeof(ApiResponse), 405)]
+		[ProducesResponseType(typeof(ApiResponse), 500)]
+		[Produces("application/json")]
+		[Route("coq_by_id")]
+		[HttpGet("{id}")]
+		public async Task<IActionResult> GetById(int id)
+		{
+			var permits = (await _unitOfWork.Permit
+				.Find(c => c.Id == id,"Application.User.Company,Application.Facility.VesselType"))
+				.FirstOrDefault();
+
+			return Ok(new ApiResponse
+			{
+				//using if statements here ?: to check conditions for the permit
+				Message = permits is not null ? "Success, Permit Found" : "Permit Not Found",
+				StatusCode = permits is not null ? HttpStatusCode.OK : HttpStatusCode.BadRequest,
+				Success = permits is null,
+				Data = permits is null ? null! : new
+				{
+					permits.Id,
+					CompanyName = permits.Application?.User?.Company?.Name,
+					LicenseNo = permits.PermitNo,
+					IssuedDate = permits.IssuedDate.ToString("MMM dd, yyyy HH:mm:ss"),
+					EpermitspiryDate = permits.ExpireDate.ToString("MMM dd, yyyy HH:mm:ss"),
+					permits.Application?.User?.Email,
+					VesselTypeType = permits.Application?.Facility?.VesselType?.Name,
+					VesselName = permits.Application?.Facility?.Name,
+				}
+			});
+
+		}
+
         [ProducesResponseType(typeof(ApiResponse), 200)]
         [ProducesResponseType(typeof(ApiResponse), 404)]
         [ProducesResponseType(typeof(ApiResponse), 405)]
@@ -91,5 +125,52 @@ namespace Bunkering.Controllers.API
 			}
 			return BadRequest();
 		}
-	}
+
+        /// <summary>
+        /// This endpoint is used to fetch documents required for a coq application
+        /// </summary>
+        /// <returns>Returns a model of required documents </returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// GET: api/application/get-dcouments/xxxx
+        /// 
+        /// </remarks>
+        /// <param name="id">The application id used to fetch documenst for the application type</param>
+        /// <response code="200">Returns an object of fees </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("get-documents")]
+        [HttpGet]
+        public async Task<IActionResult> DocumentUpload(int id) => Response(await _coqService.DocumentUpload(id));
+
+        /// <summary>
+        /// This endpoint is used to add coq documents required for an application
+        /// </summary>
+        /// <returns>Returns a message after upload </returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// GET: api/application/add-dcouments/xxxx
+        /// 
+        /// </remarks>
+        /// <param name="id">The application id used to fetch documenst for the application type</param>
+        /// <response code="200">Returns an object of fees </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("add-documents")]
+        [HttpPost]
+        public async Task<IActionResult> AddDocuments(int id) => Response(await _coqService.AddDocuments(id));
+
+    }
 }
