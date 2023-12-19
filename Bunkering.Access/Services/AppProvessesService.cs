@@ -48,17 +48,23 @@ namespace Bunkering.Access.Services
 
 				processes.ForEach(r =>
 				{
-					var trole = roles.FirstOrDefault(x => x.Id.Equals(r.TriggeredByRole));
-					var rrole = roles.FirstOrDefault(x => x.Id.Equals(r.TargetRole));
+					var trole = roles.FirstOrDefault(x => x.Name.ToLower().Equals(r.TriggeredByRole.ToLower()));
+					var rrole = roles.FirstOrDefault(x => x.Name.ToLower().Equals(r.TargetRole.ToLower()));
 					var flow = _mapper.Map<WorkflowviewModel>(r);
 
 					flow.FromLocation = location.FirstOrDefault(l => l.Id.Equals(r.FromLocationId))?.Name;
-					flow.ToLocation = location.FirstOrDefault(t => t.Id.Equals(r.ToLocationId))?.Name;
-					flow.TriggeredByRole = trole.Name;
-					flow.TargetRole = rrole.Name;
+					flow.FromLocationId = location.FirstOrDefault(l => l.Id.Equals(r.FromLocationId))?.Id;
+                    flow.ToLocation = location.FirstOrDefault(t => t.Id.Equals(r.ToLocationId))?.Name;
+                    flow.ToLocationId = location.FirstOrDefault(t => t.Id.Equals(r.ToLocationId))?.Id;
+                    flow.TriggeredByRole = trole?.Name;
+					flow.TriggeredByRoleId = trole?.Id;
+					flow.TargetRole = rrole?.Name;
+					flow.TargetRoleId = rrole?.Id;
 					flow.ApplicationType = r.ApplicationTypeId != null ? apptyeps.FirstOrDefault(x => x.Id.Equals(r.ApplicationTypeId))?.Name : "N/A";
+					flow.ApplicationTypeId = r.ApplicationTypeId != null ? apptyeps.FirstOrDefault(x => x.Id.Equals(r.ApplicationTypeId))?.Id : 1;
 					flow.VesselType = vesselType.FirstOrDefault(x => x.Id.Equals(r.VesselTypeId))?.Name;
-					flows.Add(flow);
+					flow.VesselTypeId = vesselType.FirstOrDefault(x => x.Id.Equals(r.VesselTypeId))?.Id;
+                    flows.Add(flow);
 				});
 
 				_response = new ApiResponse
@@ -93,7 +99,7 @@ namespace Bunkering.Access.Services
 			};
 		}
 
-		public async Task<ApiResponse> EditFlow(WorkFlow model)
+		public async Task<ApiResponse> EditFlow(WorkflowviewModel model)
 		{
 			try
 			{
@@ -103,10 +109,10 @@ namespace Bunkering.Access.Services
 				{
 					flow.Rate = model.Rate;
 					flow.Status = model.Status;
-					flow.TargetRole = model.TargetRole;
+					flow.TargetRole = (await _role.Roles.FirstOrDefaultAsync(x => x.Id == model.TargetRoleId)).Name;
 					flow.Action = model.Action;
-					flow.TriggeredByRole = model.TriggeredByRole;
-					flow.VesselTypeId = model.VesselTypeId;
+					flow.TriggeredByRole = (await _role.Roles.FirstOrDefaultAsync(x => x.Id == model.TriggeredByRoleId)).Name;
+					flow.VesselTypeId = (int)model.VesselTypeId;
 					flow.FromLocationId = model.FromLocationId;
 					flow.ToLocationId = model.ToLocationId;
 
