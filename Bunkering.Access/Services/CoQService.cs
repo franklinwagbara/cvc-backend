@@ -20,9 +20,11 @@ namespace Bunkering.Access.Services
         private readonly IMapper _mapper;
         private string LoginUserEmail = string.Empty;
         private readonly IElps _elps;
+        private readonly AppSetting _setting;
+        private readonly WorkFlowService _flow;
 
 
-        public CoQService(IUnitOfWork unitOfWork, IHttpContextAccessor httpCxtAccessor, ApiResponse apiReponse, UserManager<ApplicationUser> userManager, IMapper mapper, IElps elps)
+        public CoQService(IUnitOfWork unitOfWork, IHttpContextAccessor httpCxtAccessor, ApiResponse apiReponse, UserManager<ApplicationUser> userManager, IMapper mapper, IElps elps, AppSetting setting, WorkFlowService flow)
         {
             _unitOfWork = unitOfWork;
             _httpCxtAccessor = httpCxtAccessor;
@@ -31,6 +33,8 @@ namespace Bunkering.Access.Services
             _mapper = mapper;
             LoginUserEmail = _httpCxtAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
             _elps = elps;
+            _setting = setting;
+            _flow = flow;
         }
 
         public async Task<ApiResponse> CreateCoQ(CoQViewModel Model)
@@ -73,14 +77,18 @@ namespace Bunkering.Access.Services
             if (id > 0)
             {
                 var docList = new List<SubmittedDocument>();
-                var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == id, "User,Facility.VesselType,ApplicationType");
+                var app = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id == id, "User,Facility.VesselType,ApplicationType");
                 if (app != null)
                 {
-                    var factypedocs = await _unitOfWork.FacilityTypeDocuments.Find(x => x.ApplicationTypeId.Equals(app.ApplicationTypeId) && x.VesselTypeId.Equals(app.Facility.VesselTypeId));
+                    var factypedocs = await _unitOfWork.FacilityTypeDocuments
+                        .Find(x => x.ApplicationTypeId
+                        .Equals(app.Application.ApplicationTypeId) && x.VesselTypeId.Equals(app.Application.Facility.VesselTypeId));
                     if (factypedocs != null && factypedocs.Count() > 0)
                     {
-                        var compdocs = _elps.GetCompanyDocuments(app.User.ElpsId, "company").Stringify().Parse<List<Document>>();
-                        var facdocs = _elps.GetCompanyDocuments(app.Facility.ElpsId, "facility").Stringify().Parse<List<FacilityDocument>>();
+                        var compdocs = _elps.GetCompanyDocuments(app.Application.User.ElpsId, "company")
+                            .Stringify().Parse<List<Document>>();
+                        var facdocs = _elps.GetCompanyDocuments(app.Application.Facility.ElpsId, "facility")
+                            .Stringify().Parse<List<FacilityDocument>>();
                         var appdocs = await _unitOfWork.SubmittedDocument.Find(x => x.ApplicationId == id);
 
                         factypedocs.ToList().ForEach(x =>
@@ -158,7 +166,7 @@ namespace Bunkering.Access.Services
                             }
                         });
                     }
-                    _response = new ApiResponse
+                    _apiReponse = new ApiResponse
                     {
                         Message = "Facility Type Documents fetched",
                         StatusCode = HttpStatusCode.OK,
@@ -168,8 +176,8 @@ namespace Bunkering.Access.Services
                             Docs = docList,
                             ApiData = new
                             {
-                                CompanyElpsId = app.User.ElpsId,
-                                FacilityElpsId = app.Facility.ElpsId,
+                                CompanyElpsId = app.Application?.User.ElpsId,
+                                FacilityElpsId = app.Application?.Facility.ElpsId,
                                 ApiEmail = _setting.AppEmail,
                                 ApiHash = $"{_setting.AppEmail}{_setting.AppId}".GenerateSha512()
                             }
@@ -177,7 +185,7 @@ namespace Bunkering.Access.Services
                     };
                 }
                 else
-                    _response = new ApiResponse
+                    _apiReponse = new ApiResponse
                     {
                         Message = "ApplicationID invalid",
                         StatusCode = HttpStatusCode.BadRequest,
@@ -185,14 +193,14 @@ namespace Bunkering.Access.Services
                     };
             }
             else
-                _response = new ApiResponse
+                _apiReponse = new ApiResponse
                 {
                     Message = "ApplicationID invalid",
                     StatusCode = HttpStatusCode.NotFound,
                     Success = false
                 };
 
-            return _response;
+            return _apiReponse;
         }
 
         public async Task<ApiResponse> AddDocuments(int id)
@@ -201,12 +209,12 @@ namespace Bunkering.Access.Services
             if (id > 0)
             {
                 var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == id, "Facility.VesselType");
-                var user = await _userManager.FindByEmailAsync(User);
+                var user = await _userManager.FindByEmailAsync(LoginUserEmail);
                 if (app != null)
                 {
                     var facTypeDocs = await _unitOfWork.FacilityTypeDocuments.Find(x => x.ApplicationTypeId.Equals(app.ApplicationTypeId) && x.VesselTypeId.Equals(app.Facility.VesselTypeId));
 
-                    if (facTypeDocs.Count() > 0)
+                    if (facTypeDocs.Any())
                     {
                         var compdocs = (List<Document>)_elps.GetCompanyDocuments(user.ElpsId);
                         var facdocs = (List<FacilityDocument>)_elps.GetCompanyDocuments(app.Facility.ElpsId, "facility");
@@ -260,7 +268,7 @@ namespace Bunkering.Access.Services
                         : await _flow.AppWorkFlow(id, Enum.GetName(typeof(AppActions), AppActions.Submit), "Application Submitted");
                     if (submit.Item1)
                     {
-                        _response = new ApiResponse
+                        _apiReponse = new ApiResponse
                         {
                             Message = submit.Item2,
                             StatusCode = HttpStatusCode.OK,
@@ -269,17 +277,16 @@ namespace Bunkering.Access.Services
                     }
                     else
                     {
-                        _response = new ApiResponse
+                        _apiReponse = new ApiResponse
                         {
                             Message = submit.Item2,
                             StatusCode = HttpStatusCode.NotAcceptable,
                             Success = false
                         };
-
                     }
                 }
                 else
-                    _response = new ApiResponse
+                    _apiReponse = new ApiResponse
                     {
                         Message = "ApplicationID invalid",
                         StatusCode = HttpStatusCode.BadRequest,
@@ -287,14 +294,13 @@ namespace Bunkering.Access.Services
                     };
             }
             else
-                _response = new ApiResponse
+                _apiReponse = new ApiResponse
                 {
                     Message = "Application not found",
                     StatusCode = HttpStatusCode.NotFound,
                     Success = false
                 };
-            return _response;
+            return _apiReponse;
         }
-
     }
 }
