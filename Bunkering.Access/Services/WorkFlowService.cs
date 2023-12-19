@@ -190,9 +190,9 @@ namespace Bunkering.Access.Services
         public async Task<WorkFlow> GetWorkFlow(string action, ApplicationUser currentuser, int VesselTypeId)
         => action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Submit).ToLower()) || action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Resubmit))
             ? await _unitOfWork.Workflow.FirstOrDefaultAsync(x => x.Action.ToLower().Trim().Equals(action.ToLower().Trim())
-                    && currentuser.UserRoles.FirstOrDefault().Role.Id.Equals(x.TriggeredByRole) && x.VesselTypeId == VesselTypeId)
+                    && currentuser.UserRoles.FirstOrDefault().Role.Name.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim()) && x.VesselTypeId == VesselTypeId)
             : await _unitOfWork.Workflow.FirstOrDefaultAsync(x => x.Action.ToLower().Trim().Equals(action.ToLower().Trim())
-                    && currentuser.UserRoles.FirstOrDefault().Role.Id.Equals(x.TriggeredByRole)
+                    && currentuser.UserRoles.FirstOrDefault().Role.Name.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim())
             && currentuser.LocationId == x.FromLocationId && x.VesselTypeId == VesselTypeId);
 
 
@@ -270,13 +270,13 @@ namespace Bunkering.Access.Services
                                 .ThenInclude(r => r.Role)
                                 .Include(lo => lo.Location)
                                 .Include(ol => ol.Office)
-                                .Where(x => x.UserRoles.Any(y => y.Role.Id.Equals(wkflow.TargetRole))
+                                .Where(x => x.UserRoles.Any(y => y.Role.Name.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
                                 && x.LocationId == wkflow.ToLocationId && x.IsActive && x.OfficeId == currentUser.OfficeId).ToList()
                             : _userManager.Users.Include(x => x.Company).Include(f => f.Company).Include(ur => ur.UserRoles)
                                 .ThenInclude(r => r.Role)
                                 .Include(lo => lo.Location)
                                 .Include(ol => ol.Office)
-                                .Where(x => x.UserRoles.Any(y => y.Role.Id.Equals(wkflow.TargetRole))
+                                .Where(x => x.UserRoles.Any(y => y.Role.Name.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
                                 && x.LocationId == wkflow.ToLocationId && x.IsActive).ToList();
                         nextprocessingofficer = users.OrderBy(x => x.LastJobDate).FirstOrDefault();
                     }
