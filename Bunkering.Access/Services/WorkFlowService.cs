@@ -172,6 +172,11 @@ namespace Bunkering.Access.Services
                             //send and save notification
                             await SendNotification(app, action, nextprocessingofficer, processingMsg);
                         }
+                        else
+                        {
+                            res = false;
+                            processingMsg = "Next processing staff is not profiled";
+                        }
                     }
                 }
             }

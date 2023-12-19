@@ -6,11 +6,30 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Bunkering.Core.Migrations
 {
     /// <inheritdoc />
-    public partial class initialMigration : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "AppFees",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ApplicationTypeId = table.Column<int>(type: "int", nullable: false),
+                    ApplicationFee = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ProcessingFee = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    SerciveCharge = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    NOAFee = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    COQFee = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AppFees", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "ApplicationTypes",
                 columns: table => new
@@ -378,38 +397,6 @@ namespace Bunkering.Core.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AppFees",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ApplicationTypeId = table.Column<int>(type: "int", nullable: false),
-                    VesseltypeId = table.Column<int>(type: "int", nullable: false),
-                    ApplicationFee = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    AccreditationFee = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    VesselLicenseFee = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    AdministrativeFee = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    InspectionFee = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    SerciveCharge = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AppFees", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AppFees_ApplicationTypes_ApplicationTypeId",
-                        column: x => x.ApplicationTypeId,
-                        principalTable: "ApplicationTypes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AppFees_VesselTypes_VesseltypeId",
-                        column: x => x.VesseltypeId,
-                        principalTable: "VesselTypes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Facilities",
                 columns: table => new
                 {
@@ -420,14 +407,14 @@ namespace Bunkering.Core.Migrations
                     VesselTypeId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IMONumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CallSIgn = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Flag = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    YearOfBuild = table.Column<int>(type: "int", nullable: false),
-                    PlaceOfBuild = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CallSIgn = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Flag = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    YearOfBuild = table.Column<int>(type: "int", nullable: true),
+                    PlaceOfBuild = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsLicensed = table.Column<bool>(type: "bit", nullable: false),
-                    DeadWeight = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Capacity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Operator = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    DeadWeight = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Capacity = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Operator = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -637,6 +624,7 @@ namespace Bunkering.Core.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ApplicationTypeId = table.Column<int>(type: "int", nullable: false),
+                    DeportStateId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FacilityId = table.Column<int>(type: "int", nullable: false),
                     Reference = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -648,7 +636,12 @@ namespace Bunkering.Core.Migrations
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    FlowId = table.Column<int>(type: "int", nullable: true)
+                    FlowId = table.Column<int>(type: "int", nullable: true),
+                    VesselName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IMONumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LoadingPort = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DischargePort = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MarketerName = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -852,7 +845,7 @@ namespace Bunkering.Core.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ApplicationId = table.Column<int>(type: "int", nullable: false),
                     OrderId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ExtraPaymentId = table.Column<int>(type: "int", nullable: false),
+                    ExtraPaymentId = table.Column<int>(type: "int", nullable: true),
                     PaymentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TransactionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -885,8 +878,7 @@ namespace Bunkering.Core.Migrations
                         name: "FK_Payments_ExtraPayments_ExtraPaymentId",
                         column: x => x.ExtraPaymentId,
                         principalTable: "ExtraPayments",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -938,16 +930,6 @@ namespace Bunkering.Core.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AppFees_ApplicationTypeId",
-                table: "AppFees",
-                column: "ApplicationTypeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AppFees_VesseltypeId",
-                table: "AppFees",
-                column: "VesseltypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ApplicationHistories_ApplicationId",
