@@ -166,12 +166,15 @@ namespace Bunkering.Access.Services
                             DischargePort = model.DischargePort,
                             MarketerName = model.MarketerName,
                             IMONumber = model.IMONumber,
+                            ETA = model.ETA,
                         };
 
                         await _unitOfWork.Application.Add(app);
                         await _unitOfWork.SaveChangesAsync(app.UserId);
                         //save app tanks
                         var tank = await AppTanks(model.TankList, facility.Id);
+                        //save app depots
+                        //var depots = await AppDepots(model.DepotList, facility.Id);
 
 
                     if (tank != null)
@@ -258,6 +261,23 @@ namespace Bunkering.Access.Services
             }
 
             return tankList;
+
+        }
+        private Task<List<Depot>> AppDepots(List<Depot> depot, int id)
+        {
+
+            var depotList = new List<Depot>();
+            depot.ForEach(x =>
+            {
+                depotList.Add(new Depot
+                {
+                    Volume = x.Volume,
+                    Name = x.Name,
+                    ProductId = x.ProductId,
+                });
+            });
+
+             return depotList;
 
         }
 
