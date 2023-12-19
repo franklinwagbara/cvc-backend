@@ -10,6 +10,8 @@ namespace Bunkering.Core.Data
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public string State { get; set; }
+        public string Capacity { get; set; }
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAt { get; set; }
         public string? DeletedBy { get; set; }
