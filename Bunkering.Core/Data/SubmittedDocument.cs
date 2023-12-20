@@ -9,7 +9,11 @@ namespace Bunkering.Core.Data
     public class SubmittedDocument
     {
         public int Id { get; set; }
+        /// <summary>
+        /// ApplicationId for NOA and CoQId for Coq
+        /// </summary>
         public int ApplicationId { get; set; }
+        public int ApplicationTypeId { get; set; }
         public int FileId { get; set; }
         public int DocId { get; set; }
         public string DocSource { get; set; }
