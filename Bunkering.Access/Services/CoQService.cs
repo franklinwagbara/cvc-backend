@@ -37,7 +37,7 @@ namespace Bunkering.Access.Services
             _flow = flow;
         }
 
-        public async Task<ApiResponse> CreateCoQ(CoQViewModel Model)
+        public async Task<ApiResponse> CreateCoQ(CreateCoQViewModel Model)
         {
             try
             {
@@ -46,8 +46,8 @@ namespace Bunkering.Access.Services
                 if (user == null)
                     throw new Exception("Can not find user with Email: " + LoginUserEmail);
 
-                if (user.UserRoles.FirstOrDefault().Role.Name != RoleConstants.Field_Officer)
-                    throw new Exception("Only Field Officers can create CoQ.");
+                //if (user.UserRoles.FirstOrDefault().Role.Name != RoleConstants.Field_Officer)
+                //    throw new Exception("Only Field Officers can create CoQ.");
 
                 var coq = _mapper.Map<CoQ>(Model);
                 var result_coq = await _unitOfWork.CoQ.Add(coq);
@@ -77,19 +77,30 @@ namespace Bunkering.Access.Services
             if (id > 0)
             {
                 var docList = new List<SubmittedDocument>();
-                var app = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id == id, "User,Facility.VesselType,ApplicationType");
+                var app = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id == id, "Application.User,Application.Facility.VesselType,Application.ApplicationType");
                 if (app != null)
                 {
+                    var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(c => c.Name == Utils.COQ);
+                    if (appType == null)
+                    {
+                        return new()
+                        {
+                            Data = null!,
+                            Message = "Application type is not configured",
+                            StatusCode = HttpStatusCode.BadRequest,
+                            Success = false
+                        };
+                    }
                     var factypedocs = await _unitOfWork.FacilityTypeDocuments
                         .Find(x => x.ApplicationTypeId
-                        .Equals(app.Application.ApplicationTypeId) && x.VesselTypeId.Equals(app.Application.Facility.VesselTypeId));
+                        .Equals(appType.Id) && x.VesselTypeId.Equals(app.Application.Facility.VesselTypeId));
                     if (factypedocs != null && factypedocs.Count() > 0)
                     {
                         var compdocs = _elps.GetCompanyDocuments(app.Application.User.ElpsId, "company")
                             .Stringify().Parse<List<Document>>();
                         var facdocs = _elps.GetCompanyDocuments(app.Application.Facility.ElpsId, "facility")
                             .Stringify().Parse<List<FacilityDocument>>();
-                        var appdocs = await _unitOfWork.SubmittedDocument.Find(x => x.ApplicationId == id);
+                        var appdocs = await _unitOfWork.SubmittedDocument.Find(x => x.ApplicationId == app.AppId);
 
                         factypedocs.ToList().ForEach(x =>
                         {
@@ -108,7 +119,8 @@ namespace Bunkering.Access.Services
                                             DocType = x.DocType,
                                             FileId = doc.id,
                                             DocSource = doc.source,
-                                            ApplicationId = id
+                                            ApplicationId = id,
+                                            ApplicationTypeId = appType.Id
                                         });
                                     }
                                     else
@@ -118,6 +130,7 @@ namespace Bunkering.Access.Services
                                             DocId = x.DocumentTypeId,
                                             DocName = x.Name,
                                             DocType = x.DocType,
+                                            ApplicationTypeId = appType.Id
                                         });
                                     }
                                 }
@@ -127,6 +140,7 @@ namespace Bunkering.Access.Services
                                         DocId = x.DocumentTypeId,
                                         DocName = x.Name,
                                         DocType = x.DocType,
+                                        ApplicationTypeId = appType.Id
                                     });
                             }
                             else
@@ -143,7 +157,8 @@ namespace Bunkering.Access.Services
                                             DocType = x.DocType,
                                             FileId = doc.Id,
                                             DocSource = doc.Source,
-                                            ApplicationId = id
+                                            ApplicationId = id,
+                                            ApplicationTypeId = appType.Id
                                         });
                                     }
                                     else
@@ -153,6 +168,7 @@ namespace Bunkering.Access.Services
                                             DocId = x.DocumentTypeId,
                                             DocName = x.Name,
                                             DocType = x.DocType,
+                                            ApplicationTypeId = appType.Id
                                         });
                                     }
                                 }
@@ -162,6 +178,7 @@ namespace Bunkering.Access.Services
                                         DocId = x.DocumentTypeId,
                                         DocName = x.Name,
                                         DocType = x.DocType,
+                                        ApplicationTypeId = appType.Id
                                     });
                             }
                         });
