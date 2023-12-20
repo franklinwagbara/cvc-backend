@@ -9,8 +9,8 @@
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAt { get; set; }
         public string? DeletedBy { get; set; }
-        public int ProductId { get; set; }
-        public int Volume {  get; set; }
+        //public int ProductId { get; set; }
+        //public decimal Volume {  get; set; }
        
     }
 }
