@@ -19,6 +19,7 @@
 		public const string FAD = "FAD|Finance and Account";
 		public const string GMOps = "GMOps|General Manager Operations";
 		public const string Manager = "Manager|Manager";
+		public const string FO = "Field_Officer|Field Officer";
 
 	}
 }

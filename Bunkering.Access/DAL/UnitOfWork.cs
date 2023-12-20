@@ -8,11 +8,13 @@ namespace Bunkering.Access.DAL
         private ApplicationContext _context;
         public IApplication Application { get; private set; }
         public IAppFee AppFee { get; private set; }
+        public IDepotOfficer DepotOfficer { get; private set; }
         public IApplicationType ApplicationType { get; set; }
         public IApplicationHistory ApplicationHistory { get; private set; }
         public IAppointment Appointment { get; private set; }
         public ICountry Country { get; private set; }
         public IDepot Depot { get; private set; }
+        public IApplicationDepot ApplicationDepot { get; private set; }
         public IFacility Facility { get; private set; }
         public IFacilityType FacilityType { get; private set; }
         public IFacilityTypeDocuments FacilityTypeDocuments { get; private set; }
@@ -33,6 +35,9 @@ namespace Bunkering.Access.DAL
         public IValidatiionResponse ValidatiionResponse { get; set; }
         public IWorkflow Workflow { get; private set; }
         public IVesselType VesselType { get; set; }
+        public ICoQ CoQ { get; set; }
+
+
         public IvAppVessel vAppVessel { get; private set; }
         public IvAppPayment vAppPayment { get; private set; }
         public IvAppUser vAppUser { get; private set; }
@@ -69,6 +74,8 @@ namespace Bunkering.Access.DAL
             ValidatiionResponse = ValidatiionResponse != null ? ValidatiionResponse : new ValidatiionResponseRepo(_context);
             Workflow = Workflow != null ? Workflow : new WorkflowRepository(_context);
             VesselType = VesselType != null ? VesselType : new VeseelTypeRepository(_context);
+            CoQ = CoQ != null ? CoQ : new CoQRepository(_context);
+
             vAppVessel = vAppVessel != null ? vAppVessel : new vAppVesselRepository(_context);
             vFacilityPermit = vFacilityPermit != null ? vFacilityPermit : new vFacilityPermitRepository(_context);
             vAppPayment = vAppPayment != null ? vAppPayment : new vAppPaymentRepository(_context);

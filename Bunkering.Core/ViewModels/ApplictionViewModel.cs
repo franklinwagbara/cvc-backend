@@ -31,5 +31,7 @@ namespace Bunkering.Core.ViewModels
         public int DeportStateId { get; set; }
 
         public List<TankViewModel> TankList { get; set; }
+        public  List<AppDepotViewModel> DepotList { get; set; }
+        public DateTime ETA { get; set; }
     }
 }
