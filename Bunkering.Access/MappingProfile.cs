@@ -9,6 +9,7 @@ namespace Bunkering.Access
         protected MappingProfile()
         {
             CreateMap<CoQ, CoQViewModel>().ReverseMap();
+            CreateMap<ApplicationDepot, AppDepotViewModel>().ReverseMap();
         }
     }
 }

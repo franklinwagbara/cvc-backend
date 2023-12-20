@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[CoQ]
+﻿CREATE TABLE [dbo].[CoQs]
 (
 	[Id] INT IDENTITY(1, 1) NOT NULL, 
     [AppId] INT NOT NULL, 
@@ -14,6 +14,6 @@
     [DateCreated] DATETIME2 NULL, 
     [DateModified] DATETIME2 NOT NULL, 
     [CreatedBy] NVARCHAR(MAX) NOT NULL,
-    CONSTRAINT [PK_CoQ] PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT [FK_CoQ_Applications_AppId] FOREIGN KEY ([AppId]) REFERENCES [dbo].[Applications] ([Id])
+    CONSTRAINT [PK_CoQs] PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [FK_CoQs_Applications_AppId] FOREIGN KEY ([AppId]) REFERENCES [dbo].[Applications] ([Id])
 )
