@@ -108,6 +108,7 @@
     <Build Include="dbo\Tables\vAppUsers_1.sql" />
     <Build Include="dbo\Tables\vAppPayment_1.sql" />
     <Build Include="dbo\Tables\TankViewModel_1.sql" />
+    <Build Include="dbo\Tables\ApplicationDepots.sql" />
     <Build Include="dbo\Tables\Depots.sql" />
     <Build Include="dbo\Tables\Jetty.sql" />
     <Build Include="dbo\Tables\vPayment.sql" />
