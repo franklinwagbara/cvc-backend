@@ -296,6 +296,26 @@ namespace Bunkering.Access.Services
 
         // }
 
+        public async Task<ApiResponse> GetDepotsByAppId(int id)
+        {
+            if (id > 0)
+            {
+                var appDepots = await _unitOfWork.ApplicationDepot.GetDepotsAsync(id);
+                return new()
+                {
+                    Success = true,
+                    Message = "Depots fetched successfully",
+                    StatusCode = HttpStatusCode.Created,
+                    Data = appDepots
+                };
+            }
+            return new()
+            {
+                Success = false,
+                Message = "Invalid application ID",
+                StatusCode = HttpStatusCode.BadRequest
+            };
+        }
         public async Task<ApiResponse> GetTanksByAppId(int id)
         {
             List<TankViewModel> tankList = new List<TankViewModel>();
