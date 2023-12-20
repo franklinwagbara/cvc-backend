@@ -6,6 +6,3 @@
     [DeletedBy] NVARCHAR (MAX) NULL,
     CONSTRAINT [PK_Depots] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
-
-
-
