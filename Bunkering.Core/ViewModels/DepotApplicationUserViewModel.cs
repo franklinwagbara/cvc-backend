@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Bunkering.Core.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bunkering.Core.Data
+namespace Bunkering.Core.ViewModels
 {
-    public class Depot
+    public class DepotApplicationUserViewModel
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -15,8 +16,8 @@ namespace Bunkering.Core.Data
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAt { get; set; }
         public string? DeletedBy { get; set; }
-        public int ProductId { get; set; }
-        public int Volume {  get; set; }
+
+        public IEnumerable<Application>? Applications { get; set; }
        
     }
 }

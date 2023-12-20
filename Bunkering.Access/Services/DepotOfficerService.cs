@@ -3,6 +3,9 @@ using Bunkering.Core.Data;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
@@ -10,15 +13,14 @@ using System.Threading.Tasks;
 
 namespace Bunkering.Access.Services
 {
-    public class AppFeeService
+    public class DepotOfficerService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
         private ApiResponse _response = new ApiResponse();
         private readonly UserManager<ApplicationUser> _userManager;
-
         private string User;
-        public AppFeeService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<ApplicationUser> userManager)
+        public DepotOfficerService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
@@ -27,59 +29,52 @@ namespace Bunkering.Access.Services
             _userManager = userManager;
         }
 
-        public async Task<ApiResponse> GetAllFees()
+        public async Task<ApiResponse> GetAllDepotOfficerMapping()
         {
-            var fees = await _unitOfWork.AppFee.GetAll();
-            var filteredFees = fees.Where(x => x.IsDeleted == false);
+            var mappings = await _unitOfWork.DepotOfficer.GetAll();
+            var filteredMappings = mappings.Where(x => x.IsDeleted == false);
             return new ApiResponse
             {
-                Message = "All Fees found",
+                Message = "All Mappings found",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                Data = filteredFees.Select(x => new 
+                Data = filteredMappings.Select(x => new
                 {
-                    x.Id,
-                    x.SerciveCharge,
-                    x.ApplicationTypeId,
-                    x.NOAFee,
-                    x.COQFee,
-                    x.ProcessingFee,
+                    x.ID,
+                    x.OfficerID,
+                    x.DepotID,
                     x.IsDeleted
                 })
             };
         }
 
-        public async Task<ApiResponse> GetFeeByID(int id)
+        public async Task<ApiResponse> GetDepotOfficerByID(int id)
         {
-            var fee = await _unitOfWork.AppFee.FirstOrDefaultAsync(x => x.Id == id);
+            var mapping = await _unitOfWork.DepotOfficer.FirstOrDefaultAsync(x => x.ID == id);
             return new ApiResponse
             {
-                Message = "All Fees found",
+                Message = "All Mapping found",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                Data = fee
+                Data = mapping
             };
         }
 
-        public async Task<ApiResponse> CreateFee(AppFee newFee)
+        public async Task<ApiResponse> CreateDepotOfficerMapping(DepotFieldOfficer newDepotOfficer)
         {
             try
             {
-                var fee = new AppFee
+                var map = new DepotFieldOfficer
                 {
-                    ProcessingFee = newFee.ProcessingFee,
-                    ApplicationFee = newFee.ApplicationFee,
-                    SerciveCharge = newFee.SerciveCharge,
-                    NOAFee = newFee.NOAFee,
-                    COQFee = newFee.COQFee,
-                    ApplicationTypeId = newFee.ApplicationTypeId,
+                    DepotID= newDepotOfficer.DepotID,
+                    OfficerID = newDepotOfficer.OfficerID
 
                 };
-                await _unitOfWork.AppFee.Add(fee);
+                await _unitOfWork.DepotOfficer.Add(map);
                 await _unitOfWork.SaveChangesAsync("");
                 _response = new ApiResponse
                 {
-                    Message = "Fee was added successfully.",
+                    Message = "DepotOfficer mapping was added successfully.",
                     StatusCode = HttpStatusCode.OK,
                     Success = true
                 };
@@ -97,26 +92,22 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
-        public async Task<ApiResponse> EditFee(AppFee newFee)
+        public async Task<ApiResponse> EditDepotOfficerMapping(DepotFieldOfficer depot)
         {
             try
             {
                 var user = await _userManager.FindByEmailAsync(User);
-                var updateFee = await _unitOfWork.AppFee.FirstOrDefaultAsync(x => x.Id == newFee.Id);
+                var updatMapping = await _unitOfWork.DepotOfficer.FirstOrDefaultAsync(x => x.ID == depot.ID);
                 try
                 {
-                    if (updateFee != null)
+                    if (updatMapping != null)
                     {
-                        updateFee.SerciveCharge = newFee.SerciveCharge;
-                        updateFee.NOAFee = newFee.NOAFee;
-                        updateFee.COQFee = newFee.COQFee;
-                        updateFee.ApplicationFee = newFee.ApplicationFee;
-                        updateFee.ProcessingFee = newFee.ProcessingFee;
-                        updateFee.ApplicationTypeId = newFee.ApplicationTypeId;
+                        updatMapping.DepotID = depot.DepotID;
+                        updatMapping.OfficerID = depot.OfficerID;
                         var success = await _unitOfWork.SaveChangesAsync(user!.Id) > 0;
                         _response = new ApiResponse
                         {
-                            Message = success ? "Fee was Edited successfully." : "Unable to edit fee, please try again.",
+                            Message = success ? "Mapping was Edited successfully." : "Unable to edit Mapping, please try again.",
                             StatusCode = success ? HttpStatusCode.OK : HttpStatusCode.InternalServerError,
                             Success = success
                         };
@@ -136,15 +127,15 @@ namespace Bunkering.Access.Services
             {
                 _response = new ApiResponse
                 {
-                    Message = "You need to LogIn to Edit a Fee",
+                    Message = "You need to LogIn to Edit a Mapping",
                     StatusCode = HttpStatusCode.Unauthorized,
                     Success = true
                 };
-            }    
+            }
             return _response;
         }
 
-        public async Task<ApiResponse> DeleteFee(int id)
+        public async Task<ApiResponse> DeleteMapping(int id)
         {
             try
             {
@@ -153,23 +144,23 @@ namespace Bunkering.Access.Services
                 {
                     _response = new ApiResponse
                     {
-                        Message = "You need to LogIn to Delete a Fee",
+                        Message = "You need to LogIn to Delete a Mapping",
                         StatusCode = HttpStatusCode.Forbidden,
                         Success = true
                     };
                 }
-                var deactiveFee = await _unitOfWork.AppFee.FirstOrDefaultAsync(a => a.Id == id);
-                if (deactiveFee != null)
+                var deactiveMapping = await _unitOfWork.DepotOfficer.FirstOrDefaultAsync(a => a.ID == id);
+                if (deactiveMapping != null)
                 {
-                    if (!deactiveFee.IsDeleted)
+                    if (!deactiveMapping.IsDeleted)
                     {
-                        deactiveFee.IsDeleted = true;
-                        await _unitOfWork.AppFee.Update(deactiveFee);
+                        deactiveMapping.IsDeleted = true;
+                        await _unitOfWork.DepotOfficer.Update(deactiveMapping);
                         await _unitOfWork.SaveChangesAsync(user.Id);
 
                         _response = new ApiResponse
                         {
-                            Data = deactiveFee,
+                            Data = deactiveMapping,
                             Message = "Fee has been deleted",
                             StatusCode = HttpStatusCode.OK,
                             Success = true
@@ -179,8 +170,8 @@ namespace Bunkering.Access.Services
                     {
                         _response = new ApiResponse
                         {
-                            Data = deactiveFee,
-                            Message = "Fee is already deleted",
+                            Data = deactiveMapping,
+                            Message = "Mapping is already deleted",
                             StatusCode = HttpStatusCode.OK,
                             Success = true
                         };
@@ -193,12 +184,12 @@ namespace Bunkering.Access.Services
             {
                 _response = new ApiResponse
                 {
-                    Message = "You need to LogIn to Delete a Fee",
+                    Message = "You need to LogIn to Delete a Mapping",
                     StatusCode = HttpStatusCode.Unauthorized,
                     Success = true
                 };
             }
-            
+
             return _response;
         }
     }

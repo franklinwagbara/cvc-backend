@@ -302,6 +302,22 @@ namespace Bunkering.Controllers.API
         [HttpPost]
         public async Task<IActionResult> Process(int id, string act, string comment) => Response(await _appService.Process(id, act, comment));
 
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("view-application-By-Depot")]
+        [HttpGet]
+        public async Task<IActionResult> ViewApplicationByDepotID(int id) => Response(await _appService.AllApplicationsByDepot(id));
+
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("view-application-By-Depot-Officer")]
+        [HttpGet]
+        public async Task<IActionResult> ViewApplicationByDepotOfficer(Guid id) => Response(await _appService.AllApplicationsInDepotByUserID(id));
+
 
 
     }

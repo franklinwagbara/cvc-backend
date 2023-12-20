@@ -7,6 +7,7 @@ namespace Bunkering.Access.IContracts
         IApplication Application { get; }
         IApplicationDepot ApplicationDepot { get; }
         IAppFee AppFee { get; }
+        IDepotOfficer DepotOfficer { get; }
         IApplicationType ApplicationType { get; }
         IApplicationHistory ApplicationHistory { get; }
         IAppointment Appointment { get; }
@@ -31,6 +32,7 @@ namespace Bunkering.Access.IContracts
         IValidatiionResponse ValidatiionResponse { get; }
         IWorkflow Workflow { get; }
         IVesselType VesselType { get; }
+        public ICoQ CoQ { get; }
         IvFacilityPermit vFacilityPermit { get; }
         IvAppPayment vAppPayment { get; }
         IvAppVessel vAppVessel { get; }
