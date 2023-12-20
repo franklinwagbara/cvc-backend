@@ -1,8 +1,6 @@
-﻿using Bunkering.Core.Data;
-
-namespace Bunkering.Core.ViewModels
+﻿namespace Bunkering.Core.ViewModels
 {
-    public class CoQViewModel
+    public class CreateCoQViewModel
     {
         public int Id { get; set; }
         public int AppId { get; set; }
@@ -15,8 +13,5 @@ namespace Bunkering.Core.ViewModels
         public Decimal GOV { get; set; }
         public Decimal GSV { get; set; }
         public Decimal DepotPrice { get; set; }
-        public DateTime DateCreated { get; set; } = DateTime.Now;
-        public DateTime? DateModified { get; set; }
-        public string CreatedBy { get; set; } = string.Empty;
     }
 }

@@ -29,6 +29,7 @@ namespace Bunkering.Access.Services
         {
             _unitOfWork = unitOfWork;
             _httpCxtAccessor = httpCxtAccessor;
+            _apiReponse = new ApiResponse();
             _userManager = userManager;
             _mapper = mapper;
             LoginUserEmail = _httpCxtAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
@@ -50,6 +51,8 @@ namespace Bunkering.Access.Services
                 //    throw new Exception("Only Field Officers can create CoQ.");
 
                 var coq = _mapper.Map<CoQ>(Model);
+                coq.CreatedBy = LoginUserEmail;
+                coq.DateCreated = DateTime.Now;
                 var result_coq = await _unitOfWork.CoQ.Add(coq);
                 await _unitOfWork.SaveChangesAsync(user.Id);
 

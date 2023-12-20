@@ -149,83 +149,102 @@ namespace Bunkering.Access.Services
                 //else
                 //{
 
-                    var facility = await CreateFacility(model, user);
-                    if (facility != null)
+                var facility = await CreateFacility(model, user);
+                if (facility != null)
+                {
+                    var app = new Application
                     {
-                        var app = new Application
-                        {
-                            ApplicationTypeId = appType.Id,
-                            CreatedDate = DateTime.UtcNow.AddHours(1),
-                            CurrentDeskId = user.Id,
-                            Reference = Utils.RefrenceCode(),
-                            UserId = user.Id,
-                            FacilityId = facility.Id,
-                            Status = Enum.GetName(typeof(AppStatus), 0),
-                            VesselName = model.VesselName,
-                            LoadingPort = model.LoadingPort,
-                            DischargePort = model.DischargePort,
-                            MarketerName = model.MarketerName,
-                            IMONumber = model.IMONumber,
-                        };
+                        ApplicationTypeId = appType.Id,
+                        CreatedDate = DateTime.UtcNow.AddHours(1),
+                        CurrentDeskId = user.Id,
+                        Reference = Utils.RefrenceCode(),
+                        UserId = user.Id,
+                        FacilityId = facility.Id,
+                        Status = Enum.GetName(typeof(AppStatus), 0),
+                        VesselName = model.VesselName,
+                        LoadingPort = model.LoadingPort,
+                        DischargePort = model.DischargePort,
+                        MarketerName = model.MarketerName,
+                        IMONumber = model.IMONumber,
+                        ETA = model.ETA,
+                    };
 
-                        await _unitOfWork.Application.Add(app);
+                        var newApp = await _unitOfWork.Application.Add(app);
                         await _unitOfWork.SaveChangesAsync(app.UserId);
-                        //save app tanks
-                        var tank = await AppTanks(model.TankList, facility.Id);
-
-
-                    if (tank != null)
+                    //var depot = await AppDepots(model.DepotList, app.Id);
+                    if (model.DepotList.Any() && newApp != null)
                     {
-                        await _unitOfWork.Application.Add(app);
-                        await _unitOfWork.SaveChangesAsync(app.UserId);
+                        var depotList = new List<AppDepotViewModel>();
 
-                        _response = new ApiResponse
-                        {
-                            Message = "Application initiated successfully",
-                            StatusCode = HttpStatusCode.OK,
-                            Data = new { appId = app.Id },
-                            Success = true
-                        };
+                        model.DepotList.ForEach(d => {
+                            d.AppId = newApp.Id;
+                            depotList.Add(d);
+                        });
 
+                        await _unitOfWork.ApplicationDepot.AddRange(_mapper.Map<List<ApplicationDepot>>(depotList));
+                        await _unitOfWork.SaveChangesAsync(user.Id);
                     }
                     else
-                    {
-                        _response = new ApiResponse
-                        {
-                            Message = "unable to apply",
-                            StatusCode = HttpStatusCode.NotFound,
-                            Success = false
-                        };
+                        throw new Exception("Depot List must be provided!");
 
-                    }
+                    return new ApiResponse
+                    {
+                        Message = "Application initiated successfully",
+                        StatusCode = HttpStatusCode.OK,
+                        Data = new { appId = app.Id },
+                        Success = true
+                    };
+
+                    //save app tanks
+                    // var tank = await AppTanks(model.TankList, facility.Id);
+
+                    // if (tank != null)
+                    // {
+                    //     await _unitOfWork.Application.Add(app);
+                    //     await _unitOfWork.SaveChangesAsync(app.UserId);
+
+                    //     _response = new ApiResponse
+                    //     {
+                    //         Message = "Application initiated successfully",
+                    //         StatusCode = HttpStatusCode.OK,
+                    //         Data = new { appId = app.Id },
+                    //         Success = true
+                    //     };
+
+                    // }
+                    // else
+                    // {
+                    //     _response = new ApiResponse
+                    //     {
+                    //         Message = "unable to apply",
+                    //         StatusCode = HttpStatusCode.NotFound,
+                    //         Success = false
+                    //     };
+
+                    // }
 
 
                     //await _flow.AppWorkFlow(app.Id, Enum.GetName(typeof(AppActions), AppActions.Initiate), "Application Created");
-
                 }
                 else
                 {
-                    _response = new ApiResponse
+                    return new ApiResponse
                     {
                         Message = "An error occured. Pls try again.",
                         StatusCode = HttpStatusCode.BadRequest,
                         Success = false
                     };
                 }
-
-                //}
-
             }
             catch (Exception ex)
             {
-                _response = new ApiResponse
+                return new ApiResponse
                 {
                     Success = false,
                     Message = ex.Message,
                     StatusCode = HttpStatusCode.InternalServerError
                 };
             }
-            return _response;
         }
 
         //save tank information
@@ -260,6 +279,22 @@ namespace Bunkering.Access.Services
             return tankList;
 
         }
+        // private Task<List<Depot>> AppDepots(List<Depot> depot, int appId)
+        // {
+
+        //     var depotList = new List<ApplicationDepot>();
+        //     depot.ForEach(x =>
+        //     {
+        //         depotList.Add(new ApplicationDepot
+        //         {
+        //             AppId = appId,
+        //             DepotId = x.Id
+        //         });
+        //     });
+
+        //      return depotList;
+
+        // }
 
         public async Task<ApiResponse> GetTanksByAppId(int id)
         {
@@ -1172,5 +1207,75 @@ namespace Bunkering.Access.Services
 
             return _response;
         }
+
+        public async Task<ApiResponse> AllApplicationsByDepot(int depotId)
+        {
+
+            var applications = await  _unitOfWork.Application.Find(x => x.DeportStateId == depotId);
+            if (applications != null)
+            {
+                var filteredapps = applications.Where(x => x.IsDeleted == false);
+                _response = new ApiResponse
+                {
+                    Message = "Applications fetched successfully",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true,
+                    Data = applications.Select(x => new
+                    {
+                        x.Id,
+                        x.ApplicationType,
+                        x.Appointment,
+                        x.CreatedDate,
+                        x.CurrentDeskId,
+                        x.DeportStateId,
+                        x.Facility,
+                        x.FADApproved,
+                        x.MarketerName,
+                        x.IsDeleted
+                    })
+                };
+            }
+           
+           
+
+            return _response;
+        }
+
+        public async Task<ApiResponse> AllApplicationsInDepotByUserID(Guid userId)
+        {
+            var apps = await _unitOfWork.DepotOfficer.Find(x => x.OfficerID == userId);
+
+            var result = new List<DepotApplicationUserViewModel>();
+
+            foreach (var item in apps) {
+                var depot = await _unitOfWork.Depot.FirstOrDefaultAsync(x => x.Id == item.DepotID);
+                if (depot != null)
+                {
+                    var appDep = await _unitOfWork.Application.Find(x => x.DeportStateId == depot.Id);
+                    result.Add(new DepotApplicationUserViewModel
+                    {
+                        Id = depot.Id,
+                        Capacity = depot.Capacity,
+                        Applications = appDep,
+                        Name = depot.Name,
+                        State = depot.State,
+                        IsDeleted = depot.IsDeleted
+                    });
+                }
+               
+            }
+            _response = new ApiResponse
+            {
+                Message = "Applications fetched successfully",
+                StatusCode = HttpStatusCode.OK,
+                Success = true,
+                Data = result
+            };
+
+            return _response;
+        }
+
+
+        
     }
 }

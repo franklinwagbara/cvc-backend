@@ -17,6 +17,7 @@ namespace Bunkering.Core.Data
         public DbSet<AppFee> AppFees { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<ApplicationType> ApplicationTypes { get; set; }
+        public DbSet<ApplicationDepot> ApplicationDepots { get; set; }
         public DbSet<Audit> AuditLogs { get; set; }
         public DbSet<Company> Companies { get; set; }
         public DbSet<Country> Countries { get; set; }
