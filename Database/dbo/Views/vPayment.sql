@@ -1,4 +1,5 @@
-﻿CREATE VIEW dbo.vPayment
+﻿
+CREATE VIEW dbo.vPayment
 AS
 SELECT dbo.Payments.Id, dbo.AspNetUsers.Email AS CompanyEmail, dbo.Companies.Name AS CompanyName, dbo.Applications.VesselName, dbo.Payments.RRR, dbo.Payments.Amount, dbo.Payments.Status AS PaymentStatus, dbo.Applications.Reference AS AppReference, 
              dbo.Payments.PaymentDate
