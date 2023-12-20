@@ -4,6 +4,7 @@ using Bunkering.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bunkering.Core.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20231220144813_UpdatedETA")]
+    partial class UpdatedETA
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -499,63 +502,6 @@ namespace Bunkering.Core.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("AuditLogs");
-                });
-
-            modelBuilder.Entity("Bunkering.Core.Data.CoQ", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AppId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateOfSTAfterDischarge")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateOfVesselArrival")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateOfVesselUllage")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("DepotId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("DepotPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("GOV")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("GSV")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("MT_AIR")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("MT_VAC")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AppId");
-
-                    b.HasIndex("DepotId");
-
-                    b.ToTable("CoQs");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.Company", b =>
@@ -1213,9 +1159,6 @@ namespace Bunkering.Core.Migrations
                     b.Property<int>("ApplicationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ApplicationTypeId")
-                        .HasColumnType("int");
-
                     b.Property<int>("DocId")
                         .HasColumnType("int");
 
@@ -1860,25 +1803,6 @@ namespace Bunkering.Core.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Bunkering.Core.Data.CoQ", b =>
-                {
-                    b.HasOne("Bunkering.Core.Data.Application", "Application")
-                        .WithMany()
-                        .HasForeignKey("AppId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Bunkering.Core.Data.Depot", "Depot")
-                        .WithMany()
-                        .HasForeignKey("DepotId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Application");
-
-                    b.Navigation("Depot");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.Facility", b =>

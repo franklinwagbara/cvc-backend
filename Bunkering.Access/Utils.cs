@@ -156,6 +156,7 @@ namespace Bunkering.Access
 
         private static string key = "Bunering*123*Brandonetech#";
         public static string NOA = "NOA"; //notice of arrival
+        public static string COQ = "COQ"; //certificate of quantity
 
         public static string DecryptString(this string cipherText)
         {
