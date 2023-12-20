@@ -169,12 +169,19 @@ namespace Bunkering.Access.Services
                         ETA = model.ETA,
                     };
 
-                        await _unitOfWork.Application.Add(app);
+                        var newApp = await _unitOfWork.Application.Add(app);
                         await _unitOfWork.SaveChangesAsync(app.UserId);
                     //var depot = await AppDepots(model.DepotList, app.Id);
-                    if (model.DepotList.Any())
+                    if (model.DepotList.Any() && newApp != null)
                     {
-                        await _unitOfWork.ApplicationDepot.AddRange(_mapper.Map<List<ApplicationDepot>>(model.DepotList));
+                        var depotList = new List<AppDepotViewModel>();
+
+                        model.DepotList.ForEach(d => {
+                            d.AppId = newApp.Id;
+                            depotList.Add(d);
+                        });
+
+                        await _unitOfWork.ApplicationDepot.AddRange(_mapper.Map<List<ApplicationDepot>>(depotList));
                         await _unitOfWork.SaveChangesAsync(user.Id);
                     }
                     else
