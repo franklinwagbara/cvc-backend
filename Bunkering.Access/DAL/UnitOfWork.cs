@@ -13,6 +13,7 @@ namespace Bunkering.Access.DAL
         public IAppointment Appointment { get; private set; }
         public ICountry Country { get; private set; }
         public IDepot Depot { get; private set; }
+        public IApplicationDepot ApplicationDepot { get; private set; }
         public IFacility Facility { get; private set; }
         public IFacilityType FacilityType { get; private set; }
         public IFacilityTypeDocuments FacilityTypeDocuments { get; private set; }

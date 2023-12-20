@@ -5,6 +5,7 @@ namespace Bunkering.Access.IContracts
     public interface IUnitOfWork : IDisposable
     {
         IApplication Application { get; }
+        IApplicationDepot ApplicationDepot { get; }
         IAppFee AppFee { get; }
         IApplicationType ApplicationType { get; }
         IApplicationHistory ApplicationHistory { get; }

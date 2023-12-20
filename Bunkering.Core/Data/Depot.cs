@@ -15,5 +15,6 @@ namespace Bunkering.Core.Data
         public string? DeletedBy { get; set; }
         public int ProductId { get; set; }
         public int Volume {  get; set; }
+       
     }
 }

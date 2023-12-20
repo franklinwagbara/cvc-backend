@@ -152,30 +152,48 @@ namespace Bunkering.Access.Services
                     var facility = await CreateFacility(model, user);
                     if (facility != null)
                     {
-                        var app = new Application
-                        {
-                            ApplicationTypeId = appType.Id,
-                            CreatedDate = DateTime.UtcNow.AddHours(1),
-                            CurrentDeskId = user.Id,
-                            Reference = Utils.RefrenceCode(),
-                            UserId = user.Id,
-                            FacilityId = facility.Id,
-                            Status = Enum.GetName(typeof(AppStatus), 0),
-                            VesselName = model.VesselName,
-                            LoadingPort = model.LoadingPort,
-                            DischargePort = model.DischargePort,
-                            MarketerName = model.MarketerName,
-                            IMONumber = model.IMONumber,
-                            ETA = model.ETA,
+                    var app = new Application
+                    {
+                        ApplicationTypeId = appType.Id,
+                        CreatedDate = DateTime.UtcNow.AddHours(1),
+                        CurrentDeskId = user.Id,
+                        Reference = Utils.RefrenceCode(),
+                        UserId = user.Id,
+                        FacilityId = facility.Id,
+                        Status = Enum.GetName(typeof(AppStatus), 0),
+                        VesselName = model.VesselName,
+                        LoadingPort = model.LoadingPort,
+                        DischargePort = model.DischargePort,
+                        MarketerName = model.MarketerName,
+                        IMONumber = model.IMONumber,
+                        ETA = model.ETA,
+
                         };
 
                         await _unitOfWork.Application.Add(app);
                         await _unitOfWork.SaveChangesAsync(app.UserId);
-                        //save app tanks
-                        var tank = await AppTanks(model.TankList, facility.Id);
-                        //save app depots
-                        //var depots = await AppDepots(model.DepotList, facility.Id);
+                    //var depot = await AppDepots(model.DepotList, app.Id);
+                    if (model.DepotList.Any())
+                    {
+                        var depots = model.DepotList.Select(x => new ApplicationDepot
+                        {
+                            AppId = app.Id,
+                            DepotId = x.Id,
+                        }).ToList();
+                        await _unitOfWork.ApplicationDepot.AddRange(depots);
+                        await _unitOfWork.SaveChangesAsync(app.UserId);
 
+                        _response = new ApiResponse
+                        {
+                            Message = "Application initiated successfully",
+                            StatusCode = HttpStatusCode.OK,
+                            Data = new { appId = app.Id },
+                            Success = true
+                        };
+                    }
+                    //save app tanks
+                    var tank = await AppTanks(model.TankList, facility.Id);
+                       
 
                     if (tank != null)
                     {
@@ -263,17 +281,16 @@ namespace Bunkering.Access.Services
             return tankList;
 
         }
-        private Task<List<Depot>> AppDepots(List<Depot> depot, int id)
+        private Task<List<Depot>> AppDepots(List<Depot> depot, int appId)
         {
 
-            var depotList = new List<Depot>();
+            var depotList = new List<ApplicationDepot>();
             depot.ForEach(x =>
             {
-                depotList.Add(new Depot
+                depotList.Add(new ApplicationDepot
                 {
-                    Volume = x.Volume,
-                    Name = x.Name,
-                    ProductId = x.ProductId,
+                    AppId = appId,
+                    DepotId = x.Id
                 });
             });
 
