@@ -149,83 +149,102 @@ namespace Bunkering.Access.Services
                 //else
                 //{
 
-                    var facility = await CreateFacility(model, user);
-                    if (facility != null)
+                var facility = await CreateFacility(model, user);
+                if (facility != null)
+                {
+                    var app = new Application
                     {
-                        var app = new Application
-                        {
-                            ApplicationTypeId = appType.Id,
-                            CreatedDate = DateTime.UtcNow.AddHours(1),
-                            CurrentDeskId = user.Id,
-                            Reference = Utils.RefrenceCode(),
-                            UserId = user.Id,
-                            FacilityId = facility.Id,
-                            Status = Enum.GetName(typeof(AppStatus), 0),
-                            VesselName = model.VesselName,
-                            LoadingPort = model.LoadingPort,
-                            DischargePort = model.DischargePort,
-                            MarketerName = model.MarketerName,
-                            IMONumber = model.IMONumber,
-                        };
+                        ApplicationTypeId = appType.Id,
+                        CreatedDate = DateTime.UtcNow.AddHours(1),
+                        CurrentDeskId = user.Id,
+                        Reference = Utils.RefrenceCode(),
+                        UserId = user.Id,
+                        FacilityId = facility.Id,
+                        Status = Enum.GetName(typeof(AppStatus), 0),
+                        VesselName = model.VesselName,
+                        LoadingPort = model.LoadingPort,
+                        DischargePort = model.DischargePort,
+                        MarketerName = model.MarketerName,
+                        IMONumber = model.IMONumber,
+                        ETA = model.ETA,
+                    };
 
-                        await _unitOfWork.Application.Add(app);
+                        var newApp = await _unitOfWork.Application.Add(app);
                         await _unitOfWork.SaveChangesAsync(app.UserId);
-                        //save app tanks
-                        var tank = await AppTanks(model.TankList, facility.Id);
-
-
-                    if (tank != null)
+                    //var depot = await AppDepots(model.DepotList, app.Id);
+                    if (model.DepotList.Any() && newApp != null)
                     {
-                        await _unitOfWork.Application.Add(app);
-                        await _unitOfWork.SaveChangesAsync(app.UserId);
+                        var depotList = new List<AppDepotViewModel>();
 
-                        _response = new ApiResponse
-                        {
-                            Message = "Application initiated successfully",
-                            StatusCode = HttpStatusCode.OK,
-                            Data = new { appId = app.Id },
-                            Success = true
-                        };
+                        model.DepotList.ForEach(d => {
+                            d.AppId = newApp.Id;
+                            depotList.Add(d);
+                        });
 
+                        await _unitOfWork.ApplicationDepot.AddRange(_mapper.Map<List<ApplicationDepot>>(depotList));
+                        await _unitOfWork.SaveChangesAsync(user.Id);
                     }
                     else
-                    {
-                        _response = new ApiResponse
-                        {
-                            Message = "unable to apply",
-                            StatusCode = HttpStatusCode.NotFound,
-                            Success = false
-                        };
+                        throw new Exception("Depot List must be provided!");
 
-                    }
+                    return new ApiResponse
+                    {
+                        Message = "Application initiated successfully",
+                        StatusCode = HttpStatusCode.OK,
+                        Data = new { appId = app.Id },
+                        Success = true
+                    };
+
+                    //save app tanks
+                    // var tank = await AppTanks(model.TankList, facility.Id);
+
+                    // if (tank != null)
+                    // {
+                    //     await _unitOfWork.Application.Add(app);
+                    //     await _unitOfWork.SaveChangesAsync(app.UserId);
+
+                    //     _response = new ApiResponse
+                    //     {
+                    //         Message = "Application initiated successfully",
+                    //         StatusCode = HttpStatusCode.OK,
+                    //         Data = new { appId = app.Id },
+                    //         Success = true
+                    //     };
+
+                    // }
+                    // else
+                    // {
+                    //     _response = new ApiResponse
+                    //     {
+                    //         Message = "unable to apply",
+                    //         StatusCode = HttpStatusCode.NotFound,
+                    //         Success = false
+                    //     };
+
+                    // }
 
 
                     //await _flow.AppWorkFlow(app.Id, Enum.GetName(typeof(AppActions), AppActions.Initiate), "Application Created");
-
                 }
                 else
                 {
-                    _response = new ApiResponse
+                    return new ApiResponse
                     {
                         Message = "An error occured. Pls try again.",
                         StatusCode = HttpStatusCode.BadRequest,
                         Success = false
                     };
                 }
-
-                //}
-
             }
             catch (Exception ex)
             {
-                _response = new ApiResponse
+                return new ApiResponse
                 {
                     Success = false,
                     Message = ex.Message,
                     StatusCode = HttpStatusCode.InternalServerError
                 };
             }
-            return _response;
         }
 
         //save tank information
@@ -260,7 +279,43 @@ namespace Bunkering.Access.Services
             return tankList;
 
         }
+        // private Task<List<Depot>> AppDepots(List<Depot> depot, int appId)
+        // {
 
+        //     var depotList = new List<ApplicationDepot>();
+        //     depot.ForEach(x =>
+        //     {
+        //         depotList.Add(new ApplicationDepot
+        //         {
+        //             AppId = appId,
+        //             DepotId = x.Id
+        //         });
+        //     });
+
+        //      return depotList;
+
+        // }
+
+        public async Task<ApiResponse> GetDepotsByAppId(int id)
+        {
+            if (id > 0)
+            {
+                var appDepots = await _unitOfWork.ApplicationDepot.GetDepotsAsync(id);
+                return new()
+                {
+                    Success = true,
+                    Message = "Depots fetched successfully",
+                    StatusCode = HttpStatusCode.Created,
+                    Data = appDepots
+                };
+            }
+            return new()
+            {
+                Success = false,
+                Message = "Invalid application ID",
+                StatusCode = HttpStatusCode.BadRequest
+            };
+        }
         public async Task<ApiResponse> GetTanksByAppId(int id)
         {
             List<TankViewModel> tankList = new List<TankViewModel>();
@@ -500,6 +555,17 @@ namespace Bunkering.Access.Services
                 var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == id, "User,Facility.VesselType,ApplicationType");
                 if (app != null)
                 {
+                    var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(c => c.Name == Utils.NOA);
+                    if (appType == null)
+                    {
+                        return new()
+                        {
+                            Data = null!,
+                            Message = "Application type is not configured",
+                            StatusCode = HttpStatusCode.BadRequest,
+                            Success = false
+                        };
+                    }
                     var factypedocs = await _unitOfWork.FacilityTypeDocuments.Find(x => x.ApplicationTypeId.Equals(app.ApplicationTypeId) && x.VesselTypeId.Equals(app.Facility.VesselTypeId));
                     if (factypedocs != null && factypedocs.Count() > 0)
                     {
@@ -524,7 +590,8 @@ namespace Bunkering.Access.Services
                                             DocType = x.DocType,
                                             FileId = doc.id,
                                             DocSource = doc.source,
-                                            ApplicationId = id
+                                            ApplicationId = id,
+                                            ApplicationTypeId = appType.Id
                                         });
                                     }
                                     else
@@ -534,6 +601,7 @@ namespace Bunkering.Access.Services
                                             DocId = x.DocumentTypeId,
                                             DocName = x.Name,
                                             DocType = x.DocType,
+                                            ApplicationTypeId = appType.Id
                                         });
                                     }
                                 }
@@ -543,6 +611,7 @@ namespace Bunkering.Access.Services
                                         DocId = x.DocumentTypeId,
                                         DocName = x.Name,
                                         DocType = x.DocType,
+                                        ApplicationTypeId = appType.Id
                                     });
                             }
                             else
@@ -559,7 +628,8 @@ namespace Bunkering.Access.Services
                                             DocType = x.DocType,
                                             FileId = doc.Id,
                                             DocSource = doc.Source,
-                                            ApplicationId = id
+                                            ApplicationId = id,
+                                            ApplicationTypeId = appType.Id
                                         });
                                     }
                                     else
@@ -569,6 +639,7 @@ namespace Bunkering.Access.Services
                                             DocId = x.DocumentTypeId,
                                             DocName = x.Name,
                                             DocType = x.DocType,
+                                            ApplicationTypeId = appType.Id
                                         });
                                     }
                                 }
@@ -578,6 +649,7 @@ namespace Bunkering.Access.Services
                                         DocId = x.DocumentTypeId,
                                         DocName = x.Name,
                                         DocType = x.DocType,
+                                        ApplicationTypeId = appType.Id
                                     });
                             }
                         });

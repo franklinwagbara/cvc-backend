@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Bunkering.Core.ViewModels
+﻿namespace Bunkering.Core.ViewModels
 {
     public class DepotViewModel
     {
@@ -12,5 +6,7 @@ namespace Bunkering.Core.ViewModels
         public string Name { get; set; }
         public int StateId { get; set; }
         public decimal Capacity { get; set; }
+        //public int ProductId { get; set; }
+        //public decimal Volume {  get; set; }
     }
 }

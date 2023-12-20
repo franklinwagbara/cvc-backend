@@ -21,6 +21,7 @@ namespace Bunkering.Core.Data
         public DateTime CreatedDate { get; set; }
         public DateTime? SubmittedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public DateTime ETA {  get; set; }
         public string Status { get; set; }
         public bool IsDeleted { get; set; }
         public int? FlowId { get; set; }
