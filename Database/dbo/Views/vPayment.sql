@@ -1,5 +1,4 @@
-﻿
-CREATE VIEW dbo.vPayment
+﻿CREATE VIEW dbo.vPayment
 AS
 SELECT dbo.Payments.Id, dbo.AspNetUsers.Email AS CompanyEmail, dbo.Companies.Name AS CompanyName, dbo.Applications.VesselName, dbo.Payments.RRR, dbo.Payments.Amount, dbo.Payments.Status AS PaymentStatus, dbo.Applications.Reference AS AppReference, 
              dbo.Payments.PaymentDate
@@ -7,6 +6,9 @@ FROM   dbo.Payments INNER JOIN
              dbo.Applications ON dbo.Payments.ApplicationId = dbo.Applications.Id INNER JOIN
              dbo.Companies INNER JOIN
              dbo.AspNetUsers ON dbo.Companies.Id = dbo.AspNetUsers.CompanyId ON dbo.Applications.UserId = dbo.AspNetUsers.Id
+GO
+EXECUTE sp_addextendedproperty @name = N'MS_DiagramPaneCount', @value = 1, @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'VIEW', @level1name = N'vPayment';
+
 
 GO
 EXECUTE sp_addextendedproperty @name = N'MS_DiagramPane1', @value = N'[0E232FF0-B466-11cf-A24F-00AA00A3EFFF, 1.00]
@@ -147,8 +149,4 @@ Begin DesignProperties =
    End
 End
 ', @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'VIEW', @level1name = N'vPayment';
-
-
-GO
-EXECUTE sp_addextendedproperty @name = N'MS_DiagramPaneCount', @value = 1, @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'VIEW', @level1name = N'vPayment';
 
