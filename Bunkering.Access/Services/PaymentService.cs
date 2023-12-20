@@ -290,6 +290,7 @@ namespace Bunkering.Access.Services
             };
 
         }
+
         public async Task<ApiResponse> GetPaymentById(int id)
         {
             var paymentById = await _unitOfWork.vPayment.FirstOrDefaultAsync(x => x.Id.Equals(id));
