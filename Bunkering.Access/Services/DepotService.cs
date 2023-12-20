@@ -47,7 +47,7 @@ namespace Bunkering.Access.Services
             var depot = new Depot
             {
                 Name = model.Name,
-                State = model.State,
+                StateId = model.StateId,
                 Capacity = model.Capacity,
             };
 
@@ -73,7 +73,7 @@ namespace Bunkering.Access.Services
             if (depot != null)
             {
                 depot.Name = model.Name;
-                depot.State = model.State;
+                depot.StateId = model.StateId;
                 depot.Capacity = model.Capacity;
                 await _unitOfWork.Depot.Update(depot);
                 _unitOfWork.Save();
