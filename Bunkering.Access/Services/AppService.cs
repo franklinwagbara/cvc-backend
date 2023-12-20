@@ -152,27 +152,35 @@ namespace Bunkering.Access.Services
                     var facility = await CreateFacility(model, user);
                     if (facility != null)
                     {
-                        var app = new Application
-                        {
-                            ApplicationTypeId = appType.Id,
-                            CreatedDate = DateTime.UtcNow.AddHours(1),
-                            CurrentDeskId = user.Id,
-                            Reference = Utils.RefrenceCode(),
-                            UserId = user.Id,
-                            FacilityId = facility.Id,
-                            Status = Enum.GetName(typeof(AppStatus), 0),
-                            VesselName = model.VesselName,
-                            LoadingPort = model.LoadingPort,
-                            DischargePort = model.DischargePort,
-                            MarketerName = model.MarketerName,
-                            IMONumber = model.IMONumber,
+                    var app = new Application
+                    {
+                        ApplicationTypeId = appType.Id,
+                        CreatedDate = DateTime.UtcNow.AddHours(1),
+                        CurrentDeskId = user.Id,
+                        Reference = Utils.RefrenceCode(),
+                        UserId = user.Id,
+                        FacilityId = facility.Id,
+                        Status = Enum.GetName(typeof(AppStatus), 0),
+                        VesselName = model.VesselName,
+                        LoadingPort = model.LoadingPort,
+                        DischargePort = model.DischargePort,
+                        MarketerName = model.MarketerName,
+                        IMONumber = model.IMONumber,
+                        ETA = model.ETA,
+
                         };
 
                         await _unitOfWork.Application.Add(app);
                         await _unitOfWork.SaveChangesAsync(app.UserId);
-                        //save app tanks
-                        var tank = await AppTanks(model.TankList, facility.Id);
-
+                    //var depot = await AppDepots(model.DepotList, app.Id);
+                    if (model.DepotList.Any())
+                    {
+                        await _unitOfWork.ApplicationDepot.AddRange(model.DepotList);
+                        await _unitOfWork.SaveChangesAsync(user.Id);
+                    }
+                    //save app tanks
+                    var tank = await AppTanks(model.TankList, facility.Id);
+                       
 
                     if (tank != null)
                     {
@@ -258,6 +266,22 @@ namespace Bunkering.Access.Services
             }
 
             return tankList;
+
+        }
+        private Task<List<Depot>> AppDepots(List<Depot> depot, int appId)
+        {
+
+            var depotList = new List<ApplicationDepot>();
+            depot.ForEach(x =>
+            {
+                depotList.Add(new ApplicationDepot
+                {
+                    AppId = appId,
+                    DepotId = x.Id
+                });
+            });
+
+             return depotList;
 
         }
 
