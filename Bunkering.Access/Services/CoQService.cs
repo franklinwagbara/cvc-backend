@@ -6,6 +6,7 @@ using Bunkering.Core.Utils;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using System.Net;
 using System.Security.Claims;
 
@@ -24,16 +25,15 @@ namespace Bunkering.Access.Services
         private readonly WorkFlowService _flow;
 
 
-        public CoQService(IUnitOfWork unitOfWork, IHttpContextAccessor httpCxtAccessor, ApiResponse apiReponse, UserManager<ApplicationUser> userManager, IMapper mapper, IElps elps, AppSetting setting, WorkFlowService flow)
+        public CoQService(IUnitOfWork unitOfWork, IHttpContextAccessor httpCxtAccessor, UserManager<ApplicationUser> userManager, IOptions<AppSetting> setting, IMapper mapper, IElps elps, WorkFlowService flow)
         {
             _unitOfWork = unitOfWork;
             _httpCxtAccessor = httpCxtAccessor;
-            _apiReponse = apiReponse;
             _userManager = userManager;
             _mapper = mapper;
             LoginUserEmail = _httpCxtAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
             _elps = elps;
-            _setting = setting;
+            _setting = setting.Value;
             _flow = flow;
         }
 

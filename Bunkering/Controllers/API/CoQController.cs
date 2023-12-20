@@ -61,8 +61,8 @@ namespace Bunkering.Controllers.API
 		[ProducesResponseType(typeof(ApiResponse), 405)]
 		[ProducesResponseType(typeof(ApiResponse), 500)]
 		[Produces("application/json")]
-		[Route("coq_by_id")]
-		[HttpGet("{id}")]
+		[Route("coq_by_id/{id}")]
+		[HttpGet]
 		public async Task<IActionResult> GetById(int id)
 		{
 			var permits = (await _unitOfWork.Permit
