@@ -108,6 +108,7 @@
     <Build Include="dbo\Tables\vAppUsers_1.sql" />
     <Build Include="dbo\Tables\vAppPayment_1.sql" />
     <Build Include="dbo\Tables\TankViewModel_1.sql" />
+    <Build Include="dbo\Tables\ApplicationDepots.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Snapshots\Bunkering.Database_20230810_10-01-52.dacpac" />

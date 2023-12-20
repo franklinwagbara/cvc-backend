@@ -175,21 +175,8 @@ namespace Bunkering.Access.Services
                     //var depot = await AppDepots(model.DepotList, app.Id);
                     if (model.DepotList.Any())
                     {
-                        var depots = model.DepotList.Select(x => new ApplicationDepot
-                        {
-                            AppId = app.Id,
-                            DepotId = x.Id,
-                        }).ToList();
-                        await _unitOfWork.ApplicationDepot.AddRange(depots);
-                        await _unitOfWork.SaveChangesAsync(app.UserId);
-
-                        _response = new ApiResponse
-                        {
-                            Message = "Application initiated successfully",
-                            StatusCode = HttpStatusCode.OK,
-                            Data = new { appId = app.Id },
-                            Success = true
-                        };
+                        await _unitOfWork.ApplicationDepot.AddRange(model.DepotList);
+                        await _unitOfWork.SaveChangesAsync(user.Id);
                     }
                     //save app tanks
                     var tank = await AppTanks(model.TankList, facility.Id);
