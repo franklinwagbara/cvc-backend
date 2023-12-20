@@ -70,7 +70,13 @@ namespace Bunkering.Access.Services
                                 var fee = await _unitOfWork.AppFee.FirstOrDefaultAsync(x => x.ApplicationTypeId.Equals(app.ApplicationTypeId));
                                 if (fee != null)
                                 {
-                                    var total = fee.ApplicationFee + fee.ProcessingFee + fee.COQFee + fee.SerciveCharge + fee.NOAFee;
+                                    int numOfDepots = 1;
+                                    var appDepots = _unitOfWork.ApplicationDepot.GetAll().Result.Where(x => x.AppId == app.Id);
+                                    if (appDepots != null)
+                                    {
+                                        numOfDepots = appDepots.Count();
+                                    }
+                                    var total = fee.ApplicationFee + fee.ProcessingFee + (fee.COQFee * numOfDepots) + fee.SerciveCharge + fee.NOAFee;
 
                                     var request = await _elps.GeneratePaymentReference($"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}", app, total, fee.SerciveCharge);
                                     _logger.LogRequest("Creation of payment split for application with reference:" + app.Reference + "(" + app.User.Company.Name + ") by " + User, false, directory);
