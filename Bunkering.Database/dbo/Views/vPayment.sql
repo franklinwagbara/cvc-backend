@@ -2,11 +2,11 @@
 AS
 SELECT dbo.Payments.Id, dbo.AspNetUsers.Email AS CompanyEmail, dbo.Companies.Name AS CompanyName, dbo.Applications.VesselName, dbo.Payments.RRR, dbo.Payments.Amount, dbo.Payments.Status AS PaymentStatus, dbo.Applications.Reference AS AppReference, 
              dbo.ExtraPayments.Reference AS ExtraPaymentReference, dbo.Payments.PaymentDate
-FROM   dbo.Applications CROSS JOIN
-             dbo.AspNetUsers CROSS JOIN
-             dbo.Companies CROSS JOIN
-             dbo.ExtraPayments CROSS JOIN
-             dbo.Payments
+FROM   dbo.Companies INNER JOIN
+             dbo.AspNetUsers ON dbo.Companies.Id = dbo.AspNetUsers.CompanyId INNER JOIN
+             dbo.Payments INNER JOIN
+             dbo.ExtraPayments ON dbo.Payments.ExtraPaymentId = dbo.ExtraPayments.Id INNER JOIN
+             dbo.Applications ON dbo.Payments.ApplicationId = dbo.Applications.Id ON dbo.AspNetUsers.Id = dbo.Applications.UserId
 GO
 EXECUTE sp_addextendedproperty @name = N'MS_DiagramPaneCount', @value = 2, @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'VIEW', @level1name = N'vPayment';
 
@@ -26,7 +26,7 @@ Begin DesignProperties =
    Begin PaneConfigurations = 
       Begin PaneConfiguration = 0
          NumPanes = 4
-         Configuration = "(H (1[51] 4[19] 2[28] 3) )"
+         Configuration = "(H (1[52] 4[24] 2[21] 3) )"
       End
       Begin PaneConfiguration = 1
          NumPanes = 3
@@ -100,27 +100,27 @@ Begin DesignProperties =
                Right = 305
             End
             DisplayFlags = 280
-            TopColumn = 0
+            TopColumn = 4
          End
          Begin Table = "AspNetUsers"
             Begin Extent = 
-               Top = 12
-               Left = 370
-               Bottom = 539
-               Right = 673
+               Top = 0
+               Left = 378
+               Bottom = 527
+               Right = 681
             End
             DisplayFlags = 280
-            TopColumn = 0
+            TopColumn = 12
          End
          Begin Table = "Companies"
             Begin Extent = 
                Top = 216
-               Left = 1066
+               Left = 1063
                Bottom = 413
                Right = 1307
             End
             DisplayFlags = 280
-            TopColumn = 0
+            TopColumn = 1
          End
          Begin Table = "ExtraPayments"
             Begin Extent = 
@@ -140,7 +140,7 @@ Begin DesignProperties =
                Right = 1012
             End
             DisplayFlags = 280
-            TopColumn = 0
+            TopColumn = 7
          End
       End
    End
@@ -164,4 +164,6 @@ Begin DesignProperties =
          Filter = 1350
          Or = 1350
          Or = 13', @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'VIEW', @level1name = N'vPayment';
+
+
 
