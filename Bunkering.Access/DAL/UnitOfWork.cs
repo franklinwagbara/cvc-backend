@@ -14,6 +14,7 @@ namespace Bunkering.Access.DAL
         public IAppointment Appointment { get; private set; }
         public ICountry Country { get; private set; }
         public IDepot Depot { get; private set; }
+        public IApplicationDepot ApplicationDepot { get; private set; }
         public IFacility Facility { get; private set; }
         public IFacilityType FacilityType { get; private set; }
         public IFacilityTypeDocuments FacilityTypeDocuments { get; private set; }
@@ -78,7 +79,7 @@ namespace Bunkering.Access.DAL
             vAppPayment = vAppPayment != null ? vAppPayment : new vAppPaymentRepository(_context);
             vAppUser = vAppUser != null ? vAppUser : new vAppUserRepository(_context);
             vPayment = vPayment != null ? vPayment : new vPaymentRepository(_context);
-
+            ApplicationDepot = ApplicationDepot ?? new ApplicationDepotRepository(_context);
         }
 
         public int Save() => _context.SaveChanges();
