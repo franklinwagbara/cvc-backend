@@ -113,9 +113,9 @@
     <Build Include="dbo\Tables\Depots.sql" />
     <Build Include="dbo\Tables\CoQs.sql" />
     <Build Include="dbo\Tables\ApplicationDepots.sql" />
-
     <Build Include="dbo\Tables\NominatedSurveyors.sql" />
     <Build Include="dbo\Tables\Jetties.sql" />
+    <Build Include="dbo\Tables\ApplicationDepots.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Snapshots\Bunkering.Database_20230810_10-01-52.dacpac" />
