@@ -16,6 +16,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Bunkering.Access.Query;
 
 namespace Bunkering.Access.Services
 {
@@ -33,6 +34,7 @@ namespace Bunkering.Access.Services
         private readonly AppSetting _setting;
         private readonly string directory = "Application";
         private readonly IConfiguration _configuration;
+        private readonly ApplicationQueries _appQueries;
 
         public AppService(
             UserManager<ApplicationUser> userManager,
@@ -43,7 +45,8 @@ namespace Bunkering.Access.Services
             IHttpContextAccessor httpContextAccessor,
             AppLogger logger,
             IOptions<AppSetting> setting,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ApplicationQueries appQueries)
         {
             _userManager = userManager;
             _unitOfWork = unitOfWork;
@@ -55,6 +58,7 @@ namespace Bunkering.Access.Services
             _logger = logger;
             _setting = setting.Value;
             _configuration = configuration;
+            _appQueries = appQueries;
         }
 
         private async Task<Facility> CreateFacility(ApplictionViewModel model, ApplicationUser user)
@@ -1261,35 +1265,30 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
-        public async Task<ApiResponse> AllApplicationsInDepotByUserID(Guid userId)
+        public async Task<ApiResponse> AllApplicationsInDepotByUserID()
         {
-            var apps = await _unitOfWork.DepotOfficer.Find(x => x.OfficerID == userId);
+            var user = await _userManager.FindByEmailAsync(User);
 
-            var result = new List<DepotApplicationUserViewModel>();
-
-            foreach (var item in apps) {
-                var depot = await _unitOfWork.Depot.FirstOrDefaultAsync(x => x.Id == item.DepotID);
-                if (depot != null)
+            var userState = await _unitOfWork.Office.FirstOrDefaultAsync(x => x.Id == user.OfficeId);
+            if (userState is  null)
+            {
+                _response = new ApiResponse
                 {
-                    var appDep = await _unitOfWork.Application.Find(x => x.DeportStateId == depot.Id);
-                    result.Add(new DepotApplicationUserViewModel
-                    {
-                        Id = depot.Id,
-                        Capacity = depot.Capacity,
-                        Applications = appDep,
-                        Name = depot.Name,
-                        State = depot.State,
-                        IsDeleted = depot.IsDeleted
-                    });
-                }
-               
+                    Message = "No User was found",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = false
+                };
+                return _response;
             }
+            var stateId = userState.StateId;
+            var apps =  _appQueries.GetApplicationsByStateId(stateId);
+
             _response = new ApiResponse
             {
                 Message = "Applications fetched successfully",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                Data = result
+                Data = apps
             };
 
             return _response;
