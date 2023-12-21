@@ -1,5 +1,6 @@
 ﻿using Bunkering.Access.DAL;
 using Bunkering.Access.IContracts;
+using Bunkering.Access.Query;
 using Bunkering.Core.Data;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -34,6 +35,7 @@ namespace Bunkering.Access.Services
             services.AddScoped<DepotService>();
             services.AddScoped<NominatedSurveyorService>();
             services.AddScoped<CoQService>();
+            services.AddScoped<ApplicationQueries>();
 
             services.AddAutoMapper(typeof(MappingProfile));
         }
