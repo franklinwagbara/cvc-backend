@@ -32,6 +32,7 @@ namespace Bunkering.Access.Services
             _apiReponse = new ApiResponse();
             _userManager = userManager;
             _mapper = mapper;
+            _apiReponse = new ApiResponse();
             LoginUserEmail = _httpCxtAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
             _elps = elps;
             _setting = setting.Value;
