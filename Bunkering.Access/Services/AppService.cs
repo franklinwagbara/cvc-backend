@@ -16,6 +16,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Bunkering.Access.Query;
 
 namespace Bunkering.Access.Services
 {
@@ -33,6 +34,7 @@ namespace Bunkering.Access.Services
         private readonly AppSetting _setting;
         private readonly string directory = "Application";
         private readonly IConfiguration _configuration;
+        private readonly ApplicationQueries _appQueries;
 
         public AppService(
             UserManager<ApplicationUser> userManager,
@@ -43,7 +45,8 @@ namespace Bunkering.Access.Services
             IHttpContextAccessor httpContextAccessor,
             AppLogger logger,
             IOptions<AppSetting> setting,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ApplicationQueries appQueries)
         {
             _userManager = userManager;
             _unitOfWork = unitOfWork;
@@ -55,6 +58,7 @@ namespace Bunkering.Access.Services
             _logger = logger;
             _setting = setting.Value;
             _configuration = configuration;
+            _appQueries = appQueries;
         }
 
         private async Task<Facility> CreateFacility(ApplictionViewModel model, ApplicationUser user)
@@ -1277,32 +1281,14 @@ namespace Bunkering.Access.Services
                 return _response;
             }
             var stateId = userState.StateId;
-            var depots = await _unitOfWork.Depot.Find(x => x.StateId == stateId);
-
-            //var result = new List<DepotApplicationUserViewModel>();
-
-            //foreach (var item in depots) {
-            //    var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.DeportStateId == item.StateId);
-            //    if (app != null)
-            //    {
-            //        result.Add(new DepotApplicationUserViewModel
-            //        {
-            //            Id = app.Id,                        
-            //            Applications = app,
-            //            Name = app.Name,
-            //            State = depot.State,
-            //            IsDeleted = depot.IsDeleted
-            //        });
-            //    }
-               
-            //}
+            var apps =  _appQueries.GetApplicationsByStateId(stateId);
 
             _response = new ApiResponse
             {
                 Message = "Applications fetched successfully",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                //Data = result
+                Data = apps
             };
 
             return _response;

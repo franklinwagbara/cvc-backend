@@ -340,7 +340,7 @@ namespace Bunkering.Controllers.API
         [ProducesResponseType(typeof(ApiResponse), 500)]
         [Route("view-application-By-Depot-Officer")]
         [HttpGet]
-        public async Task<IActionResult> ViewApplicationByDepotOfficer(Guid id) => Response(await _appService.AllApplicationsInDepotByUserID(id));
+        public async Task<IActionResult> ViewApplicationByDepotOfficer(Guid id) => Response(await _appService.AllApplicationsInDepotByUserID());
 
 
 
