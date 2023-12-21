@@ -143,7 +143,7 @@ namespace Bunkering.Access.Services
         }
         public async Task<ApiResponse> GetAllDepot()
         {
-            var allDepot = await _unitOfWork.Depot.GetAll();
+            var allDepot = await _unitOfWork.Depot.GetAll("State");
             allDepot = allDepot.Where(x => x.DeletedAt == null);
 
             _response = new ApiResponse
