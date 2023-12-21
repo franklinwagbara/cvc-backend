@@ -3,6 +3,7 @@ using Bunkering.Core.Data;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,14 +61,36 @@ namespace Bunkering.Access.Services
             };
         }
 
-        public async Task<ApiResponse> CreateDepotOfficerMapping(DepotFieldOfficer newDepotOfficer)
+        public async Task<ApiResponse> CreateDepotOfficerMapping(DepotFieldOfficerViewModel newDepotOfficer)
         {
             try
             {
+                var depotExists = await _unitOfWork.Depot.FirstOrDefaultAsync(c => c.Id ==  newDepotOfficer.DepotID) is not null;
+                if (!depotExists)
+                {
+                    _response = new ApiResponse
+                    {
+                        Message = "Depot not found",
+                        StatusCode = HttpStatusCode.NotFound,
+                        Success = false
+                    };
+                    return _response;
+                }
+                var userExists = await _userManager.Users.AnyAsync(c => c.Id == newDepotOfficer.UserID.ToString());
+                if (!userExists)
+                {
+                    _response = new ApiResponse
+                    {
+                        Message = "Officer not found",
+                        StatusCode = HttpStatusCode.NotFound,
+                        Success = false
+                    };
+                    return _response;
+                }
                 var map = new DepotFieldOfficer
                 {
-                    DepotID= newDepotOfficer.DepotID,
-                    OfficerID = newDepotOfficer.OfficerID
+                    DepotID = newDepotOfficer.DepotID,
+                    OfficerID = newDepotOfficer.UserID
 
                 };
                 await _unitOfWork.DepotOfficer.Add(map);
@@ -92,18 +115,18 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
-        public async Task<ApiResponse> EditDepotOfficerMapping(DepotFieldOfficer depot)
+        public async Task<ApiResponse> EditDepotOfficerMapping(int id, DepotFieldOfficerViewModel depot)
         {
             try
             {
                 var user = await _userManager.FindByEmailAsync(User);
-                var updatMapping = await _unitOfWork.DepotOfficer.FirstOrDefaultAsync(x => x.ID == depot.ID);
+                var updatMapping = await _unitOfWork.DepotOfficer.FirstOrDefaultAsync(x => x.ID == id);
                 try
                 {
                     if (updatMapping != null)
                     {
                         updatMapping.DepotID = depot.DepotID;
-                        updatMapping.OfficerID = depot.OfficerID;
+                        updatMapping.OfficerID = depot.UserID;
                         var success = await _unitOfWork.SaveChangesAsync(user!.Id) > 0;
                         _response = new ApiResponse
                         {

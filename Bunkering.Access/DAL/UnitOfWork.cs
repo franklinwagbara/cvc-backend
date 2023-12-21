@@ -82,6 +82,7 @@ namespace Bunkering.Access.DAL
             vAppUser = vAppUser != null ? vAppUser : new vAppUserRepository(_context);
             vPayment = vPayment != null ? vPayment : new vPaymentRepository(_context);
             ApplicationDepot = ApplicationDepot ?? new ApplicationDepotRepository(_context);
+            DepotOfficer = DepotOfficer ?? new DepotOfficerRepository(_context);
         }
 
         public int Save() => _context.SaveChanges();
