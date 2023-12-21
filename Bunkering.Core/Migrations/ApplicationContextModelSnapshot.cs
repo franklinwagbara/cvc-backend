@@ -641,15 +641,9 @@ namespace Bunkering.Core.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
                     b.Property<string>("State")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Volume")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
