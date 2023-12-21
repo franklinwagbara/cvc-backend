@@ -16,7 +16,8 @@ namespace Bunkering.Core.Data
         public decimal Amount { get; set; }
         public string PaymentStatus { get; set; }
         public string AppReference { get; set; }
-        public string ExtraPaymentReference { get; set; }
+        //public string ExtraPaymentReference { get; set; }
+        public DateTime PaymentDate { get; set; }
 
 
     }
