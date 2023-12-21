@@ -121,4 +121,7 @@
     <None Include="Snapshots\Bunkering.Database_20230810_10-01-52.dacpac" />
     <None Include="Snapshots\Bunkering.Database_20230831_16-17-10.dacpac" />
   </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="Bunkering.Database.refactorlog" />
+  </ItemGroup>
 </Project>
