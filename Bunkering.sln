@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bunkering.Core", "Bunkering
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bunkering.Access", "Bunkering.Access\Bunkering.Access.csproj", "{196B51D2-E08A-47B8-8D24-AEB5B9AEE489}"
 EndProject
-Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Database", "Database\Database.sqlproj", "{3AB7951E-2E89-4A65-8CD0-369463E1D37A}"
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Bunkering.Database", "Bunkering.Database\Bunkering.Database.sqlproj", "{685FCA4F-93DF-4A11-8B7A-3140F038C12C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,12 +29,12 @@ Global
 		{196B51D2-E08A-47B8-8D24-AEB5B9AEE489}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{196B51D2-E08A-47B8-8D24-AEB5B9AEE489}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{196B51D2-E08A-47B8-8D24-AEB5B9AEE489}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3AB7951E-2E89-4A65-8CD0-369463E1D37A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3AB7951E-2E89-4A65-8CD0-369463E1D37A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3AB7951E-2E89-4A65-8CD0-369463E1D37A}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{3AB7951E-2E89-4A65-8CD0-369463E1D37A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3AB7951E-2E89-4A65-8CD0-369463E1D37A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3AB7951E-2E89-4A65-8CD0-369463E1D37A}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{685FCA4F-93DF-4A11-8B7A-3140F038C12C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{685FCA4F-93DF-4A11-8B7A-3140F038C12C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{685FCA4F-93DF-4A11-8B7A-3140F038C12C}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{685FCA4F-93DF-4A11-8B7A-3140F038C12C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{685FCA4F-93DF-4A11-8B7A-3140F038C12C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{685FCA4F-93DF-4A11-8B7A-3140F038C12C}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
