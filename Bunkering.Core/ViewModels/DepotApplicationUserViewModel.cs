@@ -17,7 +17,7 @@ namespace Bunkering.Core.ViewModels
         public DateTime? DeletedAt { get; set; }
         public string? DeletedBy { get; set; }
 
-        public IEnumerable<Application>? Applications { get; set; }
+        public Application? Applications { get; set; }
        
     }
 }
