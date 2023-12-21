@@ -167,7 +167,6 @@ namespace Bunkering.Access.Services
                         Status = Enum.GetName(typeof(AppStatus), 0),
                         VesselName = model.VesselName,
                         LoadingPort = model.LoadingPort,
-                        DischargePort = model.DischargePort,
                         MarketerName = model.MarketerName,
                         IMONumber = model.IMONumber,
                         ETA = model.ETA,
@@ -1067,7 +1066,6 @@ namespace Bunkering.Access.Services
                                     app.Facility.Flag,
                                     app.Facility.CallSIgn,
                                     app.Facility.Operator,
-                                    app.DischargePort,
                                     app.LoadingPort,
                                     Tanks = app.Facility.Tanks.Select(t => new
                                     {

@@ -17,7 +17,6 @@
     [VesselName]        NVARCHAR (MAX) NOT NULL,
     [IMONumber]         NVARCHAR (MAX) NOT NULL,
     [LoadingPort]       NVARCHAR (MAX) NOT NULL,
-    [DischargePort]     NVARCHAR (MAX) NOT NULL,
     [MarketerName]      NVARCHAR (MAX) NOT NULL,
     [ETA]               DATETIME2 (7)  NULL,
     CONSTRAINT [PK_Applications] PRIMARY KEY CLUSTERED ([Id] ASC),
