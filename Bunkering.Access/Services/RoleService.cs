@@ -19,11 +19,11 @@ namespace Bunkering.Access.Services
         ApiResponse _response;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public RoleService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, ApiResponse response, UserManager<ApplicationUser> userManager)
+        public RoleService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
-            _response = response;
+            _response = new ApiResponse();
             _userManager = userManager;
         }
 
