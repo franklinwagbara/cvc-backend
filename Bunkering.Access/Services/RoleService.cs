@@ -66,7 +66,7 @@ namespace Bunkering.Access.Services
         }
         public async Task<ApiResponse> EditRole(RoleViewModel model)
         {
-            ApplicationRole? foundRole = await _role.Roles.FirstOrDefaultAsync(x => x.Name.ToLower().Equals(model.Name.ToLower()));
+            ApplicationRole? foundRole = await _role.Roles.FirstOrDefaultAsync(x => x.Id.Equals(model.Id));
 
             if (foundRole != null)
             {
