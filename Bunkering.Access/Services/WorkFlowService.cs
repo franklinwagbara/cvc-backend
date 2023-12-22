@@ -259,9 +259,9 @@ namespace Bunkering.Access.Services
                 }
                 if (wkflow != null && nextprocessingofficer == null)
                 {
-                    if (wkflow.TargetRole.Equals(currentUser.UserRoles.FirstOrDefault().Role.Id))
+                    if (wkflow.TargetRole.Equals(currentUser.UserRoles.FirstOrDefault().Role.Name))
                         nextprocessingofficer = currentUser;
-                    else if (wkflow.TargetRole.Equals(app.User.UserRoles.FirstOrDefault().Role.Id))
+                    else if (wkflow.TargetRole.Equals(app.User.UserRoles.FirstOrDefault().Role.Name))
                         nextprocessingofficer = app.User;
                     else
                     {
@@ -291,7 +291,7 @@ namespace Bunkering.Access.Services
             if (app != null)
             {
                 var year = DateTime.Now.Year.ToString();
-                var pno = $"NMDPRA/BUNK/{app.Facility.VesselType.Name.Substring(0, 1).ToUpper()}/{app.ApplicationType.Name.Substring(0, 1).ToUpper()}/{year.Substring(0)}/{app.Id}";
+                var pno = $"NMDPRA/HPPITI/CVC/{app.ApplicationType.Name.Substring(0, 1).ToUpper()}/{year.Substring(2)}/{app.Id}";
                 var qrcode = Utils.GenerateQrCode($"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/License/ValidateQrCode/{id}");
                 //license.QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length);
                 //save permit to elps and portal
@@ -314,7 +314,7 @@ namespace Bunkering.Access.Services
                         Company_Id = app.User.ElpsId,
                         Date_Issued = permit.IssuedDate.ToString("yyyy-MM-ddTHH:mm:ss.fff"),
                         Date_Expire = permit.ExpireDate.ToString("yyyy-MM-ddTHH:mm:ss.fff"),
-                        CategoryName = $"Bunkering ({app.Facility.VesselType.Name})",
+                        CategoryName = $"CVC ({app.Facility.VesselType.Name})",
                         Is_Renewed = app.ApplicationType.Name,
                         LicenseId = id,
                         Expired = false
