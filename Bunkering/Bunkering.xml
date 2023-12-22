@@ -323,7 +323,7 @@
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
         </member>
-        <member name="M:Bunkering.Controllers.API.ApplicationProcessesController.EditFlow(Bunkering.Core.Data.WorkFlow)">
+        <member name="M:Bunkering.Controllers.API.ApplicationProcessesController.EditFlow(Bunkering.Core.ViewModels.WorkflowviewModel)">
             <summary>
             This endpoint is used to edit an exisiting flow
             </summary>
@@ -572,6 +572,22 @@
             </remarks>
             <param name="model">This is the model of the get messages by companyId</param>
             <response code="200">Returns a summary of the get messages by companyId </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.DepotOfficerController.GetAllFees">
+            <summary>
+            This endpoint is used to fetch  all the Fees summary
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/application/get-all-fees
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
             <response code="404">Returns not found </response>
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
@@ -867,6 +883,54 @@
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
         </member>
+        <member name="M:Bunkering.Controllers.API.LibraryController.AllJetty">
+            <summary>
+            This endpoint is used to get all Jetty
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/location/AllJetty
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.LibraryController.AllDepot">
+            <summary>
+            This endpoint is used to get all Depot
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/location/AllDepot
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.LibraryController.AllNominatedSurveyor">
+            <summary>
+            This endpoint is used to get all Nominated Surveyor
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/location/AllNominatedSurveyor
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
         <member name="M:Bunkering.Controllers.API.LocationController.CreateLocation(Bunkering.Core.ViewModels.LocationViewModel)">
             <summary>
             This endpoint is used to create location
@@ -924,6 +988,102 @@
             
             Sample Request
             GET: api/location/location
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.LocationController.CreateJetty(Bunkering.Core.ViewModels.JettyViewModel)">
+            <summary>
+            This endpoint is used to create Jetty
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/Location/Jetty
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.LocationController.EditJetty(Bunkering.Core.ViewModels.JettyViewModel)">
+            <summary>
+            This endpoint is used to edit Jetty
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/Location/Jetty
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.LocationController.DeleteJetty(System.Int32)">
+            <summary>
+            This endpoint is used to delete Jetty
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            Delete: api/Location/Jetty
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.LocationController.CreateDepot(Bunkering.Core.ViewModels.DepotViewModel)">
+            <summary>
+            This endpoint is used to C  reate Depot
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/Location/Depot
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.LocationController.EditDepot(Bunkering.Core.ViewModels.DepotViewModel)">
+            <summary>
+            This endpoint is used to Edit Depot
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/Location/Depot
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.LocationController.DeleteDepot(System.Int32)">
+            <summary>
+            This endpoint is used to Delete Depot
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            DELETE: api/Location/Depot
             
             </remarks>
             <response code="200">Returns a success message </response>
@@ -1106,6 +1266,55 @@
             
             Sample Request
             POST: api/staff/deactivate-user
+            
+            </remarks>
+            <response code="200">Returns success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.StaffController.NominatedSurveyor(Bunkering.Core.ViewModels.NominatedSurveyorViewModel)">
+            <summary>
+            This endpoint is used to add Nominated Surveyor 
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/staff/add-NominatedSurveyor
+            
+            </remarks>
+            <response code="200">Returns success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+            
+        </member>
+        <member name="M:Bunkering.Controllers.API.StaffController.EditSurveyor(Bunkering.Core.ViewModels.NominatedSurveyorViewModel)">
+            <summary>
+            This endpoint is used to edit Nominated Surveyor
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/staff/edit-NominatedSurveyor
+            
+            </remarks>
+            <response code="200">Returns success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.StaffController.DeleteNominatedSurveyor(System.Int32)">
+            <summary>
+            This endpoint is used to Deactivate a Nominated Surveyor
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/staff/deactivate-NominatedSurveyor
             
             </remarks>
             <response code="200">Returns success message </response>
