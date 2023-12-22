@@ -14,4 +14,5 @@
         public Decimal GSV { get; set; }
         public Decimal DepotPrice { get; set; }
     }
+
 }
