@@ -11,6 +11,7 @@ namespace Bunkering.Access
             CreateMap<CoQ, CoQViewModel>().ReverseMap();
             CreateMap<CoQ, CreateCoQViewModel>().ReverseMap();
             CreateMap<ApplicationDepot, AppDepotViewModel>().ReverseMap();
+            CreateMap<WorkFlow, WorkflowviewModel>().ReverseMap();
         }
     }
 }

@@ -36,6 +36,7 @@ namespace Bunkering.Access.Services
             services.AddScoped<NominatedSurveyorService>();
             services.AddScoped<CoQService>();
             services.AddScoped<ApplicationQueries>();
+            services.AddScoped<RoleService>();
 
             services.AddAutoMapper(typeof(MappingProfile));
         }
