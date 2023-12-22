@@ -54,7 +54,7 @@ namespace Bunkering.Controllers.API
 		/// <response code="400">Internal server error - bad request </response>
 		[Route("Add-Flow")]
 		[HttpPost]
-		public async Task<IActionResult> AddFlow(WorkFlow model) => Response(await _appProcService.AddFlow(model));
+		public async Task<IActionResult> AddFlow(WorkflowviewModel model) => Response(await _appProcService.AddFlow(model));
 
 		/// <summary>
 		/// This endpoint is used to edit an exisiting flow

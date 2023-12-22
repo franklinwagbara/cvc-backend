@@ -28,6 +28,7 @@ namespace Bunkering.Access.DAL
         public IPayment Payment { get; private set; }
         public IPermit Permit { get; private set; }
         public IProduct Product { get; private set; }
+        public IRole Role { get; private set; }
         public IState State { get; private set; }
         public ISubmittedDocument SubmittedDocument { get; private set; }
         public ITank Tank { get; private set; }
@@ -66,6 +67,7 @@ namespace Bunkering.Access.DAL
             Payment = Payment != null ? Payment : new PaymentRepository(_context);
             Permit = Permit != null ? Permit : new PermitRepository(_context);
             Product = Product != null ? Product : new ProductRepository(_context);
+            Role = Role != null ? Role : new RoleRepository(_context);
             State = State != null ? State : new StateRepository(_context);
             SubmittedDocument = SubmittedDocument != null ? SubmittedDocument : new SubmittedDocumentRepository(_context);
             Tank = Tank != null ? Tank : new TankRepository(_context);
@@ -79,7 +81,8 @@ namespace Bunkering.Access.DAL
             vAppPayment = vAppPayment != null ? vAppPayment : new vAppPaymentRepository(_context);
             vAppUser = vAppUser != null ? vAppUser : new vAppUserRepository(_context);
             vPayment = vPayment != null ? vPayment : new vPaymentRepository(_context);
-
+            ApplicationDepot = ApplicationDepot ?? new ApplicationDepotRepository(_context);
+            DepotOfficer = DepotOfficer ?? new DepotOfficerRepository(_context);
         }
 
         public int Save() => _context.SaveChanges();

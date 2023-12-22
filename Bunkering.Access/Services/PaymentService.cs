@@ -290,10 +290,20 @@ namespace Bunkering.Access.Services
             };
 
         }
+
         public async Task<ApiResponse> GetPaymentById(int id)
         {
             var paymentById = await _unitOfWork.vPayment.FirstOrDefaultAsync(x => x.Id.Equals(id));
-           
+           if(paymentById == null)
+            {
+                _response = new ApiResponse
+                {
+                    Message = "Payment not Found",
+                    StatusCode = HttpStatusCode.NotFound,
+                    Success = false
+                };
+
+            }
             _response = new ApiResponse
             {
                 Data = paymentById,

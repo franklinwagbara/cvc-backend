@@ -48,6 +48,8 @@ namespace Bunkering.Core.Data
         public DbSet<vAppUser> vAppUsers { get; set; }
         public DbSet<vFacilityPermit> vFacilityPermit { get; set; }
         public DbSet<vPayment> vPayment { get; set; }
+        public DbSet<CoQ> CoQs { get; set; }
+        public DbSet<DepotFieldOfficer> DepotFieldOfficers { get; set; }
 
         //public virtual DbContextOptionsBuilder EnableDetailedErrors(bool detailedErrorsEnabled = true) => detailedErrorsEnabled;
         //public virtual DbContextOptionsBuilder EnableDetailedErrors(bool detailedErrorEnabled) => DbContextOptionsBuilder;

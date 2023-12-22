@@ -74,6 +74,30 @@ namespace Bunkering.Controllers.API
         public async Task<IActionResult> AddTanks(int id) => Response(await _appService.GetTanksByAppId(id));
 
         /// <summary>
+        /// This endpoint returns a model of depots for the application using the application id
+        /// </summary>
+        /// <returns>Returns a model of depots which can be mepty</returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// GET: api/application/get-depots/1
+        /// 
+        /// </remarks>
+        /// <param name="id">NOA application Id</param>
+        /// <response code="200">Returns a list of depots </response>
+        /// <response code="404">Returns not found depots </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Produces("application/json")]
+        [Route("get-depots-by-appid")]
+        [HttpGet]
+        public async Task<IActionResult> GetDepots(int id) => Response(await _appService.GetDepotsByAppId(id));
+
+        /// <summary>
         /// This endpoint returns a model of tanks for the application using the application id
         /// </summary>
         /// <returns>Returns a model of tanks which can be mepty</returns>
@@ -316,7 +340,7 @@ namespace Bunkering.Controllers.API
         [ProducesResponseType(typeof(ApiResponse), 500)]
         [Route("view-application-By-Depot-Officer")]
         [HttpGet]
-        public async Task<IActionResult> ViewApplicationByDepotOfficer(Guid id) => Response(await _appService.AllApplicationsInDepotByUserID(id));
+        public async Task<IActionResult> ViewApplicationByDepotOfficer() => Response(await _appService.AllApplicationsInDepotByUserID());
 
 
 

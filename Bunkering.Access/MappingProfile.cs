@@ -6,10 +6,13 @@ namespace Bunkering.Access
 {
     public class MappingProfile : Profile
     {
-        protected MappingProfile()
+        public MappingProfile()
         {
             CreateMap<CoQ, CoQViewModel>().ReverseMap();
+            CreateMap<CoQ, CreateCoQViewModel>().ReverseMap();
             CreateMap<ApplicationDepot, AppDepotViewModel>().ReverseMap();
+            CreateMap<WorkFlow, WorkflowviewModel>().ReverseMap();
+            CreateMap<ApplicationRole, RoleViewModel>().ReverseMap();   
         }
     }
 }

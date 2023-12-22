@@ -41,7 +41,7 @@ namespace Bunkering.Access.Services
             var depot = new Depot
             {
                 Name = model.Name,
-                State = model.State,
+                StateId = model.StateId,
                 Capacity = model.Capacity,
             };
 
@@ -67,7 +67,7 @@ namespace Bunkering.Access.Services
             if (depot != null)
             {
                 depot.Name = model.Name;
-                depot.State = model.State;
+                depot.StateId = model.StateId;
                 depot.Capacity = model.Capacity;
                 await _unitOfWork.Depot.Update(depot);
                 _unitOfWork.Save();
@@ -143,7 +143,7 @@ namespace Bunkering.Access.Services
         }
         public async Task<ApiResponse> GetAllDepot()
         {
-            var allDepot = await _unitOfWork.Depot.GetAll();
+            var allDepot = await _unitOfWork.Depot.GetAll("State");
             allDepot = allDepot.Where(x => x.DeletedAt == null);
 
             _response = new ApiResponse
