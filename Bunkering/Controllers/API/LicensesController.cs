@@ -4,6 +4,7 @@ using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Rotativa.AspNetCore;
+using System.Drawing.Printing;
 using System.Net;
 using System.Security.Claims;
 
@@ -101,13 +102,30 @@ namespace Bunkering.Controllers.API
 			var license = await _unitOfWork.Permit.FirstOrDefaultAsync(x => x.Id.Equals(id), "Application.User.Company,Application.Facility.VesselType,Application.Payments");
 			if (license != null)
 			{
-				var qrcode = Utils.GenerateQrCode($"{Request.Scheme}://{Request.Host}/License/ValidateQrCode/{license.ApplicationId}");
-				license.QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length);
-				var viewAsPdf = new ViewAsPdf
+				//var qrcode = Utils.GenerateQrCode($"{Request.Scheme}://{Request.Host}/License/ValidateQrCode/{license.ApplicationId}");
+				//license.QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length);
+				var depots = await _unitOfWork.ApplicationDepot.Find(x => x.AppId.Equals(license.ApplicationId), "Application,Depot,Product");
+
+                var viewAsPdf = new ViewAsPdf
 				{
-					Model = license,
+					Model = new CertificareDTO
+					{
+						ETA = license.Application.ETA.Value,
+						LoadPort = license.Application.LoadingPort,
+						PermitNo = license.PermitNo,
+						QRCode = license.QRCode,
+						Vessel = license.Application.VesselName,
+						Destinations = depots.Select(y => new DepotDTO
+						{
+							Name = y.Depot.Name,
+							Product = y.Product.Name,
+							Volume = y.Volume
+						}).ToList(),						
+                    },
 					PageHeight = 327,
-					ViewName = "ViewLicense"
+					PageMargins = new Rotativa.AspNetCore.Options.Margins(10, 10, 10, 10),
+					
+                    ViewName = "ViewLicense"
 				};
 				var pdf = await viewAsPdf.BuildFile(ControllerContext);
 				return File(new MemoryStream(pdf), "application/pdf");
