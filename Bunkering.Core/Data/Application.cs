@@ -29,8 +29,6 @@ namespace Bunkering.Core.Data
         public string VesselName { get; set; }
         public string IMONumber { get; set; }
         public string LoadingPort { get; set; }
-        public string DischargePort { get; set; }
-
         public string MarketerName { get; set; }
 
         [ForeignKey("UserId")]
