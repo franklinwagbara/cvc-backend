@@ -1267,19 +1267,29 @@ namespace Bunkering.Access.Services
         {
             var user = await _userManager.FindByEmailAsync(User);
 
-            var userState = await _unitOfWork.Office.FirstOrDefaultAsync(x => x.Id == user.OfficeId);
-            if (userState is  null)
+            if (user is  null)
             {
                 _response = new ApiResponse
                 {
                     Message = "No User was found",
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Success = false
+                };
+                return _response;
+            }
+            var depots = (await _unitOfWork.DepotOfficer.Find(c => c.OfficerID == Guid.Parse(user.Id))).Select(c => c.DepotID).ToList();
+            if (!depots.Any())
+            {
+                _response = new ApiResponse
+                {
+                    Message = "User not assigned to a depot",
                     StatusCode = HttpStatusCode.OK,
                     Success = false
                 };
                 return _response;
             }
-            var stateId = userState.StateId;
-            var apps =  _appQueries.GetApplicationsByStateId(stateId);
+            var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application");
+            var apps =  appDepots.Select(x => x.Application).ToList();
 
             _response = new ApiResponse
             {
