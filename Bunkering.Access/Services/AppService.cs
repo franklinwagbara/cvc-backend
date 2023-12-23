@@ -1232,8 +1232,8 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> AllApplicationsByDepot(int depotId)
         {
-
-            var applications = await  _unitOfWork.Application.Find(x => x.DeportStateId == depotId);
+            var appDepot = await _unitOfWork.ApplicationDepot.Find(x => x.DepotId.Equals(depotId));
+            var applications = await  _unitOfWork.Application.Find(x => appDepot.Any(a => a.AppId == x.Id) == true);
             if (applications != null)
             {
                 var filteredapps = applications.Where(x => x.IsDeleted == false);
@@ -1242,19 +1242,7 @@ namespace Bunkering.Access.Services
                     Message = "Applications fetched successfully",
                     StatusCode = HttpStatusCode.OK,
                     Success = true,
-                    Data = applications.Select(x => new
-                    {
-                        x.Id,
-                        x.ApplicationType,
-                        x.Appointment,
-                        x.CreatedDate,
-                        x.CurrentDeskId,
-                        x.DeportStateId,
-                        x.Facility,
-                        x.FADApproved,
-                        x.MarketerName,
-                        x.IsDeleted
-                    })
+                    Data = applications
                 };
             }
            
@@ -1302,7 +1290,57 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
+        public async Task<ApiResponse> GetAppVesselInfo(int AppId)
+        {
+            try
+            {
+                var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(AppId));
 
+                if (app == null)
+                    throw new Exception("Application does not exist!");
+
+                var appDepot = await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.AppId== AppId);
+
+                if (appDepot == null)
+                    throw new Exception("Application depot does not exist!");
+
+                var depot = await _unitOfWork.Depot.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.Id));  
+                var product = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.ProductId));
+
+                if (product == null)
+                    throw new Exception("Product does not exist");
+                if (depot == null)
+                    throw new Exception("Depot does not exist");
+
+                return new ApiResponse
+                {
+                    Data = new
+                    {
+                        MarketerName = depot.MarketerName,
+                        DepotCapacity = depot.Capacity,
+                        ProductName = product.Name,
+                        Volume = appDepot.Volume,
+                        VesselName = app.VesselName,
+                        MotherVessel = app.MotherVessel,
+                        Jetty = app.Jetty,
+                        ETA = app.ETA,
+                        RecievingTerminal = depot.Name,
+                    },
+                    Message = "Successfull.",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = false
+                };
+            }
+            catch (Exception e)
+            {
+                return new ApiResponse
+                {
+                    Message = $"{e.Message} +++ {e.StackTrace} ~~~ {e.InnerException?.ToString()}",
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Success = false,
+                };
+            }
+        }
         
     }
 }
