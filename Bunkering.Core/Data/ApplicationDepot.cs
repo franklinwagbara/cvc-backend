@@ -14,7 +14,7 @@ namespace Bunkering.Core.Data
         public decimal Volume { get; set; }       
         public int ProductId { get; set; }
         [ForeignKey(nameof(ProductId))]
-        public Application Product { get; set; }
+        public Product Product { get; set; }
 
     }
 }

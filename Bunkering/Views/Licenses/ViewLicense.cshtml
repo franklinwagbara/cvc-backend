@@ -1,7 +1,7 @@
-﻿
-@model Permit
+﻿@model CertificareDTO
 @{
     Layout = null;
+    int count = 0;
 }
 <html lang="en">
 <head>
@@ -10,7 +10,7 @@
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
 </head>
 <body>
-    <div style="font-size: 1.5em;">
+    <div style="font-size: 1.5em !important;">
         <div class="text-center">
             <div>
                 <img src="~/assets/nmdpraLogo.png" alt="Logo" style="height: 250px; display: block; margin: 0 auto;" />
@@ -21,81 +21,57 @@
                 </b>
             </div>
             <div style="color: forestgreen; text-align: center; margin-top: -1em;">
-                <h1>BUNKERING VESSEL LICENSE</h1>
+                <h1>COASTAL VESSEL CLEARANCE CERTIFICATE</h1>
             </div>
         </div>
         <div style="float: right; position: relative; margin-top: 1em; margin-bottom: 1em;">
-            <h2><span>BVL No:</span> <span style="padding: 0 50px 0 10px; font-weight: bold;">@Model.PermitNo</span></h2>
-            <h2>IND: <span style=" padding: 0 40px 0 10px; font-weight: bold;">@Model.Application.User.Company.Name.Split(' ')[0].ToUpper()</span></h2>
+            <h2><span>CERT. No:</span> <span style="padding: 0 50px 0 10px; font-weight: bold;">@Model.PermitNo</span></h2>
         </div>
         <div style="width: 100%; text-align: center; position: absolute; top: 50%; margin-top: -400px;">
-            <img src="~/assets/coat-of-arm.jpg" style="width: 820px; width: 920px; opacity: 0.1;" />
+            <img src="~/assets/coat-of-arm.jpg" style="width: 920px; opacity: 0.1; margin-left: -5em;;" />
         </div>
         <br /> <br />
         <br /> <br />
-        <br /> <br />
-        <table style="width: 100%; font-size: 1.3em;" >
-            <tr>
-                <td colspan="3" style="text-align: justify;"><p>This License is hereby granted to:</p></td>
-                <td colspan="3" style=" border-bottom: 2px dotted; text-align: center;">
-                    @Model.Application.User.Company.Name
-                </td>
-            </tr>
-            <tr>
-                <td>Of</td>
-                <td colspan="5" style="border-bottom: 2px dotted; text-align: center;">
-                    <b>@Model.Application.User.Company.Address</b>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="6" style="text-align: center;">
-                    <div>(Address of the Company)</div>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="6">
-                    To operate the Bunkering vessel of which particulars are given below:
-                </td>
-            </tr>
-            <tr>
-                <td colspan="3">Name of Bunkering Vessel</td>
-                <td colspan="3" style="border-bottom: 2px dotted; text-align: center;">
-                    @Model.Application.Facility.Name
-                </td>
-            </tr>
-            <tr>
-                <td colspan="3">Dead Weight (metric tons)</td>
-                <td colspan="3" style="border-bottom: 2px dotted; text-align: center;">
-                    @* @Model.Application.Facility.DeadWeight.ToString("#,###.##") *@
-                </td>
-            </tr>
-            <tr>
-                <td colspan="3" style="text-align: justify;">
-                    <p>
-                        This License expires on the 31<sup>st</sup> of December
-                    </p>
-                </td>
-                <td colspan="3" style="border-bottom: 2px dotted; text-align: center;">@Model.ExpireDate.ToString("yyyy")</td>
-            </tr>
-            <tr>
-                <td>Fees Paid:</td>
-                <td colspan="5">@Model.Application.Payments.Sum(x => x.Amount).ToString("#,###.##")</td>
-            </tr>
-            <tr>
-                <td>Dated this</td>
-                <td style="border-bottom: 2px dotted; width: inherit; !important;">
-                    <b>@Model.IssuedDate.ToString("dd")<sup>@DateSub(Model.IssuedDate.Day)</sup> </b>
-                </td>
-                <td style="width: inherit;x"> day of</td>
-                <td style="border-bottom: 2px dotted;width: inherit;">
-                    <b>@Model.IssuedDate.ToString("MMMM")</b>
-                </td>
-                <td>year</td>
-                <td style="border-bottom: 2px dotted; width: inherit;">
-                    <b>@Model.IssuedDate.Year</b>
-                </td>
-            </tr>
-        </table>
+        <p>
+            As approved by the ACE, please find below details of the vessel clearance for your kind attention:
+        </p>
+        <p>
+            <table style="width: 100%; font-size: 1em !important; border: 1px solid gray; padding: 5px;">
+                <thead>
+                    <tr>
+                        <th>S/N</th>
+                        <th>VESSEL/<br />TRUCK</th>
+                        <th>PRODUCT</th>
+                        <th>QTY(MTS)</th>
+                        <th>ETA</th>
+                        <th>LOAD PORT</th>
+                        <th>DESTINATION</th>
+                        <th>JETTY</th>
+                        <th>NOMINATED <br />SURVEYOR</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Destinations)
+                    {
+                        count++;
+                        <tr>
+                            <td>@count</td>
+                            <td>@Model.Vessel</td>
+                            <td>@item.Product</td>
+                            <td>@item.Volume.ToString("N2")</td>
+                            <td>@Model.ETA.ToString("dd MMM yyyy")</td>
+                            <td>@Model.LoadPort</td>
+                            <td>@item.Name</td>
+                            <td>@Model.Jetty</td>
+                            <td>@Model.Surveyor</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </p>
+        <p>
+            Please allow the vessel to discharge/loading and ensure complete recertification.
+        </p>
         <div style="margin-top: 2em;">
             <div style="float: left !important;">
                 <img src="data:imaage/png;base64,@Model.QRCode" width="170" height="170" />
@@ -145,15 +121,18 @@
         border: 5px solid;
         padding: 3em;
         justify-content: center;
+        position:relative;
     }
 
-    table {
+    /* table {
         border-collapse: separate;
         border-spacing: 0 15px;
-    }
+    } */
 
-    td {
+    td, th {
+        text-align:center;
         width: 160px;
         padding: 3px;
+        border: 1px dotted #999;
     }
 </style>
