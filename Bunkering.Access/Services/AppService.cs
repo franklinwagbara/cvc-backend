@@ -184,14 +184,6 @@ namespace Bunkering.Access.Services
 
                     var newApp = await _unitOfWork.Application.Add(app);
                     var volume = model.DepotList.Sum(c => c.Volume);
-                    surveyor.NominatedVolume += volume;
-                    var appSurveyor = new ApplicationSurveyor()
-                    {
-                        ApplicationId = app.Id,
-                        NominatedSurveyorId = surveyor.Id,
-                        Volume = volume
-                    };
-                    _ = await _unitOfWork.ApplicationSurveyor.Add(appSurveyor);
                     await _unitOfWork.SaveChangesAsync(app.UserId);
                     //var depot = await AppDepots(model.DepotList, app.Id);
                     if (model.DepotList.Any() && newApp != null)
@@ -208,6 +200,15 @@ namespace Bunkering.Access.Services
                     else
                         throw new Exception("Depot List must be provided!");
 
+                    surveyor.NominatedVolume += volume;
+                    var appSurveyor = new ApplicationSurveyor()
+                    {
+                        ApplicationId = newApp.Id,
+                        NominatedSurveyorId = surveyor.Id,
+                        Volume = volume
+                    };
+                    await _unitOfWork.ApplicationSurveyor.Add(appSurveyor);
+                    await _unitOfWork.SaveChangesAsync(user.Id);
                     return new ApiResponse
                     {
                         Message = "Application initiated successfully",
@@ -1107,7 +1108,8 @@ namespace Bunkering.Access.Services
                         }
 
                         var rrr = app.Payments.FirstOrDefault()?.RRR;
-
+                        var surveyorId = (await _unitOfWork.ApplicationSurveyor
+                            .FirstOrDefaultAsync(x => x.ApplicationId == id))?.NominatedSurveyorId;
                         _response = new ApiResponse
                         {
                             Message = "Application detail found",
@@ -1135,6 +1137,7 @@ namespace Bunkering.Access.Services
                                 AppHistories = histories,
                                 Schedules = sch,
                                 Documents = app.SubmittedDocuments,
+                                NominatedSurveyor = (await _unitOfWork.NominatedSurveyor.Find(c => c.Id == surveyorId)).FirstOrDefault(),
                                 Vessel = new
                                 {
                                     app.Facility.Name,
