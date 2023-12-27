@@ -342,7 +342,27 @@ namespace Bunkering.Controllers.API
         [HttpGet]
         public async Task<IActionResult> ViewApplicationByDepotOfficer() => Response(await _appService.AllApplicationsInDepotByUserID());
 
-
+        /// <summary>
+        /// This endpoint is used to fetch details of an NOA Vessel
+        /// </summary>
+        /// <returns>Returns an application info</returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// GET: api/application/get-app-vessel-info
+        /// 
+        /// </remarks>
+        /// <response code="200">Returns an application / vessel info </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("get-app-vessel-info")]
+        [HttpGet]
+        public async Task<IActionResult> GetAppVesselInfo(int Id) => Response(await _appService.GetAppVesselInfo(Id));
 
     }
 }

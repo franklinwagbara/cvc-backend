@@ -66,16 +66,19 @@ namespace Bunkering.Access.Services
         }
         public async Task<ApiResponse> EditRole(RoleViewModel model)
         {
-            var edit = await _unitOfWork.Role.FirstOrDefaultAsync(r => r.Id == model.Id);
-            if(edit != null)
+            ApplicationRole? foundRole = await _role.Roles.FirstOrDefaultAsync(x => x.Id.Equals(model.Id));
+
+            if (foundRole != null)
             {
-                model.Name = edit.Name;
-                model.Description = edit.Description;
-                await _unitOfWork.Role.Update(edit);
-                _unitOfWork.Save();
+                foundRole.Description = model.Description;
+                foundRole.Name = model.Name;
+
+                await _role.UpdateAsync(foundRole);
+                await _unitOfWork.SaveChangesAsync("");
 
                 _response = new ApiResponse
                 {
+                    Data = foundRole,
                     Message = "Updated Successfully",
                     StatusCode = HttpStatusCode.OK,
                     Success = true,
@@ -92,9 +95,9 @@ namespace Bunkering.Access.Services
             }
             return _response;
         }
-        public async Task<ApiResponse> AllRoles (RoleViewModel model)
+        public async Task<ApiResponse> AllRoles ()
         {
-            var allRoles = await _unitOfWork.Role.GetAll();
+            var allRoles = await _role.Roles.ToListAsync();
 
             _response = new ApiResponse
             {
@@ -105,7 +108,29 @@ namespace Bunkering.Access.Services
             };
             return _response;
         }
-       
-       
+
+
+        public async Task<ApiResponse> DeleteRole(string Id)
+        {
+            ApplicationRole? foundRole = await _role.Roles.FirstOrDefaultAsync(x => x.Id.ToLower().Equals(Id));
+
+            if (foundRole != null)
+            {
+                await _role.DeleteAsync(foundRole);
+                return new ApiResponse
+                {
+                    Message = "Deletion successfull.",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true,
+                };
+            }
+            else
+                return new ApiResponse
+                {
+                    Message = "Role does not exist!",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true,
+                };
+        }
     }
 }

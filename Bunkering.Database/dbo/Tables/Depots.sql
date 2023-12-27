@@ -6,5 +6,6 @@
     [IsDeleted] BIT NOT NULL DEFAULT 0, 
     [DeletedAt] DATETIME NULL , 
     [DeletedBy] NVARCHAR(MAX) NULL, 
+    [MarketerName] NVARCHAR(MAX) NULL, 
     CONSTRAINT [PK_Depots] PRIMARY KEY CLUSTERED ([Id] ASC)
 );

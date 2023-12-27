@@ -1,5 +1,6 @@
 ﻿using Bunkering.Access.IContracts;
 using Bunkering.Core.Data;
+using Bunkering.Core.Utils;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -32,26 +33,28 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> GetAllDepotOfficerMapping()
         {
-            var mappings = await _unitOfWork.DepotOfficer.GetAll();
-            var filteredMappings = mappings.Where(x => x.IsDeleted == false);
+            var mappings = await _unitOfWork.DepotOfficer.GetAll("Depot");
+            var staffs = await _userManager.Users.Where(x => x.UserRoles.Any(u => u.Role.Name == RoleConstants.COMPANY) != true).ToListAsync();
+            var filteredMappings = mappings.Where(x => x.IsDeleted == false).Select(d => new DepotFieldOfficerViewModel
+            {
+                DepotID = d.ID,
+                UserID = d.OfficerID,
+                DepotName = d.Depot.Name,
+                OfficerName = staffs.Where(x => x.Id == d.OfficerID.ToString()).Select(u => u?.FirstName + ", " + u?.LastName ).FirstOrDefault()
+            }).ToList(); 
+
             return new ApiResponse
             {
                 Message = "All Mappings found",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                Data = filteredMappings.Select(x => new
-                {
-                    x.ID,
-                    x.OfficerID,
-                    x.DepotID,
-                    x.IsDeleted
-                })
+                Data = filteredMappings
             };
         }
 
         public async Task<ApiResponse> GetDepotOfficerByID(int id)
         {
-            var mapping = await _unitOfWork.DepotOfficer.FirstOrDefaultAsync(x => x.ID == id);
+            DepotFieldOfficer? mapping = await _unitOfWork.DepotOfficer.FirstOrDefaultAsync(x => x.ID == id);
             return new ApiResponse
             {
                 Message = "All Mapping found",
