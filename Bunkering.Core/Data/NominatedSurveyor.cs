@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Azure.Core.GeoJson;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ namespace Bunkering.Core.Data
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public double QuantitySurveyed { get; set; }
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAt { get; set; }
         public string? DeletedBy { get; set; }
