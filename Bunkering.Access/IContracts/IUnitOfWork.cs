@@ -1,4 +1,5 @@
 ﻿using Bunkering.Access.DAL;
+using Bunkering.Core.Data;
 
 namespace Bunkering.Access.IContracts
 {
@@ -22,6 +23,7 @@ namespace Bunkering.Access.IContracts
         ILocation Location { get; }
         IMessage Message { get; }
         INominatedSurveyor NominatedSurveyor { get; }
+        IApplicationSurveyor ApplicationSurveyor { get; }
         IOffice Office { get; }
         IPayment Payment { get; }
         IPermit Permit { get; }

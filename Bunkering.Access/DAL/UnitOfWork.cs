@@ -46,6 +46,8 @@ namespace Bunkering.Access.DAL
         public IvFacilityPermit vFacilityPermit { get; private set; }
         public IvPayment vPayment { get; private set; }
 
+        public IApplicationSurveyor ApplicationSurveyor { get; private set; }
+
         public UnitOfWork(ApplicationContext context)
         {
             _context = context;
@@ -66,6 +68,7 @@ namespace Bunkering.Access.DAL
             Location = Location != null ? Location : new LocationRepository(_context);
             Message = Message != null ? Message : new MessageRepository(_context);
             NominatedSurveyor = NominatedSurveyor != null ? NominatedSurveyor : new NominatedSurveyorRepository(_context);
+            ApplicationSurveyor = ApplicationSurveyor != null ? ApplicationSurveyor : new ApplicationSurveyorRepository(_context);
             Payment = Payment != null ? Payment : new PaymentRepository(_context);
             Permit = Permit != null ? Permit : new PermitRepository(_context);
             Product = Product != null ? Product : new ProductRepository(_context);
