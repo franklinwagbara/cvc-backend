@@ -158,7 +158,7 @@ namespace Bunkering.Access.Services
 			else
 				_response = new ApiResponse
 				{
-					Message = "An error occured, please contact Support/ICT.",
+					Message = "An error occurred, please contact Support/ICT.",
 					StatusCode = HttpStatusCode.InternalServerError,
 					Success = false,
 				};

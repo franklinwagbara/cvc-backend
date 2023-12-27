@@ -19,7 +19,7 @@ namespace Bunkering.Access.DAL
 
         public async Task<NominatedSurveyor?> GetNextAsync()
         {
-            return await _context.NominatedSurveyors.OrderBy(c => c.NominatedAmount).FirstOrDefaultAsync();
+            return await _context.NominatedSurveyors.OrderBy(c => c.NominatedVolume).FirstOrDefaultAsync();
         }
     }
 

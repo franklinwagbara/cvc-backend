@@ -184,7 +184,7 @@ namespace Bunkering.Access.Services
 
                     var newApp = await _unitOfWork.Application.Add(app);
                     var volume = model.DepotList.Sum(c => c.Volume);
-                    surveyor.NominatedAmount += volume;
+                    surveyor.NominatedVolume += volume;
                     var appSurveyor = new ApplicationSurveyor()
                     {
                         ApplicationId = app.Id,
@@ -202,7 +202,6 @@ namespace Bunkering.Access.Services
                             d.AppId = newApp.Id;
                             depotList.Add(d);
                         });
-
                         await _unitOfWork.ApplicationDepot.AddRange(_mapper.Map<List<ApplicationDepot>>(depotList));
                         await _unitOfWork.SaveChangesAsync(user.Id);
                     }
