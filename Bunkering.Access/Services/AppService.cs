@@ -943,7 +943,27 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> MyDesk()
         {
-            var user = await _userManager.FindByEmailAsync(User);
+            try
+            {
+                var user = await _userManager.Users.Include(x => x.Location).FirstOrDefaultAsync(x => x.Email.Equals(User));
+                if(user.Location.Name == LOCATION.FO)
+                        return await GetMyDeskFO(user);
+                else 
+                    return await GetMyDeskOthers(user);
+            }
+            catch (Exception e)
+            {
+                return new ApiResponse
+                {
+                    Message = e.Message,
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Success = true,
+                };
+            }
+        }
+
+        private async Task<ApiResponse> GetMyDeskOthers(ApplicationUser? user)
+        {
             var apps = await _unitOfWork.Application.Find(x => x.CurrentDeskId.Equals(user.Id), "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
             if (await _userManager.IsInRoleAsync(user, "FAD"))
                 apps = await _unitOfWork.Application.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)), "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
@@ -966,7 +986,48 @@ namespace Bunkering.Access.Services
                     PaymentStatus = x.Payments.Count != 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted))
                         ? "Payment confirmed" : x.Payments.Count != 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentRejected)) ? "Payment rejected" : "Payment pending",
                     RRR = x.Payments.FirstOrDefault()?.RRR,
-                    CreatedDate = x.CreatedDate.ToString("MMMM dd, yyyy HH:mm:ss")
+                    CreatedDate = x.CreatedDate.ToString("MMMM dd, yyyy HH:mm:ss"),
+                    ApplicationType = x.ApplicationType.Name
+                }).ToList(),
+            };
+        }
+
+        private async Task<ApiResponse> GetMyDeskFO(ApplicationUser? user)
+        {
+            var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Application.ApplicationType,Application.User.Company,Depot");
+            // if (await _userManager.IsInRoleAsync(user, "FAD"))
+            //     coqs = await _unitOfWork.CoQ.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)));
+            if (await _userManager.IsInRoleAsync(user, "Company"))
+                coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Application.ApplicationType,Application.User.Company,Depot");
+            return new ApiResponse
+            {
+                Message = "Applications fetched successfully",
+                StatusCode = HttpStatusCode.OK,
+                Success = true,
+                Data = coqs.Select(x => new
+                {
+                    x.Id,
+                    CompanyEmail = x.Application?.User.Email,
+                    ImportName = x.Application?.User.Company.Name,
+                    VesselName = x.Application?.VesselName,
+                    x.Reference,
+                    x.Status,
+                    DepotName = x.Depot?.Name,
+                    DepotId = x.DepotId,
+                    DateOfVesselArrival = x.DateOfVesselArrival.ToShortDateString(),
+                    DateOfVesselUllage = x.DateOfVesselUllage.ToShortDateString(),
+                    DateOfSTAfterDischarge = x.DateOfSTAfterDischarge.ToShortDateString(),
+                    DateOfVesselArrivalISO = x.DateOfVesselArrival.ToString("MM/dd/yyyy"),
+                    DateOfVesselUllageISO = x.DateOfVesselUllage.ToString("MM/dd/yyyy"),
+                    DateOfSTAfterDischargeISO = x.DateOfSTAfterDischarge.ToString("MM/dd/yyyy"),
+                    MT_VAC = x.MT_VAC,
+                    MT_AIR = x.MT_AIR,
+                    GOV = x.GOV,
+                    GSV = x.GSV,
+                    DepotPrice = x.DepotPrice,
+                    CreatedBy = x.CreatedBy,
+                    SubmittedDate = x.SubmittedDate,
+                    ApplicationType = "COQ"
                 }).ToList(),
             };
         }

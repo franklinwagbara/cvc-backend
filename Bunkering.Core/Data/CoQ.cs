@@ -17,7 +17,14 @@ namespace Bunkering.Core.Data
         public Decimal DepotPrice { get; set; }
         public DateTime DateCreated { get; set; } = DateTime.Now;
         public DateTime? DateModified { get; set; }
+        public DateTime? SubmittedDate { get; set; }
         public string CreatedBy { get; set; } = string.Empty;
+
+        public string? Status { get; set; } = string.Empty;
+        public bool? IsDeleted { get; set; }
+        public string? Reference { get; set; } = string.Empty;
+        public string? CurrentDeskId { get; set; }
+        public bool? FADApproved { get; set; }
 
         [ForeignKey("AppId")]
         public Application? Application { get; set; }
