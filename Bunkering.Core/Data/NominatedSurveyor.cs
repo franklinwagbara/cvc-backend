@@ -13,5 +13,6 @@ namespace Bunkering.Core.Data
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAt { get; set; }
         public string? DeletedBy { get; set; }
+        public decimal NominatedAmount { get; set; } = 0;
     }
 }

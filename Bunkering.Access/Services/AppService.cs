@@ -128,7 +128,6 @@ namespace Bunkering.Access.Services
                         Success = false
                     };
                 }
-
                 // get app configuration for notice of arrival
                 var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Utils.NOA)); 
 
@@ -138,6 +137,17 @@ namespace Bunkering.Access.Services
                     {
                         StatusCode = HttpStatusCode.NotFound,
                         Message = "NOA not configured as application type, please contact support",
+                        Success = false
+                    };
+                }
+
+                var surveyor = await _unitOfWork.NominatedSurveyor.GetNextAsync();
+                if (surveyor is null)
+                {
+                    return new ApiResponse
+                    {
+                        StatusCode = HttpStatusCode.NotFound,
+                        Message = "Surveyors not configured, please contact support",
                         Success = false
                     };
                 }
@@ -172,8 +182,17 @@ namespace Bunkering.Access.Services
                         ETA = model.ETA,
                     };
 
-                        var newApp = await _unitOfWork.Application.Add(app);
-                        await _unitOfWork.SaveChangesAsync(app.UserId);
+                    var newApp = await _unitOfWork.Application.Add(app);
+                    var volume = model.DepotList.Sum(c => c.Volume);
+                    surveyor.NominatedAmount += volume;
+                    var appSurveyor = new ApplicationSurveyor()
+                    {
+                        ApplicationId = app.Id,
+                        NominatedSurveyorId = surveyor.Id,
+                        Volume = volume
+                    };
+                    _ = await _unitOfWork.ApplicationSurveyor.Add(appSurveyor);
+                    await _unitOfWork.SaveChangesAsync(app.UserId);
                     //var depot = await AppDepots(model.DepotList, app.Id);
                     if (model.DepotList.Any() && newApp != null)
                     {
