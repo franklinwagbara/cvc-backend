@@ -36,6 +36,8 @@ namespace Bunkering.Access.DAL
         public IWorkflow Workflow { get; private set; }
         public IVesselType VesselType { get; set; }
         public ICoQ CoQ { get; set; }
+        public ICOQHistory COQHistory { get; set; }
+        public ICOQCertificate COQCertificate { get; set; }
 
 
         public IvAppVessel vAppVessel { get; private set; }
@@ -78,6 +80,8 @@ namespace Bunkering.Access.DAL
             Workflow = Workflow != null ? Workflow : new WorkflowRepository(_context);
             VesselType = VesselType != null ? VesselType : new VeseelTypeRepository(_context);
             CoQ = CoQ != null ? CoQ : new CoQRepository(_context);
+            COQHistory = COQHistory != null? COQHistory: new COQHistoryRepository(_context);
+            COQCertificate = COQCertificate != null? COQCertificate: new COQCertificateRepository(_context);
 
             vAppVessel = vAppVessel != null ? vAppVessel : new vAppVesselRepository(_context);
             vFacilityPermit = vFacilityPermit != null ? vFacilityPermit : new vFacilityPermitRepository(_context);

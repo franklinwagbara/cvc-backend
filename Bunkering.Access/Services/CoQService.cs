@@ -49,12 +49,34 @@ namespace Bunkering.Access.Services
                     throw new Exception("Can not find user with Email: " + LoginUserEmail);
 
                 //if (user.UserRoles.FirstOrDefault().Role.Name != RoleConstants.Field_Officer)
-                //    throw new Exception("Only Field Officers can create CoQ.");
+                //   throw new Exception("Only Field Officers can create CoQ.");
+                
+                var foundCOQ = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.AppId.Equals(Model.AppId) && x.DepotId.Equals(Model.DepotId));
+                CoQ? result_coq = null;
+                if(foundCOQ == null)
+                {
+                    var coq = _mapper.Map<CoQ>(Model);
+                    coq.CreatedBy = LoginUserEmail;
+                    coq.DateCreated = DateTime.Now;
+                    coq.CurrentDeskId = user.Id;
+                    coq.Status = Enum.GetName(typeof(AppStatus), AppStatus.Initiated);
+                    result_coq = await _unitOfWork.CoQ.Add(coq);
+                }
+                else
+                {
+                    foundCOQ.DateOfSTAfterDischarge = Model.DateOfSTAfterDischarge;
+                    foundCOQ.DateOfVesselArrival = Model.DateOfVesselArrival;
+                    foundCOQ.DateOfVesselUllage = Model.DateOfVesselUllage;
+                    foundCOQ.DepotPrice = Model.DepotPrice;
+                    foundCOQ.GOV = Model.GOV;
+                    foundCOQ.GSV = Model.GSV;
+                    foundCOQ.MT_VAC = Model.MT_VAC;
+                    foundCOQ.MT_AIR = Model.MT_AIR;
+                    foundCOQ.CurrentDeskId = user.Id;
+                    
+                    result_coq = await _unitOfWork.CoQ.Update(foundCOQ);
+                }
 
-                var coq = _mapper.Map<CoQ>(Model);
-                coq.CreatedBy = LoginUserEmail;
-                coq.DateCreated = DateTime.Now;
-                var result_coq = await _unitOfWork.CoQ.Add(coq);
                 await _unitOfWork.SaveChangesAsync(user.Id);
 
                 return new ApiResponse
@@ -322,6 +344,63 @@ namespace Bunkering.Access.Services
                     Success = false
                 };
             return _apiReponse;
+        }
+
+        public async Task<ApiResponse> Submit(int Id)
+        {
+            try
+            {
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id.Equals(Id)) ?? throw new Exception($"COQ with id={Id} does not exist.");
+                var user = await _userManager.FindByEmailAsync(LoginUserEmail) ?? throw new Exception($"User with email={LoginUserEmail} does not exist.");
+
+                var result = await _flow.CoqWorkFlow(Id, Enum.GetName(typeof(AppActions), AppActions.Submit), "Application Submitted");
+
+                return new ApiResponse
+                {
+                    Message = result.Item2,
+                    StatusCode = result.Item1? HttpStatusCode.OK: HttpStatusCode.InternalServerError,
+                    Success = true
+                };
+            }
+            catch (Exception e)
+            {
+                return new ApiResponse
+                {
+                    Message = e.Message,
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Success = true
+                };
+            }
+        }
+
+        public async Task<ApiResponse> Process(int id, string act, string comment)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(LoginUserEmail) ?? throw new Exception($"User with the email={LoginUserEmail} was not found.");
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id.Equals(id)) ?? throw new Exception($"COQ with the ID={id} could not be found.");
+
+                var result = await _flow.CoqWorkFlow(id, act, comment);
+
+                if(result.Item1)
+                    return new ApiResponse
+                    {
+                        Data = result.Item1,
+                        Message = "COQ Application has been pushed",
+                        Success = true,
+                        StatusCode = HttpStatusCode.OK
+                    };
+                else throw new Exception("COQ Application could not be pushed.");
+            }
+            catch (Exception e)
+            {
+                return new ApiResponse
+                {
+                    Message = e.Message,
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Success = true
+                };
+            }
         }
     }
 }

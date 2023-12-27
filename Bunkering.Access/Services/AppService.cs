@@ -962,7 +962,27 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> MyDesk()
         {
-            var user = await _userManager.FindByEmailAsync(User);
+            try
+            {
+                var user = await _userManager.Users.Include(x => x.Location).FirstOrDefaultAsync(x => x.Email.Equals(User));
+                if(user.Location.Name == LOCATION.FO)
+                        return await GetMyDeskFO(user);
+                else 
+                    return await GetMyDeskOthers(user);
+            }
+            catch (Exception e)
+            {
+                return new ApiResponse
+                {
+                    Message = e.Message,
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Success = true,
+                };
+            }
+        }
+
+        private async Task<ApiResponse> GetMyDeskOthers(ApplicationUser? user)
+        {
             var apps = await _unitOfWork.Application.Find(x => x.CurrentDeskId.Equals(user.Id), "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
             if (await _userManager.IsInRoleAsync(user, "FAD"))
                 apps = await _unitOfWork.Application.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)), "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
@@ -985,7 +1005,48 @@ namespace Bunkering.Access.Services
                     PaymentStatus = x.Payments.Count != 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted))
                         ? "Payment confirmed" : x.Payments.Count != 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentRejected)) ? "Payment rejected" : "Payment pending",
                     RRR = x.Payments.FirstOrDefault()?.RRR,
-                    CreatedDate = x.CreatedDate.ToString("MMMM dd, yyyy HH:mm:ss")
+                    CreatedDate = x.CreatedDate.ToString("MMMM dd, yyyy HH:mm:ss"),
+                    ApplicationType = x.ApplicationType.Name
+                }).ToList(),
+            };
+        }
+
+        private async Task<ApiResponse> GetMyDeskFO(ApplicationUser? user)
+        {
+            var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Application.ApplicationType,Application.User.Company,Depot");
+            // if (await _userManager.IsInRoleAsync(user, "FAD"))
+            //     coqs = await _unitOfWork.CoQ.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)));
+            if (await _userManager.IsInRoleAsync(user, "Company"))
+                coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Application.ApplicationType,Application.User.Company,Depot");
+            return new ApiResponse
+            {
+                Message = "Applications fetched successfully",
+                StatusCode = HttpStatusCode.OK,
+                Success = true,
+                Data = coqs.Select(x => new
+                {
+                    x.Id,
+                    CompanyEmail = x.Application?.User.Email,
+                    ImportName = x.Application?.User.Company.Name,
+                    VesselName = x.Application?.VesselName,
+                    x.Reference,
+                    x.Status,
+                    DepotName = x.Depot?.Name,
+                    DepotId = x.DepotId,
+                    DateOfVesselArrival = x.DateOfVesselArrival.ToShortDateString(),
+                    DateOfVesselUllage = x.DateOfVesselUllage.ToShortDateString(),
+                    DateOfSTAfterDischarge = x.DateOfSTAfterDischarge.ToShortDateString(),
+                    DateOfVesselArrivalISO = x.DateOfVesselArrival.ToString("MM/dd/yyyy"),
+                    DateOfVesselUllageISO = x.DateOfVesselUllage.ToString("MM/dd/yyyy"),
+                    DateOfSTAfterDischargeISO = x.DateOfSTAfterDischarge.ToString("MM/dd/yyyy"),
+                    MT_VAC = x.MT_VAC,
+                    MT_AIR = x.MT_AIR,
+                    GOV = x.GOV,
+                    GSV = x.GSV,
+                    DepotPrice = x.DepotPrice,
+                    CreatedBy = x.CreatedBy,
+                    SubmittedDate = x.SubmittedDate,
+                    ApplicationType = "COQ"
                 }).ToList(),
             };
         }
@@ -1251,8 +1312,8 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> AllApplicationsByDepot(int depotId)
         {
-
-            var applications = await  _unitOfWork.Application.Find(x => x.DeportStateId == depotId);
+            var appDepot = await _unitOfWork.ApplicationDepot.Find(x => x.DepotId.Equals(depotId));
+            var applications = await  _unitOfWork.Application.Find(x => appDepot.Any(a => a.AppId == x.Id) == true);
             if (applications != null)
             {
                 var filteredapps = applications.Where(x => x.IsDeleted == false);
@@ -1261,19 +1322,7 @@ namespace Bunkering.Access.Services
                     Message = "Applications fetched successfully",
                     StatusCode = HttpStatusCode.OK,
                     Success = true,
-                    Data = applications.Select(x => new
-                    {
-                        x.Id,
-                        x.ApplicationType,
-                        x.Appointment,
-                        x.CreatedDate,
-                        x.CurrentDeskId,
-                        x.DeportStateId,
-                        x.Facility,
-                        x.FADApproved,
-                        x.MarketerName,
-                        x.IsDeleted
-                    })
+                    Data = applications
                 };
             }
            
@@ -1321,7 +1370,57 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
+        public async Task<ApiResponse> GetAppVesselInfo(int AppId)
+        {
+            try
+            {
+                var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(AppId));
 
+                if (app == null)
+                    throw new Exception("Application does not exist!");
+
+                var appDepot = await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.AppId== AppId);
+
+                if (appDepot == null)
+                    throw new Exception("Application depot does not exist!");
+
+                var depot = await _unitOfWork.Depot.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.Id));  
+                var product = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.ProductId));
+
+                if (product == null)
+                    throw new Exception("Product does not exist");
+                if (depot == null)
+                    throw new Exception("Depot does not exist");
+
+                return new ApiResponse
+                {
+                    Data = new
+                    {
+                        MarketerName = depot.MarketerName,
+                        DepotCapacity = depot.Capacity,
+                        ProductName = product.Name,
+                        Volume = appDepot.Volume,
+                        VesselName = app.VesselName,
+                        MotherVessel = app.MotherVessel,
+                        Jetty = app.Jetty,
+                        ETA = app.ETA,
+                        RecievingTerminal = depot.Name,
+                    },
+                    Message = "Successfull.",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = false
+                };
+            }
+            catch (Exception e)
+            {
+                return new ApiResponse
+                {
+                    Message = $"{e.Message} +++ {e.StackTrace} ~~~ {e.InnerException?.ToString()}",
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Success = false,
+                };
+            }
+        }
         
     }
 }

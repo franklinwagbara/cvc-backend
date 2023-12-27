@@ -19,6 +19,8 @@
     [LoadingPort]       NVARCHAR (MAX) NOT NULL,
     [MarketerName]      NVARCHAR (MAX) NOT NULL,
     [ETA]               DATETIME2 (7)  NULL,
+    [MotherVessel] NVARCHAR(MAX) NULL, 
+    [Jetty] NVARCHAR(MAX) NULL, 
     CONSTRAINT [PK_Applications] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_Applications_ApplicationTypes_ApplicationTypeId] FOREIGN KEY ([ApplicationTypeId]) REFERENCES [dbo].[ApplicationTypes] ([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_Applications_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [dbo].[AspNetUsers] ([Id]) ON DELETE CASCADE,

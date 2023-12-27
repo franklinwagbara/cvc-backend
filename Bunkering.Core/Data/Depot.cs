@@ -11,6 +11,7 @@ namespace Bunkering.Core.Data
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAt { get; set; }
         public string? DeletedBy { get; set; }
+        public string? MarketerName { get; set; }
         //public int ProductId { get; set; }
         //public decimal Volume {  get; set; }
 
