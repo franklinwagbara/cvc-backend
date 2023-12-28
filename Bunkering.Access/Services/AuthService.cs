@@ -193,6 +193,8 @@ namespace Bunkering.Access.Services
 							user.LastLogin,
 							user.ProfileComplete,
 							Status = user.IsActive,
+							Location = user.Location?.Name,
+							Office = user.Office?.Name,
 							Token = GenerateToken(user)
 						},
 					};
