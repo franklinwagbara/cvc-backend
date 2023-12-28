@@ -255,5 +255,37 @@ namespace Bunkering.Controllers.API
         [Route("process")]
         [HttpPost]
         public async Task<IActionResult> Process(int id, string act, string comment) => Response(await _coqService.Process(id, act, comment));
+
+
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Produces("application/json")]
+        [Route("debit_note/{id}")]
+        [HttpGet]
+        [AllowAnonymous]
+
+        public async Task<IActionResult> DebitNote(int id)
+        {
+            var note = (await _coqService.GetDebitNote(id));
+            var data = note.Data as DebitNoteDTO;
+            if (data is not null)
+            {
+                var viewAsPdf = new ViewAsPdf
+                {
+                    Model = data,
+                    PageHeight = 327,
+                    PageMargins = new Rotativa.AspNetCore.Options.Margins(10, 10, 10, 10),
+
+                    ViewName = "DebitNote"
+                };
+                var pdf = await viewAsPdf.BuildFile(ControllerContext);
+                return File(new MemoryStream(pdf), "application/pdf");
+            }
+            return BadRequest(note);
+
+        }
+
     }
 }
