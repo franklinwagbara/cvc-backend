@@ -128,7 +128,6 @@ namespace Bunkering.Access.Services
                         Success = false
                     };
                 }
-
                 // get app configuration for notice of arrival
                 var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Utils.NOA)); 
 
@@ -138,6 +137,17 @@ namespace Bunkering.Access.Services
                     {
                         StatusCode = HttpStatusCode.NotFound,
                         Message = "NOA not configured as application type, please contact support",
+                        Success = false
+                    };
+                }
+
+                var surveyor = await _unitOfWork.NominatedSurveyor.GetNextAsync();
+                if (surveyor is null)
+                {
+                    return new ApiResponse
+                    {
+                        StatusCode = HttpStatusCode.NotFound,
+                        Message = "Surveyors not configured, please contact support",
                         Success = false
                     };
                 }
@@ -172,8 +182,9 @@ namespace Bunkering.Access.Services
                         ETA = model.ETA,
                     };
 
-                        var newApp = await _unitOfWork.Application.Add(app);
-                        await _unitOfWork.SaveChangesAsync(app.UserId);
+                    var newApp = await _unitOfWork.Application.Add(app);
+                    var volume = model.DepotList.Sum(c => c.Volume);
+                    await _unitOfWork.SaveChangesAsync(app.UserId);
                     //var depot = await AppDepots(model.DepotList, app.Id);
                     if (model.DepotList.Any() && newApp != null)
                     {
@@ -183,13 +194,21 @@ namespace Bunkering.Access.Services
                             d.AppId = newApp.Id;
                             depotList.Add(d);
                         });
-
                         await _unitOfWork.ApplicationDepot.AddRange(_mapper.Map<List<ApplicationDepot>>(depotList));
                         await _unitOfWork.SaveChangesAsync(user.Id);
                     }
                     else
                         throw new Exception("Depot List must be provided!");
 
+                    surveyor.NominatedVolume += volume;
+                    var appSurveyor = new ApplicationSurveyor()
+                    {
+                        ApplicationId = newApp.Id,
+                        NominatedSurveyorId = surveyor.Id,
+                        Volume = volume
+                    };
+                    await _unitOfWork.ApplicationSurveyor.Add(appSurveyor);
+                    await _unitOfWork.SaveChangesAsync(user.Id);
                     return new ApiResponse
                     {
                         Message = "Application initiated successfully",
@@ -943,7 +962,27 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> MyDesk()
         {
-            var user = await _userManager.FindByEmailAsync(User);
+            try
+            {
+                var user = await _userManager.Users.Include(x => x.Location).FirstOrDefaultAsync(x => x.Email.Equals(User));
+                if(user.Location.Name == LOCATION.FO)
+                        return await GetMyDeskFO(user);
+                else 
+                    return await GetMyDeskOthers(user);
+            }
+            catch (Exception e)
+            {
+                return new ApiResponse
+                {
+                    Message = e.Message,
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Success = true,
+                };
+            }
+        }
+
+        private async Task<ApiResponse> GetMyDeskOthers(ApplicationUser? user)
+        {
             var apps = await _unitOfWork.Application.Find(x => x.CurrentDeskId.Equals(user.Id), "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
             if (await _userManager.IsInRoleAsync(user, "FAD"))
                 apps = await _unitOfWork.Application.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)), "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
@@ -966,7 +1005,49 @@ namespace Bunkering.Access.Services
                     PaymentStatus = x.Payments.Count != 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted))
                         ? "Payment confirmed" : x.Payments.Count != 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentRejected)) ? "Payment rejected" : "Payment pending",
                     RRR = x.Payments.FirstOrDefault()?.RRR,
-                    CreatedDate = x.CreatedDate.ToString("MMMM dd, yyyy HH:mm:ss")
+                    CreatedDate = x.CreatedDate.ToString("MMMM dd, yyyy HH:mm:ss"),
+                    ApplicationType = x.ApplicationType.Name
+                }).ToList(),
+            };
+        }
+
+        private async Task<ApiResponse> GetMyDeskFO(ApplicationUser? user)
+        {
+            var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Application.ApplicationType,Application.User.Company,Depot");
+            // if (await _userManager.IsInRoleAsync(user, "FAD"))
+            //     coqs = await _unitOfWork.CoQ.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)));
+            if (await _userManager.IsInRoleAsync(user, "Company"))
+                coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Application.ApplicationType,Application.User.Company,Depot");
+            return new ApiResponse
+            {
+                Message = "Applications fetched successfully",
+                StatusCode = HttpStatusCode.OK,
+                Success = true,
+                Data = coqs.Select(x => new
+                {
+                    x.Id,
+                    AppId = x.AppId,
+                    CompanyEmail = x.Application?.User.Email,
+                    ImportName = x.Application?.User.Company.Name,
+                    VesselName = x.Application?.VesselName,
+                    x.Reference,
+                    x.Status,
+                    DepotName = x.Depot?.Name,
+                    DepotId = x.DepotId,
+                    DateOfVesselArrival = x.DateOfVesselArrival.ToShortDateString(),
+                    DateOfVesselUllage = x.DateOfVesselUllage.ToShortDateString(),
+                    DateOfSTAfterDischarge = x.DateOfSTAfterDischarge.ToShortDateString(),
+                    DateOfVesselArrivalISO = x.DateOfVesselArrival.ToString("MM/dd/yyyy"),
+                    DateOfVesselUllageISO = x.DateOfVesselUllage.ToString("MM/dd/yyyy"),
+                    DateOfSTAfterDischargeISO = x.DateOfSTAfterDischarge.ToString("MM/dd/yyyy"),
+                    MT_VAC = x.MT_VAC,
+                    MT_AIR = x.MT_AIR,
+                    GOV = x.GOV,
+                    GSV = x.GSV,
+                    DepotPrice = x.DepotPrice,
+                    CreatedBy = x.CreatedBy,
+                    SubmittedDate = x.SubmittedDate,
+                    ApplicationType = "COQ"
                 }).ToList(),
             };
         }
@@ -1028,7 +1109,8 @@ namespace Bunkering.Access.Services
                         }
 
                         var rrr = app.Payments.FirstOrDefault()?.RRR;
-
+                        var surveyorId = (await _unitOfWork.ApplicationSurveyor
+                            .FirstOrDefaultAsync(x => x.ApplicationId == id))?.NominatedSurveyorId;
                         _response = new ApiResponse
                         {
                             Message = "Application detail found",
@@ -1056,6 +1138,7 @@ namespace Bunkering.Access.Services
                                 AppHistories = histories,
                                 Schedules = sch,
                                 Documents = app.SubmittedDocuments,
+                                NominatedSurveyor = (await _unitOfWork.NominatedSurveyor.Find(c => c.Id == surveyorId)).FirstOrDefault(),
                                 Vessel = new
                                 {
                                     app.Facility.Name,
