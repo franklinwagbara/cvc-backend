@@ -38,6 +38,7 @@ namespace Bunkering.Access.Services
                     var surveyor = new NominatedSurveyor
                     {
                         Name = model.Name,
+                        Email = model.Email,
                     };
 
                     await _unitOfWork.NominatedSurveyor.Add(surveyor);
@@ -85,6 +86,7 @@ namespace Bunkering.Access.Services
             if (editSurveyor != null)
             {
                 editSurveyor.Name = model.Name;
+                editSurveyor.Email = model.Email;
 
                 await _unitOfWork.NominatedSurveyor.Update(editSurveyor);
                 _unitOfWork.Save();
