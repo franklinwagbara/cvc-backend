@@ -195,8 +195,6 @@ namespace Bunkering.Access.Services
                     && currentuser.UserRoles.FirstOrDefault().Role.Name.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim())
             && currentuser.LocationId == x.FromLocationId && x.VesselTypeId == VesselTypeId);
 
-
-
         public async Task<bool> SaveHistory(string action, int appid, WorkFlow flow, ApplicationUser user, ApplicationUser nextUser, string comment)
         {
             await _unitOfWork.ApplicationHistory.Add(new ApplicationHistory
@@ -288,6 +286,9 @@ namespace Bunkering.Access.Services
         internal async Task<(bool, string)> GeneratePermit(int id, string userid)
         {
             var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == id, "Facility.VesselType,ApplicationType");
+            //select surveyor for NOA
+            await UpdateApplicationWithSelectedSurveyor(app, userid);
+
             if (app != null)
             {
                 var year = DateTime.Now.Year.ToString();
@@ -337,6 +338,18 @@ namespace Bunkering.Access.Services
 
             }
             return (false, null);
+        }
+
+        internal async Task UpdateApplicationWithSelectedSurveyor(Application app, string userid)
+        {
+            var surveyors = await _unitOfWork.NominatedSurveyor.GetAll();
+            if (surveyors.Any())
+            {
+                var nextSurveyor = surveyors.OrderBy(q => q.QuantitySurveyed).FirstOrDefault();
+                app.SurveyorId = nextSurveyor?.Id;
+                await _unitOfWork.Application.Update(app);
+                await _unitOfWork.SaveChangesAsync(userid);
+            }
         }
 
         public async Task SendNotification(Application app, string action, ApplicationUser user, string comment)
