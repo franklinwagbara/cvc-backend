@@ -1007,6 +1007,7 @@ namespace Bunkering.Access.Services
                 Data = coqs.Select(x => new
                 {
                     x.Id,
+                    AppId = x.AppId,
                     CompanyEmail = x.Application?.User.Email,
                     ImportName = x.Application?.User.Company.Name,
                     VesselName = x.Application?.VesselName,
