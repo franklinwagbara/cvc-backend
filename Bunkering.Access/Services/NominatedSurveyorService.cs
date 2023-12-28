@@ -156,7 +156,7 @@ namespace Bunkering.Access.Services
         public async Task<ApiResponse> AllNominatedSurveyor()
         {
             var allSurveyor = await _unitOfWork.NominatedSurveyor.GetAll();
-            allSurveyor = allSurveyor.Where(x => x.IsDeleted == null);
+            allSurveyor = allSurveyor.Where(x => x.IsDeleted != true);
 
             _response = new ApiResponse
             {
