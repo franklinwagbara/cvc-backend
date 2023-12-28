@@ -113,9 +113,9 @@ namespace Bunkering.Access.Services
 					TLicensedfacs = facilities.Count(x => x.IsLicensed),
 					TValidLicense = certificates.Count(x => x.ExpireDate > DateTime.UtcNow.AddHours(1)),
 					TAmount = payments.Where(x => x.Status.ToLower().Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted))).Sum(x => x.Amount),
-					TProcessing = allCoqs.Count(x => x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing))),
-					TApproved = allCoqs.Count(x => x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed))),
-					TRejected = allCoqs.Count(x => x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Rejected))),
+					TProcessing = allCoqs.Count(x => x.Status == Enum.GetName(typeof(AppStatus), AppStatus.Processing)),
+					TApproved = allCoqs.Count(x => x.Status == Enum.GetName(typeof(AppStatus), AppStatus.Completed)),
+					TRejected = allCoqs.Count(x => x.Status == Enum.GetName(typeof(AppStatus), AppStatus.Rejected)),
 					TExpiring30 = await _userManager.IsInRoleAsync(user, "Company")
 					? certificates.Count(x => x.COQ.CurrentDeskId.Equals(user.Id) && x.ExpireDate.AddDays(30) >= DateTime.UtcNow.AddHours(1))
 					: certificates.Count(x => x.ExpireDate.AddDays(30) >= DateTime.UtcNow.AddHours(1))
