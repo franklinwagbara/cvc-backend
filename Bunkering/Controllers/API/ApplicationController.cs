@@ -362,7 +362,7 @@ namespace Bunkering.Controllers.API
         [ProducesResponseType(typeof(ApiResponse), 500)]
         [Route("get-app-vessel-info")]
         [HttpGet]
-        public async Task<IActionResult> GetAppVesselInfo(int Id) => Response(await _appService.GetAppVesselInfo(Id));
+        public async Task<IActionResult> GetAppVesselInfo(int Id, int DepotId) => Response(await _appService.GetAppVesselInfo(Id, DepotId));
 
     }
 }

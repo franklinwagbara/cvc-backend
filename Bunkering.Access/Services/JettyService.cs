@@ -147,7 +147,7 @@ namespace Bunkering.Access.Services
         public async Task<ApiResponse> AllJetty()
         {
             var allJetty = await _unitOfWork.Jetty.GetAll();
-            allJetty = allJetty.Where(x => x.DeletedAt == null);
+            allJetty = allJetty.Where(x => x.IsDeleted == false).ToList();
 
             _response = new ApiResponse
             {

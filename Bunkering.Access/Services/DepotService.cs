@@ -157,5 +157,30 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
+        public async Task<ApiResponse> AllDepotByAppId(int AppId)
+        {
+            try
+            {
+                var appDepots = await _unitOfWork.ApplicationDepot.Find(x => x.AppId == AppId, "Depot") ?? throw new Exception("No Depot was applied for this NOA application.");
+                var depots = appDepots.Select(x => x.Depot).ToList() ?? throw new Exception("Could find these depot(s)");
+
+                return new ApiResponse
+                {
+                    Data = depots,
+                    Message = "Successful.",
+                    Success = true,
+                    StatusCode = HttpStatusCode.OK
+                };
+            }
+            catch (Exception e)
+            {
+                return new ApiResponse
+                {
+                    Message = $"{e.Message} +++ {e.StackTrace} ~~~ {e.InnerException?.ToString()}",
+                    Success = false,
+                    StatusCode = HttpStatusCode.InternalServerError
+                };
+            }
+        }
     }
 }

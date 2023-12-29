@@ -13,6 +13,9 @@ namespace Bunkering.Core.ViewModels
 
         public string MarketerName { get; set; }
         public int DeportStateId { get; set; }
+        public string? Jetty { get; set; }
+        public string? MotherVessel { get; set; }
+        
 
         //public List<TankViewModel> TankList { get; set; }
         public  List<AppDepotViewModel> DepotList { get; set; }
