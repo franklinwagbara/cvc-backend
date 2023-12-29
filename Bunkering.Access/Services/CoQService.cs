@@ -400,5 +400,53 @@ namespace Bunkering.Access.Services
                 };
             }
         }
+
+        public async Task<ApiResponse> GetDebitNote(int id)
+        {
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(c => c.Id == id, "Depot");
+
+
+            if (coq is not null)
+            {
+                var app = await _unitOfWork.Application.FirstOrDefaultAsync(a => a.Id == coq.AppId);
+                if (app is null)
+                {
+                    return new ApiResponse
+                    {
+                        Message = "Application Not Found",
+                        StatusCode = HttpStatusCode.NotFound,
+                        Success = false
+                    };
+                }
+                var price = coq.MT_VAC * coq.DepotPrice;
+                var result = new DebitNoteDTO(
+                coq.DateOfSTAfterDischarge,
+                coq.DateOfSTAfterDischarge.AddDays(21),
+                app.MarketerName,
+                coq.Depot!.Name,
+                price,
+                coq.DepotPrice * 0.01m,
+                coq.Depot!.Capacity,
+                price / coq.Depot!.Capacity
+                );
+                return new ApiResponse
+                {
+                    Message = $"Debit note fetched successfully",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true,
+                    Data = result
+                };
+            }
+            else
+            {
+                return new ApiResponse
+                {
+                    Message = "CoQ Not Found",
+                    StatusCode = HttpStatusCode.NotFound,
+                    Success = false
+                };
+            }
+        }
+
     }
 }

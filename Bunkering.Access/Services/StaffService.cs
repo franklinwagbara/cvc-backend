@@ -41,7 +41,7 @@ namespace Bunkering.Access.Services
 			{
 				var user = await _userManager.Users.Include(x => x.Location).FirstOrDefaultAsync(x => x.Email.Equals(User));
 
-				if(user.Location.Name == LOCATION.FO)
+				if(user.Location?.Name == LOCATION.FO)
 					return await GetDashboardFO(user);
 				else 
 					return await GetDashboardOthers(user);
