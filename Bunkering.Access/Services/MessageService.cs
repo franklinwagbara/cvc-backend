@@ -1,4 +1,5 @@
 ﻿using Azure;
+using Bunkering.Access.DAL;
 using Bunkering.Access.IContracts;
 using Bunkering.Core.Data;
 using Bunkering.Core.ViewModels;
@@ -100,7 +101,8 @@ namespace Bunkering.Access.Services
                         d.Content,
                         d.ApplicationId,
                         d.UserId,
-                        d.Date
+                        d.Date,
+                        d.IsRead
                     })
                 };
             else
@@ -132,7 +134,8 @@ namespace Bunkering.Access.Services
                         d.Content,
                         d.ApplicationId,
                         d.UserId,
-                        d.Date
+                        d.Date,
+                        d.IsRead
                     })
                 };
             else
@@ -152,6 +155,11 @@ namespace Bunkering.Access.Services
         {
             var messages = await _unitOfWork.Message.FirstOrDefaultAsync(m => m.Id == id);
             if (messages != null)
+            {
+                messages.IsRead = true;
+                await _unitOfWork.Message.Update(messages);
+                _unitOfWork.Save();
+
                 _response = new ApiResponse
                 {
                     Message = "Success",
@@ -159,6 +167,9 @@ namespace Bunkering.Access.Services
                     Success = true,
                     Data = messages
                 };
+                
+            }              
+                
             else
                 _response = new ApiResponse
                 {
