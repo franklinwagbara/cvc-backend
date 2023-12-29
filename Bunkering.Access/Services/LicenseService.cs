@@ -28,7 +28,6 @@ namespace Bunkering.Access.Services
             _contextAccessor = contextAccessor;
         }
 
-
         public async Task<ApiResponse> LicenseReport(LicenseReportViewModel model)
         {
             var permitReport = await _unitOfWork.vFacilityPermit.Find(a => a.IssuedDate >= model.Min && a.IssuedDate <= model.Max);
@@ -53,23 +52,16 @@ namespace Bunkering.Access.Services
                     Success = true,
 
                 };
-
                 return _response;
             }
             else
-            {
                 _response = new ApiResponse
                 {
                     Message = "Permit Report Not Found",
                     StatusCode = HttpStatusCode.NotFound,
                     Success = false,
                 };
-            }
-
             return _response;
-
-
         }
-
     }
 }

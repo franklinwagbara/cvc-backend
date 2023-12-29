@@ -1,6 +1,8 @@
 ﻿CREATE TABLE [dbo].[Payments] (
     [Id]                 INT             IDENTITY (1, 1) NOT NULL,
     [ApplicationId]      INT             NOT NULL,
+    [COQId]              INT             NULL,
+    [ApplicationTypeId]  INT             NULL,
     [OrderId]            NVARCHAR (MAX)  NOT NULL,
     [ExtraPaymentId]     INT             NULL,
     [PaymentType]        NVARCHAR (MAX)  NOT NULL,
@@ -25,6 +27,8 @@
     CONSTRAINT [FK_Payments_Applications_ApplicationId] FOREIGN KEY ([ApplicationId]) REFERENCES [dbo].[Applications] ([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_Payments_ExtraPayments_ExtraPaymentId] FOREIGN KEY ([ExtraPaymentId]) REFERENCES [dbo].[ExtraPayments] ([Id])
 );
+
+
 
 
 

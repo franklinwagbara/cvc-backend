@@ -254,8 +254,6 @@ namespace Bunkering.Access.Services
                     && currentuser.UserRoles.FirstOrDefault().Role.Name.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim())
             && currentuser.LocationId == x.FromLocationId && x.VesselTypeId == VesselTypeId);
 
-
-
         public async Task<bool> SaveHistory(string action, int appid, WorkFlow flow, ApplicationUser user, ApplicationUser nextUser, string comment)
         {
             await _unitOfWork.ApplicationHistory.Add(new ApplicationHistory
@@ -427,10 +425,12 @@ namespace Bunkering.Access.Services
         internal async Task<(bool, string)> GeneratePermit(int id, string userid)
         {
             var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == id, "Facility.VesselType,ApplicationType");
+            //select surveyor for NOA
+
             if (app != null)
             {
                 var year = DateTime.Now.Year.ToString();
-                var pno = $"NMDPRA/HPPITI/CVC/{app.ApplicationType.Name.Substring(0, 1).ToUpper()}/{year.Substring(2)}/{app.Id}";
+                var pno = $"NMDPRA/DSSRI/CVC/{app.ApplicationType.Name.Substring(0, 1).ToUpper()}/{year.Substring(2)}/{app.Id}";
                 var qrcode = Utils.GenerateQrCode($"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/License/ValidateQrCode/{id}");
                 //license.QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length);
                 //save permit to elps and portal
@@ -484,7 +484,7 @@ namespace Bunkering.Access.Services
             if (coq != null)
             {
                 var year = DateTime.Now.Year.ToString();
-                var pno = $"NMDPRA/HPPITI/COQ/{coq.Application?.ApplicationType.Name.Substring(0, 1).ToUpper()}/{year.Substring(2)}/{coq.Id}";
+                var pno = $"NMDPRA/DSSRI/COQ/{coq.Application?.ApplicationType.Name.Substring(0, 1).ToUpper()}/{year.Substring(2)}/{coq.Id}";
                 var qrcode = Utils.GenerateQrCode($"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/License/ValidateQrCode/{id}");
                 //license.QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length);
                 //save certificate to elps and portal
@@ -527,7 +527,6 @@ namespace Bunkering.Access.Services
                         return (true, pno);
                     }
                 }
-
             }
             return (false, null);
         }

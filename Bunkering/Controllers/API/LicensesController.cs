@@ -120,11 +120,11 @@ namespace Bunkering.Controllers.API
 							Name = y.Depot.Name,
 							Product = y.Product.Name,
 							Volume = y.Volume
-						}).ToList(),						
+						}).ToList(),
+						Jetty = license.Application.Jetty,					
                     },
 					PageHeight = 327,
-					PageMargins = new Rotativa.AspNetCore.Options.Margins(10, 10, 10, 10),
-					
+					PageMargins = new Rotativa.AspNetCore.Options.Margins(10, 10, 10, 10),					
                     ViewName = "ViewLicense"
 				};
 				var pdf = await viewAsPdf.BuildFile(ControllerContext);

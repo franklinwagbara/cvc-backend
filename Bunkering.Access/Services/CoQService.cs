@@ -46,7 +46,7 @@ namespace Bunkering.Access.Services
                 var user = await _userManager.FindByEmailAsync(LoginUserEmail);
 
                 if (user == null)
-                    throw new Exception("Can not find user with Email: " + LoginUserEmail);
+                    throw new Exception("Cannot find user with Email: " + LoginUserEmail);
 
                 //if (user.UserRoles.FirstOrDefault().Role.Name != RoleConstants.Field_Officer)
                 //   throw new Exception("Only Field Officers can create CoQ.");
@@ -57,7 +57,7 @@ namespace Bunkering.Access.Services
                 {
                     var coq = _mapper.Map<CoQ>(Model);
                     coq.CreatedBy = LoginUserEmail;
-                    coq.DateCreated = DateTime.Now;
+                    coq.DateCreated = DateTime.UtcNow.AddHours(1);
                     coq.CurrentDeskId = user.Id;
                     coq.Status = Enum.GetName(typeof(AppStatus), AppStatus.Initiated);
                     result_coq = await _unitOfWork.CoQ.Add(coq);
@@ -90,9 +90,8 @@ namespace Bunkering.Access.Services
             {
                 return _apiReponse = new ApiResponse
                 {
-                    Data = null,
                     Message = $"{e.Message} +++ {e.StackTrace} ~~~ {e.InnerException?.ToString()}\n",
-                    StatusCode = System.Net.HttpStatusCode.InternalServerError
+                    StatusCode = HttpStatusCode.InternalServerError
                 };
             }
         }
@@ -248,7 +247,6 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> AddDocuments(int id)
         {
-
             if (id > 0)
             {
                 var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == id, "Facility.VesselType");
