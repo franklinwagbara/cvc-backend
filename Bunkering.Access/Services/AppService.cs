@@ -486,7 +486,7 @@ namespace Bunkering.Access.Services
                         Success = false
                     };
 
-                    var total = fee.COQFee + fee.SerciveCharge + fee.NOAFee;
+                    var total = (double)fee.COQFee + (double)fee.SerciveCharge + (double)fee.NOAFee;
 
                     var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.ApplicationId.Equals(id));
                     if (payment == null)
@@ -502,7 +502,7 @@ namespace Bunkering.Access.Services
                             PaymentType = "NGN",
                             Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending),
                             TransactionDate = DateTime.UtcNow.AddHours(1),
-                            ServiceCharge = fee.SerciveCharge,
+                            ServiceCharge = (double)fee.SerciveCharge,
                             AppReceiptId = "",
                             RRR = "",
                             TransactionId = "",
