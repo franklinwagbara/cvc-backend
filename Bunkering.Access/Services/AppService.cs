@@ -1437,7 +1437,7 @@ namespace Bunkering.Access.Services
             try
             {
                 var debitnoteId = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));
-                var debitnotes = await _unitOfWork.Payment.Find(x => x.ApplicationId.Equals(id) && x.ApplicationTypeId.Equals(debitnoteId.Id));
+                var debitnotes = await _unitOfWork.vDebitNote.Find(x => x.ApplicationId.Equals(id) && x.ApplicationTypeId.Equals(debitnoteId.Id));
 
                 if (debitnotes == null)
                     throw new Exception("Debit note does not exist for this application!");
@@ -1449,10 +1449,18 @@ namespace Bunkering.Access.Services
                 {
                     Data = debitnotes.Select(x => new
                     {
-                        x.Amount,
+                        x.Id,
+                        x.COQId,
                         x.OrderId,
                         x.TransactionDate,
-                        x.ApplicationId
+                        x.Status,
+                        x.DepotName,
+                        x.Description,
+                        x.PaymentDate,
+                        x.RRR,
+                        x.Amount,
+                        x.ServiceCharge,
+                        x.Arrears
                     }),
                     Message = "Successfull.",
                     StatusCode = HttpStatusCode.OK,
