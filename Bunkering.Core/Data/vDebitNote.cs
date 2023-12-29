@@ -15,6 +15,7 @@ namespace Bunkering.Core.Data
         public string DepotName { get; set; }
         public string OrderId { get; set; }
         public string RRR { get; set; }
+        public string ApptypeName { get; set; }
         public string Description { get; set; }
         public double Amount { get; set; }
         public double Arrears { get; set; }

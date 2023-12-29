@@ -364,27 +364,6 @@ namespace Bunkering.Controllers.API
         [HttpGet]
         public async Task<IActionResult> GetAppVesselInfo(int Id, int DepotId) => Response(await _appService.GetAppVesselInfo(Id, DepotId));
 
-        /// <summary>
-        /// This endpoint is used to fetch all Debit notes for a NOA/CVC application
-        /// </summary>
-        /// <returns>Returns a list of Debit notes for an application</returns>
-        /// <remarks>
-        /// 
-        /// Sample Request
-        /// GET: api/application/get-app-vessel-info
-        /// 
-        /// </remarks>
-        /// <response code="200">Returns a list of Debit notes for an application </response>
-        /// <response code="404">Returns not found </response>
-        /// <response code="401">Unauthorized user </response>
-        /// <response code="400">Internal server error - bad request </response>
-        [ProducesResponseType(typeof(ApiResponse), 200)]
-        [ProducesResponseType(typeof(ApiResponse), 404)]
-        [ProducesResponseType(typeof(ApiResponse), 405)]
-        [ProducesResponseType(typeof(ApiResponse), 500)]
-        [Route("get-debit-botes-by-appid")]
-        [HttpGet]
-        public async Task<IActionResult> GetDebitNotes(int Id) => Response(await _appService.GetDebitNotesByAppId(Id));
 
     }
 }
