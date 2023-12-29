@@ -179,6 +179,8 @@ namespace Bunkering.Access.Services
                         LoadingPort = model.LoadingPort,
                         MarketerName = model.MarketerName,
                         IMONumber = model.IMONumber,
+                        MotherVessel = model.MotherVessel,
+                        Jetty = model.Jetty,
                         ETA = model.ETA,
                     };
 
@@ -1316,7 +1318,7 @@ namespace Bunkering.Access.Services
         public async Task<ApiResponse> AllApplicationsByDepot(int depotId)
         {
             var appDepot = await _unitOfWork.ApplicationDepot.Find(x => x.DepotId.Equals(depotId));
-            var applications = await  _unitOfWork.Application.Find(x => appDepot.Any(a => a.AppId == x.Id) == true);
+            var applications = await  _unitOfWork.Application.Find(x => appDepot.Any(a => a.AppId == x.Id && x.Status == Enum.GetName(AppStatus.Completed)) == true);
             if (applications != null)
             {
                 var filteredapps = applications.Where(x => x.IsDeleted == false);
@@ -1373,7 +1375,7 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
-        public async Task<ApiResponse> GetAppVesselInfo(int AppId)
+        public async Task<ApiResponse> GetAppVesselInfo(int AppId, int DepotId)
         {
             try
             {
@@ -1382,18 +1384,21 @@ namespace Bunkering.Access.Services
                 if (app == null)
                     throw new Exception("Application does not exist!");
 
-                var appDepot = await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.AppId== AppId);
+                var appDepot = await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.AppId == AppId && x.DepotId == DepotId);
 
                 if (appDepot == null)
-                    throw new Exception("Application depot does not exist!");
+                    throw new Exception("The Select depot does not exist for this application!");
 
-                var depot = await _unitOfWork.Depot.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.Id));  
+                var depot = await _unitOfWork.Depot.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.DepotId));  
                 var product = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.ProductId));
 
                 if (product == null)
                     throw new Exception("Product does not exist");
                 if (depot == null)
                     throw new Exception("Depot does not exist");
+
+                //Check if COQ exists
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.AppId == app.Id && x.DepotId == depot.Id);
 
                 return new ApiResponse
                 {
@@ -1408,6 +1413,8 @@ namespace Bunkering.Access.Services
                         Jetty = app.Jetty,
                         ETA = app.ETA,
                         RecievingTerminal = depot.Name,
+                        COQExist = coq == null? false: true,
+                        coqId = coq?.Id,
                     },
                     Message = "Successfull.",
                     StatusCode = HttpStatusCode.OK,
