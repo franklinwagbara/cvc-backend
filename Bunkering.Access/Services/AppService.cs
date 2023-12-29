@@ -1425,5 +1425,43 @@ namespace Bunkering.Access.Services
             }
         }
         
+        public async Task<ApiResponse> GetDebitNotesByAppId(int id)
+        {
+            try
+            {
+                var debitnoteId = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));
+                var debitnotes = await _unitOfWork.Payment.Find(x => x.ApplicationId.Equals(id) && x.ApplicationTypeId.Equals(debitnoteId.Id));
+
+                if (debitnotes == null)
+                    throw new Exception("Debit note does not exist for this application!");
+
+                //var depot = await _unitOfWork.Depot.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.Id));  
+                //var product = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.ProductId));
+
+                return new ApiResponse
+                {
+                    Data = debitnotes.Select(x => new
+                    {
+                        x.Amount,
+                        x.OrderId,
+                        x.TransactionDate,
+                        x.ApplicationId
+                    }),
+                    Message = "Successfull.",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = false
+                };
+            }
+            catch (Exception e)
+            {
+                return new ApiResponse
+                {
+                    Message = $"{e.Message} +++ {e.StackTrace} ~~~ {e.InnerException?.ToString()}",
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Success = false,
+                };
+            }
+        }
+        
     }
 }
