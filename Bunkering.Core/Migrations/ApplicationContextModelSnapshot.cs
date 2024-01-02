@@ -77,10 +77,6 @@ namespace Bunkering.Core.Migrations
                     b.Property<int>("DeportStateId")
                         .HasColumnType("int");
 
-                    b.Property<string>("DischargePort")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("ETA")
                         .HasColumnType("datetime2");
 
@@ -103,6 +99,9 @@ namespace Bunkering.Core.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Jetty")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("LoadingPort")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -113,6 +112,9 @@ namespace Bunkering.Core.Migrations
 
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("MotherVessel")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Reference")
                         .IsRequired()
@@ -249,6 +251,28 @@ namespace Bunkering.Core.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.ApplicationSurveyor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ApplicationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NominatedSurveyorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Volume")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ApplicationSurveyors");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.ApplicationType", b =>
@@ -501,6 +525,87 @@ namespace Bunkering.Core.Migrations
                     b.ToTable("AuditLogs");
                 });
 
+            modelBuilder.Entity("Bunkering.Core.Data.COQCertificate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("COQId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CertifcateNo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ElpsId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ExpireDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("IssuedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("QRCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Signature")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("COQId");
+
+                    b.ToTable("COQCertificates");
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.COQHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("COQId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TargetRole")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TargetedTo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TriggeredBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TriggeredByRole")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("COQHistories");
+                });
+
             modelBuilder.Entity("Bunkering.Core.Data.CoQ", b =>
                 {
                     b.Property<int>("Id")
@@ -514,6 +619,9 @@ namespace Bunkering.Core.Migrations
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CurrentDeskId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DateCreated")
@@ -537,17 +645,32 @@ namespace Bunkering.Core.Migrations
                     b.Property<decimal>("DepotPrice")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<bool?>("FADApproved")
+                        .HasColumnType("bit");
+
                     b.Property<decimal>("GOV")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("GSV")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<decimal>("MT_AIR")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("MT_VAC")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Reference")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("SubmittedDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -637,6 +760,9 @@ namespace Bunkering.Core.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<string>("MarketerName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -645,6 +771,8 @@ namespace Bunkering.Core.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("StateId");
 
                     b.ToTable("Depots");
                 });
@@ -667,6 +795,8 @@ namespace Bunkering.Core.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("DepotID");
 
                     b.ToTable("DepotFieldOfficers");
                 });
@@ -974,12 +1104,18 @@ namespace Bunkering.Core.Migrations
                     b.Property<int?>("ApplicationId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("COQId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool?>("IsCOQ")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
@@ -1013,12 +1149,18 @@ namespace Bunkering.Core.Migrations
                     b.Property<string>("DeletedBy")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("NominatedVolume")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -1792,7 +1934,7 @@ namespace Bunkering.Core.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Bunkering.Core.Data.Application", "Product")
+                    b.HasOne("Bunkering.Core.Data.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1876,6 +2018,17 @@ namespace Bunkering.Core.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Bunkering.Core.Data.COQCertificate", b =>
+                {
+                    b.HasOne("Bunkering.Core.Data.CoQ", "COQ")
+                        .WithMany()
+                        .HasForeignKey("COQId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("COQ");
+                });
+
             modelBuilder.Entity("Bunkering.Core.Data.CoQ", b =>
                 {
                     b.HasOne("Bunkering.Core.Data.Application", "Application")
@@ -1891,6 +2044,28 @@ namespace Bunkering.Core.Migrations
                         .IsRequired();
 
                     b.Navigation("Application");
+
+                    b.Navigation("Depot");
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.Depot", b =>
+                {
+                    b.HasOne("Bunkering.Core.Data.State", "State")
+                        .WithMany()
+                        .HasForeignKey("StateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("State");
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.DepotFieldOfficer", b =>
+                {
+                    b.HasOne("Bunkering.Core.Data.Depot", "Depot")
+                        .WithMany()
+                        .HasForeignKey("DepotID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Depot");
                 });

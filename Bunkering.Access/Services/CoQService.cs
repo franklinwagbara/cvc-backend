@@ -46,15 +46,37 @@ namespace Bunkering.Access.Services
                 var user = await _userManager.FindByEmailAsync(LoginUserEmail);
 
                 if (user == null)
-                    throw new Exception("Can not find user with Email: " + LoginUserEmail);
+                    throw new Exception("Cannot find user with Email: " + LoginUserEmail);
 
                 //if (user.UserRoles.FirstOrDefault().Role.Name != RoleConstants.Field_Officer)
-                //    throw new Exception("Only Field Officers can create CoQ.");
+                //   throw new Exception("Only Field Officers can create CoQ.");
+                
+                var foundCOQ = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.AppId.Equals(Model.AppId) && x.DepotId.Equals(Model.DepotId));
+                CoQ? result_coq = null;
+                if(foundCOQ == null)
+                {
+                    var coq = _mapper.Map<CoQ>(Model);
+                    coq.CreatedBy = LoginUserEmail;
+                    coq.DateCreated = DateTime.UtcNow.AddHours(1);
+                    coq.CurrentDeskId = user.Id;
+                    coq.Status = Enum.GetName(typeof(AppStatus), AppStatus.Initiated);
+                    result_coq = await _unitOfWork.CoQ.Add(coq);
+                }
+                else
+                {
+                    foundCOQ.DateOfSTAfterDischarge = Model.DateOfSTAfterDischarge;
+                    foundCOQ.DateOfVesselArrival = Model.DateOfVesselArrival;
+                    foundCOQ.DateOfVesselUllage = Model.DateOfVesselUllage;
+                    foundCOQ.DepotPrice = Model.DepotPrice;
+                    foundCOQ.GOV = Model.GOV;
+                    foundCOQ.GSV = Model.GSV;
+                    foundCOQ.MT_VAC = Model.MT_VAC;
+                    foundCOQ.MT_AIR = Model.MT_AIR;
+                    foundCOQ.CurrentDeskId = user.Id;
+                    
+                    result_coq = await _unitOfWork.CoQ.Update(foundCOQ);
+                }
 
-                var coq = _mapper.Map<CoQ>(Model);
-                coq.CreatedBy = LoginUserEmail;
-                coq.DateCreated = DateTime.Now;
-                var result_coq = await _unitOfWork.CoQ.Add(coq);
                 await _unitOfWork.SaveChangesAsync(user.Id);
 
                 return new ApiResponse
@@ -68,9 +90,8 @@ namespace Bunkering.Access.Services
             {
                 return _apiReponse = new ApiResponse
                 {
-                    Data = null,
                     Message = $"{e.Message} +++ {e.StackTrace} ~~~ {e.InnerException?.ToString()}\n",
-                    StatusCode = System.Net.HttpStatusCode.InternalServerError
+                    StatusCode = HttpStatusCode.InternalServerError
                 };
             }
         }
@@ -226,7 +247,6 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> AddDocuments(int id)
         {
-
             if (id > 0)
             {
                 var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == id, "Facility.VesselType");
@@ -323,5 +343,110 @@ namespace Bunkering.Access.Services
                 };
             return _apiReponse;
         }
+
+        public async Task<ApiResponse> Submit(int Id)
+        {
+            try
+            {
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id.Equals(Id)) ?? throw new Exception($"COQ with id={Id} does not exist.");
+                var user = await _userManager.FindByEmailAsync(LoginUserEmail) ?? throw new Exception($"User with email={LoginUserEmail} does not exist.");
+
+                var result = await _flow.CoqWorkFlow(Id, Enum.GetName(typeof(AppActions), AppActions.Submit), "Application Submitted");
+
+                return new ApiResponse
+                {
+                    Message = result.Item2,
+                    StatusCode = result.Item1? HttpStatusCode.OK: HttpStatusCode.InternalServerError,
+                    Success = true
+                };
+            }
+            catch (Exception e)
+            {
+                return new ApiResponse
+                {
+                    Message = e.Message,
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Success = true
+                };
+            }
+        }
+
+        public async Task<ApiResponse> Process(int id, string act, string comment)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(LoginUserEmail) ?? throw new Exception($"User with the email={LoginUserEmail} was not found.");
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id.Equals(id)) ?? throw new Exception($"COQ with the ID={id} could not be found.");
+
+                var result = await _flow.CoqWorkFlow(id, act, comment);
+
+                if(result.Item1)
+                    return new ApiResponse
+                    {
+                        Data = result.Item1,
+                        Message = "COQ Application has been pushed",
+                        Success = true,
+                        StatusCode = HttpStatusCode.OK
+                    };
+                else throw new Exception("COQ Application could not be pushed.");
+            }
+            catch (Exception e)
+            {
+                return new ApiResponse
+                {
+                    Message = e.Message,
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Success = true
+                };
+            }
+        }
+
+        public async Task<ApiResponse> GetDebitNote(int id)
+        {
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(c => c.Id == id, "Depot");
+
+
+            if (coq is not null)
+            {
+                var app = await _unitOfWork.Application.FirstOrDefaultAsync(a => a.Id == coq.AppId);
+                if (app is null)
+                {
+                    return new ApiResponse
+                    {
+                        Message = "Application Not Found",
+                        StatusCode = HttpStatusCode.NotFound,
+                        Success = false
+                    };
+                }
+                var price = coq.MT_VAC * coq.DepotPrice;
+                var result = new DebitNoteDTO(
+                coq.DateOfSTAfterDischarge,
+                coq.DateOfSTAfterDischarge.AddDays(21),
+                app.MarketerName,
+                coq.Depot!.Name,
+                price,
+                coq.DepotPrice * 0.01m,
+                coq.Depot!.Capacity,
+                price / coq.Depot!.Capacity
+                );
+                return new ApiResponse
+                {
+                    Message = $"Debit note fetched successfully",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true,
+                    Data = result
+                };
+            }
+            else
+            {
+                return new ApiResponse
+                {
+                    Message = "CoQ Not Found",
+                    StatusCode = HttpStatusCode.NotFound,
+                    Success = false
+                };
+            }
+        }
+
     }
 }
