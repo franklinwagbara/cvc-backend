@@ -233,7 +233,7 @@ namespace Bunkering.Controllers.API
         [HttpPost]
         public async Task<IActionResult> Submit(int id) => Response(await _coqService.Submit(id));
 
-         /// <summary>
+        /// <summary>
         /// This endpoint is used to process a COQ Application
         /// </summary>
         /// <returns>Returns a message after submission </returns>
@@ -256,7 +256,6 @@ namespace Bunkering.Controllers.API
         [HttpPost]
         public async Task<IActionResult> Process(int id, string act, string comment) => Response(await _coqService.Process(id, act, comment));
 
-
         [ProducesResponseType(typeof(ApiResponse), 200)]
         [ProducesResponseType(typeof(ApiResponse), 404)]
         [ProducesResponseType(typeof(ApiResponse), 405)]
@@ -265,7 +264,6 @@ namespace Bunkering.Controllers.API
         [Route("debit_note/{id}")]
         [HttpGet]
         [AllowAnonymous]
-
         public async Task<IActionResult> DebitNote(int id)
         {
             var note = (await _coqService.GetDebitNote(id));
@@ -286,6 +284,52 @@ namespace Bunkering.Controllers.API
             return BadRequest(note);
 
         }
+
+        /// <summary>
+        /// This endpoint is used to add coq tanks
+        /// </summary>
+        /// <returns>Returns a message after adding </returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// POST: api/coq/add-coq-tank/xxxx
+        /// 
+        /// </remarks>
+        /// <param name="model">model for adding tank to coq</param>
+        /// <response code="200">Returns a success message </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("add-coq-tank")]
+        [HttpPost]
+        public async Task<IActionResult> AddCoqTank(COQCrudeTankDTO model) => Response(await _coqService.AddCoqTank(model));
+
+        /// <summary>
+        /// This endpoint is used to add coq gas tanks
+        /// </summary>
+        /// <returns>Returns a message after adding </returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// POST: api/coq/add-coq-tank/xxxx
+        /// 
+        /// </remarks>
+        /// <param name="model">model for adding tank to coq</param>
+        /// <response code="200">Returns a success message </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("add-coq-gas-tank")]
+        [HttpPost]
+        public async Task<IActionResult> AddCoqTank(CoQGasTankDTO model) => Response(await _coqService.AddCoqTank(model));
 
     }
 }

@@ -448,5 +448,51 @@ namespace Bunkering.Access.Services
             }
         }
 
+        public async Task<ApiResponse> AddCoqTank(COQCrudeTankDTO model) 
+        {
+            var user = await _userManager.FindByEmailAsync(LoginUserEmail);
+            try
+            {
+                var tank = await _unitOfWork.CoQTank.FirstOrDefaultAsync(x => x.CoQId == model.CoQId && x.TankName.ToLower().Equals(model.TankName.ToLower()) && x.TankMeasurement.Any(m => m.MeasurementTypeId.Equals(model.MeasurementTypeId)));
+                if(tank == null)
+                {
+                    var data = _mapper.Map<TankMeasurement>(model);
+                    await _unitOfWork.CoQTank.Add(new COQTank
+                    {
+                        CoQId = model.CoQId,
+                        TankName = model.TankName,
+                        TankMeasurement = new List<TankMeasurement> { data }
+                    });
+                    await _unitOfWork.SaveChangesAsync(user.Id);
+
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return _apiReponse;
+        }
+
+        public async Task<ApiResponse> AddCoqTank(CoQGasTankDTO model)
+        {
+            var user = await _userManager.FindByEmailAsync(LoginUserEmail);
+            try
+            {
+                var data = _mapper.Map<TankMeasurement>(model);
+                await _unitOfWork.CoQTank.Add(new COQTank
+                {
+                    CoQId = model.CoQId,
+                    TankName = model.TankName,
+                    TankMeasurement = new List<TankMeasurement> { data }
+                });
+                await _unitOfWork.SaveChangesAsync(user.Id);
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return _apiReponse;
+        }
     }
 }

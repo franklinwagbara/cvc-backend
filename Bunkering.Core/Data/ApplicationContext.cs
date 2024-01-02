@@ -54,6 +54,9 @@ namespace Bunkering.Core.Data
         public DbSet<COQHistory> COQHistories { get; set; }
         public DbSet<COQCertificate> COQCertificates { get; set; }
         public DbSet<ApplicationSurveyor> ApplicationSurveyors { get; set; }
+        public DbSet<COQTank> COQTanks { get; set; }
+        public DbSet<MeasurementType> MeasurementTypes { get; set; }
+        public DbSet<TankMeasurement> TankMeasurements { get; set; }
 
         //public virtual DbContextOptionsBuilder EnableDetailedErrors(bool detailedErrorsEnabled = true) => detailedErrorsEnabled;
         //public virtual DbContextOptionsBuilder EnableDetailedErrors(bool detailedErrorEnabled) => DbContextOptionsBuilder;
