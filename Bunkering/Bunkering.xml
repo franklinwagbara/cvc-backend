@@ -122,6 +122,23 @@
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
         </member>
+        <member name="M:Bunkering.Controllers.API.ApplicationController.GetDepots(System.Int32)">
+            <summary>
+            This endpoint returns a model of depots for the application using the application id
+            </summary>
+            <returns>Returns a model of depots which can be mepty</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/application/get-depots/1
+            
+            </remarks>
+            <param name="id">NOA application Id</param>
+            <response code="200">Returns a list of depots </response>
+            <response code="404">Returns not found depots </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
         <member name="M:Bunkering.Controllers.API.ApplicationController.AddTanks(System.Collections.Generic.List{Bunkering.Core.ViewModels.TankViewModel})">
             <summary>
             This endpoint returns a model of tanks for the application using the application id
@@ -306,7 +323,7 @@
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
         </member>
-        <member name="M:Bunkering.Controllers.API.ApplicationProcessesController.AddFlow(Bunkering.Core.Data.WorkFlow)">
+        <member name="M:Bunkering.Controllers.API.ApplicationProcessesController.AddFlow(Bunkering.Core.ViewModels.WorkflowviewModel)">
             <summary>
             This endpoint is used to add new flow to the system
             </summary>
@@ -572,6 +589,40 @@
             </remarks>
             <param name="model">This is the model of the get messages by companyId</param>
             <response code="200">Returns a summary of the get messages by companyId </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.CoQController.DocumentUpload(System.Int32)">
+            <summary>
+            This endpoint is used to fetch documents required for a coq application
+            </summary>
+            <returns>Returns a model of required documents </returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/application/get-dcouments/xxxx
+            
+            </remarks>
+            <param name="id">The application id used to fetch documenst for the application type</param>
+            <response code="200">Returns an object of fees </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.CoQController.AddDocuments(System.Int32)">
+            <summary>
+            This endpoint is used to add coq documents required for an application
+            </summary>
+            <returns>Returns a message after upload </returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/application/add-dcouments/xxxx
+            
+            </remarks>
+            <param name="id">The application id used to fetch documenst for the application type</param>
+            <response code="200">Returns an object of fees </response>
             <response code="404">Returns not found </response>
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
@@ -1107,6 +1158,72 @@
             <response code="404">Returns not found </response>
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.RoleController.CreateRole(Bunkering.Core.ViewModels.RoleViewModel)">
+            <summary>
+            This endpoint is used to add new role
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/staff/add-role
+            
+            </remarks>
+            <response code="200">Returns success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+            
+        </member>
+        <member name="M:Bunkering.Controllers.API.RoleController.EditRole(Bunkering.Core.ViewModels.RoleViewModel)">
+            <summary>
+            This endpoint is used to edit role
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/staff/edit-role
+            
+            </remarks>
+            <response code="200">Returns success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.RoleController.DeleteRole(System.String)">
+            <summary>
+            This endpoint is used to delete role
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/staff/edit-role
+            
+            </remarks>
+            <response code="200">Returns success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.RoleController.AllRoles">
+            <summary>
+            This endpoint is used to get all roles
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/staff/get-roles
+            
+            </remarks>
+            <response code="200">Returns success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+            
         </member>
         <member name="M:Bunkering.Controllers.API.SchedulesController.ScheduleInspection(Bunkering.Core.ViewModels.ScheduleViewModel)">
             <summary>
