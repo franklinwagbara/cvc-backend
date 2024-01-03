@@ -96,6 +96,28 @@ namespace Bunkering.Access.Services
             }
         }
 
+        public async Task<ApiResponse> GetCoQsByAppId(int appId)
+        {
+            try
+            {
+                var foundCOQ = await _unitOfWork.CoQ.Find(x => x.AppId == appId);
+                return new ApiResponse
+                {
+                    Data = foundCOQ,
+                    Message = "Successful",
+                    StatusCode = System.Net.HttpStatusCode.OK
+                };
+            }
+            catch (Exception e)
+            {
+                return _apiReponse = new ApiResponse
+                {
+                    Message = $"{e.Message} +++ {e.StackTrace} ~~~ {e.InnerException?.ToString()}\n",
+                    StatusCode = HttpStatusCode.InternalServerError
+                };
+            }
+        }
+
         public async Task<ApiResponse> DocumentUpload(int id)
         {
 
