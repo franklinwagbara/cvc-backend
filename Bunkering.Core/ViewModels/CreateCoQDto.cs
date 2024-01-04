@@ -58,6 +58,8 @@ namespace Bunkering.Core.ViewModels
         public List<TankBeforeReading> TankBeforeReadings { get; set; }
         public List<TankAfterReading> TankAfterReadings { get; set; }
 
+        public List<SubmitDocumentDto> SubmitDocuments { get; set; }
+
 
     }
 }

@@ -421,7 +421,7 @@ namespace Bunkering.Access.Services
                 {
                     Message = e.Message,
                     StatusCode = HttpStatusCode.InternalServerError,
-                    Success = true
+                    Success = false
                 };
             }
         }
@@ -499,14 +499,20 @@ namespace Bunkering.Access.Services
         //    return _apiReponse;
         //}
 
-        public async Task<ApiResponse> AddCoqTank(CreateGasProductCoQDto model)
+        public async Task<ApiResponse> CreateCOQForGas(CreateGasProductCoQDto model)
         {
             var user = await _userManager.FindByEmailAsync(LoginUserEmail);
+            var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name == Utils.COQ);
+
+            if (appType is null)
+            {
+                throw new Exception("Application type of COQ is not configured yet, please contact support");
+            }
+
             using var transaction = _context.Database.BeginTransaction();
             try
             {
-
-                //var data = _mapper.Map<TankMeasurement>(model);
+                #region Create Coq
                 var coq = new CoQ
                 {
                     AppId = model.NoaAppId,
@@ -524,11 +530,14 @@ namespace Bunkering.Access.Services
                 _context.CoQs.Add(coq);
                 _context.SaveChanges();
 
+                #endregion
+
+                #region Create COQ Tank
                 var coqTankList = new List<COQTank>();
 
-                foreach(var before in model.TankBeforeReadings)
+                foreach (var before in model.TankBeforeReadings)
                 {
-                   var newCoqTank = new COQTank
+                    var newCoqTank = new COQTank
                     {
                         CoQId = coq.Id,
                         TankId = before.TankId
@@ -542,7 +551,10 @@ namespace Bunkering.Access.Services
                         var a = after.coQGasTankDTO;
 
                         var newBTankM = _mapper.Map<TankMeasurement>(b);
+                        newBTankM.MeasurementType = ReadingType.Before;
+
                         var newATankM = _mapper.Map<TankMeasurement>(a);
+                        newATankM.MeasurementType = ReadingType.After;
 
                         var newTankMeasurement = new List<TankMeasurement>
                         {
@@ -553,19 +565,48 @@ namespace Bunkering.Access.Services
 
                         coqTankList.Add(newCoqTank);
                     }
-                    
+
 
                 }
-              
+
                 _context.COQTanks.AddRange(coqTankList);
+                #endregion
+
+                #region Document Submission
+                
+                var sDocumentList = _mapper.Map<List<SubmittedDocument>>(model.SubmitDocuments);
+
+                sDocumentList.ForEach(x =>
+                {
+                    x.ApplicationId = coq.Id;
+                    x.ApplicationTypeId = appType.Id; 
+                });
+
+                _context.SubmittedDocuments.AddRange(sDocumentList);
+                #endregion
 
                 _context.SaveChanges();
+
+                transaction.Commit();
             }
             catch (Exception ex)
-            {
+            { 
+                transaction.Rollback();
 
+                return new ApiResponse
+                {
+                    Message = $"An error occur, COQ not created: {ex.Message}",
+                    Success = false,
+                    StatusCode = HttpStatusCode.InternalServerError
+                };
             }
-            return _apiReponse;
+
+            return new ApiResponse
+            {
+                Message = "COQ created successfully",
+                Success = true,
+                StatusCode = HttpStatusCode.OK
+            };
         }
     }
 }

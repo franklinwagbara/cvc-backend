@@ -337,8 +337,8 @@ namespace Bunkering.Controllers.API
         [ProducesResponseType(typeof(ApiResponse), 404)]
         [ProducesResponseType(typeof(ApiResponse), 405)]
         [ProducesResponseType(typeof(ApiResponse), 500)]
-        [Route("add-coq-gas-tank")]
+        [Route("create-coq-gas")]
         [HttpPost]
-        public async Task<IActionResult> AddCoqTank(CreateGasProductCoQDto model) => Response(await _coqService.AddCoqTank(model));
+        public async Task<IActionResult> CreateCOQForGas(CreateGasProductCoQDto model) => Response(await _coqService.CreateCOQForGas(model));
     }
 }
