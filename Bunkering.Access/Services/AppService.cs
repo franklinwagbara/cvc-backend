@@ -178,7 +178,7 @@ namespace Bunkering.Access.Services
                         VesselName = model.VesselName,
                         LoadingPort = model.LoadingPort,
                         MarketerName = model.MarketerName,
-                        IMONumber = model.IMONumber,
+                        //IMONumber = model.IMONumber,
                         MotherVessel = model.MotherVessel,
                         Jetty = model.Jetty,
                         ETA = model.ETA,
@@ -1430,6 +1430,39 @@ namespace Bunkering.Access.Services
                     Success = false,
                 };
             }
+        }
+
+        public async Task<ApiResponse> IMONumberVerification(string imoNumber)
+        {
+            var verifyIMO = await _unitOfWork.Facility.FirstOrDefaultAsync(x => x.IMONumber.Equals(imoNumber));
+            if (verifyIMO != null)
+            {
+                _response = new ApiResponse
+                {
+                    Message = "Verified",
+                    Data = new
+                    {
+                       Id = verifyIMO.Id,
+                       IMONumber = verifyIMO.IMONumber,
+                       Name = verifyIMO.Name
+                    }    
+                };
+
+                return _response;
+              
+            }
+            else
+            {
+                _response = new ApiResponse
+                {
+                    Message = "Not Found",
+                    StatusCode = HttpStatusCode.NotFound,
+                    Success = false
+                };
+                
+            }
+
+            return _response;
         }
 
     }
