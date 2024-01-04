@@ -1445,7 +1445,9 @@ namespace Bunkering.Access.Services
                        Id = verifyIMO.Id,
                        IMONumber = verifyIMO.IMONumber,
                        Name = verifyIMO.Name
-                    }    
+                    },  
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true
                 };
 
                 return _response;

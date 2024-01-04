@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bunkering.Controllers.API
 {
+    //[Authorize]
+    [Route("api/[controller]")]
+    [ApiController]
     public class VesselController : ResponseController
     {
        private readonly AppService _appService;

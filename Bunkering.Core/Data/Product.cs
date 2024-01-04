@@ -4,5 +4,6 @@ namespace Bunkering.Core.Data
     { 
         public int Id { get; set; }
         public string Name { get; set; }
+        public string ProductType { get; set; }
     }   
 }
