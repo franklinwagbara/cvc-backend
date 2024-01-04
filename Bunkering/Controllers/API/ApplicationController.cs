@@ -365,6 +365,5 @@ namespace Bunkering.Controllers.API
         public async Task<IActionResult> GetAppVesselInfo(int Id, int DepotId) => Response(await _appService.GetAppVesselInfo(Id, DepotId));
 
 
-
     }
 }

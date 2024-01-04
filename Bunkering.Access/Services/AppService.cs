@@ -1141,6 +1141,7 @@ namespace Bunkering.Access.Services
                                 Schedules = sch,
                                 Documents = app.SubmittedDocuments,
                                 app.MarketerName,
+                                app.MotherVessel,
                                 app.Jetty,
                                 app.LoadingPort,
                                 NominatedSurveyor = (await _unitOfWork.NominatedSurveyor.Find(c => c.Id == surveyorId)).FirstOrDefault(),
