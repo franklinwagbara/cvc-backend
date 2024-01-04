@@ -16,8 +16,6 @@ namespace Bunkering.Access
 		private readonly IServiceProvider _serviceProvider;
 		private readonly IElps _elps;
 
-
-
 		public Seeder(
 			ApplicationContext db,
 			IServiceProvider serviceProvider,
@@ -216,7 +214,7 @@ namespace Bunkering.Access
 		{
 			var _context = _serviceProvider.GetRequiredService<ApplicationContext>();
 			//var apptypes = new[] { "NOA", "COQ", "DebitNote" };
-			var apptypes = Enum.GetNames(typeof(AppTypes));
+			var apptypes = EnumExtension.GetNames<AppTypes>();
 			var appTypesDb = apptypes.Where(x => !_context.ApplicationTypes.Any(a => a.Name.Equals(x)));
 
             if (appTypesDb != null)
@@ -228,7 +226,23 @@ namespace Bunkering.Access
 			}
 		}
 
-		public async Task CreateVesselType()
+        public async Task CreateTankMeasurementTypes()
+        {
+            var _context = _serviceProvider.GetRequiredService<ApplicationContext>();
+            //var apptypes = new[] { "NOA", "COQ", "DebitNote" };
+            var mtypes = EnumExtension.GetNames<MeasureType>();
+            var mTypesDb = mtypes.Where(x => !_context.MeasurementTypes.Any(a => a.Name.Equals(x)));
+
+            if (mTypesDb != null)
+            {
+                foreach (var f in mTypesDb)
+                    _context.MeasurementTypes.Add(new MeasurementType { Name = f });
+
+                _context.SaveChanges();
+            }
+        }
+
+        public async Task CreateVesselType()
 		{
 			var _context = _serviceProvider.GetRequiredService<ApplicationContext>();
 			var vesselType = new[] { "Badge", "Vessel" };
@@ -253,6 +267,7 @@ namespace Bunkering.Access
 				_context.SaveChanges();
 			}
 		}
+
 		public async Task CreateLocations()
 		{
 			var _context = _serviceProvider.GetRequiredService<ApplicationContext>();
@@ -263,7 +278,6 @@ namespace Bunkering.Access
 					_context.Locations.Add(new Location { Name = l });
 				_context.SaveChanges();
 			}
-
 		}
 	}
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Bunkering.Core.Utils
 {
-	public class EnumExtension
+	public static class EnumExtension
 	{
 		public static List<EnumValue> GetValues<T>()
 		{

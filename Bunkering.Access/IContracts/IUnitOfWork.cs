@@ -35,9 +35,11 @@ namespace Bunkering.Access.IContracts
         IValidatiionResponse ValidatiionResponse { get; }
         IWorkflow Workflow { get; }
         IVesselType VesselType { get; }
-        public ICoQ CoQ { get; }
-        public ICOQHistory COQHistory { get; }
-        public ICOQCertificate COQCertificate { get; }
+        ICoQ CoQ { get; }
+        ICOQTank CoQTank { get; }
+        ICOQHistory COQHistory { get; }
+        ICOQCertificate COQCertificate { get; }
+        IMeasurementTypeRepository MeasurementType { get; }
         IvFacilityPermit vFacilityPermit { get; }
         IvAppPayment vAppPayment { get; }
         IvAppVessel vAppVessel { get; }
