@@ -86,8 +86,8 @@ namespace Bunkering.Access.Services
             var editProduct =  await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id == model.Id);
             if (editProduct != null)
             {
-                model.Name = editProduct.Name;
-                model.ProductType = model.ProductType;
+                editProduct.Name = model.Name;
+                editProduct.ProductType = model.ProductType;
 
                 await _unitOfWork.Product.Update(editProduct);
                  _unitOfWork.Save();
