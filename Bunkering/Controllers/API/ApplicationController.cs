@@ -176,7 +176,7 @@ namespace Bunkering.Controllers.API
         /// GET: api/application/add-dcouments/xxxx
         /// 
         /// </remarks>
-        /// <param name="id">The application id used to fetch documenst for the application type</param>
+        /// <param name="id">The application id used to fetch documents for the application type</param>
         /// <response code="200">Returns an object of fees </response>
         /// <response code="404">Returns not found </response>
         /// <response code="401">Unauthorized user </response>
