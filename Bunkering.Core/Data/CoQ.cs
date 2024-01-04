@@ -7,9 +7,13 @@ namespace Bunkering.Core.Data
         public int Id { get; set; }
         public int AppId { get; set; }  
         public int DepotId { get; set; }
+        public int PlantId { get; set; }
         public DateTime DateOfVesselArrival { get; set; }   
         public DateTime DateOfVesselUllage { get; set; }
         public DateTime DateOfSTAfterDischarge { get; set; }
+        public double QuauntityReflectedOnBill { get; set; }
+        public double ArrivalShipFigure { get; set; }
+        public double DischargeShipFigure { get; set; }
         public Decimal MT_VAC { get; set; }
         public Decimal MT_AIR { get; set; }
         public Decimal GOV { get; set; }    
