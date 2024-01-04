@@ -313,7 +313,7 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> GetDepotsList()
         {
-            var apiUrl = "https://depotonline.nmdpra.gov.ng/Application/DepotFacilityReports"
+            var apiUrl = "https://depotonline.nmdpra.gov.ng/Application/DepotFacilityReports";
             try
             {
                 HttpResponseMessage response = await _httpClient.GetAsync(apiUrl);
