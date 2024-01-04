@@ -15,6 +15,8 @@ namespace Bunkering.Access.DAL
         public ICountry Country { get; private set; }
         public IDepot Depot { get; private set; }
         public IApplicationDepot ApplicationDepot { get; private set; }
+        public IPlant Plant { get; private set; }
+        public IPlantTank PlantTank { get; private set; }
         public IFacility Facility { get; private set; }
         public IFacilityType FacilityType { get; private set; }
         public IFacilityTypeDocuments FacilityTypeDocuments { get; private set; }
