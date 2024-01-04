@@ -23,9 +23,10 @@ namespace Bunkering.Access.Services
         private readonly IElps _elps;
         private readonly AppSetting _setting;
         private readonly WorkFlowService _flow;
+        private readonly ApplicationContext _context;
 
 
-        public CoQService(IUnitOfWork unitOfWork, IHttpContextAccessor httpCxtAccessor, UserManager<ApplicationUser> userManager, IOptions<AppSetting> setting, IMapper mapper, IElps elps, WorkFlowService flow)
+        public CoQService(IUnitOfWork unitOfWork, IHttpContextAccessor httpCxtAccessor, UserManager<ApplicationUser> userManager, IOptions<AppSetting> setting, IMapper mapper, IElps elps, WorkFlowService flow, ApplicationContext context)
         {
             _unitOfWork = unitOfWork;
             _httpCxtAccessor = httpCxtAccessor;
@@ -37,6 +38,7 @@ namespace Bunkering.Access.Services
             _elps = elps;
             _setting = setting.Value;
             _flow = flow;
+            _context = context;
         }
 
         public async Task<ApiResponse> CreateCoQ(CreateCoQViewModel Model)
@@ -496,12 +498,27 @@ namespace Bunkering.Access.Services
             return _apiReponse;
         }
 
-        public async Task<ApiResponse> AddCoqTank(CoQGasTankDTO model)
+        public async Task<ApiResponse> AddCoqTank(CreateGasProductCoQDto model)
         {
             var user = await _userManager.FindByEmailAsync(LoginUserEmail);
+            using var transaction = _context.Database.BeginTransaction();
             try
             {
-                var data = _mapper.Map<TankMeasurement>(model);
+
+                //var data = _mapper.Map<TankMeasurement>(model);
+                var coq = new CoQ
+                {
+                    AppId = model.NoaAppId,
+                    PlantId = model.PlantId,
+                    DepotId = model.PlantId,
+                    DateOfSTAfterDischarge = model.DateOfSTAfterDischarge,
+                    DateOfVesselArrival = model.DateOfVesselArrival,
+                    DateOfVesselUllage = model.DateOfVesselUllage,
+                    DepotPrice = model.DepotPrice,
+                    
+
+                };
+
                 await _unitOfWork.CoQTank.Add(new COQTank
                 {
                     CoQId = model.CoQId,
