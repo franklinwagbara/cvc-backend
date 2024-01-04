@@ -29,6 +29,8 @@ namespace Bunkering.Access.IContracts
         IPermit Permit { get; }
         IProduct Product { get; }
         IRole Role { get; }
+        IPlant Plant { get; }
+        IPlantTank PlantTank { get; }
         IState State { get; }
         ISubmittedDocument SubmittedDocument { get; }
         ITank Tank { get; }

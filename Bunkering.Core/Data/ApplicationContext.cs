@@ -34,6 +34,8 @@ namespace Bunkering.Core.Data
         public DbSet<Message> Messages { get; set; }
         public DbSet<NominatedSurveyor> NominatedSurveyors { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<Plant> Plants { get; set; }
+        public DbSet<PlantTank> PlantTanks { get; set; }
         public DbSet<Permit> Permits { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<State> States { get; set; }
