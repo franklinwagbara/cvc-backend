@@ -249,7 +249,7 @@ namespace Bunkering.Access.Services
         public async Task<WorkFlow> GetWorkFlow(string action, ApplicationUser currentuser, int VesselTypeId)
         => action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Submit).ToLower()) || action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Resubmit))
             ? await _unitOfWork.Workflow.FirstOrDefaultAsync(x => x.Action.ToLower().Trim().Equals(action.ToLower().Trim())
-                    && currentuser.UserRoles.FirstOrDefault().Role.Name.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim()) && x.VesselTypeId == VesselTypeId)
+                    && currentuser.UserRoles.FirstOrDefault().Role.Name.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim()))
             : await _unitOfWork.Workflow.FirstOrDefaultAsync(x => x.Action.ToLower().Trim().Equals(action.ToLower().Trim())
                     && currentuser.UserRoles.FirstOrDefault().Role.Name.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim())
             && currentuser.LocationId == x.FromLocationId && x.VesselTypeId == VesselTypeId);
