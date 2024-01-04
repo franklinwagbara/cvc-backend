@@ -527,16 +527,16 @@ namespace Bunkering.Access.DAL
 							beneficiaryAccount = _appSetting.NMDPRAAccount,
 							beneficiaryAmount = $"{(double)amountdue + ((double)serviceCharge * 0.5)}",
 							deductFeeFrom = "0"
+						},
+						new RPartner
+						{
+							lineItemsId = "2",
+							beneficiaryName = _appSetting.BOBName,
+							bankCode = _appSetting.BOBankCode,
+							beneficiaryAccount = _appSetting.BOAccount,
+							beneficiaryAmount = $"{(double)serviceCharge * 0.5}",
+							deductFeeFrom = "1"
 						}
-						//new RPartner
-						//{
-						//	lineItemsId = "2",
-						//	beneficiaryName = _appSetting.BOBName,
-						//	bankCode = _appSetting.BOBankCode,
-						//	beneficiaryAccount = _appSetting.BOAccount,
-						//	beneficiaryAmount = $"{(double)serviceCharge * 0.5}",
-						//	deductFeeFrom = "1"
-						//}
 					},
 					customFields = new List<CustomField>
 					{
@@ -569,7 +569,7 @@ namespace Bunkering.Access.DAL
 					applicationItems = new List<ApplicationItem>
 					{
 						new ApplicationItem { Group = DefaultValues.AppName, Name = application.Facility.Name, Description = $"{application.Facility.Name} Facility payment" },
-						new ApplicationItem { Group = "Facility Details", Name = $"{application.Facility.Name}-{application.Facility.ElpsId}", Description = application.Facility.VesselType.Name },
+						new ApplicationItem { Group = "Vessel Details", Name = $"{application.Facility.Name}-{application.Facility.ElpsId}", Description = application.Facility.VesselType.Name },
 						new ApplicationItem { Group = "Payment", Name = "Payment Description: ", Description = application.Payments.FirstOrDefault().Description }
 					}
 				};
@@ -586,7 +586,92 @@ namespace Bunkering.Access.DAL
 			return null;
 		}
 
-		public async Task<Payment> GenerateExtraPaymentReference(string baseUrl, Application application, Payment payment, decimal totalAmount, decimal serviceCharge)
+        public async Task<RemitaResponse> GenerateDebitNotePaymentReference(string baseUrl, double totalAmount, string companyName, string companyEmail, string appRef, string depotName, int compElpsId, string paymentType, string paymentDescription)
+        {
+            try
+            {
+                var remitaObject = new
+                {
+                    serviceTypeId = _appSetting.ServiceTypeId,
+                    categoryName = DefaultValues.AppName,
+                    totalAmount = totalAmount.ToString("N2"),
+                    payerName = TruncateText(companyName, 25),
+                    payerEmail = companyEmail,
+                    serviceCharge = Decimal.ToInt32(0).ToString(),
+                    amountDue = Decimal.ToInt32(0).ToString(),
+                    orderId = appRef,
+                    returnSuccessUrl = $"{baseUrl}/api/Payment/UpdateDebitNote?orderId={appRef}",
+                    returnFailureUrl = $"{baseUrl}/api/Payment/UpdateDebitNote?orderId= {appRef}",
+                    returnBankPaymentUrl = $"{baseUrl}/api/Payment/UpdateDebitNote?orderId= {appRef}",
+                    lineItems = new List<RPartner>
+                    {
+                        new RPartner
+                        {
+                            lineItemsId = "1",
+                            beneficiaryName = _appSetting.NMDPRABName,
+                            bankCode = _appSetting.NMDPRABankCode,
+                            beneficiaryAccount = _appSetting.NMDPRAAccount,
+                            beneficiaryAmount = (totalAmount * 0.5).ToString("N2"),
+                            deductFeeFrom = "0"
+                        },
+                        new RPartner
+                        {
+                            lineItemsId = "2",
+                            beneficiaryName = _appSetting.MDGIFBName,
+                            bankCode = _appSetting.MDGIFBankCode,
+                            beneficiaryAccount = _appSetting.MDGIFAccount,
+                            beneficiaryAmount = (totalAmount * 0.5).ToString("N2"),
+                            deductFeeFrom = "0"
+                        }
+                    },
+                    customFields = new List<CustomField>
+                    {
+						//new CustomField
+						//{
+						//	Name = "STATE",
+						//	Value = $"{application.Facility.LGA.State.Name} State",
+						//	Type = "All"
+						//},
+						new CustomField
+                        {
+                            Name = "COMPANY BRANCH",
+                            Value = depotName,
+                            Type = "All"
+                        },
+						new CustomField
+						{
+							Name = paymentType,
+							Value = paymentDescription,
+							Type = "All"
+						},
+                        //new
+                        //{
+                        //    name = "Field/Zonal Office",
+                        //    value = /*(from s in _context.States join f in _context.FieldLocations on s.FieldLocationId equals f.Id where s.Code.Equals(application.Facility.StateCode) select f.Description).FirstOrDefault()*/"",
+                        //    type = "ALL"
+                        //}
+                    },
+                    documentTypes = (string)null,
+                    applicationItems = new List<ApplicationItem>
+                    {
+                        new ApplicationItem { Group = paymentType, Name = depotName, Description = $"Debit Note payment for {depotName}" },
+                        //new ApplicationItem { Group = "Payment", Name = "Payment Description: ", Description = application.Payments.FirstOrDefault().Description }
+                    }
+                };
+
+                var result = CallElps($"/api/Payments/{compElpsId}/", HttpMethod.Post,
+                    remitaObject);
+                if (result != null)
+                    return result.Parse<RemitaResponse>();
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        public async Task<Payment> GenerateExtraPaymentReference(string baseUrl, Application application, Payment payment, decimal totalAmount, decimal serviceCharge)
 		{
 			//try
 			//{

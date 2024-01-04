@@ -158,7 +158,7 @@ namespace Bunkering.Access.Services
 			else
 				_response = new ApiResponse
 				{
-					Message = "An error occured, please contact Support/ICT.",
+					Message = "An error occurred, please contact Support/ICT.",
 					StatusCode = HttpStatusCode.InternalServerError,
 					Success = false,
 				};
@@ -171,6 +171,8 @@ namespace Bunkering.Access.Services
 			if (!string.IsNullOrEmpty(id))
 			{
 				var user = await _user.Users.Include(c => c.Company)
+					.Include(c => c.Office)
+					.Include(c => c.Location)
 					.Include(ur => ur.UserRoles).ThenInclude(r => r.Role)
 					.FirstOrDefaultAsync(x => x.Id.Equals(id));
 				if (user != null)
@@ -183,14 +185,17 @@ namespace Bunkering.Access.Services
 						Data = new
 						{
 							UserId = user.Email,
+							UserUuid = user.Id,
 							user.ElpsId,
-							FirstName = !user.UserRoles.FirstOrDefault().Role.Name.Equals("Company") ? user.FirstName : user.Company.Name,
+							FirstName = user.UserRoles.FirstOrDefault()?.Role?.Name?.Equals("Company") is not true ? user.FirstName : user.Company.Name,
 							user.LastName,
-							UserRoles = user.UserRoles.FirstOrDefault(x => !x.Role.Name.Equals("Staff"))?.Role.Name,
+							UserRoles = user.UserRoles.FirstOrDefault(x => x.Role?.Name?.Equals("Staff") is false)?.Role?.Name,
 							user.CreatedOn,
 							user.LastLogin,
 							user.ProfileComplete,
 							Status = user.IsActive,
+							Location = user.Location?.Name,
+							Office = user.Office?.Name,
 							Token = GenerateToken(user)
 						},
 					};
@@ -208,6 +213,19 @@ namespace Bunkering.Access.Services
 		{
 			var tokenHandler = new JwtSecurityTokenHandler();
 			var tokenKey = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]);
+			var claims = new List<Claim>();
+			if (user.Office != null)
+			{
+				claims.Add(new Claim("office", user.Office.Name));
+			}
+			if (user.Location != null)
+			{
+				claims.Add(new Claim("location", user.Location.Name));
+			}
+			if (user.Company != null)
+			{
+				claims.Add(new Claim("company", user.Company.Name));
+			}
 			var tokenDescriptor = new SecurityTokenDescriptor
 			{
 				Subject = new ClaimsIdentity(new Claim[]
@@ -219,6 +237,7 @@ namespace Bunkering.Access.Services
 				Expires = DateTime.UtcNow.AddDays(1),
 				SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature)
 			};
+			tokenDescriptor.Subject.AddClaims(claims);
 			var token = tokenHandler.CreateToken(tokenDescriptor);
 			return tokenHandler.WriteToken(token);
 		}

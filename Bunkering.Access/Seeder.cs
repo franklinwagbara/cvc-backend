@@ -215,10 +215,13 @@ namespace Bunkering.Access
 		public async Task CreateAppTypes()
 		{
 			var _context = _serviceProvider.GetRequiredService<ApplicationContext>();
-			var apptypes = new[] { "New", "Renewal" };
-			if (!_context.ApplicationTypes.Any())
+			//var apptypes = new[] { "NOA", "COQ", "DebitNote" };
+			var apptypes = Enum.GetNames(typeof(AppTypes));
+			var appTypesDb = apptypes.Where(x => !_context.ApplicationTypes.Any(a => a.Name.Equals(x)));
+
+            if (appTypesDb != null)
 			{
-				foreach (var f in apptypes)
+				foreach (var f in appTypesDb)
 					_context.ApplicationTypes.Add(new ApplicationType { Name = f });
 
 				_context.SaveChanges();

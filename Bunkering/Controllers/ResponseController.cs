@@ -8,7 +8,7 @@ namespace Bunkering.Controllers
 	{
 		protected new IActionResult Response(ApiResponse response)
 		{
-			if (response.StatusCode == HttpStatusCode.OK)
+			if (response?.StatusCode == HttpStatusCode.OK)
 				return Ok(response);
 
 			if (response.StatusCode == HttpStatusCode.BadRequest)

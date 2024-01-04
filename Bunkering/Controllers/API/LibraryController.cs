@@ -17,14 +17,20 @@ namespace Bunkering.Controllers.API
     public class LibraryController : ResponseController
     {
         private readonly LibraryService libraryService;
+        private readonly JettyService _jettyService;
+        private readonly DepotService _depotservice;
+        private readonly NominatedSurveyorService _nominatedSurveyorService;
         private readonly AppStageDocService _appStageDocService;
 
 
-        public LibraryController(LibraryService libraryService_, AppStageDocService appStageDocService)
+        public LibraryController(LibraryService libraryService_, AppStageDocService appStageDocService, JettyService jettyService, DepotService depotService, NominatedSurveyorService nominatedSurveyorService)
         {
             this.libraryService = libraryService_;
 
             _appStageDocService = appStageDocService;
+            _jettyService = jettyService;
+            _depotservice = depotService;
+            _nominatedSurveyorService = nominatedSurveyorService;
 
         }
 
@@ -420,5 +426,102 @@ namespace Bunkering.Controllers.API
         [HttpGet]
 
         public async Task<IActionResult> AllOffices() => Response(await libraryService.AllOffices());
+
+
+        /// <summary>
+        /// This endpoint is used to get all Jetty
+        /// </summary>
+        /// <returns>Returns a success message</returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// GET: api/location/AllJetty
+        /// 
+        /// </remarks>
+        /// <response code="200">Returns a success message </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("All-Jetty")]
+        [HttpGet]
+
+        public async Task<IActionResult> AllJetty() => Response(await _jettyService.AllJetty());
+
+
+
+        /// <summary>
+        /// This endpoint is used to get all Depot
+        /// </summary>
+        /// <returns>Returns a success message</returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// GET: api/location/AllDepot
+        /// 
+        /// </remarks>
+        /// <response code="200">Returns a success message </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("All-Depot")]
+        [HttpGet]
+
+        public async Task<IActionResult> AllDepot() => Response(await _depotservice.GetAllDepot());
+
+        /// <summary>
+        /// This endpoint is used to get all Depot by noa id
+        /// </summary>
+        /// <returns>Returns a success message</returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// GET: api/location/AllDepot-by-AppId
+        /// 
+        /// </remarks>
+        /// <response code="200">Returns a success message </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("All-Depot-By-AppId")]
+        [HttpGet]
+
+        public async Task<IActionResult> AllDepotByAppId(int AppId) => Response(await _depotservice.AllDepotByAppId(AppId));
+
+
+
+        /// <summary>
+        /// This endpoint is used to get all Nominated Surveyor
+        /// </summary>
+        /// <returns>Returns a success message</returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// GET: api/location/AllNominatedSurveyor
+        /// 
+        /// </remarks>
+        /// <response code="200">Returns a success message </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("All-NominatedSurveyor")]
+        [HttpGet]
+
+        public async Task<IActionResult> AllNominatedSurveyor() => Response(await _nominatedSurveyorService.AllNominatedSurveyor());
     }
 }

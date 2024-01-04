@@ -74,6 +74,30 @@ namespace Bunkering.Controllers.API
         public async Task<IActionResult> AddTanks(int id) => Response(await _appService.GetTanksByAppId(id));
 
         /// <summary>
+        /// This endpoint returns a model of depots for the application using the application id
+        /// </summary>
+        /// <returns>Returns a model of depots which can be mepty</returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// GET: api/application/get-depots/1
+        /// 
+        /// </remarks>
+        /// <param name="id">NOA application Id</param>
+        /// <response code="200">Returns a list of depots </response>
+        /// <response code="404">Returns not found depots </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Produces("application/json")]
+        [Route("get-depots-by-appid")]
+        [HttpGet]
+        public async Task<IActionResult> GetDepots(int id) => Response(await _appService.GetDepotsByAppId(id));
+
+        /// <summary>
         /// This endpoint returns a model of tanks for the application using the application id
         /// </summary>
         /// <returns>Returns a model of tanks which can be mepty</returns>
@@ -152,7 +176,7 @@ namespace Bunkering.Controllers.API
         /// GET: api/application/add-dcouments/xxxx
         /// 
         /// </remarks>
-        /// <param name="id">The application id used to fetch documenst for the application type</param>
+        /// <param name="id">The application id used to fetch documents for the application type</param>
         /// <response code="200">Returns an object of fees </response>
         /// <response code="404">Returns not found </response>
         /// <response code="401">Unauthorized user </response>
@@ -302,6 +326,43 @@ namespace Bunkering.Controllers.API
         [HttpPost]
         public async Task<IActionResult> Process(int id, string act, string comment) => Response(await _appService.Process(id, act, comment));
 
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("view-application-By-Depot")]
+        [HttpGet]
+        public async Task<IActionResult> ViewApplicationByDepotID(int id) => Response(await _appService.AllApplicationsByDepot(id));
+
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("view-application-By-Depot-Officer")]
+        [HttpGet]
+        public async Task<IActionResult> ViewApplicationByDepotOfficer() => Response(await _appService.AllApplicationsInDepotByUserID());
+
+        /// <summary>
+        /// This endpoint is used to fetch details of an NOA Vessel
+        /// </summary>
+        /// <returns>Returns an application info</returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// GET: api/application/get-app-vessel-info
+        /// 
+        /// </remarks>
+        /// <response code="200">Returns an application / vessel info </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("get-app-vessel-info")]
+        [HttpGet]
+        public async Task<IActionResult> GetAppVesselInfo(int Id, int DepotId) => Response(await _appService.GetAppVesselInfo(Id, DepotId));
 
 
     }

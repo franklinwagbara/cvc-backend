@@ -21,15 +21,16 @@ namespace Bunkering.Core.Data
         public DateTime CreatedDate { get; set; }
         public DateTime? SubmittedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public DateTime? ETA {  get; set; }
         public string Status { get; set; }
         public bool IsDeleted { get; set; }
         public int? FlowId { get; set; }
-
+        public int? SurveyorId { get; set; }
         public string VesselName { get; set; }
+        public string? MotherVessel { get; set; }
+        public string? Jetty { get; set; }
         public string IMONumber { get; set; }
         public string LoadingPort { get; set; }
-        public string DischargePort { get; set; }
-
         public string MarketerName { get; set; }
 
         [ForeignKey("UserId")]
