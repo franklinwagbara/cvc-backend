@@ -11,9 +11,14 @@ namespace Bunkering.Core.ViewModels
     {
         [Required]
         public int CoQId { get; set; }
-        public int MeasurementTypeId { get; set; }
         [Required]
-        public string TankName { get; set; }
+        public int TankId { get; set; }
+        public List<TankMeasurementDTO> Measurement { get; set; }
+
+    }
+    public class TankMeasurementDTO
+    {
+        public int MeasurementTypeId { get; set; }
         [Required]
         public double DIP { get; set; }
         [Required]
@@ -31,7 +36,7 @@ namespace Bunkering.Core.ViewModels
         public double Density { get; set; }
         [Required]
         public double VCF { get; set; }
-        private double GSV  => VCF * GOV;
+        private double GSV => VCF * GOV;
         private double MTVAC => Density * GOV;
     }
 }

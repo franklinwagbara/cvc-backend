@@ -448,28 +448,41 @@ namespace Bunkering.Access.Services
             }
         }
 
-        public async Task<ApiResponse> AddCoqTank(COQCrudeTankDTO model) 
+        public async Task<ApiResponse> AddCoqTank(COQCrudeTankDTO model)
         {
             var user = await _userManager.FindByEmailAsync(LoginUserEmail);
             try
             {
-                var tank = await _unitOfWork.CoQTank.FirstOrDefaultAsync(x => x.CoQId == model.CoQId && x.TankName.ToLower().Equals(model.TankName.ToLower()) && x.TankMeasurement.Any(m => m.MeasurementTypeId.Equals(model.MeasurementTypeId)));
+                var tank = await _unitOfWork.CoQTank.FirstOrDefaultAsync(x => x.CoQId == model.CoQId && x.TankId.Equals(model.TankId));
                 if(tank == null)
                 {
-                    var data = _mapper.Map<TankMeasurement>(model);
-                    await _unitOfWork.CoQTank.Add(new COQTank
-                    {
-                        CoQId = model.CoQId,
-                        TankName = model.TankName,
-                        TankMeasurement = new List<TankMeasurement> { data }
-                    });
+                    var data = _mapper.Map<COQTank>(model);
+                    await _unitOfWork.CoQTank.Add(data);
                     await _unitOfWork.SaveChangesAsync(user.Id);
 
+                    _apiReponse = new ApiResponse
+                    {
+                        Message = "COQ Tank added successfully",
+                        StatusCode = HttpStatusCode.OK,
+                        Success = true,
+                    };
                 }
+                else
+                    _apiReponse = new ApiResponse
+                    {
+                        Message = "COQ Tank already exists",
+                        StatusCode = HttpStatusCode.OK,
+                        Success = true,
+                    };
             }
             catch (Exception ex)
             {
-
+                _apiReponse = new ApiResponse
+                {
+                    Message = $"An error occured {ex.Message}",
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Success = false,
+                };
             }
             return _apiReponse;
         }
