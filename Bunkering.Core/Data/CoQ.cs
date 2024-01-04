@@ -11,14 +11,16 @@ namespace Bunkering.Core.Data
         public DateTime DateOfVesselArrival { get; set; }   
         public DateTime DateOfVesselUllage { get; set; }
         public DateTime DateOfSTAfterDischarge { get; set; }
-        public double QuauntityReflectedOnBill { get; set; }
-        public double ArrivalShipFigure { get; set; }
-        public double DischargeShipFigure { get; set; }
-        public Decimal MT_VAC { get; set; }
-        public Decimal MT_AIR { get; set; }
-        public Decimal GOV { get; set; }    
-        public Decimal GSV { get; set; }
-        public Decimal DepotPrice { get; set; }
+        public double QuauntityReflectedOnBill { get; set; } = 0;
+        public double ArrivalShipFigure { get; set; } = 0;
+        public double DischargeShipFigure { get; set; } = 0;
+        public double DifferenceBtwShipAndShoreFigure { get; set; } = 0;
+        public double PercentageDifference { get; set; } = 0;
+        public double MT_VAC { get; set; } = 0;
+        public double MT_AIR { get; set; } = 0;
+        public double GOV { get; set; } = 0;
+        public double GSV { get; set; } = 0;
+        public double DepotPrice { get; set; } = 0;
         public DateTime DateCreated { get; set; } = DateTime.Now;
         public DateTime? DateModified { get; set; }
         public DateTime? SubmittedDate { get; set; }

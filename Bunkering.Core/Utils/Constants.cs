@@ -26,4 +26,10 @@
     {
         public const string AppName = "NOA & Vessel Clearance";
     }
+
+    public static class ReadingType
+    {
+        public const string Before = "Before";
+        public const string After = "After";
+    }
 }
