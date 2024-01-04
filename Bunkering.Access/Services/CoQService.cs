@@ -519,12 +519,12 @@ namespace Bunkering.Access.Services
 
                 };
 
-                await _unitOfWork.CoQTank.Add(new COQTank
-                {
-                    CoQId = model.CoQId,
-                    TankName = model.TankName,
-                    TankMeasurement = new List<TankMeasurement> { data }
-                });
+                //await _unitOfWork.CoQTank.Add(new COQTank
+                //{
+                //    CoQId = model.CoQId,
+                //    TankName = model.TankName,
+                //    TankMeasurement = new List<TankMeasurement> { data }
+                //});
                 await _unitOfWork.SaveChangesAsync(user.Id);
             }
             catch (Exception ex)
