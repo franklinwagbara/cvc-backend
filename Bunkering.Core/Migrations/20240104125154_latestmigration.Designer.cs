@@ -4,6 +4,7 @@ using Bunkering.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bunkering.Core.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20240104125154_latestmigration")]
+    partial class latestmigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -91,6 +94,10 @@ namespace Bunkering.Core.Migrations
 
                     b.Property<int?>("FlowId")
                         .HasColumnType("int");
+
+                    b.Property<string>("IMONumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -616,8 +623,9 @@ namespace Bunkering.Core.Migrations
                     b.Property<int>("CoQId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TankId")
-                        .HasColumnType("int");
+                    b.Property<string>("TankName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -634,9 +642,6 @@ namespace Bunkering.Core.Migrations
 
                     b.Property<int>("AppId")
                         .HasColumnType("int");
-
-                    b.Property<double>("ArrivalShipFigure")
-                        .HasColumnType("float");
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
@@ -663,41 +668,26 @@ namespace Bunkering.Core.Migrations
                     b.Property<int>("DepotId")
                         .HasColumnType("int");
 
-                    b.Property<double>("DepotPrice")
-                        .HasColumnType("float");
-
-                    b.Property<double>("DifferenceBtwShipAndShoreFigure")
-                        .HasColumnType("float");
-
-                    b.Property<double>("DischargeShipFigure")
-                        .HasColumnType("float");
+                    b.Property<decimal>("DepotPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<bool?>("FADApproved")
                         .HasColumnType("bit");
 
-                    b.Property<double>("GOV")
-                        .HasColumnType("float");
+                    b.Property<decimal>("GOV")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<double>("GSV")
-                        .HasColumnType("float");
+                    b.Property<decimal>("GSV")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<double>("MT_AIR")
-                        .HasColumnType("float");
+                    b.Property<decimal>("MT_AIR")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<double>("MT_VAC")
-                        .HasColumnType("float");
-
-                    b.Property<double>("PercentageDifference")
-                        .HasColumnType("float");
-
-                    b.Property<int>("PlantId")
-                        .HasColumnType("int");
-
-                    b.Property<double>("QuauntityReflectedOnBill")
-                        .HasColumnType("float");
+                    b.Property<decimal>("MT_VAC")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
@@ -1375,83 +1365,6 @@ namespace Bunkering.Core.Migrations
                     b.ToTable("Permits");
                 });
 
-            modelBuilder.Entity("Bunkering.Core.Data.Plant", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Company")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("CompanyElpsId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("ElpsPlantId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PlantType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("State")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Plants");
-                });
-
-            modelBuilder.Entity("Bunkering.Core.Data.PlantTank", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Capacity")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("PlantId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Position")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Product")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TankName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PlantId");
-
-                    b.ToTable("PlantTanks");
-                });
-
             modelBuilder.Entity("Bunkering.Core.Data.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -1527,6 +1440,9 @@ namespace Bunkering.Core.Migrations
                     b.Property<int>("FileId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsFAD")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationId");
@@ -1575,6 +1491,15 @@ namespace Bunkering.Core.Migrations
                     b.Property<int>("COQTankId")
                         .HasColumnType("int");
 
+                    b.Property<double>("CorrectedLiquidVolume")
+                        .HasColumnType("float");
+
+                    b.Property<double>("CorrectedLiquidVolumeM3")
+                        .HasColumnType("float");
+
+                    b.Property<double>("CorrectedVapourVolume")
+                        .HasColumnType("float");
+
                     b.Property<double>("DIP")
                         .HasColumnType("float");
 
@@ -1590,15 +1515,20 @@ namespace Bunkering.Core.Migrations
                     b.Property<double>("GSV")
                         .HasColumnType("float");
 
-                    b.Property<double>("LiquidDensityVac")
+                    b.Property<double>("LiquidDensityAir")
+                        .HasColumnType("float");
+
+                    b.Property<double>("LiquidWeightAir")
+                        .HasColumnType("float");
+
+                    b.Property<double>("LiquidWeightVAC")
                         .HasColumnType("float");
 
                     b.Property<double>("MTVAC")
                         .HasColumnType("float");
 
-                    b.Property<string>("MeasurementType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("MeasurementTypeId")
+                        .HasColumnType("int");
 
                     b.Property<double>("MolecularWeight")
                         .HasColumnType("float");
@@ -1627,6 +1557,12 @@ namespace Bunkering.Core.Migrations
                     b.Property<decimal>("Tempearture")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<double>("TotalGasWeightAir")
+                        .HasColumnType("float");
+
+                    b.Property<double>("TotalGasWeightVAC")
+                        .HasColumnType("float");
+
                     b.Property<double>("VCF")
                         .HasColumnType("float");
 
@@ -1637,6 +1573,15 @@ namespace Bunkering.Core.Migrations
                         .HasColumnType("float");
 
                     b.Property<double>("VapourTemperature")
+                        .HasColumnType("float");
+
+                    b.Property<double>("VapourVolume")
+                        .HasColumnType("float");
+
+                    b.Property<double>("VapourWeightAir")
+                        .HasColumnType("float");
+
+                    b.Property<double>("VapourWeightVAC")
                         .HasColumnType("float");
 
                     b.Property<double>("WaterDIP")
@@ -2464,15 +2409,6 @@ namespace Bunkering.Core.Migrations
                     b.Navigation("Application");
                 });
 
-            modelBuilder.Entity("Bunkering.Core.Data.PlantTank", b =>
-                {
-                    b.HasOne("Bunkering.Core.Data.Plant", null)
-                        .WithMany("Tanks")
-                        .HasForeignKey("PlantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Bunkering.Core.Data.State", b =>
                 {
                     b.HasOne("Bunkering.Core.Data.Country", "Country")
@@ -2596,11 +2532,6 @@ namespace Bunkering.Core.Migrations
                 {
                     b.Navigation("FacilitySources");
 
-                    b.Navigation("Tanks");
-                });
-
-            modelBuilder.Entity("Bunkering.Core.Data.Plant", b =>
-                {
                     b.Navigation("Tanks");
                 });
 

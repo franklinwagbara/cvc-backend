@@ -15,19 +15,20 @@
     [IsDeleted]         BIT            NOT NULL,
     [FlowId]            INT            NULL,
     [VesselName]        NVARCHAR (MAX) NOT NULL,
-    [IMONumber]         NVARCHAR (MAX) NOT NULL,
     [LoadingPort]       NVARCHAR (MAX) NOT NULL,
     [MarketerName]      NVARCHAR (MAX) NOT NULL,
     [ETA]               DATETIME2 (7)  NULL,
-    [MotherVessel] NVARCHAR(MAX) NULL, 
-    [Jetty] NVARCHAR(MAX) NULL, 
-    [SurveyorId] INT NULL DEFAULT 0, 
+    [MotherVessel]      NVARCHAR (MAX) NULL,
+    [Jetty]             NVARCHAR (MAX) NULL,
+    [SurveyorId]        INT            DEFAULT ((0)) NULL,
     CONSTRAINT [PK_Applications] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_Applications_ApplicationTypes_ApplicationTypeId] FOREIGN KEY ([ApplicationTypeId]) REFERENCES [dbo].[ApplicationTypes] ([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_Applications_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [dbo].[AspNetUsers] ([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_Applications_Facilities_FacilityId] FOREIGN KEY ([FacilityId]) REFERENCES [dbo].[Facilities] ([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_Applications_WorkFlows_FlowId] FOREIGN KEY ([FlowId]) REFERENCES [dbo].[WorkFlows] ([Id])
 );
+
+
 
 
 
