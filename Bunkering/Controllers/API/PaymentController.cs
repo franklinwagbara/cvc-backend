@@ -135,6 +135,51 @@ namespace Bunkering.Controllers.API
         }
 
 
+        /// <summary>
+        /// This endpoint is used to fetch all Debit notes for a NOA/CVC application
+        /// </summary>
+        /// <returns>Returns a list of Debit notes for an application</returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// GET: api/application/get-debit-botes-by-appid
+        /// 
+        /// </remarks>
+        /// <response code="200">Returns a list of Debit notes for an application </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("get-debit-botes-by-appid")]
+        [HttpGet]
+        public async Task<IActionResult> GetDebitNotes(int Id) => Response(await _payment.GetDebitNotesByAppId(Id));
+
+        /// <summary>
+        /// This endpoint is used to fetch all pending payments for a NOA/CVC application
+        /// </summary>
+        /// <returns>Returns a list of pending payments for an application</returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// GET: api/application/get-pending-payments-by-appid
+        /// 
+        /// </remarks>
+        /// <response code="200">Returns a list of pending payments for an application </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("get-pending-payments-by-appid")]
+        [HttpGet]
+        public async Task<IActionResult> GetPendingPaymentsByAppId(int Id) => Response(await _payment.GetPendingPaymentsByAppId(Id));
+
+
         [AllowAnonymous]
         [ProducesResponseType(typeof(ApiResponse), 200)]
         [ProducesResponseType(typeof(ApiResponse), 404)]
@@ -158,8 +203,6 @@ namespace Bunkering.Controllers.API
 
         public async Task<IActionResult> GetAllPayments() => Response(await _payment.GetAllPayments());
 
-
-
         [AllowAnonymous]
         [ProducesResponseType(typeof(ApiResponse), 200)]
         [ProducesResponseType(typeof(ApiResponse), 404)]
@@ -168,7 +211,6 @@ namespace Bunkering.Controllers.API
         [Produces("application/json")]
         [HttpGet]
         [Route("PaymentById")]
-
         public async Task<IActionResult> GetPaymentsById(int id) => Response(await _payment.GetPaymentById(id));
 
     }

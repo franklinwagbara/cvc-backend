@@ -143,6 +143,16 @@ namespace Bunkering.Controllers.API
 		[ProducesResponseType(typeof(ApiResponse), 405)]
 		[ProducesResponseType(typeof(ApiResponse), 500)]
 		[Produces("application/json")]
+		[Route("coq_by_appId/{appId}")]
+		[HttpGet]
+		public async Task<IActionResult> GetCoqs(int appId) => Response(await _coqService.GetCoQsByAppId(appId));
+
+        [AllowAnonymous]
+		[ProducesResponseType(typeof(ApiResponse), 200)]
+		[ProducesResponseType(typeof(ApiResponse), 404)]
+		[ProducesResponseType(typeof(ApiResponse), 405)]
+		[ProducesResponseType(typeof(ApiResponse), 500)]
+		[Produces("application/json")]
 		[Route("view_license")]
 		[HttpGet]
 		public async Task<IActionResult> ViewLicense(int id)

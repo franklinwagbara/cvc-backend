@@ -185,6 +185,7 @@ namespace Bunkering.Access.Services
 						Data = new
 						{
 							UserId = user.Email,
+							UserUuid = user.Id,
 							user.ElpsId,
 							FirstName = user.UserRoles.FirstOrDefault()?.Role?.Name?.Equals("Company") is not true ? user.FirstName : user.Company.Name,
 							user.LastName,

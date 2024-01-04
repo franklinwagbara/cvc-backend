@@ -590,7 +590,7 @@ namespace Bunkering.Access.Services
                             Success = false
                         };
                     }
-                    var factypedocs = await _unitOfWork.FacilityTypeDocuments.Find(x => x.ApplicationTypeId.Equals(app.ApplicationTypeId) && x.VesselTypeId.Equals(app.Facility.VesselTypeId));
+                    var factypedocs = await _unitOfWork.FacilityTypeDocuments.Find(x => x.ApplicationTypeId.Equals(app.ApplicationTypeId));
                     if (factypedocs != null && factypedocs.Count() > 0)
                     {
                         var compdocs = _elps.GetCompanyDocuments(app.User.ElpsId, "company").Stringify().Parse<List<Document>>();
@@ -1431,52 +1431,6 @@ namespace Bunkering.Access.Services
                 };
             }
         }
-        
-        public async Task<ApiResponse> GetDebitNotesByAppId(int id)
-        {
-            try
-            {
-                var debitnoteId = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));
-                var debitnotes = await _unitOfWork.vDebitNote.Find(x => x.ApplicationId.Equals(id) && x.ApplicationTypeId.Equals(debitnoteId.Id));
 
-                if (debitnotes == null)
-                    throw new Exception("Debit note does not exist for this application!");
-
-                //var depot = await _unitOfWork.Depot.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.Id));  
-                //var product = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.ProductId));
-
-                return new ApiResponse
-                {
-                    Data = debitnotes.Select(x => new
-                    {
-                        x.Id,
-                        x.COQId,
-                        x.OrderId,
-                        x.TransactionDate,
-                        x.Status,
-                        x.DepotName,
-                        x.Description,
-                        x.PaymentDate,
-                        x.RRR,
-                        x.Amount,
-                        x.ServiceCharge,
-                        x.Arrears
-                    }),
-                    Message = "Successfull.",
-                    StatusCode = HttpStatusCode.OK,
-                    Success = false
-                };
-            }
-            catch (Exception e)
-            {
-                return new ApiResponse
-                {
-                    Message = $"{e.Message} +++ {e.StackTrace} ~~~ {e.InnerException?.ToString()}",
-                    StatusCode = HttpStatusCode.InternalServerError,
-                    Success = false,
-                };
-            }
-        }
-        
     }
 }
