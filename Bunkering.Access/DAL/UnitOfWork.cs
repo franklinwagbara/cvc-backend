@@ -36,17 +36,16 @@ namespace Bunkering.Access.DAL
         public IWorkflow Workflow { get; private set; }
         public IVesselType VesselType { get; set; }
         public ICoQ CoQ { get; set; }
+        public ICOQTank CoQTank { get; set; }
         public ICOQHistory COQHistory { get; set; }
         public ICOQCertificate COQCertificate { get; set; }
-
-
+        public IMeasurementTypeRepository MeasurementType { get; private set; }
         public IvAppVessel vAppVessel { get; private set; }
         public IvAppPayment vAppPayment { get; private set; }
         public IvAppUser vAppUser { get; private set; }
         public IvFacilityPermit vFacilityPermit { get; private set; }
         public IvPayment vPayment { get; private set; }
         public IvDebitNote vDebitNote { get; private set; }
-
         public IApplicationSurveyor ApplicationSurveyor { get; private set; }
 
         public UnitOfWork(ApplicationContext context)
@@ -81,9 +80,10 @@ namespace Bunkering.Access.DAL
             Workflow = Workflow != null ? Workflow : new WorkflowRepository(_context);
             VesselType = VesselType != null ? VesselType : new VeseelTypeRepository(_context);
             CoQ = CoQ != null ? CoQ : new CoQRepository(_context);
+            CoQTank = CoQTank != null ? CoQTank : new COQTankRepository(_context);
             COQHistory = COQHistory != null? COQHistory: new COQHistoryRepository(_context);
             COQCertificate = COQCertificate != null? COQCertificate: new COQCertificateRepository(_context);
-
+             MeasurementType = MeasurementType != null? MeasurementType : new MeasurementTypeRepository(_context);
             vAppVessel = vAppVessel != null ? vAppVessel : new vAppVesselRepository(_context);
             vFacilityPermit = vFacilityPermit != null ? vFacilityPermit : new vFacilityPermitRepository(_context);
             vAppPayment = vAppPayment != null ? vAppPayment : new vAppPaymentRepository(_context);
