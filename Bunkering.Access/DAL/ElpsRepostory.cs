@@ -613,7 +613,7 @@ namespace Bunkering.Access.DAL
                             beneficiaryName = _appSetting.NMDPRABName,
                             bankCode = _appSetting.NMDPRABankCode,
                             beneficiaryAccount = _appSetting.NMDPRAAccount,
-                            beneficiaryAmount = (totalAmount * 0.5).ToString("N2"),
+                            beneficiaryAmount = (totalAmount * 0.05).ToString("N2"),
                             deductFeeFrom = "0"
                         },
                         new RPartner
@@ -622,7 +622,7 @@ namespace Bunkering.Access.DAL
                             beneficiaryName = _appSetting.MDGIFBName,
                             bankCode = _appSetting.MDGIFBankCode,
                             beneficiaryAccount = _appSetting.MDGIFAccount,
-                            beneficiaryAmount = (totalAmount * 0.5).ToString("N2"),
+                            beneficiaryAmount = (totalAmount * 0.05).ToString("N2"),
                             deductFeeFrom = "0"
                         }
                     },
