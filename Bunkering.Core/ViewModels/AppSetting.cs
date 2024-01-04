@@ -14,6 +14,7 @@ namespace Bunkering.Core.ViewModels
         public string PublicKey { get; set; }
         public string DepotUrl { get; set; }
         public string DepotUri { get; set; }
+        public string DepotListUri { get; set; }
         public string CvlUrl { get; set; }
         public string CvlUri { get; set; }
         public string CvlKey { get; set; }
