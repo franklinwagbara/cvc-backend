@@ -10,7 +10,7 @@ namespace Bunkering.Core.Data
     {
         public int Id { get; set; }
         public int CoQId { get; set; }
-        public string TankName { get; set; }
+        public int TankId { get; set; }
         public ICollection<TankMeasurement> TankMeasurement { get; set; }
     }
 }

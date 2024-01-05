@@ -94,6 +94,8 @@ namespace Bunkering.Access.DAL
             vDebitNote = vDebitNote != null ? vDebitNote : new vDebitNoteRepository(_context);
             ApplicationDepot = ApplicationDepot ?? new ApplicationDepotRepository(_context);
             DepotOfficer = DepotOfficer ?? new DepotOfficerRepository(_context);
+            Plant = Plant ?? new PlantRepository(_context);
+            PlantTank = PlantTank ?? new PlantTankRepository(_context);
         }
 
         public int Save() => _context.SaveChanges();
