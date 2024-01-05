@@ -530,30 +530,18 @@ namespace Bunkering.Access.Services
                     
                 };
 
-        //        //var data = _mapper.Map<TankMeasurement>(model);
-        //        var coq = new CoQ
-        //        {
-        //            AppId = model.NoaAppId,
-        //            PlantId = model.PlantId,
-        //            DepotId = model.PlantId,
-        //            DateOfSTAfterDischarge = model.DateOfSTAfterDischarge,
-        //            DateOfVesselArrival = model.DateOfVesselArrival,
-        //            DateOfVesselUllage = model.DateOfVesselUllage,
-        //            DepotPrice = model.DepotPrice,
-                    
+                #endregion
 
-        //        };
+                #region Create COQ Tank
+                var coqTankList = new List<COQTank>();
 
-        //        await _unitOfWork.CoQTank.Add(new COQTank
-        //        {
-        //            CoQId = model.CoQId,
-        //            TankName = model.TankName,
-        //            TankMeasurement = new List<TankMeasurement> { data }
-        //        });
-        //        await _unitOfWork.SaveChangesAsync(user.Id);
-        //    }
-        //    catch (Exception ex)
-        //    {
+                foreach (var before in model.TankBeforeReadings)
+                {
+                    var newCoqTank = new COQTank
+                    {
+                        CoQId = coq.Id,
+                        TankId = before.TankId
+                    };
 
                     var after = model.TankAfterReadings.FirstOrDefault(x => x.TankId == before.TankId);
 
