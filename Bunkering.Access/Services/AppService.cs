@@ -1354,7 +1354,7 @@ namespace Bunkering.Access.Services
                 };
                 return _response;
             }
-            var depots = (await _unitOfWork.DepotOfficer.Find(c => c.OfficerID == Guid.Parse(user.Id))).Select(c => c.DepotID).ToList();
+            var depots = (await _unitOfWork.PlantOfficer.Find(c => c.OfficerID == Guid.Parse(user.Id))).Select(c => c.PlantID).ToList();
             if (!depots.Any())
             {
                 _response = new ApiResponse
@@ -1471,5 +1471,80 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
+        public async Task<ApiResponse> EditIMONoByName(string name, string newIMO)
+        {
+            var vessel = await _unitOfWork.Facility.FirstOrDefaultAsync(x => x.Name.Equals(name));
+            if (vessel == null)
+            {
+                _response = new ApiResponse
+                {
+                    Message = "No Vessel was found with this Name",
+                    StatusCode = HttpStatusCode.NotFound,
+                    Success = false
+                };
+            }
+            else
+            {
+                var check = await _unitOfWork.Facility.FirstOrDefaultAsync(_ => _.IMONumber.Equals(newIMO));
+                if (check == null)
+                {
+
+                    vessel.IMONumber = newIMO;
+                    await _unitOfWork.Facility.Update(vessel);
+                    _unitOfWork.Save();
+
+                    _response = new ApiResponse
+                    {
+                        Message = "Updated Successfully",
+                        StatusCode = HttpStatusCode.OK,
+                        Success = true,
+                    };
+                }
+                else
+                {
+                    _response = new ApiResponse
+                    {
+                        Message = "There is an Existing Vessel with the suggested IMO number",
+                        StatusCode = HttpStatusCode.Conflict,
+                        Success = false,
+                    };
+                }
+            }
+
+            return _response;
+
+        }
+
+        public async Task<ApiResponse> GetAllVessels()
+        {
+            var vessel = await _unitOfWork.Facility.GetAll();
+            if (vessel != null)
+            {
+                _response = new ApiResponse
+                {
+                    Message = "Vessels was found",
+                    StatusCode = HttpStatusCode.NotFound,
+                    Success = true,
+                    Data = vessel.Select(x => new
+                    {
+                        VesselName = x.Name,
+                        ImoNumber = x.IMONumber,
+                        VesselId = x.Id,
+                    }).ToList()
+                };
+            }
+            else
+            {
+                _response = new ApiResponse
+                {
+                    Message = "No Vessel was found",
+                    StatusCode = HttpStatusCode.NotFound,
+                    Success = false,
+                };
+            }
+            
+
+            return _response;
+        }
     }
 }

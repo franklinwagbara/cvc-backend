@@ -17,7 +17,7 @@ namespace Bunkering.Access.DAL
             {
                 Id = x.DepotId,
                 Name = x.Depot.Name,
-                StateId = x.Depot.StateId,
+                StateName = x.Depot.State,
             }).ToListAsync();
         }
     }
