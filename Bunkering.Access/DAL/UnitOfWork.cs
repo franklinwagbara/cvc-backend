@@ -8,7 +8,7 @@ namespace Bunkering.Access.DAL
         private ApplicationContext _context;
         public IApplication Application { get; private set; }
         public IAppFee AppFee { get; private set; }
-        public IDepotOfficer DepotOfficer { get; private set; }
+        public IPantOfficer PlantOfficer { get; private set; }
         public IApplicationType ApplicationType { get; set; }
         public IApplicationHistory ApplicationHistory { get; private set; }
         public IAppointment Appointment { get; private set; }
@@ -93,7 +93,7 @@ namespace Bunkering.Access.DAL
             vPayment = vPayment != null ? vPayment : new vPaymentRepository(_context);
             vDebitNote = vDebitNote != null ? vDebitNote : new vDebitNoteRepository(_context);
             ApplicationDepot = ApplicationDepot ?? new ApplicationDepotRepository(_context);
-            DepotOfficer = DepotOfficer ?? new DepotOfficerRepository(_context);
+            PlantOfficer = PlantOfficer ?? new PlantOfficerRepository(_context);
             Plant = Plant ?? new PlantRepository(_context);
             PlantTank = PlantTank ?? new PlantTankRepository(_context);
         }
