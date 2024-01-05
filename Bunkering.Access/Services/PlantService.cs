@@ -18,8 +18,9 @@ namespace Bunkering.Access.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private string User;
         private readonly HttpClient _httpClient;
+        private readonly IElps _elps;
 
-        public PlantService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<ApplicationUser> userManager)
+        public PlantService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<ApplicationUser> userManager, IElps elps)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
@@ -27,6 +28,7 @@ namespace Bunkering.Access.Services
             User = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
             _userManager = userManager;
             _httpClient = new HttpClient();
+            _elps = elps;
         }
 
         public async Task<ApiResponse> GetAllPlants()
@@ -36,6 +38,30 @@ namespace Bunkering.Access.Services
             return new ApiResponse
             {
                 Message = "All Fees found",
+                StatusCode = HttpStatusCode.OK,
+                Success = true,
+                Data = filteredPlants
+            };
+        }
+
+        public async Task<ApiResponse> GetAllPlantsByCompany()
+        {
+            var user = await _userManager.FindByEmailAsync(User);
+            if (user == null)
+            {
+                _response = new ApiResponse
+                {
+                    Message = "You need to LogIn to get Plants",
+                    StatusCode = HttpStatusCode.MethodNotAllowed,
+                    Success = false
+                };
+                return _response;
+            }
+            var plants = await _unitOfWork.Plant.GetAll();
+            var filteredPlants = plants.Where(x => x.IsDeleted == false && x.Email == user.Email);
+            return new ApiResponse
+            {
+                Message = "All Plants for Company",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
                 Data = filteredPlants
@@ -72,11 +98,11 @@ namespace Bunkering.Access.Services
             else
             {
                 updatePlant.Name = plant.Name;
-                updatePlant.Company = plant.Company;
+                updatePlant.Company = user.Company.Name;
                 //updatePlant.PlantType = plant.PlantType;
                 updatePlant.ElpsPlantId = plant.PlantElpsId;
-                updatePlant.CompanyElpsId = plant.CompanyElpsId;
-                updatePlant.Email = plant.Email;
+                updatePlant.CompanyElpsId = user.ElpsId;
+                updatePlant.Email = user.Email;
                 updatePlant.State = plant.State;
                 updatePlant.IsDeleted = false;
 
@@ -145,22 +171,33 @@ namespace Bunkering.Access.Services
             try
             {
                 var user = await _userManager.FindByEmailAsync(User);
+                if (user == null)
+                {
+                    _response = new ApiResponse
+                    {
+                        Message = "You need to LogIn to get Create Plants",
+                        StatusCode = HttpStatusCode.MethodNotAllowed,
+                        Success = false
+                    };
+                    return _response;
+                }
+                //var companyDetails = _elps.GetCompanyDetailByEmail(user.Email);
                 
                 var facility = new Plant
                 {
                     Name = plant.Name,
                     PlantType = 2,
                     State = plant.State,
-                    Company = plant.Company,
-                    Email = plant.Email,
+                    Company = user.Company?.Name,
+                    Email = user.Email,
                     ElpsPlantId = plant.PlantElpsId,
-                    CompanyElpsId = plant.CompanyElpsId,
+                    CompanyElpsId = user.ElpsId,
                     IsDeleted = false,
                 };
                 await _unitOfWork.Plant.Add(facility);
                 await _unitOfWork.SaveChangesAsync(user.Id);
 
-                int plantId = facility.Id;
+               /* int plantId = facility.Id;
 
                 var TankList = new List<PlantTank>();
                 foreach (var item in plant.Tanks)
@@ -176,7 +213,7 @@ namespace Bunkering.Access.Services
                     TankList.Add(plantTanks);
                 }
                 await _unitOfWork.PlantTank.AddRange(TankList);
-                await _unitOfWork.SaveChangesAsync(user.Id);
+                await _unitOfWork.SaveChangesAsync(user.Id);*/
 
                 _response = new ApiResponse
                 {

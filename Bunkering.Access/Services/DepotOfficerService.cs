@@ -28,13 +28,13 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> GetAllDepotOfficerMapping()
         {
-            var mappings = await _unitOfWork.DepotOfficer.GetAll("Depot");
+            var mappings = await _unitOfWork.PlantOfficer.GetAll("Plant");
             var staffs = await _userManager.Users.Where(x => x.UserRoles.Any(u => u.Role.Name == RoleConstants.COMPANY) != true).ToListAsync();
             var filteredMappings = mappings.Where(x => x.IsDeleted == false).Select(d => new DepotFieldOfficerViewModel
             {
                 DepotID = d.ID,
                 UserID = d.OfficerID,
-                DepotName = d.Depot.Name,
+                DepotName = d.Plant.Name,
                 OfficerName = staffs.Where(x => x.Id == d.OfficerID.ToString()).Select(u => u?.FirstName + ", " + u?.LastName ).FirstOrDefault()
             }).ToList(); 
 
@@ -49,7 +49,7 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> GetDepotOfficerByID(int id)
         {
-            DepotFieldOfficer? mapping = await _unitOfWork.DepotOfficer.FirstOrDefaultAsync(x => x.ID == id);
+            PlantFieldOfficer? mapping = await _unitOfWork.PlantOfficer.FirstOrDefaultAsync(x => x.ID == id);
             return new ApiResponse
             {
                 Message = "All Mapping found",
@@ -63,12 +63,12 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var depotExists = await _unitOfWork.Depot.FirstOrDefaultAsync(c => c.Id ==  newDepotOfficer.DepotID) is not null;
+                var depotExists = await _unitOfWork.Plant.FirstOrDefaultAsync(c => c.Id ==  newDepotOfficer.DepotID) is not null;
                 if (!depotExists)
                 {
                     _response = new ApiResponse
                     {
-                        Message = "Depot not found",
+                        Message = "Facility not found",
                         StatusCode = HttpStatusCode.NotFound,
                         Success = false
                     };
@@ -85,17 +85,17 @@ namespace Bunkering.Access.Services
                     };
                     return _response;
                 }
-                var map = new DepotFieldOfficer
+                var map = new PlantFieldOfficer
                 {
-                    DepotID = newDepotOfficer.DepotID,
+                    PlantID = newDepotOfficer.DepotID,
                     OfficerID = newDepotOfficer.UserID
 
                 };
-                await _unitOfWork.DepotOfficer.Add(map);
+                await _unitOfWork.PlantOfficer.Add(map);
                 await _unitOfWork.SaveChangesAsync("");
                 _response = new ApiResponse
                 {
-                    Message = "DepotOfficer mapping was added successfully.",
+                    Message = "Facility Officer mapping was added successfully.",
                     StatusCode = HttpStatusCode.OK,
                     Success = true
                 };
@@ -118,12 +118,12 @@ namespace Bunkering.Access.Services
             try
             {
                 var user = await _userManager.FindByEmailAsync(User);
-                var updatMapping = await _unitOfWork.DepotOfficer.FirstOrDefaultAsync(x => x.ID == id);
+                var updatMapping = await _unitOfWork.PlantOfficer.FirstOrDefaultAsync(x => x.ID == id);
                 try
                 {
                     if (updatMapping != null)
                     {
-                        updatMapping.DepotID = depot.DepotID;
+                        updatMapping.PlantID = depot.DepotID;
                         updatMapping.OfficerID = depot.UserID;
                         var success = await _unitOfWork.SaveChangesAsync(user!.Id) > 0;
                         _response = new ApiResponse
@@ -170,13 +170,13 @@ namespace Bunkering.Access.Services
                         Success = true
                     };
                 }
-                var deactiveMapping = await _unitOfWork.DepotOfficer.FirstOrDefaultAsync(a => a.ID == id);
+                var deactiveMapping = await _unitOfWork.PlantOfficer.FirstOrDefaultAsync(a => a.ID == id);
                 if (deactiveMapping != null)
                 {
                     if (!deactiveMapping.IsDeleted)
                     {
                         deactiveMapping.IsDeleted = true;
-                        await _unitOfWork.DepotOfficer.Update(deactiveMapping);
+                        await _unitOfWork.PlantOfficer.Update(deactiveMapping);
                         await _unitOfWork.SaveChangesAsync(user.Id);
 
                         _response = new ApiResponse

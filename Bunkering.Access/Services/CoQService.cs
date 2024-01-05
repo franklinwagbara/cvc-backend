@@ -6,6 +6,7 @@ using Bunkering.Core.Utils;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Http.Headers;
@@ -269,6 +270,125 @@ namespace Bunkering.Access.Services
                 };
 
             return _apiReponse;
+        }
+        public async Task<object?> GetCoqRequiredDocuments(Application appp)
+        {
+
+            var docList = new List<SubmittedDocument>();
+            var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(c => c.Name == Utils.COQ);
+            if (appType == null || appp == null)
+            {
+                return null;
+            }
+            var factypedocs = await _unitOfWork.FacilityTypeDocuments
+                .Find(x => x.ApplicationTypeId
+                .Equals(appType.Id) && x.VesselTypeId.Equals(appp.Facility.VesselTypeId));
+            if (factypedocs != null && factypedocs.Count() > 0)
+            {
+                var compdocs = _elps.GetCompanyDocuments(appp.User.ElpsId, "company")
+                    .Stringify().Parse<List<Document>>();
+                var facdocs = _elps.GetCompanyDocuments(appp.Facility.ElpsId, "facility")
+                    .Stringify().Parse<List<FacilityDocument>>();
+                var appdocs = await _unitOfWork.SubmittedDocument.Find(x => x.ApplicationId == appp.Id);
+
+                factypedocs.ToList().ForEach(x =>
+                {
+                    if (x.DocType.ToLower().Equals("company"))
+                    {
+                        if (compdocs != null && compdocs.Count > 0)
+                        {
+
+                            var doc = compdocs.FirstOrDefault(y => int.Parse(y.document_type_id) == x.DocumentTypeId);
+                            if (doc != null)
+                            {
+                                docList.Add(new SubmittedDocument
+                                {
+                                    DocId = x.DocumentTypeId,
+                                    DocName = x.Name,
+                                    DocType = x.DocType,
+                                    FileId = doc.id,
+                                    DocSource = doc.source,
+                                    ApplicationId = appp.Id,
+                                    ApplicationTypeId = appType.Id
+                                });
+                            }
+                            else
+                            {
+                                docList.Add(new SubmittedDocument
+                                {
+                                    DocId = x.DocumentTypeId,
+                                    DocName = x.Name,
+                                    DocType = x.DocType,
+                                    ApplicationTypeId = appType.Id
+                                });
+                            }
+                        }
+                        else
+                            docList.Add(new SubmittedDocument
+                            {
+                                DocId = x.DocumentTypeId,
+                                DocName = x.Name,
+                                DocType = x.DocType,
+                                ApplicationTypeId = appType.Id
+                            });
+                    }
+                    else
+                    {
+                        if (facdocs != null && facdocs.Count > 0)
+                        {
+                            var doc = facdocs.FirstOrDefault(y => y.Document_Type_Id == x.DocumentTypeId);
+                            if (doc != null)
+                            {
+                                docList.Add(new SubmittedDocument
+                                {
+                                    DocId = x.DocumentTypeId,
+                                    DocName = x.Name,
+                                    DocType = x.DocType,
+                                    FileId = doc.Id,
+                                    DocSource = doc.Source,
+                                    ApplicationId = appp.Id,
+                                    ApplicationTypeId = appType.Id
+                                });
+                            }
+                            else
+                            {
+                                docList.Add(new SubmittedDocument
+                                {
+                                    DocId = x.DocumentTypeId,
+                                    DocName = x.Name,
+                                    DocType = x.DocType,
+                                    ApplicationTypeId = appType.Id
+                                });
+                            }
+                        }
+                        else
+                            docList.Add(new SubmittedDocument
+                            {
+                                DocId = x.DocumentTypeId,
+                                DocName = x.Name,
+                                DocType = x.DocType,
+                                ApplicationTypeId = appType.Id
+                            });
+                    }
+                });
+            }
+            return new ApiResponse
+            {
+                Message = "Facility Type Documents fetched",
+                StatusCode = HttpStatusCode.OK,
+                Success = true,
+                Data = new
+                {
+                    Docs = docList,
+                    ApiData = new
+                    {
+                        CompanyElpsId = appp.User.ElpsId,
+                        FacilityElpsId = appp.Facility.ElpsId,
+                        ApiEmail = _setting.AppEmail,
+                        ApiHash = $"{_setting.AppEmail}{_setting.AppId}".GenerateSha512()
+                    }
+                }
+            };
         }
 
         public async Task<ApiResponse> AddDocuments(int id)
@@ -644,6 +764,62 @@ namespace Bunkering.Access.Services
                 Message = "COQ created successfully",
                 Success = true,
                 StatusCode = HttpStatusCode.OK
+            };
+        }
+
+        public async Task<ApiResponse> GetCoqCreateRequirementsAsync(int depotId, int appId)
+        {
+            var appDepot = await _context.ApplicationDepots.Include(c => c.Product)
+                .Include(c => c.Application.Facility)
+                .Include(c => c.Application.User)
+                .Include(c => c.Depot)
+                .FirstOrDefaultAsync(c => c.AppId == appId && c.DepotId == depotId);
+            if (appDepot?.Depot is null)
+            {
+                return new()
+                {
+                    Success = false,
+                    StatusCode = HttpStatusCode.NotFound,
+                    Message = "Depot not found in the application"
+                };
+            }
+            var plant = await _context.Plants
+                .Include(p => p.Tanks)
+                .FirstOrDefaultAsync(t => t.Id == appDepot.DepotId);
+            if (plant is null)
+            {
+                return new()
+                {
+                    Success = false,
+                    StatusCode = HttpStatusCode.NotFound,
+                    Message = "Depot not found in the application"
+                };
+            }
+
+            var tanks = plant.Tanks.Select(t => new TankDTO()
+            {
+                Id = t.Id,
+                Name = t.TankName
+            }).ToList();
+
+            var docData = (await GetCoqRequiredDocuments(appDepot.Application) as dynamic)?.Data;
+
+
+
+            var data = new CreateCoqGetDTO
+            {
+                ProductName = appDepot.Product.Name,
+                ProductType = appDepot.Product.ProductType,
+                Tanks = tanks,
+                RequiredDocuments = docData.Docs as List<SubmittedDocument>,
+                ApiData = docData.ApiData
+            };
+            return new()
+            {
+                Success = true,
+                StatusCode = HttpStatusCode.OK,
+                Data = data,
+                Message = "fetched successfully"
             };
         }
     }
