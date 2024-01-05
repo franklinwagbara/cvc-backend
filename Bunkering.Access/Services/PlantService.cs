@@ -123,7 +123,7 @@ namespace Bunkering.Access.Services
             try
             {
                 var user = await _userManager.FindByEmailAsync(User);
-                var updatePlant = await _unitOfWork.PlantTank.FirstOrDefaultAsync(x => x.Id == tank.Id);
+                var updatePlant = await _unitOfWork.PlantTank.FirstOrDefaultAsync(x => x.PlantTankId == tank.Id);
                 if (updatePlant == null)
                 {
                     _response = new ApiResponse
@@ -367,7 +367,7 @@ namespace Bunkering.Access.Services
                         Success = true
                     };
                 }
-                var deactivePlantTank = await _unitOfWork.PlantTank.FirstOrDefaultAsync(a => a.Id == id);
+                var deactivePlantTank = await _unitOfWork.PlantTank.FirstOrDefaultAsync(a => a.PlantTankId == id);
                 if (deactivePlantTank != null)
                 {
                     if (!deactivePlantTank.IsDeleted)

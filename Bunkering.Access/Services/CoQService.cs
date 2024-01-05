@@ -798,7 +798,7 @@ namespace Bunkering.Access.Services
 
             var tanks = plant.Tanks.Select(t => new TankDTO()
             {
-                Id = t.Id,
+                Id = t.PlantTankId,
                 Name = t.TankName
             }).ToList();
 
