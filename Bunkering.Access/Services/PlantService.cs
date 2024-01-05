@@ -1,10 +1,12 @@
-﻿using Bunkering.Access.IContracts;
+﻿using Bunkering.Access.DAL;
+using Bunkering.Access.IContracts;
 using Bunkering.Core.Data;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Diagnostics;
 using System.Net;
 using System.Security.Claims;
 
@@ -420,14 +422,69 @@ namespace Bunkering.Access.Services
                 response.EnsureSuccessStatusCode();
 
                 string jsonResponse = await response.Content.ReadAsStringAsync();
-                Plant depotList = JsonConvert.DeserializeObject<Plant>(jsonResponse);
+                var data = JsonConvert.DeserializeObject<List<dynamic>>(jsonResponse);
+
+                if (data.Any())
+                {
+                    var depotList = new List<Plant>();
+
+                    foreach (var item in data)
+                    {
+                        var plant = new Plant
+                        {
+                            Name = item.depotName,
+                            ElpsPlantId = item.depotElpsId,
+                            Email = item.email,
+                            State = item.state,
+                            Company = item.company,
+                            CompanyElpsId = item.companyElpsId,
+                        };
+
+                        if (item.tanks != null)
+                        {
+                            var tankList = new List<PlantTank>();
+                            foreach (var tank in item.tanks)
+                            {
+                                var pTank = new PlantTank
+                                {
+                                    TankName = tank.tankName,
+                                    Product = tank.product,
+                                    Capacity = tank.capacity,
+                                    Position = tank.position
+                                };
+
+                                tankList.Add(pTank);
+                            }
+                            plant.Tanks = tankList;
+                        }
+
+                        depotList.Add(plant);
+                    }
+
+                    await _unitOfWork.Plant.AddRange(depotList);
+                    await _unitOfWork.SaveChangesAsync("");
+
+                }
+
+                //var plantMap = new List<Plant>();
+                //var plantTankMap = new List<PlantTank>();
+                //foreach (var item in depotList)
+                //{
+                //    var plants = new Plant
+                //    {
+                //        Name = item.Name,
+                //    };
+                //    TankList.Add(plantTanks);
+                //}
+                
+               
+
 
                 _response = new ApiResponse
                 {
-                    Message = "You need to LogIn to Delete a Tank",
-                    StatusCode = HttpStatusCode.Forbidden,
-                    Success = true,
-                    Data = depotList
+                    Message = "Successfully Pulled data from Depot project into Plant Table",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true
 
                 };
 

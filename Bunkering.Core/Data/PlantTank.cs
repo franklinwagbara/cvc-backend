@@ -10,10 +10,10 @@ namespace Bunkering.Core.Data
     {
         public int PlantTankId { get; set; }
         public int PlantId { get; set; }
-        public string TankName { get; set; }
-        public string Product { get; set; }
-        public decimal Capacity { get; set; }
-        public string Position { get; set; }
+        public string? TankName { get; set; }
+        public string? Product { get; set; }
+        public decimal? Capacity { get; set; }
+        public string? Position { get; set; }
         public bool IsDeleted { get; set; }
     }
 }
