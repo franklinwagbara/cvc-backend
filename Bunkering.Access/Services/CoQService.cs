@@ -509,104 +509,40 @@ namespace Bunkering.Access.Services
                 throw new Exception("Application type of COQ is not configured yet, please contact support");
             }
 
-            using var transaction = _context.Database.BeginTransaction();
-            try
-            {
-                #region Create Coq
-                var coq = new CoQ
-                {
-                    AppId = model.NoaAppId,
-                    PlantId = model.PlantId,
-                    DepotId = model.PlantId,
-                    DateOfSTAfterDischarge = model.DateOfSTAfterDischarge,
-                    DateOfVesselArrival = model.DateOfVesselArrival,
-                    DateOfVesselUllage = model.DateOfVesselUllage,
-                    DepotPrice = model.DepotPrice,
-                    ArrivalShipFigure = model.ArrivalShipFigure,
-                    QuauntityReflectedOnBill = model.QuauntityReflectedOnBill,
-                    DischargeShipFigure = model.DischargeShipFigure,
-                };
+        //public async Task<ApiResponse> AddCoqTank(CreateGasProductCoQDto model)
+        //{
+        //    var user = await _userManager.FindByEmailAsync(LoginUserEmail);
+        //    using var transaction = _context.Database.BeginTransaction();
+        //    try
+        //    {
 
-                _context.CoQs.Add(coq);
-                _context.SaveChanges();
+        //        //var data = _mapper.Map<TankMeasurement>(model);
+        //        var coq = new CoQ
+        //        {
+        //            AppId = model.NoaAppId,
+        //            PlantId = model.PlantId,
+        //            DepotId = model.PlantId,
+        //            DateOfSTAfterDischarge = model.DateOfSTAfterDischarge,
+        //            DateOfVesselArrival = model.DateOfVesselArrival,
+        //            DateOfVesselUllage = model.DateOfVesselUllage,
+        //            DepotPrice = model.DepotPrice,
+                    
 
-                #endregion
+        //        };
 
-                #region Create COQ Tank
-                var coqTankList = new List<COQTank>();
+        //        await _unitOfWork.CoQTank.Add(new COQTank
+        //        {
+        //            CoQId = model.CoQId,
+        //            TankName = model.TankName,
+        //            TankMeasurement = new List<TankMeasurement> { data }
+        //        });
+        //        await _unitOfWork.SaveChangesAsync(user.Id);
+        //    }
+        //    catch (Exception ex)
+        //    {
 
-                foreach (var before in model.TankBeforeReadings)
-                {
-                    var newCoqTank = new COQTank
-                    {
-                        CoQId = coq.Id,
-                        TankId = before.TankId
-                    };
-
-                    var after = model.TankAfterReadings.FirstOrDefault(x => x.TankId == before.TankId);
-
-                    if (after != null && before.coQGasTankDTO != null)
-                    {
-                        var b = before.coQGasTankDTO;
-                        var a = after.coQGasTankDTO;
-
-                        var newBTankM = _mapper.Map<TankMeasurement>(b);
-                        newBTankM.MeasurementType = ReadingType.Before;
-
-                        var newATankM = _mapper.Map<TankMeasurement>(a);
-                        newATankM.MeasurementType = ReadingType.After;
-
-                        var newTankMeasurement = new List<TankMeasurement>
-                        {
-                            newBTankM, newATankM
-                        };
-
-                        newCoqTank.TankMeasurement = newTankMeasurement;
-
-                        coqTankList.Add(newCoqTank);
-                    }
-
-
-                }
-
-                _context.COQTanks.AddRange(coqTankList);
-                #endregion
-
-                #region Document Submission
-                
-                var sDocumentList = _mapper.Map<List<SubmittedDocument>>(model.SubmitDocuments);
-
-                sDocumentList.ForEach(x =>
-                {
-                    x.ApplicationId = coq.Id;
-                    x.ApplicationTypeId = appType.Id; 
-                });
-
-                _context.SubmittedDocuments.AddRange(sDocumentList);
-                #endregion
-
-                _context.SaveChanges();
-
-                transaction.Commit();
-            }
-            catch (Exception ex)
-            { 
-                transaction.Rollback();
-
-                return new ApiResponse
-                {
-                    Message = $"An error occur, COQ not created: {ex.Message}",
-                    Success = false,
-                    StatusCode = HttpStatusCode.InternalServerError
-                };
-            }
-
-            return new ApiResponse
-            {
-                Message = "COQ created successfully",
-                Success = true,
-                StatusCode = HttpStatusCode.OK
-            };
-        }
+        //    }
+        //    return _apiReponse;
+        //}
     }
 }

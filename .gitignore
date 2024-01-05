@@ -439,3 +439,4 @@ FodyWeavers.xsd
 /Bunkering.Core/obj/Debug/net7.0/Bunkering.Core.GeneratedMSBuildEditorConfig.editorconfig
 *.v2
 *.csproj
+/.vs/Bunkering/DesignTimeBuild/.dtbcache.v2
