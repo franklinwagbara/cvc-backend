@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -57,5 +58,6 @@ namespace Bunkering.Core.ViewModels
         public Decimal DepotPrice { get; set; }
         public List<TankBeforeReading> TankBeforeReadings { get; set; }
         public List<TankAfterReading> TankAfterReadings { get; set; }
+        
     }
 }

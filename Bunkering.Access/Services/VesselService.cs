@@ -28,7 +28,8 @@ namespace Bunkering.Access.Services
             _userManager = userManager;
         }
 
-        public async Task<ApiResponse> EditIMONoByName(string name, string newIMO)
+        /*
+         public async Task<ApiResponse> EditIMONoByName(string name, string newIMO)
         {
             var vessel = await _unitOfWork.Facility.FirstOrDefaultAsync(x => x.Name.Equals(name));
             if (vessel == null)
@@ -70,6 +71,6 @@ namespace Bunkering.Access.Services
 
             return _response;
 
-        }
+        }*/
     }
 }

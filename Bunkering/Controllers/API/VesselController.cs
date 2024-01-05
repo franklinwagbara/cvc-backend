@@ -24,7 +24,7 @@ namespace Bunkering.Controllers.API
         /// <remarks>
         /// 
         /// Sample Request
-        /// post: api/application/verifyIMONumbers
+        /// post: api/vessel/verifyIMONumbers
         /// 
         /// </remarks>
         /// <param name="model">Model for applying for a bunker application</param>

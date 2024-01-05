@@ -318,27 +318,29 @@ namespace Bunkering.Controllers.API
         [HttpPost]
         public async Task<IActionResult> AddCoqTank(COQCrudeTankDTO model) => Response(await _coqService.AddCoqTank(model));
 
-        /// <summary>
-        /// This endpoint is used to add coq gas tanks
-        /// </summary>
-        /// <returns>Returns a message after adding </returns>
-        /// <remarks>
-        /// 
-        /// Sample Request
-        /// POST: api/coq/add-coq-tank/xxxx
-        /// 
-        /// </remarks>
-        /// <param name="model">model for adding tank to coq</param>
-        /// <response code="200">Returns a success message </response>
-        /// <response code="404">Returns not found </response>
-        /// <response code="401">Unauthorized user </response>
-        /// <response code="400">Internal server error - bad request </response>
-        [ProducesResponseType(typeof(ApiResponse), 200)]
-        [ProducesResponseType(typeof(ApiResponse), 404)]
-        [ProducesResponseType(typeof(ApiResponse), 405)]
-        [ProducesResponseType(typeof(ApiResponse), 500)]
-        [Route("add-coq-gas-tank")]
-        [HttpPost]
-        public async Task<IActionResult> AddCoqTank(CreateGasProductCoQDto model) => Response(await _coqService.AddCoqTank(model));
+        ///// <summary>
+        ///// This endpoint is used to add coq gas tanks
+        ///// </summary>
+        ///// <returns>Returns a message after adding </returns>
+        ///// <remarks>
+        ///// 
+        ///// Sample Request
+        ///// POST: api/coq/add-coq-tank/xxxx
+        ///// 
+        ///// </remarks>
+        ///// <param name="model">model for adding tank to coq</param>
+        ///// <response code="200">Returns a success message </response>
+        ///// <response code="404">Returns not found </response>
+        ///// <response code="401">Unauthorized user </response>
+        ///// <response code="400">Internal server error - bad request </response>
+        /*
+         [ProducesResponseType(typeof(ApiResponse), 200)]
+         [ProducesResponseType(typeof(ApiResponse), 404)]
+         [ProducesResponseType(typeof(ApiResponse), 405)]
+         [ProducesResponseType(typeof(ApiResponse), 500)]
+         [Route("add-coq-gas-tank")]
+         [HttpPost]
+         public async Task<IActionResult> AddCoqTank(CreateGasProductCoQDto model) => Response(await _coqService.AddCoqTank(model));
+        */
     }
 }
