@@ -499,15 +499,15 @@ namespace Bunkering.Access.Services
         //    return _apiReponse;
         //}
 
-        public async Task<ApiResponse> CreateCOQForGas(CreateGasProductCoQDto model)
-        {
-            var user = await _userManager.FindByEmailAsync(LoginUserEmail);
-            var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name == Utils.COQ);
+        //public async Task<ApiResponse> CreateCOQForGas(CreateGasProductCoQDto model)
+        //{
+        //    var user = await _userManager.FindByEmailAsync(LoginUserEmail);
+        //    var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name == Utils.COQ);
 
-            if (appType is null)
-            {
-                throw new Exception("Application type of COQ is not configured yet, please contact support");
-            }
+        //    if (appType is null)
+        //    {
+        //        throw new Exception("Application type of COQ is not configured yet, please contact support");
+        //    }
 
         //public async Task<ApiResponse> AddCoqTank(CreateGasProductCoQDto model)
         //{
