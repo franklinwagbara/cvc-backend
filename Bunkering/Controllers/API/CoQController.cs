@@ -147,6 +147,15 @@ namespace Bunkering.Controllers.API
 		[HttpGet]
 		public async Task<IActionResult> GetCoqs(int appId) => Response(await _coqService.GetCoQsByAppId(appId));
 
+		[ProducesResponseType(typeof(ApiResponse), 200)]
+		[ProducesResponseType(typeof(ApiResponse), 404)]
+		[ProducesResponseType(typeof(ApiResponse), 405)]
+		[ProducesResponseType(typeof(ApiResponse), 500)]
+		[Produces("application/json")]
+		[Route("coq_requirement/{appId}")]
+		[HttpGet]
+		public async Task<IActionResult> GetCoqRequirements(int appId, int depotId) => Response(await _coqService.GetCoqCreateRequirementsAsync(depotId, appId));
+
         [AllowAnonymous]
 		[ProducesResponseType(typeof(ApiResponse), 200)]
 		[ProducesResponseType(typeof(ApiResponse), 404)]
@@ -333,12 +342,12 @@ namespace Bunkering.Controllers.API
         /// <response code="404">Returns not found </response>
         /// <response code="401">Unauthorized user </response>
         /// <response code="400">Internal server error - bad request </response>
-        //[ProducesResponseType(typeof(ApiResponse), 200)]
-        //[ProducesResponseType(typeof(ApiResponse), 404)]
-        //[ProducesResponseType(typeof(ApiResponse), 405)]
-        //[ProducesResponseType(typeof(ApiResponse), 500)]
-        //[Route("add-coq-gas-tank")]
-        //[HttpPost]
-        //public async Task<IActionResult> AddCoqTank(CreateGasProductCoQDto model) => Response(await _coqService.AddCoqTank(model));
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("add-coq-gas-tank")]
+        [HttpPost]
+        public async Task<IActionResult> CreateCOQForGas(CreateGasProductCoQDto model) => Response(await _coqService.CreateCOQForGas(model));
     }
 }

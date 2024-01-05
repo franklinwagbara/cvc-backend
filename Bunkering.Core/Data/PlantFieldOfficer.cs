@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace Bunkering.Core.Data
 {
-    public class DepotFieldOfficer
+    public class PlantFieldOfficer
     {
         public int ID { get; set; }
-        public int DepotID { get; set; }
+        public int PlantID { get; set; }
         public Guid OfficerID { get; set; }
         public bool IsDeleted { get; set; } = false;
 
-        [ForeignKey(nameof(DepotID))]
-        public Depot? Depot { get; set; }
+        [ForeignKey(nameof(PlantID))]
+        public Plant? Plant { get; set; }
     }
 }
