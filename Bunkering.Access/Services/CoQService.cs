@@ -498,40 +498,40 @@ namespace Bunkering.Access.Services
             return _apiReponse;
         }
 
-        public async Task<ApiResponse> AddCoqTank(CreateGasProductCoQDto model)
-        {
-            var user = await _userManager.FindByEmailAsync(LoginUserEmail);
-            using var transaction = _context.Database.BeginTransaction();
-            try
-            {
+        //public async Task<ApiResponse> AddCoqTank(CreateGasProductCoQDto model)
+        //{
+        //    var user = await _userManager.FindByEmailAsync(LoginUserEmail);
+        //    using var transaction = _context.Database.BeginTransaction();
+        //    try
+        //    {
 
-                //var data = _mapper.Map<TankMeasurement>(model);
-                var coq = new CoQ
-                {
-                    AppId = model.NoaAppId,
-                    PlantId = model.PlantId,
-                    DepotId = model.PlantId,
-                    DateOfSTAfterDischarge = model.DateOfSTAfterDischarge,
-                    DateOfVesselArrival = model.DateOfVesselArrival,
-                    DateOfVesselUllage = model.DateOfVesselUllage,
-                    DepotPrice = model.DepotPrice,
+        //        //var data = _mapper.Map<TankMeasurement>(model);
+        //        var coq = new CoQ
+        //        {
+        //            AppId = model.NoaAppId,
+        //            PlantId = model.PlantId,
+        //            DepotId = model.PlantId,
+        //            DateOfSTAfterDischarge = model.DateOfSTAfterDischarge,
+        //            DateOfVesselArrival = model.DateOfVesselArrival,
+        //            DateOfVesselUllage = model.DateOfVesselUllage,
+        //            DepotPrice = model.DepotPrice,
                     
 
-                };
+        //        };
 
-                await _unitOfWork.CoQTank.Add(new COQTank
-                {
-                    CoQId = model.CoQId,
-                    TankName = model.TankName,
-                    TankMeasurement = new List<TankMeasurement> { data }
-                });
-                await _unitOfWork.SaveChangesAsync(user.Id);
-            }
-            catch (Exception ex)
-            {
+        //        await _unitOfWork.CoQTank.Add(new COQTank
+        //        {
+        //            CoQId = model.CoQId,
+        //            TankName = model.TankName,
+        //            TankMeasurement = new List<TankMeasurement> { data }
+        //        });
+        //        await _unitOfWork.SaveChangesAsync(user.Id);
+        //    }
+        //    catch (Exception ex)
+        //    {
 
-            }
-            return _apiReponse;
-        }
+        //    }
+        //    return _apiReponse;
+        //}
     }
 }

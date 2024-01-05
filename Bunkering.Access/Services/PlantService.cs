@@ -42,6 +42,19 @@ namespace Bunkering.Access.Services
             };
         }
 
+        public async Task<ApiResponse> GetAllPlantTanksByPlantId(int id)
+        {
+            var tanks = await _unitOfWork.PlantTank.Find(x => x.PlantId == id);
+            var filteredPlants = tanks.Where(x => x.IsDeleted == false);
+            return new ApiResponse
+            {
+                Message = "All Fees found",
+                StatusCode = HttpStatusCode.OK,
+                Success = true,
+                Data = filteredPlants
+            };
+        }
+
         public async Task<ApiResponse> EditPlant(PlantDTO plant)
         {
             var user = await _userManager.FindByEmailAsync(User);
@@ -61,7 +74,7 @@ namespace Bunkering.Access.Services
                 updatePlant.Name = plant.Name;
                 updatePlant.Company = plant.Company;
                 //updatePlant.PlantType = plant.PlantType;
-                updatePlant.ElpsPlantId = plant.FacilityElpsId;
+                updatePlant.ElpsPlantId = plant.PlantElpsId;
                 updatePlant.CompanyElpsId = plant.CompanyElpsId;
                 updatePlant.Email = plant.Email;
                 updatePlant.State = plant.State;
@@ -132,14 +145,17 @@ namespace Bunkering.Access.Services
             try
             {
                 var user = await _userManager.FindByEmailAsync(User);
-
+                
                 var facility = new Plant
                 {
                     Name = plant.Name,
-                    //PlantType = plant.PlantType,
+                    PlantType = 2,
                     State = plant.State,
                     Company = plant.Company,
-                    Email = plant.Email  
+                    Email = plant.Email,
+                    ElpsPlantId = plant.PlantElpsId,
+                    CompanyElpsId = plant.CompanyElpsId,
+                    IsDeleted = false,
                 };
                 await _unitOfWork.Plant.Add(facility);
                 await _unitOfWork.SaveChangesAsync(user.Id);
@@ -165,6 +181,53 @@ namespace Bunkering.Access.Services
                 _response = new ApiResponse
                 {
                     Message = "Plant was added successfully.",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true
+                };
+            }
+            catch (Exception ex)
+            {
+                _response = new ApiResponse
+                {
+                    Message = ex.Message,
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Success = false
+                };
+            }
+
+            return _response;
+        }
+
+        public async Task<ApiResponse> CreatePlantTank(PlantTankDTO plant, int id)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(User);
+                var getPlant = await _unitOfWork.Plant.FirstOrDefaultAsync( x => x.Id == id);
+                if (getPlant.IsDeleted == true)
+                {
+                    _response = new ApiResponse
+                    {
+                        Message = "This Plant has been Deleted.",
+                        StatusCode = HttpStatusCode.NotFound,
+                        Success = false
+                    };
+                }
+                var tank = new PlantTank
+                {
+                   PlantId = id,
+                   Capacity = plant.Capacity,
+                   Position = plant.Position,
+                   Product = plant.Product,
+                   TankName = plant.TankName
+                   
+                };
+                await _unitOfWork.PlantTank.Add(tank);
+                await _unitOfWork.SaveChangesAsync(user.Id);              
+
+                _response = new ApiResponse
+                {
+                    Message = "Tank was added to the Plant successfully.",
                     StatusCode = HttpStatusCode.OK,
                     Success = true
                 };
