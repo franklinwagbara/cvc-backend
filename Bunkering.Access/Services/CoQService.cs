@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using System.Net;
 using System.Security.Claims;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Bunkering.Access.Services
 {
@@ -41,62 +42,62 @@ namespace Bunkering.Access.Services
             _context = context;
         }
 
-        public async Task<ApiResponse> CreateCoQ(CreateCoQViewModel Model)
-        {
-            try
-            {
-                var user = await _userManager.FindByEmailAsync(LoginUserEmail);
+        //public async Task<ApiResponse> CreateCoQ(CreateCoQViewModel Model)
+        //{
+        //    try
+        //    {
+        //        var user = await _userManager.FindByEmailAsync(LoginUserEmail);
 
-                if (user == null)
-                    throw new Exception("Cannot find user with Email: " + LoginUserEmail);
+        //        if (user == null)
+        //            throw new Exception("Cannot find user with Email: " + LoginUserEmail);
 
-                //if (user.UserRoles.FirstOrDefault().Role.Name != RoleConstants.Field_Officer)
-                //   throw new Exception("Only Field Officers can create CoQ.");
+        //        //if (user.UserRoles.FirstOrDefault().Role.Name != RoleConstants.Field_Officer)
+        //        //   throw new Exception("Only Field Officers can create CoQ.");
                 
-                var foundCOQ = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.AppId.Equals(Model.AppId) && x.DepotId.Equals(Model.DepotId));
-                CoQ? result_coq = null;
-                if(foundCOQ == null)
-                {
-                    var coq = _mapper.Map<CoQ>(Model);
-                    coq.CreatedBy = LoginUserEmail;
-                    coq.DateCreated = DateTime.UtcNow.AddHours(1);
-                    coq.CurrentDeskId = user.Id;
-                    coq.Status = Enum.GetName(typeof(AppStatus), AppStatus.Initiated);
-                    result_coq = await _unitOfWork.CoQ.Add(coq);
-                }
-                else
-                {
-                    foundCOQ.DateOfSTAfterDischarge = Model.DateOfSTAfterDischarge;
-                    foundCOQ.DateOfVesselArrival = Model.DateOfVesselArrival;
-                    foundCOQ.DateOfVesselUllage = Model.DateOfVesselUllage;
-                    foundCOQ.DepotPrice = Model.DepotPrice;
-                    foundCOQ.GOV = Model.GOV;
-                    foundCOQ.GSV = Model.GSV;
-                    foundCOQ.MT_VAC = Model.MT_VAC;
-                    foundCOQ.MT_AIR = Model.MT_AIR;
-                    foundCOQ.CurrentDeskId = user.Id;
+        //        var foundCOQ = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.AppId.Equals(Model.AppId) && x.DepotId.Equals(Model.DepotId));
+        //        CoQ? result_coq = null;
+        //        if(foundCOQ == null)
+        //        {
+        //            var coq = _mapper.Map<CoQ>(Model);
+        //            coq.CreatedBy = LoginUserEmail;
+        //            coq.DateCreated = DateTime.UtcNow.AddHours(1);
+        //            coq.CurrentDeskId = user.Id;
+        //            coq.Status = Enum.GetName(typeof(AppStatus), AppStatus.Initiated);
+        //            result_coq = await _unitOfWork.CoQ.Add(coq);
+        //        }
+        //        else
+        //        {
+        //            foundCOQ.DateOfSTAfterDischarge = Model.DateOfSTAfterDischarge;
+        //            foundCOQ.DateOfVesselArrival = Model.DateOfVesselArrival;
+        //            foundCOQ.DateOfVesselUllage = Model.DateOfVesselUllage;
+        //            foundCOQ.DepotPrice = Model.DepotPrice;
+        //            foundCOQ.GOV = Model.GOV;
+        //            foundCOQ.GSV = Model.GSV;
+        //            foundCOQ.MT_VAC = Model.MT_VAC;
+        //            foundCOQ.MT_AIR = Model.MT_AIR;
+        //            foundCOQ.CurrentDeskId = user.Id;
                     
-                    result_coq = await _unitOfWork.CoQ.Update(foundCOQ);
-                }
+        //            result_coq = await _unitOfWork.CoQ.Update(foundCOQ);
+        //        }
 
-                await _unitOfWork.SaveChangesAsync(user.Id);
+        //        await _unitOfWork.SaveChangesAsync(user.Id);
 
-                return new ApiResponse
-                {
-                    Data = result_coq,
-                    Message = "Successfull",
-                    StatusCode = System.Net.HttpStatusCode.OK
-                };
-            }
-            catch (Exception e)
-            {
-                return _apiReponse = new ApiResponse
-                {
-                    Message = $"{e.Message} +++ {e.StackTrace} ~~~ {e.InnerException?.ToString()}\n",
-                    StatusCode = HttpStatusCode.InternalServerError
-                };
-            }
-        }
+        //        return new ApiResponse
+        //        {
+        //            Data = result_coq,
+        //            Message = "Successfull",
+        //            StatusCode = System.Net.HttpStatusCode.OK
+        //        };
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return _apiReponse = new ApiResponse
+        //        {
+        //            Message = $"{e.Message} +++ {e.StackTrace} ~~~ {e.InnerException?.ToString()}\n",
+        //            StatusCode = HttpStatusCode.InternalServerError
+        //        };
+        //    }
+        //}
 
         public async Task<ApiResponse> GetCoQsByAppId(int appId)
         {
@@ -420,7 +421,7 @@ namespace Bunkering.Access.Services
                 {
                     Message = e.Message,
                     StatusCode = HttpStatusCode.InternalServerError,
-                    Success = true
+                    Success = false
                 };
             }
         }
@@ -442,23 +443,23 @@ namespace Bunkering.Access.Services
                         Success = false
                     };
                 }
-                var price = coq.MT_VAC * coq.DepotPrice;
-                var result = new DebitNoteDTO(
-                coq.DateOfSTAfterDischarge,
-                coq.DateOfSTAfterDischarge.AddDays(21),
-                app.MarketerName,
-                coq.Depot!.Name,
-                price,
-                coq.DepotPrice * 0.01m,
-                coq.Depot!.Capacity,
-                price / coq.Depot!.Capacity
-                );
+                //var price = coq.MT_VAC * coq.DepotPrice;
+                //var result = new DebitNoteDTO(
+                //coq.DateOfSTAfterDischarge,
+                //coq.DateOfSTAfterDischarge.AddDays(21),
+                //app.MarketerName,
+                //coq.Depot!.Name,
+                //price,
+                //coq.DepotPrice * 0.01m,
+                //coq.Depot!.Capacity,
+                //price / coq.Depot!.Capacity
+                //);
                 return new ApiResponse
                 {
                     Message = $"Debit note fetched successfully",
                     StatusCode = HttpStatusCode.OK,
                     Success = true,
-                    Data = result
+                    //Data = result
                 };
             }
             else
@@ -472,31 +473,41 @@ namespace Bunkering.Access.Services
             }
         }
 
-        public async Task<ApiResponse> AddCoqTank(COQCrudeTankDTO model) 
+        //public async Task<ApiResponse> AddCoqTank(COQCrudeTankDTO model) 
+        //{
+        //    var user = await _userManager.FindByEmailAsync(LoginUserEmail);
+        //    try
+        //    {
+        //        var tank = await _unitOfWork.CoQTank.FirstOrDefaultAsync(x => x.CoQId == model.CoQId && x.TankName.ToLower().Equals(model.TankName.ToLower()) && x.TankMeasurement.Any(m => m.MeasurementTypeId.Equals(model.MeasurementTypeId)));
+        //        if(tank == null)
+        //        {
+        //            var data = _mapper.Map<TankMeasurement>(model);
+        //            await _unitOfWork.CoQTank.Add(new COQTank
+        //            {
+        //                CoQId = model.CoQId,
+        //                TankName = model.TankName,
+        //                TankMeasurement = new List<TankMeasurement> { data }
+        //            });
+        //            await _unitOfWork.SaveChangesAsync(user.Id);
+
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+
+        //    }
+        //    return _apiReponse;
+        //}
+
+        public async Task<ApiResponse> CreateCOQForGas(CreateGasProductCoQDto model)
         {
             var user = await _userManager.FindByEmailAsync(LoginUserEmail);
-            try
-            {
-                var tank = await _unitOfWork.CoQTank.FirstOrDefaultAsync(x => x.CoQId == model.CoQId && x.TankName.ToLower().Equals(model.TankName.ToLower()) && x.TankMeasurement.Any(m => m.MeasurementTypeId.Equals(model.MeasurementTypeId)));
-                if(tank == null)
-                {
-                    var data = _mapper.Map<TankMeasurement>(model);
-                    await _unitOfWork.CoQTank.Add(new COQTank
-                    {
-                        CoQId = model.CoQId,
-                        TankName = model.TankName,
-                        TankMeasurement = new List<TankMeasurement> { data }
-                    });
-                    await _unitOfWork.SaveChangesAsync(user.Id);
+            var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name == Utils.COQ);
 
-                }
-            }
-            catch (Exception ex)
+            if (appType is null)
             {
-
+                throw new Exception("Application type of COQ is not configured yet, please contact support");
             }
-            return _apiReponse;
-        }
 
         //public async Task<ApiResponse> AddCoqTank(CreateGasProductCoQDto model)
         //{

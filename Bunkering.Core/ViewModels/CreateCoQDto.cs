@@ -8,14 +8,12 @@ namespace Bunkering.Core.ViewModels
 {
     public class CreateCoQGasTankDTO
     {
-        public int CoQId { get; set; }
-        public string TankName { get; set; }
         public double LiquidDensityVac { get; set; }
         public double ObservedSounding { get; set; }
         public double TapeCorrection { get; set; }
         public double LiquidTemperature { get; set; }
         public double ObservedLiquidVolume { get; set; }
-        public double ShrinkageFactorAir { get; set; }
+        public double ShrinkageFactorLiquid { get; set; }
         public double Vcf { get; set; }
         //public double LiquidWeightVAC { get; set; }
         //public double LiquidWeightAir { get; set; }
@@ -36,11 +34,13 @@ namespace Bunkering.Core.ViewModels
 
     public class TankBeforeReading
     {
+        public int TankId { get; set; }
         public CreateCoQGasTankDTO coQGasTankDTO { get; set; }
     }
 
     public class TankAfterReading
     {
+        public int TankId { get; set; }
         public CreateCoQGasTankDTO coQGasTankDTO { get; set; }
     }
 
@@ -54,8 +54,12 @@ namespace Bunkering.Core.ViewModels
         public DateTime DateOfVesselArrival { get; set; }
         public DateTime DateOfVesselUllage { get; set; }
         public DateTime DateOfSTAfterDischarge { get; set; }
-        public Decimal DepotPrice { get; set; }
+        public double DepotPrice { get; set; }
         public List<TankBeforeReading> TankBeforeReadings { get; set; }
         public List<TankAfterReading> TankAfterReadings { get; set; }
+
+        public List<SubmitDocumentDto> SubmitDocuments { get; set; }
+
+
     }
 }
