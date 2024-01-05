@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -501,13 +502,9 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> CreateCOQForGas(CreateGasProductCoQDto model)
         {
-            var user = await _userManager.FindByEmailAsync(LoginUserEmail);
-            var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name == Utils.COQ);
+            var user = await _userManager.FindByEmailAsync(LoginUserEmail) ?? throw new Exception("Unathorise, this action is restricted to only authorise users");
 
-            if (appType is null)
-            {
-                throw new Exception("Application type of COQ is not configured yet, please contact support");
-            }
+            var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name == Utils.COQ) ?? throw new Exception("Application type of COQ is not configured yet, please contact support");
 
             using var transaction = _context.Database.BeginTransaction();
             try
@@ -517,6 +514,7 @@ namespace Bunkering.Access.Services
                 {
                     AppId = model.NoaAppId,
                     PlantId = model.PlantId,
+                    Reference = Utils.GenerateCoQRefrenceCode(),
                     DepotId = model.PlantId,
                     DateOfSTAfterDischarge = model.DateOfSTAfterDischarge,
                     DateOfVesselArrival = model.DateOfVesselArrival,
@@ -525,6 +523,11 @@ namespace Bunkering.Access.Services
                     ArrivalShipFigure = model.ArrivalShipFigure,
                     QuauntityReflectedOnBill = model.QuauntityReflectedOnBill,
                     DischargeShipFigure = model.DischargeShipFigure,
+                    CreatedBy = user.Id,
+                    Status = Enum.GetName(typeof(AppStatus), AppStatus.Processing),
+                    DateCreated = DateTime.UtcNow.AddHours(1),
+                    //SubmittedDate = DateTime.UtcNow.AddHours(1),
+                    
                 };
 
                 _context.CoQs.Add(coq);
@@ -573,13 +576,26 @@ namespace Bunkering.Access.Services
                 #endregion
 
                 #region Document Submission
-                
-                var sDocumentList = _mapper.Map<List<SubmittedDocument>>(model.SubmitDocuments);
 
-                sDocumentList.ForEach(x =>
+                //SubmitDocumentDto sDoc = model.SubmitDocuments.FirstOrDefault();
+                //var sDocument = _mapper.Map<SubmittedDocument>(sDoc);
+
+                var sDocumentList = new List<SubmittedDocument>();
+
+                model.SubmitDocuments.ForEach(x =>
                 {
-                    x.ApplicationId = coq.Id;
-                    x.ApplicationTypeId = appType.Id; 
+                    var newSDoc = new SubmittedDocument
+                    {
+                        DocId = x.DocId,
+                        FileId = x.FileId,
+                        DocName = x.DocName,
+                        DocSource = x.DocSource,
+                        DocType = x.DocType,
+                        ApplicationId = coq.Id,
+                        ApplicationTypeId = appType.Id,
+                    };
+
+                    sDocumentList.Add(newSDoc);
                 });
 
                 _context.SubmittedDocuments.AddRange(sDocumentList);
@@ -587,7 +603,32 @@ namespace Bunkering.Access.Services
 
                 _context.SaveChanges();
 
-                transaction.Commit();
+               
+
+                var submit = await _flow.CoqWorkFlow(coq.Id, Enum.GetName(typeof(AppActions), AppActions.Submit), "COQ Submitted", user.Id);
+                if (submit.Item1)
+                {
+                    transaction.Commit();
+
+                    return new ApiResponse
+                    {
+                        Message = submit.Item2,
+                        StatusCode = HttpStatusCode.OK,
+                        Success = true
+                    };
+                }
+                else
+                {
+                    transaction.Rollback();
+                    return new ApiResponse
+                    {
+                        Message = submit.Item2,
+                        StatusCode = HttpStatusCode.NotAcceptable,
+                        Success = false
+                    };
+
+                }
+                
             }
             catch (Exception ex)
             { 
