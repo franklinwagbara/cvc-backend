@@ -14,7 +14,7 @@ namespace Bunkering.Core.Data
         public string Email { get; set; }
         public string State { get; set; }
         public long?  ElpsPlantId { get; set; }
-        public long  CompanyElpsId { get; set; }
+        public long?  CompanyElpsId { get; set; }
         public int  PlantType { get; set; }
         public bool IsDeleted { get; set; }
         public ICollection<PlantTank> Tanks { get; set; }
