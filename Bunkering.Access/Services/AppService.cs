@@ -174,11 +174,11 @@ namespace Bunkering.Access.Services
                         Reference = Utils.RefrenceCode(),
                         UserId = user.Id,
                         FacilityId = facility.Id,
-                        Status = Enum.GetName(typeof(AppStatus), 0),
+                        Status = Enum.GetName(typeof(AppStatus), AppStatus.Initiated),
                         VesselName = model.VesselName,
                         LoadingPort = model.LoadingPort,
                         MarketerName = model.MarketerName,
-                        IMONumber = model.IMONumber,
+                        //IMONumber = model.IMONumber,
                         MotherVessel = model.MotherVessel,
                         Jetty = model.Jetty,
                         ETA = model.ETA,
@@ -590,7 +590,7 @@ namespace Bunkering.Access.Services
                             Success = false
                         };
                     }
-                    var factypedocs = await _unitOfWork.FacilityTypeDocuments.Find(x => x.ApplicationTypeId.Equals(app.ApplicationTypeId) && x.VesselTypeId.Equals(app.Facility.VesselTypeId));
+                    var factypedocs = await _unitOfWork.FacilityTypeDocuments.Find(x => x.ApplicationTypeId.Equals(app.ApplicationTypeId));
                     if (factypedocs != null && factypedocs.Count() > 0)
                     {
                         var compdocs = _elps.GetCompanyDocuments(app.User.ElpsId, "company").Stringify().Parse<List<Document>>();
@@ -1140,6 +1140,10 @@ namespace Bunkering.Access.Services
                                 AppHistories = histories,
                                 Schedules = sch,
                                 Documents = app.SubmittedDocuments,
+                                app.MarketerName,
+                                app.MotherVessel,
+                                app.Jetty,
+                                app.LoadingPort,
                                 NominatedSurveyor = (await _unitOfWork.NominatedSurveyor.Find(c => c.Id == surveyorId)).FirstOrDefault(),
                                 Vessel = new
                                 {
@@ -1430,6 +1434,41 @@ namespace Bunkering.Access.Services
                     Success = false,
                 };
             }
+        }
+
+        public async Task<ApiResponse> IMONumberVerification(string imoNumber)
+        {
+            var verifyIMO = await _unitOfWork.Facility.FirstOrDefaultAsync(x => x.IMONumber.Equals(imoNumber));
+            if (verifyIMO != null)
+            {
+                _response = new ApiResponse
+                {
+                    Message = "Verified",
+                    Data = new
+                    {
+                       Id = verifyIMO.Id,
+                       IMONumber = verifyIMO.IMONumber,
+                       Name = verifyIMO.Name
+                    },  
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true
+                };
+
+                return _response;
+              
+            }
+            else
+            {
+                _response = new ApiResponse
+                {
+                    Message = "Not Found",
+                    StatusCode = HttpStatusCode.NotFound,
+                    Success = false
+                };
+                
+            }
+
+            return _response;
         }
 
     }

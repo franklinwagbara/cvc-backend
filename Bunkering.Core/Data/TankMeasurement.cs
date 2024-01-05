@@ -10,38 +10,40 @@ namespace Bunkering.Core.Data
     {
         public int Id { get; set; }
         public int COQTankId { get; set; }
-        public int MeasurementTypeId { get; set; }
-        public double DIP { get; set; }
-        public double WaterDIP { get; set; }
-        public double TOV { get; set; }
-        public double WaterVolume { get; set; }
-        public double FloatRoofCorr { get; set; }
-        public double GOV { get; set; }
-        public decimal Tempearture { get; set; }
-        public double Density { get; set; }
-        public double VCF { get; set; }
-        public double GSV { get; set; }
-        public double MTVAC { get; set; }
-        public double LiquidDensityAir { get; set; }
-        public double ObservedSounding { get; set; }
-        public double TapeCorrection { get; set; }
-        public double CorrectedLiquidVolume { get; set; }
-        public double ObservedLiquidVolume { get; set; }
-        public double ShrinkageFactorLiquid { get; set; }
-        public double CorrectedLiquidVolumeM3 { get; set; }
-        public double LiquidWeightVAC { get; set; }
-        public double LiquidWeightAir { get; set; }
-        public double TankVolume { get; set; }
-        public double VapourVolume { get; set; }
-        public double ShrinkageFactorVapour { get; set; }
-        public double CorrectedVapourVolume { get; set; }
-        public double VapourTemperature { get; set; }
-        public double VapourPressure { get; set; }
-        public double MolecularWeight { get; set; }
-        public double VapourFactor { get; set; }
-        public double VapourWeightVAC { get; set; }
-        public double VapourWeightAir { get; set; }
-        public double TotalGasWeightVAC { get; set; }
-        public double TotalGasWeightAir { get; set; }
+        public string MeasurementType { get; set; }
+        public double DIP { get; set; } = 0;
+        public double WaterDIP { get; set; } = 0;
+        public double TOV { get; set; } = 0;
+        public double WaterVolume { get; set; } = 0;
+        public double FloatRoofCorr { get; set; } = 0;
+        public double GOV { get; set; } = 0;
+        public decimal Tempearture { get; set; } = 0;
+        public double Density { get; set; } = 0;
+        public double VCF { get; set; } = 0;
+        public double GSV { get; set; } = 0;
+        public double MTVAC { get; set; } = 0;
+        public double LiquidDensityVac { get; set; } = 0;
+        public double ObservedSounding { get; set; } = 0;
+        public double TapeCorrection { get; set; } = 0;
+        public double ObservedLiquidVolume { get; set; } = 0;
+        public double ShrinkageFactorLiquid { get; set; } = 0;
+        public double TankVolume { get; set; } = 0;
+        public double ShrinkageFactorVapour { get; set; } = 0;
+        public double VapourTemperature { get; set; } = 0;
+        public double VapourPressure { get; set; } = 0;
+        public double MolecularWeight { get; set; } = 0;
+        public double VapourFactor { get; set; } = 0;
+        public double LiquidDensityAir => LiquidDensityVac * 0.0011;
+        public double CorrectedLiquidLevel => ObservedSounding + TapeCorrection;
+        public double CorrectedLiquidVolumeM3 => ObservedLiquidVolume * ShrinkageFactorLiquid;
+        public double GrossStandardVolumeGas => CorrectedLiquidVolumeM3 * VCF;
+        public double LiquidWeightVAC => LiquidDensityVac * GrossStandardVolumeGas;
+        public double LiquidWeightAir => LiquidDensityAir * GrossStandardVolumeGas;
+        public double VapourVolume => TankVolume - ObservedLiquidVolume;
+        public double CorrectedVapourVolume => VapourVolume * ShrinkageFactorVapour;
+        public double VapourWeightVAC => CorrectedVapourVolume * VapourFactor;
+        public double VapourWeightAir => (LiquidDensityAir / LiquidDensityVac) * VapourWeightVAC;
+        public double TotalGasWeightVAC => LiquidWeightVAC + VapourWeightVAC;
+        public double TotalGasWeightAir => LiquidWeightAir + VapourWeightAir;
     }
 }

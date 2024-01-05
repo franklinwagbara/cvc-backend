@@ -71,6 +71,15 @@ namespace Bunkering.Access
             }
         }
 
+        public static string GenerateCoQRefrenceCode()
+        {
+            lock (lockThis)
+            {
+                Thread.Sleep(1000);
+                return $"224{DateTime.Now.ToString("MMddyyHHmmss")}";
+            }
+        }
+
         public static void SendMail(Dictionary<string, string> mailsettings, string toEmail, string subject, string body, string bcc = null)
         {
             var credentials = new NetworkCredential(mailsettings.GetValue("UserName"), mailsettings.GetValue("mailPass"));

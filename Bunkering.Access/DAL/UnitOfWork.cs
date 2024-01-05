@@ -15,6 +15,8 @@ namespace Bunkering.Access.DAL
         public ICountry Country { get; private set; }
         public IDepot Depot { get; private set; }
         public IApplicationDepot ApplicationDepot { get; private set; }
+        public IPlant Plant { get; private set; }
+        public IPlantTank PlantTank { get; private set; }
         public IFacility Facility { get; private set; }
         public IFacilityType FacilityType { get; private set; }
         public IFacilityTypeDocuments FacilityTypeDocuments { get; private set; }
@@ -92,6 +94,8 @@ namespace Bunkering.Access.DAL
             vDebitNote = vDebitNote != null ? vDebitNote : new vDebitNoteRepository(_context);
             ApplicationDepot = ApplicationDepot ?? new ApplicationDepotRepository(_context);
             DepotOfficer = DepotOfficer ?? new DepotOfficerRepository(_context);
+            Plant = Plant ?? new PlantRepository(_context);
+            PlantTank = PlantTank ?? new PlantTankRepository(_context);
         }
 
         public int Save() => _context.SaveChanges();

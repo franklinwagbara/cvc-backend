@@ -16,8 +16,8 @@ namespace Bunkering.Core.ViewModels
 			CreateMap<TankViewModel, Tank>().ReverseMap();
 			CreateMap<WorkflowviewModel, WorkFlow>().ReverseMap();
 			CreateMap<FacilitySourceDto, FacilitySource>().ReverseMap();
-			CreateMap<CoQGasTankDTO, COQTank>().ReverseMap();
-			CreateMap<COQCrudeTankDTO, COQTank>().ReverseMap();
+			CreateMap<CreateCoQGasTankDTO, TankMeasurement>().ReverseMap();
+			CreateMap<COQCrudeTankDTO, TankMeasurement>().ReverseMap();
 		}
 	}
 }

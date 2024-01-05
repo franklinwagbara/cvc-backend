@@ -214,13 +214,13 @@ namespace Bunkering.Access.Services
                     coq.SubmittedDate = DateTime.UtcNow.AddHours(1);
 
                 if (action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Approve).ToLower()))
-                    message = "Application processed successfully and moved to the next processing staff";
+                    message = "COQ processed successfully and moved to the next processing staff";
                 else if (action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Submit).ToLower()))
-                    message = "Application submitted successfully";
+                    message = "COQ submitted successfully";
                 else if (action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Resubmit).ToLower()))
-                    message = "Application re-submitted successfully";
+                    message = "COQ re-submitted successfully";
                 else
-                    message = "Application has been returned for review";
+                    message = "COQ has been returned for review";
 
                 await _unitOfWork.CoQ.Update(coq);
                 await _unitOfWork.SaveChangesAsync(currentUser.Id);
@@ -237,7 +237,7 @@ namespace Bunkering.Access.Services
                         message = $"COQ Application with reference {coq.Reference} has been approved and certificate {certificate.Item2} has been generated successfully";
                 }
                 //send and save notification
-                await SendNotification(app, action, nextProcessingOfficer, message);
+                //await SendCOQNotification(coq, action, nextProcessingOfficer, message);
                 return (true, message);
                 
             }
@@ -249,7 +249,7 @@ namespace Bunkering.Access.Services
         public async Task<WorkFlow> GetWorkFlow(string action, ApplicationUser currentuser, int VesselTypeId)
         => action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Submit).ToLower()) || action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Resubmit))
             ? await _unitOfWork.Workflow.FirstOrDefaultAsync(x => x.Action.ToLower().Trim().Equals(action.ToLower().Trim())
-                    && currentuser.UserRoles.FirstOrDefault().Role.Name.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim()) && x.VesselTypeId == VesselTypeId)
+                    && currentuser.UserRoles.FirstOrDefault().Role.Name.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim()))
             : await _unitOfWork.Workflow.FirstOrDefaultAsync(x => x.Action.ToLower().Trim().Equals(action.ToLower().Trim())
                     && currentuser.UserRoles.FirstOrDefault().Role.Name.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim())
             && currentuser.LocationId == x.FromLocationId && x.VesselTypeId == VesselTypeId);
