@@ -1514,5 +1514,37 @@ namespace Bunkering.Access.Services
             return _response;
 
         }
+
+        public async Task<ApiResponse> GetAllVessels()
+        {
+            var vessel = await _unitOfWork.Facility.GetAll();
+            if (vessel != null)
+            {
+                _response = new ApiResponse
+                {
+                    Message = "Vessels was found",
+                    StatusCode = HttpStatusCode.NotFound,
+                    Success = true,
+                    Data = vessel.Select(x => new
+                    {
+                        VesselName = x.Name,
+                        ImoNumber = x.IMONumber,
+                        VesselId = x.Id,
+                    }).ToList()
+                };
+            }
+            else
+            {
+                _response = new ApiResponse
+                {
+                    Message = "No Vessel was found",
+                    StatusCode = HttpStatusCode.NotFound,
+                    Success = false,
+                };
+            }
+            
+
+            return _response;
+        }
     }
 }
