@@ -47,6 +47,32 @@ namespace Bunkering.Access.Services
             }
 
         }
+        public async Task<ApiResponse> GetProductsById(int id)
+        {
+            var getById = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(id));
+            if(getById != null)
+            {
+                _response = new ApiResponse
+                {
+                    Message = "Successful",
+                    Data = getById,
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true
+
+                };
+            }
+            else
+            {
+                _response = new ApiResponse
+                {
+
+                    Message = "Product Not Found",
+                    StatusCode = HttpStatusCode.NotFound,
+                    Success = false
+                };
+            }
+            return _response;
+        }
         public async Task<ApiResponse> CreateProduct(ProductViewModel model)
         {
             var createProduct = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Name.ToLower() == model.Name.ToLower());
@@ -111,6 +137,8 @@ namespace Bunkering.Access.Services
             }
             return _response;
         }
+
+        
       
 
       
