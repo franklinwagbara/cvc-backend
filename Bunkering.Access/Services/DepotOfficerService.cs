@@ -63,7 +63,10 @@ namespace Bunkering.Access.Services
         {
             try
             {
+                var userExists = await _userManager.Users.AnyAsync(c => c.Id == newDepotOfficer.UserID.ToString());
                 var depotExists = await _unitOfWork.Plant.FirstOrDefaultAsync(c => c.Id ==  newDepotOfficer.DepotID) is not null;
+
+
                 if (!depotExists)
                 {
                     _response = new ApiResponse
@@ -74,8 +77,8 @@ namespace Bunkering.Access.Services
                     };
                     return _response;
                 }
-                var userExists = await _userManager.Users.AnyAsync(c => c.Id == newDepotOfficer.UserID.ToString());
-                if (!userExists)
+
+                else if(!userExists)
                 {
                     _response = new ApiResponse
                     {
@@ -85,20 +88,36 @@ namespace Bunkering.Access.Services
                     };
                     return _response;
                 }
-                var map = new PlantFieldOfficer
+                else if(depotExists != null && userExists != null)
                 {
-                    PlantID = newDepotOfficer.DepotID,
-                    OfficerID = newDepotOfficer.UserID
+                    _response = new ApiResponse
+                    {
+                        Message = "Officer is Already Assigned To This Depot",
+                        StatusCode = HttpStatusCode.Conflict,
+                        Success = false,
+                    };
 
-                };
-                await _unitOfWork.PlantOfficer.Add(map);
-                await _unitOfWork.SaveChangesAsync("");
-                _response = new ApiResponse
+                }
+                else
                 {
-                    Message = "Facility Officer mapping was added successfully.",
-                    StatusCode = HttpStatusCode.OK,
-                    Success = true
-                };
+                    var map = new PlantFieldOfficer
+                    {
+                        PlantID = newDepotOfficer.DepotID,
+                        OfficerID = newDepotOfficer.UserID
+
+                    };
+                    await _unitOfWork.PlantOfficer.Add(map);
+                    await _unitOfWork.SaveChangesAsync("");
+
+                    _response = new ApiResponse
+                    {
+                        Message = "Facility Officer mapping was added successfully.",
+                        StatusCode = HttpStatusCode.OK,
+                        Success = true,
+                    };
+
+                }
+
             }
             catch (Exception ex)
             {

@@ -70,7 +70,7 @@ namespace Bunkering.Controllers.API
 
         public async Task<IActionResult> EditIMONoByName(string name, string newIMO) => Response(await _appService.EditIMONoByName(name, newIMO));
 
-        [Route("get-avialable-vessels")]
+        [Route("get-available-vessels")]
         [HttpGet]
         public async Task<IActionResult> GetAvailableVesssels() => Response(await _appService.GetAllVessels());
 

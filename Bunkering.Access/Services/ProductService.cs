@@ -137,10 +137,48 @@ namespace Bunkering.Access.Services
             }
             return _response;
         }
+        public async Task<ApiResponse> DeleteProduct(int id)
+        {
+            var delProduct = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(id));
+            if (delProduct != null)
+            {
+                if (!delProduct.IsDeleted)
+                {
+                    delProduct.IsDeleted = true;
+                    await _unitOfWork.Product.Update(delProduct);
+                    _unitOfWork.Save();
 
-        
-      
+                    _response = new ApiResponse
+                    {
+                        Message = "Successful",
+                        Data = delProduct,
+                        StatusCode = HttpStatusCode.OK,
+                        Success = true,
+                    };
+                }
+                else
+                {
+                    _response = new ApiResponse
+                    {
+                        Message = "Product already deleted",
+                        StatusCode = HttpStatusCode.BadRequest,
+                        Success = true,
+                    };
+                }
 
-      
+
+            }
+            else
+            {
+                _response = new ApiResponse
+                {
+                    Message = "Product doesnt exist",
+                    StatusCode = HttpStatusCode.NotFound,
+                    Success = false,
+                };
+            }
+            return _response;
+        }
+
     }
 }
