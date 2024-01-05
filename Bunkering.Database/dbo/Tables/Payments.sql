@@ -1,6 +1,8 @@
 ﻿CREATE TABLE [dbo].[Payments] (
     [Id]                 INT             IDENTITY (1, 1) NOT NULL,
     [ApplicationId]      INT             NOT NULL,
+    [COQId]              INT             NULL,
+    [ApplicationTypeId]  INT             NULL,
     [OrderId]            NVARCHAR (MAX)  NOT NULL,
     [ExtraPaymentId]     INT             NULL,
     [PaymentType]        NVARCHAR (MAX)  NOT NULL,
@@ -10,9 +12,9 @@
     [RRR]                NVARCHAR (MAX)  NOT NULL,
     [Description]        NVARCHAR (MAX)  NOT NULL,
     [AppReceiptId]       NVARCHAR (MAX)  NOT NULL,
-    [Amount]             DECIMAL (18, 2) NOT NULL,
-    [Arrears]            DECIMAL (18, 2) NOT NULL,
-    [ServiceCharge]      DECIMAL (18, 2) NOT NULL,
+    [Amount]             FLOAT NOT NULL,
+    [Arrears]            FLOAT NOT NULL,
+    [ServiceCharge]      FLOAT NOT NULL,
     [TxnMessage]         NVARCHAR (MAX)  NOT NULL,
     [RetryCount]         INT             NOT NULL,
     [LastRetryDate]      DATETIME2 (7)   NOT NULL,
@@ -25,6 +27,8 @@
     CONSTRAINT [FK_Payments_Applications_ApplicationId] FOREIGN KEY ([ApplicationId]) REFERENCES [dbo].[Applications] ([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_Payments_ExtraPayments_ExtraPaymentId] FOREIGN KEY ([ExtraPaymentId]) REFERENCES [dbo].[ExtraPayments] ([Id])
 );
+
+
 
 
 

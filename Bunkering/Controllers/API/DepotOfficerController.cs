@@ -1,5 +1,6 @@
 ﻿using Bunkering.Access.Services;
 using Bunkering.Core.Data;
+using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,11 +40,11 @@ namespace Bunkering.Controllers.API
 
         [Route("add-mapping")]
         [HttpPost]
-        public async Task<IActionResult> AddMapping(DepotFieldOfficer model) => Response(await _depotOfficerService.CreateDepotOfficerMapping(model));
+        public async Task<IActionResult> AddMapping(DepotFieldOfficerViewModel model) => Response(await _depotOfficerService.CreateDepotOfficerMapping(model));
 
-        [Route("edit-mapping")]
+        [Route("edit-mapping/{id}")]
         [HttpPut]
-        public async Task<IActionResult> EditMapping(DepotFieldOfficer model) => Response(await _depotOfficerService.EditDepotOfficerMapping(model));
+        public async Task<IActionResult> EditMapping(int id, DepotFieldOfficerViewModel model) => Response(await _depotOfficerService.EditDepotOfficerMapping(id, model));
 
         [Route("get-mapping-byId")]
         [HttpGet]

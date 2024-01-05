@@ -4,6 +4,7 @@ using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System.Net;
+using System.Security.Claims;
 
 namespace Bunkering.Access.Services
 {
@@ -143,7 +144,7 @@ namespace Bunkering.Access.Services
         }
         public async Task<ApiResponse> GetAllDepot()
         {
-            var allDepot = await _unitOfWork.Depot.GetAll();
+            var allDepot = await _unitOfWork.Depot.GetAll("State");
             allDepot = allDepot.Where(x => x.DeletedAt == null);
 
             _response = new ApiResponse
@@ -157,5 +158,34 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
+        public async Task<ApiResponse> AllDepotByAppId(int AppId)
+        {
+            try
+            {
+                var user = _contextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.PrimarySid)?.Value;
+                var depotOffices = (await _unitOfWork.DepotOfficer.Find(c => c.OfficerID.ToString() == user && c.IsDeleted != true)).ToList();
+                var appDepots = (await _unitOfWork.ApplicationDepot.Find(x => x.AppId == AppId, "Depot")).ToList() ?? throw new Exception("No Depot was applied for this NOA application.");
+                var depots = appDepots.Where(x => depotOffices
+                .Exists(a => a.DepotID == x.DepotId)).Select(x => x.Depot)
+                .ToList() ?? throw new Exception("Could find these depot(s)");
+
+                return new ApiResponse
+                {
+                    Data = depots,
+                    Message = "Successful.",
+                    Success = true,
+                    StatusCode = HttpStatusCode.OK
+                };
+            }
+            catch (Exception e)
+            {
+                return new ApiResponse
+                {
+                    Message = $"{e.Message} +++ {e.StackTrace} ~~~ {e.InnerException?.ToString()}",
+                    Success = false,
+                    StatusCode = HttpStatusCode.InternalServerError
+                };
+            }
+        }
     }
 }

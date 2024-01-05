@@ -1,6 +1,7 @@
 ﻿using Bunkering.Access;
 using Bunkering.Access.IContracts;
 using Bunkering.Access.Services;
+using Bunkering.Core.Data;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,27 +34,45 @@ namespace Bunkering.Controllers.API
 		[HttpGet]
 		public async Task<IActionResult> Index()
 		{
-			var permits = await _unitOfWork.Permit.GetAll("Application.User.Company,Application.Facility.VesselType");
-
-			return Ok(new ApiResponse
+			try
 			{
-				//using if statements here ?: to check conditions for the permit
-				Message = permits.Count() > 0 ? "Success, Permit Found" : "Permit Not Found",
-				StatusCode = permits.Count() > 0 ? HttpStatusCode.OK : HttpStatusCode.BadRequest,
-				Success = permits.Count() > 0 ? true : false,
-				Data = permits.Count() > 0 ? permits.Select(x => new
-				{
-					x.Id,
-					CompanyName = x.Application.User.Company.Name,
-					LicenseNo = x.PermitNo,
-					IssuedDate = x.IssuedDate.ToString("MMM dd, yyyy HH:mm:ss"),
-					ExpiryDate = x.ExpireDate.ToString("MMM dd, yyyy HH:mm:ss"),
-					x.Application.User.Email,
-					VesselTypeType = x.Application.Facility.VesselType.Name,
-					VesselName = x.Application.Facility.Name,
-				}) : new { }
-			});
+                var coqs = await _unitOfWork.CoQ.GetAll("Application.User.Company,Depot");
 
+                return Ok(new ApiResponse
+                {
+                    Message = "Success",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true,
+                    Data = coqs.Select(c => new
+                    {
+						AppId = c.AppId,
+                        ImportName = c.Application?.User?.Company?.Name,
+						VesselName = c.Application?.VesselName,
+						DepotName = c.Depot?.Name,
+						DepotId = c.DepotId,
+                        DateOfVesselArrival = c.DateOfVesselArrival.ToShortDateString(),
+                        DateOfVesselUllage = c.DateOfVesselUllage.ToShortDateString(),
+                        DateOfSTAfterDischarge = c.DateOfSTAfterDischarge.ToShortDateString(),
+						MT_VAC = c.MT_VAC,
+						MT_AIR = c.MT_AIR,
+						GOV = c.GOV,
+						GSV = c.GSV,
+						DepotPrice = c.DepotPrice,
+						CreatedBy = c.CreatedBy,
+						Id = c.Id
+                    }).ToList()
+                });
+            }
+			catch (Exception e)
+			{
+                return Response(new ApiResponse
+                {
+                    Message = e.Message,
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Success = true,
+                    Data = null
+                });
+            }
 		}
 
 		[ProducesResponseType(typeof(ApiResponse), 200)]
@@ -65,39 +84,68 @@ namespace Bunkering.Controllers.API
 		[HttpGet]
 		public async Task<IActionResult> GetById(int id)
 		{
-			var permits = (await _unitOfWork.Permit
-				.Find(c => c.Id == id,"Application.User.Company,Application.Facility.VesselType"))
-				.FirstOrDefault();
+            try
+            {
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id == id, "Application.User.Company,Depot");
 
-			return Ok(new ApiResponse
-			{
-				//using if statements here ?: to check conditions for the permit
-				Message = permits is not null ? "Success, Permit Found" : "Permit Not Found",
-				StatusCode = permits is not null ? HttpStatusCode.OK : HttpStatusCode.BadRequest,
-				Success = permits is null,
-				Data = permits is null ? null! : new
-				{
-					permits.Id,
-					CompanyName = permits.Application?.User?.Company?.Name,
-					LicenseNo = permits.PermitNo,
-					IssuedDate = permits.IssuedDate.ToString("MMM dd, yyyy HH:mm:ss"),
-					EpermitspiryDate = permits.ExpireDate.ToString("MMM dd, yyyy HH:mm:ss"),
-					permits.Application?.User?.Email,
-					VesselTypeType = permits.Application?.Facility?.VesselType?.Name,
-					VesselName = permits.Application?.Facility?.Name,
-				}
-			});
+                return Ok(new ApiResponse
+                {
+                    Message = "Success",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true,
+                    Data = new {
+                        AppId = coq.AppId,
+                        ImportName = coq.Application?.User?.Company?.Name,
+                        VesselName = coq.Application?.VesselName,
+                        DepotName = coq.Depot?.Name,
+                        DepotId = coq.DepotId,
+                        DateOfVesselArrival = coq.DateOfVesselArrival.ToShortDateString(),
+                        DateOfVesselUllage = coq.DateOfVesselUllage.ToShortDateString(),
+                        DateOfSTAfterDischarge = coq.DateOfSTAfterDischarge.ToShortDateString(),
+                        DateOfVesselArrivalISO = coq.DateOfVesselArrival.ToString("MM/dd/yyyy"),
+                        DateOfVesselUllageISO = coq.DateOfVesselUllage.ToString("MM/dd/yyyy"),
+                        DateOfSTAfterDischargeISO = coq.DateOfSTAfterDischarge.ToString("MM/dd/yyyy"),
+                        MT_VAC = coq.MT_VAC,
+                        MT_AIR = coq.MT_AIR,
+                        GOV = coq.GOV,
+                        GSV = coq.GSV,
+                        DepotPrice = coq.DepotPrice,
+                        CreatedBy = coq.CreatedBy,
+                        Id = coq.Id,
+                        SubmittedDate = coq.SubmittedDate
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                return Response(new ApiResponse
+                {
+                    Message = e.Message,
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Success = true,
+                    Data = null
+                });
+            }
+        }
 
-		}
+        //[ProducesResponseType(typeof(ApiResponse), 200)]
+        //[ProducesResponseType(typeof(ApiResponse), 404)]
+        //[ProducesResponseType(typeof(ApiResponse), 405)]
+        //[ProducesResponseType(typeof(ApiResponse), 500)]
+        //[Produces("application/json")]
+        //[Route("createCOQ")]
+        //[HttpPost]
+        //public async Task<IActionResult> CreateCoQ([FromBody] CreateCoQViewModel Model) => Response(await _coqService.CreateCoQ(Model));
 
-        [ProducesResponseType(typeof(ApiResponse), 200)]
-        [ProducesResponseType(typeof(ApiResponse), 404)]
-        [ProducesResponseType(typeof(ApiResponse), 405)]
-        [ProducesResponseType(typeof(ApiResponse), 500)]
-        [Produces("application/json")]
-        [Route("createCOQ")]
-        [HttpPost]
-        public async Task<IActionResult> CreateCoQ([FromBody] CreateCoQViewModel Model) => Response(await _coqService.CreateCoQ(Model));
+        [AllowAnonymous]
+		[ProducesResponseType(typeof(ApiResponse), 200)]
+		[ProducesResponseType(typeof(ApiResponse), 404)]
+		[ProducesResponseType(typeof(ApiResponse), 405)]
+		[ProducesResponseType(typeof(ApiResponse), 500)]
+		[Produces("application/json")]
+		[Route("coq_by_appId/{appId}")]
+		[HttpGet]
+		public async Task<IActionResult> GetCoqs(int appId) => Response(await _coqService.GetCoQsByAppId(appId));
 
         [AllowAnonymous]
 		[ProducesResponseType(typeof(ApiResponse), 200)]
@@ -172,5 +220,125 @@ namespace Bunkering.Controllers.API
         [HttpPost]
         public async Task<IActionResult> AddDocuments(int id) => Response(await _coqService.AddDocuments(id));
 
+        /// <summary>
+        /// This endpoint is used to submit a COQ Application
+        /// </summary>
+        /// <returns>Returns a message after submission </returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// GET: api/coq/submit/xxxx
+        /// 
+        /// </remarks>
+        /// <param name="id">The coq id used to fetch coq application</param>
+        /// <response code="200">Returns success message </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("submit")]
+        [HttpPost]
+        public async Task<IActionResult> Submit(int id) => Response(await _coqService.Submit(id));
+
+        /// <summary>
+        /// This endpoint is used to process a COQ Application
+        /// </summary>
+        /// <returns>Returns a message after submission </returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// GET: api/coq/submit/xxxx
+        /// 
+        /// </remarks>
+        /// <param name="id">The coq id used to fetch coq application</param>
+        /// <response code="200">Returns success message </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("process")]
+        [HttpPost]
+        public async Task<IActionResult> Process(int id, string act, string comment) => Response(await _coqService.Process(id, act, comment));
+
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Produces("application/json")]
+        [Route("debit_note/{id}")]
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> DebitNote(int id)
+        {
+            var note = (await _coqService.GetDebitNote(id));
+            var data = note.Data as DebitNoteDTO;
+            if (data is not null)
+            {
+                var viewAsPdf = new ViewAsPdf
+                {
+                    Model = data,
+                    PageHeight = 327,
+                    PageMargins = new Rotativa.AspNetCore.Options.Margins(10, 10, 10, 10),
+
+                    ViewName = "DebitNote"
+                };
+                var pdf = await viewAsPdf.BuildFile(ControllerContext);
+                return File(new MemoryStream(pdf), "application/pdf");
+            }
+            return BadRequest(note);
+
+        }
+
+        /// <summary>
+        /// This endpoint is used to add coq tanks
+        /// </summary>
+        /// <returns>Returns a message after adding </returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// POST: api/coq/add-coq-tank/xxxx
+        /// 
+        /// </remarks>
+        /// <param name="model">model for adding tank to coq</param>
+        /// <response code="200">Returns a success message </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        //[ProducesResponseType(typeof(ApiResponse), 200)]
+        //[ProducesResponseType(typeof(ApiResponse), 404)]
+        //[ProducesResponseType(typeof(ApiResponse), 405)]
+        //[ProducesResponseType(typeof(ApiResponse), 500)]
+        //[Route("add-coq-tank")]
+        //[HttpPost]
+        //public async Task<IActionResult> AddCoqTank(COQCrudeTankDTO model) => Response(await _coqService.AddCoqTank(model));
+
+        /// <summary>
+        /// This endpoint is used to add coq gas tanks
+        /// </summary>
+        /// <returns>Returns a message after adding </returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// POST: api/coq/add-coq-tank/xxxx
+        /// 
+        /// </remarks>
+        /// <param name="model">model for adding tank to coq</param>
+        /// <response code="200">Returns a success message </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("add-coq-gas-tank")]
+        [HttpPost]
+        public async Task<IActionResult> CreateCOQForGas(CreateGasProductCoQDto model) => Response(await _coqService.CreateCOQForGas(model));
     }
 }

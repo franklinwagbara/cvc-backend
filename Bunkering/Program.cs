@@ -29,7 +29,7 @@ builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("AppSett
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("EmailSetting"));
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.Configure<ErrorHandlingOptions>(builder.Configuration.GetSection("ErrorHandling"));
-
+builder.Services.AddControllers();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddAuthentication(x =>
 {
@@ -67,7 +67,6 @@ builder.Services.AddAuthorization(options =>
 });
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddControllers();
 builder.Services.AddSwaggerGen(options =>
 {
 	options.SwaggerDoc("v1", new OpenApiInfo
@@ -177,5 +176,7 @@ using (var scope = scopedFactory.CreateScope())
 	await service.CreateVesselType();
 	await service.CreateProducts();
 	await service.CreateLocations();
+	await service.CreateTankMeasurementTypes();
+	
 }
 app.Run();

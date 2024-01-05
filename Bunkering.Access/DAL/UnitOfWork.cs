@@ -15,6 +15,8 @@ namespace Bunkering.Access.DAL
         public ICountry Country { get; private set; }
         public IDepot Depot { get; private set; }
         public IApplicationDepot ApplicationDepot { get; private set; }
+        public IPlant Plant { get; private set; }
+        public IPlantTank PlantTank { get; private set; }
         public IFacility Facility { get; private set; }
         public IFacilityType FacilityType { get; private set; }
         public IFacilityTypeDocuments FacilityTypeDocuments { get; private set; }
@@ -36,13 +38,17 @@ namespace Bunkering.Access.DAL
         public IWorkflow Workflow { get; private set; }
         public IVesselType VesselType { get; set; }
         public ICoQ CoQ { get; set; }
-
-
+        public ICOQTank CoQTank { get; set; }
+        public ICOQHistory COQHistory { get; set; }
+        public ICOQCertificate COQCertificate { get; set; }
+        public IMeasurementTypeRepository MeasurementType { get; private set; }
         public IvAppVessel vAppVessel { get; private set; }
         public IvAppPayment vAppPayment { get; private set; }
         public IvAppUser vAppUser { get; private set; }
         public IvFacilityPermit vFacilityPermit { get; private set; }
         public IvPayment vPayment { get; private set; }
+        public IvDebitNote vDebitNote { get; private set; }
+        public IApplicationSurveyor ApplicationSurveyor { get; private set; }
 
         public UnitOfWork(ApplicationContext context)
         {
@@ -64,6 +70,7 @@ namespace Bunkering.Access.DAL
             Location = Location != null ? Location : new LocationRepository(_context);
             Message = Message != null ? Message : new MessageRepository(_context);
             NominatedSurveyor = NominatedSurveyor != null ? NominatedSurveyor : new NominatedSurveyorRepository(_context);
+            ApplicationSurveyor = ApplicationSurveyor != null ? ApplicationSurveyor : new ApplicationSurveyorRepository(_context);
             Payment = Payment != null ? Payment : new PaymentRepository(_context);
             Permit = Permit != null ? Permit : new PermitRepository(_context);
             Product = Product != null ? Product : new ProductRepository(_context);
@@ -75,13 +82,20 @@ namespace Bunkering.Access.DAL
             Workflow = Workflow != null ? Workflow : new WorkflowRepository(_context);
             VesselType = VesselType != null ? VesselType : new VeseelTypeRepository(_context);
             CoQ = CoQ != null ? CoQ : new CoQRepository(_context);
-
+            CoQTank = CoQTank != null ? CoQTank : new COQTankRepository(_context);
+            COQHistory = COQHistory != null? COQHistory: new COQHistoryRepository(_context);
+            COQCertificate = COQCertificate != null? COQCertificate: new COQCertificateRepository(_context);
+             MeasurementType = MeasurementType != null? MeasurementType : new MeasurementTypeRepository(_context);
             vAppVessel = vAppVessel != null ? vAppVessel : new vAppVesselRepository(_context);
             vFacilityPermit = vFacilityPermit != null ? vFacilityPermit : new vFacilityPermitRepository(_context);
             vAppPayment = vAppPayment != null ? vAppPayment : new vAppPaymentRepository(_context);
             vAppUser = vAppUser != null ? vAppUser : new vAppUserRepository(_context);
             vPayment = vPayment != null ? vPayment : new vPaymentRepository(_context);
+            vDebitNote = vDebitNote != null ? vDebitNote : new vDebitNoteRepository(_context);
             ApplicationDepot = ApplicationDepot ?? new ApplicationDepotRepository(_context);
+            DepotOfficer = DepotOfficer ?? new DepotOfficerRepository(_context);
+            Plant = Plant ?? new PlantRepository(_context);
+            PlantTank = PlantTank ?? new PlantTankRepository(_context);
         }
 
         public int Save() => _context.SaveChanges();

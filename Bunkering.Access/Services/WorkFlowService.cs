@@ -187,15 +187,72 @@ namespace Bunkering.Access.Services
             return (res, processingMsg);
         }
 
+        public async Task<(bool, string)> CoqWorkFlow(int coqId, string action, string comment, string currUserId = null, string delUserId = null)
+        {
+            try
+            {
+                var message = string.Empty;
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id.Equals(coqId)) ?? throw new Exception($"COQ with Id={coqId} was not found.");
+                var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == coq.AppId, "User,Facility.VesselType,Payments") ?? throw new Exception($"Application with Id={coq.AppId} was not found.");
+
+                currUserId = string.IsNullOrEmpty(currUserId) ? coq.CurrentDeskId : currUserId;
+                var currentUser = _userManager.Users
+                        .Include(x => x.Company)
+                        .Include(ol => ol.Office)
+                        .Include(lo => lo.UserRoles)
+                        .ThenInclude(r => r.Role)
+                        .Include(lo => lo.Location)
+                        .FirstOrDefault(x => x.Id.Equals(currUserId)) ?? throw new Exception($"User with Id={currUserId} was not found.");
+                var workFlow = (await GetWorkFlow(action, currentUser, app.Facility.VesselTypeId)) ?? throw new Exception($"Work Flow for this action was not found.");
+                var nextProcessingOfficer = (await GetNextStaffCOQ(coqId, action, workFlow, currentUser, delUserId)) ?? throw new Exception($"No processing staff for this action was not found.");
+
+                coq.CurrentDeskId = nextProcessingOfficer.Id;
+                coq.Status = workFlow.Status;
+                coq.DateModified = DateTime.UtcNow.AddHours(1);
+                
+                if(action.Equals(Enum.GetName(typeof(AppActions), AppActions.Submit)))
+                    coq.SubmittedDate = DateTime.UtcNow.AddHours(1);
+
+                if (action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Approve).ToLower()))
+                    message = "COQ processed successfully and moved to the next processing staff";
+                else if (action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Submit).ToLower()))
+                    message = "COQ submitted successfully";
+                else if (action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Resubmit).ToLower()))
+                    message = "COQ re-submitted successfully";
+                else
+                    message = "COQ has been returned for review";
+
+                await _unitOfWork.CoQ.Update(coq);
+                await _unitOfWork.SaveChangesAsync(currentUser.Id);
+                nextProcessingOfficer.LastJobDate = DateTime.UtcNow.AddHours(1);
+                await _userManager.UpdateAsync(nextProcessingOfficer);
+                //save action to history
+                await SaveCOQHistory(action, coqId, workFlow, currentUser, nextProcessingOfficer, comment);
+
+                //Generate permit number on final approval
+                if (workFlow.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)))
+                {
+                    var certificate = await GenerateCOQCertificate(coqId, currentUser.Id);
+                    if (certificate.Item1)
+                        message = $"COQ Application with reference {coq.Reference} has been approved and certificate {certificate.Item2} has been generated successfully";
+                }
+                //send and save notification
+                //await SendCOQNotification(coq, action, nextProcessingOfficer, message);
+                return (true, message);
+                
+            }
+            catch (Exception e)
+            {
+                return (false, e.Message);
+            }
+        }
         public async Task<WorkFlow> GetWorkFlow(string action, ApplicationUser currentuser, int VesselTypeId)
         => action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Submit).ToLower()) || action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Resubmit))
             ? await _unitOfWork.Workflow.FirstOrDefaultAsync(x => x.Action.ToLower().Trim().Equals(action.ToLower().Trim())
-                    && currentuser.UserRoles.FirstOrDefault().Role.Name.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim()) && x.VesselTypeId == VesselTypeId)
+                    && currentuser.UserRoles.FirstOrDefault().Role.Name.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim()))
             : await _unitOfWork.Workflow.FirstOrDefaultAsync(x => x.Action.ToLower().Trim().Equals(action.ToLower().Trim())
                     && currentuser.UserRoles.FirstOrDefault().Role.Name.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim())
             && currentuser.LocationId == x.FromLocationId && x.VesselTypeId == VesselTypeId);
-
-
 
         public async Task<bool> SaveHistory(string action, int appid, WorkFlow flow, ApplicationUser user, ApplicationUser nextUser, string comment)
         {
@@ -204,6 +261,23 @@ namespace Bunkering.Access.Services
                 Action = action,
                 Date = DateTime.Now.AddHours(1),
                 ApplicationId = appid,
+                TargetedTo = nextUser.Id,
+                TargetRole = nextUser.UserRoles.Where(x => !x.Role.Id.Equals("Staff")).FirstOrDefault().Role.Id,
+                TriggeredBy = user.Id,
+                TriggeredByRole = user.UserRoles.Where(x => !x.Role.Name.Equals("Staff")).FirstOrDefault().Role.Id,
+                Comment = comment
+            });
+            var res = await _unitOfWork.SaveChangesAsync(user.Id);
+            return res > 0;
+        }
+
+        public async Task<bool> SaveCOQHistory(string action, int coqId, WorkFlow flow, ApplicationUser user, ApplicationUser nextUser, string comment)
+        {
+            await _unitOfWork.COQHistory.Add(new COQHistory
+            {
+                Action = action,
+                Date = DateTime.Now.AddHours(1),
+                COQId = coqId,
                 TargetedTo = nextUser.Id,
                 TargetRole = nextUser.UserRoles.Where(x => !x.Role.Id.Equals("Staff")).FirstOrDefault().Role.Id,
                 TriggeredBy = user.Id,
@@ -259,10 +333,73 @@ namespace Bunkering.Access.Services
                 }
                 if (wkflow != null && nextprocessingofficer == null)
                 {
-                    if (wkflow.TargetRole.Equals(currentUser.UserRoles.FirstOrDefault().Role.Id))
+                    if (wkflow.TargetRole.Equals(currentUser.UserRoles.FirstOrDefault().Role.Name))
                         nextprocessingofficer = currentUser;
-                    else if (wkflow.TargetRole.Equals(app.User.UserRoles.FirstOrDefault().Role.Id))
+                    else if (wkflow.TargetRole.Equals(app.User.UserRoles.FirstOrDefault().Role.Name))
                         nextprocessingofficer = app.User;
+                    else
+                    {
+                        var users = !action.Equals(Enum.GetName(typeof(AppActions), AppActions.Submit))
+                            ? _userManager.Users.Include(x => x.Company).Include(f => f.Company).Include(ur => ur.UserRoles)
+                                .ThenInclude(r => r.Role)
+                                .Include(lo => lo.Location)
+                                .Include(ol => ol.Office)
+                                .Where(x => x.UserRoles.Any(y => y.Role.Name.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
+                                && x.LocationId == wkflow.ToLocationId && x.IsActive && x.OfficeId == currentUser.OfficeId).ToList()
+                            : _userManager.Users.Include(x => x.Company).Include(f => f.Company).Include(ur => ur.UserRoles)
+                                .ThenInclude(r => r.Role)
+                                .Include(lo => lo.Location)
+                                .Include(ol => ol.Office)
+                                .Where(x => x.UserRoles.Any(y => y.Role.Name.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
+                                && x.LocationId == wkflow.ToLocationId && x.IsActive).ToList();
+                        nextprocessingofficer = users.OrderBy(x => x.LastJobDate).FirstOrDefault();
+                    }
+                }
+                return nextprocessingofficer;
+            }
+        }
+
+        public async Task<ApplicationUser> GetNextStaffCOQ(int coqId, string action, WorkFlow wkflow, ApplicationUser currentUser, string delUserId = null)
+        {
+            ApplicationUser nextprocessingofficer = null;
+            if (!string.IsNullOrEmpty(delUserId))
+                return _userManager.Users.Include(x => x.Company)
+                    .Include(ur => ur.UserRoles).ThenInclude(r => r.Role)
+                    .Include(lo => lo.Location).Include(ol => ol.Office)
+                    .FirstOrDefault(x => x.Id.Equals(delUserId) && x.IsActive);
+            else
+            {
+                // var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == appid, "User.UserRoles.Role");
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id.Equals(coqId)) ?? throw new Exception($"Unable to find COQ with ID={coqId}.");
+
+                if (action.Equals(Enum.GetName(typeof(AppActions), AppActions.Resubmit)) || action.Equals(Enum.GetName(typeof(AppActions), AppActions.Reject)))
+                {
+                    var historylist = await _unitOfWork.COQHistory.Find(x => x.COQId == coqId
+                                        && currentUser.UserRoles.FirstOrDefault().Role.Id.Equals(x.TargetRole)
+                                        && x.TargetedTo.Equals(currentUser.Id)
+                                        && x.TriggeredByRole.Equals(wkflow.TargetRole));
+
+                    var history = historylist.OrderByDescending(x => x.Id).FirstOrDefault();
+                    if (history != null)
+                    {
+                        nextprocessingofficer = _userManager.Users.Include(ur => ur.UserRoles).ThenInclude(r => r.Role).Include(lo => lo.Location).Include(ol => ol.Office)
+                                                    .FirstOrDefault(x => x.Id.Equals(history.TriggeredBy));
+                        if (nextprocessingofficer != null && !nextprocessingofficer.IsActive)
+                        {
+                            var users = _userManager.Users
+                                            .Include(x => x.Company).Include(ur => ur.UserRoles).ThenInclude(r => r.Role).Include(lo => lo.Location).Include(ol => ol.Office)
+                                            .Where(x => x.UserRoles.Where(y => y.Role.Id.Equals(wkflow.TargetRole)) != null
+                                            && x.IsActive).ToList();
+                            nextprocessingofficer = users.OrderBy(x => x.LastJobDate).FirstOrDefault();
+                        }
+                    }
+                }
+                if (wkflow != null && nextprocessingofficer == null)
+                {
+                    if (wkflow.TargetRole.Equals(currentUser.UserRoles.FirstOrDefault().Role.Name))
+                        nextprocessingofficer = currentUser;
+                    // else if (wkflow.TargetRole.Equals(app.User.UserRoles.FirstOrDefault().Role.Name))
+                    //     nextprocessingofficer = app.User;
                     else
                     {
                         var users = !action.Equals(Enum.GetName(typeof(AppActions), AppActions.Submit))
@@ -288,10 +425,12 @@ namespace Bunkering.Access.Services
         internal async Task<(bool, string)> GeneratePermit(int id, string userid)
         {
             var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == id, "Facility.VesselType,ApplicationType");
+            //select surveyor for NOA
+
             if (app != null)
             {
                 var year = DateTime.Now.Year.ToString();
-                var pno = $"NMDPRA/BUNK/{app.Facility.VesselType.Name.Substring(0, 1).ToUpper()}/{app.ApplicationType.Name.Substring(0, 1).ToUpper()}/{year.Substring(0)}/{app.Id}";
+                var pno = $"NMDPRA/DSSRI/CVC/{app.ApplicationType.Name.Substring(0, 1).ToUpper()}/{year.Substring(2)}/{app.Id}";
                 var qrcode = Utils.GenerateQrCode($"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/License/ValidateQrCode/{id}");
                 //license.QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length);
                 //save permit to elps and portal
@@ -314,7 +453,7 @@ namespace Bunkering.Access.Services
                         Company_Id = app.User.ElpsId,
                         Date_Issued = permit.IssuedDate.ToString("yyyy-MM-ddTHH:mm:ss.fff"),
                         Date_Expire = permit.ExpireDate.ToString("yyyy-MM-ddTHH:mm:ss.fff"),
-                        CategoryName = $"Bunkering ({app.Facility.VesselType.Name})",
+                        CategoryName = $"CVC ({app.Facility.VesselType.Name})",
                         Is_Renewed = app.ApplicationType.Name,
                         LicenseId = id,
                         Expired = false
@@ -335,6 +474,59 @@ namespace Bunkering.Access.Services
                     }
                 }
 
+            }
+            return (false, null);
+        }
+
+        internal async Task<(bool, string)> GenerateCOQCertificate(int id, string userid)
+        {
+            var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id == id, "Application.ApplicationType,Application.User,Application.Facility.VesselType");
+            if (coq != null)
+            {
+                var year = DateTime.Now.Year.ToString();
+                var pno = $"NMDPRA/DSSRI/COQ/{coq.Application?.ApplicationType.Name.Substring(0, 1).ToUpper()}/{year.Substring(2)}/{coq.Id}";
+                var qrcode = Utils.GenerateQrCode($"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/License/ValidateQrCode/{id}");
+                //license.QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length);
+                //save certificate to elps and portal
+                var certificate = new COQCertificate
+                {
+                    COQId = id,
+                    ExpireDate = DateTime.UtcNow.AddHours(1).AddMonths(12),
+                    IssuedDate = DateTime.Now,
+                    CertifcateNo = pno,
+                    Signature = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/wwwroot/assets/fa.png",
+                    QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length)
+                };
+
+                var req = await Utils.Send(_appSetting.ElpsUrl, new HttpRequestMessage(HttpMethod.Post, $"api/Permits/{coq.Application?.User.ElpsId}/{_appSetting.AppEmail}/{Utils.GenerateSha512($"{_appSetting.AppEmail}{_appSetting.AppId}")}")
+                {
+                    Content = new StringContent(new
+                    {
+                        Permit_No = pno,
+                        OrderId = coq.Reference,
+                        Company_Id = coq.Application?.User.ElpsId,
+                        Date_Issued = certificate.IssuedDate.ToString("yyyy-MM-ddTHH:mm:ss.fff"),
+                        Date_Expire = certificate.ExpireDate.ToString("yyyy-MM-ddTHH:mm:ss.fff"),
+                        CategoryName = $"COQ ({coq.Application?.Facility.VesselType.Name})",
+                        Is_Renewed = coq.Application?.ApplicationType.Name,
+                        LicenseId = id,
+                        Expired = false
+                    }.Stringify(), Encoding.UTF8, "application/json")
+                });
+
+                if (req.IsSuccessStatusCode)
+                {
+                    var content = await req.Content.ReadAsStringAsync();
+                    if (!string.IsNullOrEmpty(content))
+                    {
+                        var dic = content.Parse<Dictionary<string, string>>();
+                        certificate.ElpsId = int.Parse(dic.GetValue("id"));
+                        await _unitOfWork.COQCertificate.Add(certificate);
+                        await _unitOfWork.SaveChangesAsync(userid);
+
+                        return (true, pno);
+                    }
+                }
             }
             return (false, null);
         }
@@ -365,6 +557,41 @@ namespace Bunkering.Access.Services
             await _unitOfWork.Message.Add(new Message
             {
                 ApplicationId = app.Id,
+                Content = body,
+                Date = DateTime.Now.AddHours(1),
+                Subject = subject,
+                UserId = user.Id
+            });
+            await _unitOfWork.SaveChangesAsync(user.Id);
+        }
+
+        public async Task SendCOQNotification(CoQ coq, string action, ApplicationUser user, string comment)
+        {
+            string content = $"COQ Application with reference {coq.Reference} has been submitted to your desk for further processing";
+            string subject = $"COQ Application with reference {coq.Reference} Submitted";
+            switch (action)
+            {
+                case "Reject":
+                    content = $"COQ Application with reference {coq.Reference} has been rejected and <br/>returned to your desk for further processing. Below is for your information - <br/>{comment}";
+                    break;
+                case "Approve":
+                    content = $"COQ Application with reference {coq.Reference} has been endorsed and <br/> move to your desk for further processing";
+                    subject = $"COQ Application with reference {coq.Reference} pushed for processing";
+                    break;
+                default:
+                    break;
+            }
+            //send and save notification
+
+            var body = Utils.ReadTextFile(_env.WebRootPath, "GeneralTemplate.cshtml");
+            var url = _httpContextAccessor.HttpContext.Request.Scheme + "://" + _httpContextAccessor.HttpContext.Request.Host + "/assets/nmdpraLogo.png";
+            body = string.Format(body, content, DateTime.Now.Year, url);
+            Utils.SendMail(_mailSetting.Stringify().Parse<Dictionary<string, string>>(), user.Email, subject, body);
+
+            await _unitOfWork.Message.Add(new Message
+            {
+                COQId = coq.Id,
+                IsCOQ = true,
                 Content = body,
                 Date = DateTime.Now.AddHours(1),
                 Subject = subject,

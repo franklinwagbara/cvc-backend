@@ -7,7 +7,9 @@ namespace Bunkering.Core.Data
 	{
 		public int Id { get; set; }
 		public int ApplicationId { get; set; }
-		public string OrderId { get; set; }
+        public int? COQId { get; set; }
+        public int? ApplicationTypeId { get; set; }
+        public string OrderId { get; set; }
 		public int? ExtraPaymentId { get; set; }
 		public string PaymentType { get; set; }
 		public DateTime TransactionDate { get; set; }
@@ -16,9 +18,9 @@ namespace Bunkering.Core.Data
 		public string RRR { get; set; }
 		public string Description { get; set; }
 		public string AppReceiptId { get; set; }
-		public decimal Amount { get; set; }
-		public decimal Arrears { get; set; }
-		public decimal ServiceCharge { get; set; }
+		public double Amount { get; set; }
+		public double Arrears { get; set; }
+		public double ServiceCharge { get; set; }
 		public string TxnMessage { get; set; }
 		public int RetryCount { get; set; }
 		public DateTime LastRetryDate { get; set; }

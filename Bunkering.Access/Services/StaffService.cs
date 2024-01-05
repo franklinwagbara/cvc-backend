@@ -36,51 +36,92 @@ namespace Bunkering.Access.Services
 		}
 
 		public async Task<ApiResponse> Dashboard()
-		{
-			var user = await _userManager.FindByEmailAsync(User);
-			var allApps = await _userManager.IsInRoleAsync(user, "Company") ? await _unitOfWork.Application.Find(x => x.UserId.Equals(user.Id), "Payments") : await _unitOfWork.Application.GetAll("Payments");
-			//var apps = await _userManager.IsInRoleAsync(user, Roles.FAD)
-			//	? (allApps.Where(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing))))
-			//	: (allApps.Where(x => x.CurrentDeskId.Equals(user.Id)));
-			var apps = allApps.Where(x => x.CurrentDeskId.Equals(user.Id));
-			var permits = await _userManager.IsInRoleAsync(user, "Company") ? await _unitOfWork.Permit.Find(x => x.Application.UserId.Equals(user.Id), "Application") : await _unitOfWork.Permit.GetAll("Application");
-			var facilities = await _userManager.IsInRoleAsync(user, "Company") ? await _unitOfWork.Facility.Find(x => x.CompanyId.Equals(user.CompanyId), "VesselType") : await _unitOfWork.Facility.GetAll("VesselType");
-			var payments = await _userManager.IsInRoleAsync(user, "Company") ? await _unitOfWork.Payment.Find(x => allApps.Any(a => a.Id.Equals(x.ApplicationId))) : await _unitOfWork.Payment.GetAll();
+        {
+			try
+			{
+				var user = await _userManager.Users.Include(x => x.Location).FirstOrDefaultAsync(x => x.Email.Equals(User));
 
-			if (user != null)
-				_response = new ApiResponse
+				if(user.Location?.Name == LOCATION.FO)
+					return await GetDashboardFO(user);
+				else 
+					return await GetDashboardOthers(user);
+			}
+			catch (Exception e)
+			{
+				return new ApiResponse
 				{
-					Message = "Success",
-					StatusCode = HttpStatusCode.OK,
-					Success = true,
-					Data = new
-					{
-						DeskCount = apps.Count(),
-						TotalApps = allApps.Count(),
-						TMobileFacs = 0,
-						TFixedFacs = 0,
-						TotalLicenses = permits.Count(),
-						TLicensedfacs = facilities.Count(x => x.IsLicensed),
-						TValidLicense = permits.Count(x => x.ExpireDate > DateTime.UtcNow.AddHours(1)),
-						TAmount = payments.Where(x => x.Status.ToLower().Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted))).Sum(x => x.Amount),
-						TProcessing = allApps.Count(x => x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing))),
-						TApproved = allApps.Count(x => x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed))),
-						TRejected = allApps.Count(x => x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Rejected))),
-						TExpiring30 = await _userManager.IsInRoleAsync(user, "Company")
-						? permits.Count(x => x.Application.UserId.Equals(user.Id) && x.ExpireDate.AddDays(30) >= DateTime.UtcNow.AddHours(1))
-						: permits.Count(x => x.ExpireDate.AddDays(30) >= DateTime.UtcNow.AddHours(1))
-					}
-				};
-			else
-				_response = new ApiResponse
-				{
-					Message = "No Application was found",
-					StatusCode = HttpStatusCode.NotFound,
+					Message = e.Message,
+					StatusCode = HttpStatusCode.InternalServerError,
 					Success = false
 				};
+			}
+        }
 
-			return _response;
-		}
+        private async Task<ApiResponse> GetDashboardOthers(ApplicationUser? user)
+        {
+            var allApps = await _userManager.IsInRoleAsync(user, "Company") ? await _unitOfWork.Application.Find(x => x.UserId.Equals(user.Id), "Payments") : await _unitOfWork.Application.GetAll("Payments");
+            var apps = allApps.Where(x => x.CurrentDeskId.Equals(user.Id));
+            var permits = await _userManager.IsInRoleAsync(user, "Company") ? await _unitOfWork.Permit.Find(x => x.Application.UserId.Equals(user.Id), "Application") : await _unitOfWork.Permit.GetAll("Application");
+            var facilities = await _userManager.IsInRoleAsync(user, "Company") ? await _unitOfWork.Facility.Find(x => x.CompanyId.Equals(user.CompanyId), "VesselType") : await _unitOfWork.Facility.GetAll("VesselType");
+            var payments = await _userManager.IsInRoleAsync(user, "Company") ? await _unitOfWork.Payment.Find(x => allApps.Any(a => a.Id.Equals(x.ApplicationId))) : await _unitOfWork.Payment.GetAll();
+
+			return new ApiResponse
+			{
+				Message = "Success",
+				StatusCode = HttpStatusCode.OK,
+				Success = true,
+				Data = new
+				{
+					DeskCount = apps.Count(),
+					TotalApps = allApps.Count(),
+					TMobileFacs = 0,
+					TFixedFacs = 0,
+					TotalLicenses = permits.Count(),
+					TLicensedfacs = facilities.Count(x => x.IsLicensed),
+					TValidLicense = permits.Count(x => x.ExpireDate > DateTime.UtcNow.AddHours(1)),
+					TAmount = payments.Where(x => x.Status.ToLower().Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted))).Sum(x => x.Amount),
+					TProcessing = allApps.Count(x => x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing))),
+					TApproved = allApps.Count(x => x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed))),
+					TRejected = allApps.Count(x => x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Rejected))),
+					TExpiring30 = await _userManager.IsInRoleAsync(user, "Company")
+					? permits.Count(x => x.Application.UserId.Equals(user.Id) && x.ExpireDate.AddDays(30) >= DateTime.UtcNow.AddHours(1))
+					: permits.Count(x => x.ExpireDate.AddDays(30) >= DateTime.UtcNow.AddHours(1))
+				}
+			};
+        }
+
+        private async Task<ApiResponse> GetDashboardFO(ApplicationUser? user)
+        {
+			var allCoqs = await _unitOfWork.CoQ.GetAll();
+			var coqs = (await _unitOfWork.CoQ.GetAll()).Where(x => x.CurrentDeskId == user?.Id).ToList();
+			var facilities = await _unitOfWork.Facility.GetAll("VesselType");
+			var certificates = await _unitOfWork.COQCertificate.GetAll("COQ");
+			var payments = await _unitOfWork.Payment.GetAll();
+
+			return new ApiResponse
+			{
+				Message = "Success",
+				StatusCode = HttpStatusCode.OK,
+				Success = true,
+				Data = new
+				{
+					DeskCount = coqs.Count(),
+					TotalApps = allCoqs.Count(),
+					TMobileFacs = 0,
+					TFixedFacs = 0,
+					TotalLicenses = certificates.Count(),
+					TLicensedfacs = facilities.Count(x => x.IsLicensed),
+					TValidLicense = certificates.Count(x => x.ExpireDate > DateTime.UtcNow.AddHours(1)),
+					TAmount = payments.Where(x => x.Status.ToLower().Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted))).Sum(x => x.Amount),
+					TProcessing = allCoqs.Count(x => x.Status == Enum.GetName(typeof(AppStatus), AppStatus.Processing)),
+					TApproved = allCoqs.Count(x => x.Status == Enum.GetName(typeof(AppStatus), AppStatus.Completed)),
+					TRejected = allCoqs.Count(x => x.Status == Enum.GetName(typeof(AppStatus), AppStatus.Rejected)),
+					TExpiring30 = await _userManager.IsInRoleAsync(user, "Company")
+					? certificates.Count(x => x.COQ.CurrentDeskId.Equals(user.Id) && x.ExpireDate.AddDays(30) >= DateTime.UtcNow.AddHours(1))
+					: certificates.Count(x => x.ExpireDate.AddDays(30) >= DateTime.UtcNow.AddHours(1))
+				}
+			};
+        }
 
 		public async Task<ApiResponse> AllUsers()
 		{

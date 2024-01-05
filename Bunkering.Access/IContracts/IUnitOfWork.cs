@@ -1,4 +1,5 @@
 ﻿using Bunkering.Access.DAL;
+using Bunkering.Core.Data;
 
 namespace Bunkering.Access.IContracts
 {
@@ -22,23 +23,31 @@ namespace Bunkering.Access.IContracts
         ILocation Location { get; }
         IMessage Message { get; }
         INominatedSurveyor NominatedSurveyor { get; }
+        IApplicationSurveyor ApplicationSurveyor { get; }
         IOffice Office { get; }
         IPayment Payment { get; }
         IPermit Permit { get; }
         IProduct Product { get; }
         IRole Role { get; }
+        IPlant Plant { get; }
+        IPlantTank PlantTank { get; }
         IState State { get; }
         ISubmittedDocument SubmittedDocument { get; }
         ITank Tank { get; }
         IValidatiionResponse ValidatiionResponse { get; }
         IWorkflow Workflow { get; }
         IVesselType VesselType { get; }
-        public ICoQ CoQ { get; }
+        ICoQ CoQ { get; }
+        ICOQTank CoQTank { get; }
+        ICOQHistory COQHistory { get; }
+        ICOQCertificate COQCertificate { get; }
+        IMeasurementTypeRepository MeasurementType { get; }
         IvFacilityPermit vFacilityPermit { get; }
         IvAppPayment vAppPayment { get; }
         IvAppVessel vAppVessel { get; }
         IvAppUser vAppUser { get; }
         IvPayment vPayment { get; }
+        IvDebitNote vDebitNote { get; }
         int Save();
         Task<int> SaveChangesAsync(string userId);
     }

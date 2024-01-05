@@ -38,6 +38,7 @@ namespace Bunkering.Access.Services
                     var surveyor = new NominatedSurveyor
                     {
                         Name = model.Name,
+                        Email = model.Email,
                     };
 
                     await _unitOfWork.NominatedSurveyor.Add(surveyor);
@@ -79,12 +80,14 @@ namespace Bunkering.Access.Services
 
             return _response;
         }
+
         public async Task<ApiResponse> EditSurveyor(NominatedSurveyorViewModel model)
         {
             var editSurveyor = await _unitOfWork.NominatedSurveyor.FirstOrDefaultAsync(x => x.Id == model.Id);
             if (editSurveyor != null)
             {
                 editSurveyor.Name = model.Name;
+                editSurveyor.Email = model.Email;
 
                 await _unitOfWork.NominatedSurveyor.Update(editSurveyor);
                 _unitOfWork.Save();
@@ -108,6 +111,7 @@ namespace Bunkering.Access.Services
             }
             return _response;
         }
+
         public async Task<ApiResponse> DeleteSurveyor(int id)
         {
             var surveyor = await _unitOfWork.NominatedSurveyor.FirstOrDefaultAsync(x => x.Id.Equals(id));
@@ -116,7 +120,7 @@ namespace Bunkering.Access.Services
                 if (!surveyor.IsDeleted)
                 {
                     surveyor.IsDeleted = true;
-                    surveyor.DeletedAt = DateTime.Now;
+                    surveyor.DeletedAt = DateTime.UtcNow.AddHours(1);
                     surveyor.DeletedBy = _contextAccessor.HttpContext.User.Identity?.Name ?? string.Empty;
                     await _unitOfWork.NominatedSurveyor.Update(surveyor);
                     _unitOfWork.Save();
@@ -153,10 +157,11 @@ namespace Bunkering.Access.Services
             }
             return _response;
         }
+
         public async Task<ApiResponse> AllNominatedSurveyor()
         {
             var allSurveyor = await _unitOfWork.NominatedSurveyor.GetAll();
-            allSurveyor = allSurveyor.Where(x => x.IsDeleted == null);
+            allSurveyor = allSurveyor.Where(x => x.IsDeleted != true);
 
             _response = new ApiResponse
             {

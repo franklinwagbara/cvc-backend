@@ -3,6 +3,7 @@ using Bunkering.Core.Data;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,19 +19,21 @@ namespace Bunkering.Access.Services
         private readonly IHttpContextAccessor _contextAccessor;
         ApiResponse _response;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<ApplicationRole> _role;
 
-        public RoleService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, ApiResponse response, UserManager<ApplicationUser> userManager)
+        public RoleService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, RoleManager<ApplicationRole> role, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
-            _response = response;
+            _response = new ApiResponse();
             _userManager = userManager;
+            _role = role;
         }
 
         public async Task<ApiResponse> CreateRole(RoleViewModel model)
         {
-            var addRole = await _unitOfWork.Role.FirstOrDefaultAsync(d => d.Name.ToLower() == model.Name.ToLower());
-            if (addRole != null)
+            var foundRole = await _role.Roles.FirstOrDefaultAsync(x => x.Name.ToLower().Equals(model.Name.ToLower())); 
+            if (foundRole != null)
             {
                 _response = new ApiResponse
                 {
@@ -42,19 +45,19 @@ namespace Bunkering.Access.Services
                 return _response;
 
             }
-            var role = new Role
+
+            var newRole = new ApplicationRole
             {
                 Name = model.Name,
                 Description = model.Description,
             };
 
-            await _unitOfWork.Role.Add(role);
+            var result = await _role.CreateAsync(newRole);
             await _unitOfWork.SaveChangesAsync("");
-            model.Id = role.Id;
 
             _response = new ApiResponse
             {
-                Data = model,
+                Data = newRole,
                 Message = "Role Created",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
@@ -63,16 +66,19 @@ namespace Bunkering.Access.Services
         }
         public async Task<ApiResponse> EditRole(RoleViewModel model)
         {
-            var edit = await _unitOfWork.Role.FirstOrDefaultAsync(r => r.Id == model.Id);
-            if(edit != null)
+            ApplicationRole? foundRole = await _role.Roles.FirstOrDefaultAsync(x => x.Id.Equals(model.Id));
+
+            if (foundRole != null)
             {
-                model.Name = edit.Name;
-                model.Description = edit.Description;
-                await _unitOfWork.Role.Update(edit);
-                _unitOfWork.Save();
+                foundRole.Description = model.Description;
+                foundRole.Name = model.Name;
+
+                await _role.UpdateAsync(foundRole);
+                await _unitOfWork.SaveChangesAsync("");
 
                 _response = new ApiResponse
                 {
+                    Data = foundRole,
                     Message = "Updated Successfully",
                     StatusCode = HttpStatusCode.OK,
                     Success = true,
@@ -89,9 +95,9 @@ namespace Bunkering.Access.Services
             }
             return _response;
         }
-        public async Task<ApiResponse> AllRoles (RoleViewModel model)
+        public async Task<ApiResponse> AllRoles ()
         {
-            var allRoles = await _unitOfWork.Role.GetAll();
+            var allRoles = await _role.Roles.ToListAsync();
 
             _response = new ApiResponse
             {
@@ -102,7 +108,29 @@ namespace Bunkering.Access.Services
             };
             return _response;
         }
-       
-       
+
+
+        public async Task<ApiResponse> DeleteRole(string Id)
+        {
+            ApplicationRole? foundRole = await _role.Roles.FirstOrDefaultAsync(x => x.Id.ToLower().Equals(Id));
+
+            if (foundRole != null)
+            {
+                await _role.DeleteAsync(foundRole);
+                return new ApiResponse
+                {
+                    Message = "Deletion successfull.",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true,
+                };
+            }
+            else
+                return new ApiResponse
+                {
+                    Message = "Role does not exist!",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true,
+                };
+        }
     }
 }

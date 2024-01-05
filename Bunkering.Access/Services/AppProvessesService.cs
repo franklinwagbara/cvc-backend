@@ -85,10 +85,15 @@ namespace Bunkering.Access.Services
 			return _response;
 		}
 
-		public async Task<ApiResponse> AddFlow(WorkFlow model)
+		public async Task<ApiResponse> AddFlow(WorkflowviewModel model)
 		{
 			var user = await _userManager.FindByEmailAsync(User);
-			await _unitOfWork.Workflow.Add(model);
+
+			var wk = _mapper.Map<WorkFlow>(model);
+			wk.TriggeredByRole = (await _role.Roles.FirstOrDefaultAsync(x => x.Id == model.TriggeredByRoleId))?.Name;
+			wk.TargetRole = (await _role.Roles.FirstOrDefaultAsync(x => x.Id == model.TargetRoleId))?.Name;
+
+			await _unitOfWork.Workflow.Add(wk);
 			await _unitOfWork.SaveChangesAsync(user.Id);
 
 			return new ApiResponse

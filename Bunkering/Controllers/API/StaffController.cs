@@ -94,7 +94,7 @@ namespace Bunkering.Controllers.API
         /// 
         [Route("add-user")]
         [HttpPost]
-        public async Task<IActionResult> AddUsers(UserViewModel model) => Response(await _staffService.Create(model));
+        public async Task<IActionResult> AddUsers([FromForm]UserViewModel model) => Response(await _staffService.Create(model));
 
 
         /// <summary>

@@ -3,8 +3,9 @@
     [Name] NVARCHAR (MAX) NOT NULL DEFAULT null,
     [StateId] INT NOT NULL DEFAULT 0, 
     [Capacity] DECIMAL NOT NULL DEFAULT 0, 
-    [IsDeleted] BIT NOT NULL DEFAULT false, 
+    [IsDeleted] BIT NOT NULL DEFAULT 0, 
     [DeletedAt] DATETIME NULL , 
     [DeletedBy] NVARCHAR(MAX) NULL, 
+    [MarketerName] NVARCHAR(MAX) NULL, 
     CONSTRAINT [PK_Depots] PRIMARY KEY CLUSTERED ([Id] ASC)
 );

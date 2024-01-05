@@ -14,8 +14,22 @@
         public const string SUPER_ADMIN = "SuperAdmin";
         public const string Field_Officer = "Field_Officer";
     }
+
+    public static class LOCATION
+    {
+        public const string HQ = "HQ";
+        public const string FO = "FO";
+        public const string ZO = "ZO";
+    }
+
     public static class DefaultValues
     {
         public const string AppName = "NOA & Vessel Clearance";
+    }
+
+    public static class ReadingType
+    {
+        public const string Before = "Before";
+        public const string After = "After";
     }
 }

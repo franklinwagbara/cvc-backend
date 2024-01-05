@@ -34,6 +34,8 @@ namespace Bunkering.Core.Data
         public DbSet<Message> Messages { get; set; }
         public DbSet<NominatedSurveyor> NominatedSurveyors { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<Plant> Plants { get; set; }
+        public DbSet<PlantTank> PlantTanks { get; set; }
         public DbSet<Permit> Permits { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<State> States { get; set; }
@@ -48,7 +50,15 @@ namespace Bunkering.Core.Data
         public DbSet<vAppUser> vAppUsers { get; set; }
         public DbSet<vFacilityPermit> vFacilityPermit { get; set; }
         public DbSet<vPayment> vPayment { get; set; }
+        public DbSet<vDebitNote> VDebitNotes { get; set; }
         public DbSet<CoQ> CoQs { get; set; }
+        public DbSet<DepotFieldOfficer> DepotFieldOfficers { get; set; }
+        public DbSet<COQHistory> COQHistories { get; set; }
+        public DbSet<COQCertificate> COQCertificates { get; set; }
+        public DbSet<ApplicationSurveyor> ApplicationSurveyors { get; set; }
+        public DbSet<COQTank> COQTanks { get; set; }
+        public DbSet<MeasurementType> MeasurementTypes { get; set; }
+        public DbSet<TankMeasurement> TankMeasurements { get; set; }
 
         //public virtual DbContextOptionsBuilder EnableDetailedErrors(bool detailedErrorsEnabled = true) => detailedErrorsEnabled;
         //public virtual DbContextOptionsBuilder EnableDetailedErrors(bool detailedErrorEnabled) => DbContextOptionsBuilder;
