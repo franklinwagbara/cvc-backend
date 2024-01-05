@@ -1354,7 +1354,7 @@ namespace Bunkering.Access.Services
                 };
                 return _response;
             }
-            var depots = (await _unitOfWork.DepotOfficer.Find(c => c.OfficerID == Guid.Parse(user.Id))).Select(c => c.DepotID).ToList();
+            var depots = (await _unitOfWork.PlantOfficer.Find(c => c.OfficerID == Guid.Parse(user.Id))).Select(c => c.PlantID).ToList();
             if (!depots.Any())
             {
                 _response = new ApiResponse

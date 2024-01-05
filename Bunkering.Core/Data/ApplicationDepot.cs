@@ -7,7 +7,7 @@ namespace Bunkering.Core.Data
         public int Id { get; set; }
         public int DepotId { get; set; }
         [ForeignKey(nameof(DepotId))]
-        public Depot Depot { get; set; }
+        public Plant Depot { get; set; }
         public int AppId { get; set; }
         [ForeignKey(nameof(AppId))]
         public Application Application { get; set; }
