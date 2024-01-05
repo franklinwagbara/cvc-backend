@@ -13,7 +13,7 @@ namespace Bunkering.Core.ViewModels
         public string Company { get; set; }
         public string Email { get; set; }
         public string State { get; set; }
-        public long FacilityElpsId { get; set; }
+        public long PlantElpsId { get; set; }
         public long CompanyElpsId { get; set; }
         public PlantType PlantType { get; set; }
         public List<PlantTankDTO> Tanks { get; set; }

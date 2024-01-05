@@ -177,5 +177,6 @@ using (var scope = scopedFactory.CreateScope())
 	await service.CreateProducts();
 	await service.CreateLocations();
 	await service.CreateTankMeasurementTypes();
+	
 }
 app.Run();

@@ -333,12 +333,12 @@ namespace Bunkering.Controllers.API
         /// <response code="404">Returns not found </response>
         /// <response code="401">Unauthorized user </response>
         /// <response code="400">Internal server error - bad request </response>
-        [ProducesResponseType(typeof(ApiResponse), 200)]
-        [ProducesResponseType(typeof(ApiResponse), 404)]
-        [ProducesResponseType(typeof(ApiResponse), 405)]
-        [ProducesResponseType(typeof(ApiResponse), 500)]
-        [Route("create-coq-gas")]
-        [HttpPost]
-        public async Task<IActionResult> CreateCOQForGas(CreateGasProductCoQDto model) => Response(await _coqService.CreateCOQForGas(model));
+        //[ProducesResponseType(typeof(ApiResponse), 200)]
+        //[ProducesResponseType(typeof(ApiResponse), 404)]
+        //[ProducesResponseType(typeof(ApiResponse), 405)]
+        //[ProducesResponseType(typeof(ApiResponse), 500)]
+        //[Route("add-coq-gas-tank")]
+        //[HttpPost]
+        //public async Task<IActionResult> AddCoqTank(CreateGasProductCoQDto model) => Response(await _coqService.AddCoqTank(model));
     }
 }

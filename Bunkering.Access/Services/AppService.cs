@@ -174,7 +174,7 @@ namespace Bunkering.Access.Services
                         Reference = Utils.RefrenceCode(),
                         UserId = user.Id,
                         FacilityId = facility.Id,
-                        Status = Enum.GetName(typeof(AppStatus), 0),
+                        Status = Enum.GetName(typeof(AppStatus), AppStatus.Initiated),
                         VesselName = model.VesselName,
                         LoadingPort = model.LoadingPort,
                         MarketerName = model.MarketerName,
@@ -1449,7 +1449,9 @@ namespace Bunkering.Access.Services
                        Id = verifyIMO.Id,
                        IMONumber = verifyIMO.IMONumber,
                        Name = verifyIMO.Name
-                    }    
+                    },  
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true
                 };
 
                 return _response;
