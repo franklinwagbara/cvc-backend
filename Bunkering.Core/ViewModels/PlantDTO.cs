@@ -8,14 +8,14 @@ namespace Bunkering.Core.ViewModels
 {
     public class PlantDTO
     {
-        public int Id { get; set; }
+       // public int Id { get; set; }
         public string Name { get; set; }
        // public string Company { get; set; }
        // public string Email { get; set; }
         public string State { get; set; }
         public long PlantElpsId { get; set; }
        // public long CompanyElpsId { get; set; }
-        public PlantType PlantType { get; set; }
+        public int PlantType { get; set; }
     }
 
     public class PlantTankDTO
