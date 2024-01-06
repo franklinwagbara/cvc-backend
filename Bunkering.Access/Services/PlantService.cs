@@ -34,7 +34,8 @@ namespace Bunkering.Access.Services
             _userManager = userManager;
             _httpClient = new HttpClient();
             _elps = elps;
-            _plantQueries = new PlantQueries(context);
+            
+           
         }
 
         public async Task<ApiResponse> GetAllPlants()
@@ -63,9 +64,9 @@ namespace Bunkering.Access.Services
                 };
                 return _response;
             }
-            //var plants = await _plantQueries.GetPlantsByCompanywithTanks(user.Email);
-            var plants = await _unitOfWork.Plant.GetAll();
-            var filteredPlants = plants.Where(x => x.IsDeleted == false);
+            var plants = GetPlantsByCompanywithTanks(user.Email);
+            //var plants = await _unitOfWork.Plant.GetAll();
+            var filteredPlants = plants.Where(x => x.IsDeleted == false && x.Email == user.Email);
             return new ApiResponse
             {
                 Message = "All Plants for Company",
@@ -88,16 +89,12 @@ namespace Bunkering.Access.Services
             };
         }
 
-        public async Task<ApiResponse> EditPlant(PlantDTO plant)
+        public async Task<ApiResponse> EditPlant(int Id, PlantDTO plant)
         {
-            var user = await _userManager.FindByEmailAsync(User);
-
-            var companyDetails = _elps.GetCompanyDetailByEmail(user.Email);
-            var comName = companyDetails["name"];
-
+            var user = await _userManager.FindByEmailAsync(User);          
             
 
-            var updatePlant = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id == plant.Id);
+            var updatePlant = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id == Id);
             if (updatePlant == null)
             {
                 _response = new ApiResponse
@@ -110,9 +107,8 @@ namespace Bunkering.Access.Services
             }
             else
             {
-                updatePlant.Name = plant.Name;
-                updatePlant.Company = user.Company.Name;
-                //updatePlant.PlantType = plant.PlantType;
+                updatePlant.Name = plant.Name;                
+                updatePlant.PlantType = plant.PlantType;
                 updatePlant.ElpsPlantId = plant.PlantElpsId;
                 updatePlant.CompanyElpsId = user.ElpsId;
                 updatePlant.Email = user.Email;
@@ -131,12 +127,12 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
-        public async Task<ApiResponse> EditPlantTanks(PlantTankDTO tank)
+        public async Task<ApiResponse> EditPlantTanks(int Id, PlantTankDTO tank)
         {
             try
             {
                 var user = await _userManager.FindByEmailAsync(User);
-                var updatePlant = await _unitOfWork.PlantTank.FirstOrDefaultAsync(x => x.PlantTankId == tank.Id);
+                var updatePlant = await _unitOfWork.PlantTank.FirstOrDefaultAsync(x => x.PlantTankId == Id);
                 if (updatePlant == null)
                 {
                     _response = new ApiResponse
@@ -511,6 +507,16 @@ namespace Bunkering.Access.Services
             }
             return _response;
 
+        }
+
+        private List<Plant> GetPlantsByCompanywithTanks(string email)
+        {
+            //var plants = (from p in _unitOfWork.Plant.Query()
+            //              join pt in _unitOfWork.PlantTank.Query() on p.Id equals pt.PlantId
+            //              where p.Email == email
+            //              select p).ToList();
+            var plist = _unitOfWork.Plant.Query().Include(u => u.Tanks).Where(x => x.Email == email).ToList();
+            return plist;
         }
     }
 }
