@@ -60,13 +60,13 @@ namespace Bunkering.Controllers.API
         [HttpPost]
         public async Task<IActionResult> AddPlantTank(PlantTankDTO model, int id) => Response(await _plantService.CreatePlantTank(model, id));
 
-        [Route("edit-plant/{plant}")]
+        [Route("edit-plant/{id}")]
         [HttpPut]
-        public async Task<IActionResult> EditPlant(PlantDTO model) => Response(await _plantService.EditPlant(model));
+        public async Task<IActionResult> EditPlant(int id, PlantDTO model) => Response(await _plantService.EditPlant(id, model));
 
-        [Route("edit-plantTank/{plantTank}")]
+        [Route("edit-plantTank/{id}")]
         [HttpPut]
-        public async Task<IActionResult> EditPlantTank(PlantTankDTO model) => Response(await _plantService.EditPlantTanks(model));
+        public async Task<IActionResult> EditPlantTank(int id, PlantTankDTO model) => Response(await _plantService.EditPlantTanks(id, model));
 
 
         [Route("get-plant/{id}")]

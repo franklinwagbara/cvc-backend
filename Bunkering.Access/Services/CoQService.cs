@@ -668,6 +668,7 @@ namespace Bunkering.Access.Services
                     CreatedBy = user.Id,
                     Status = Enum.GetName(typeof(AppStatus), AppStatus.Processing),
                     DateCreated = DateTime.UtcNow.AddHours(1),
+                    NameConsignee = model.NameConsignee,
                     //SubmittedDate = DateTime.UtcNow.AddHours(1),
                     
                 };
@@ -781,12 +782,155 @@ namespace Bunkering.Access.Services
                 };
             }
 
-            return new ApiResponse
+            //return new ApiResponse
+            //{
+            //    Message = "COQ created successfully",
+            //    Success = true,
+            //    StatusCode = HttpStatusCode.OK
+            //};
+        }
+
+
+        public async Task<ApiResponse> CreateCOQForLiquid(CreateCoQLiquidDto model)
+        {
+            var user = await _userManager.FindByEmailAsync(LoginUserEmail) ?? throw new Exception("Unathorise, this action is restricted to only authorise users");
+
+            var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name == Utils.COQ) ?? throw new Exception("Application type of COQ is not configured yet, please contact support");
+
+            using var transaction = _context.Database.BeginTransaction();
+            try
             {
-                Message = "COQ created successfully",
-                Success = true,
-                StatusCode = HttpStatusCode.OK
-            };
+                #region Create Coq
+                var coq = new CoQ
+                {
+                    AppId = model.NoaAppId,
+                    PlantId = model.PlantId,
+                    Reference = Utils.GenerateCoQRefrenceCode(),
+                    DepotId = model.PlantId,
+                    DateOfSTAfterDischarge = model.DateOfSTAfterDischarge,
+                    DateOfVesselArrival = model.DateOfVesselArrival,
+                    DateOfVesselUllage = model.DateOfVesselUllage,
+                    DepotPrice = model.DepotPrice,
+                    CreatedBy = user.Id,
+                    Status = Enum.GetName(typeof(AppStatus), AppStatus.Processing),
+                    DateCreated = DateTime.UtcNow.AddHours(1),
+                    //NameConsignee = model.NameConsignee,
+                    //SubmittedDate = DateTime.UtcNow.AddHours(1),
+                };
+
+                #endregion
+
+                #region Create COQ Tank
+                var coqTankList = new List<COQTank>();
+
+                foreach (var before in model.TankBeforeReadings)
+                {
+                    var newCoqTank = new COQTank
+                    {
+                        CoQId = coq.Id,
+                        TankId = before.TankId
+                    };
+
+                    var after = model.TankAfterReadings.FirstOrDefault(x => x.TankId == before.TankId);
+
+                    if (after != null && before.coQTankDTO != null)
+                    {
+                        var b = before.coQTankDTO;
+                        var a = after.coQTankDTO;
+
+                        var newBTankM = _mapper.Map<TankMeasurement>(b);
+                        newBTankM.MeasurementType = ReadingType.Before;
+
+                        var newATankM = _mapper.Map<TankMeasurement>(a);
+                        newATankM.MeasurementType = ReadingType.After;
+
+                        var newTankMeasurement = new List<TankMeasurement>
+                        {
+                            newBTankM, newATankM
+                        };
+
+                        newCoqTank.TankMeasurement = newTankMeasurement;
+
+                        coqTankList.Add(newCoqTank);
+                    }
+                }
+
+                _context.COQTanks.AddRange(coqTankList);
+                #endregion
+
+                #region Document Submission
+
+                //SubmitDocumentDto sDoc = model.SubmitDocuments.FirstOrDefault();
+                //var sDocument = _mapper.Map<SubmittedDocument>(sDoc);
+
+                var sDocumentList = new List<SubmittedDocument>();
+
+                model.SubmitDocuments.ForEach(x =>
+                {
+                    var newSDoc = new SubmittedDocument
+                    {
+                        DocId = x.DocId,
+                        FileId = x.FileId,
+                        DocName = x.DocName,
+                        DocSource = x.DocSource,
+                        DocType = x.DocType,
+                        ApplicationId = coq.Id,
+                        ApplicationTypeId = appType.Id,
+                    };
+
+                    sDocumentList.Add(newSDoc);
+                });
+
+                _context.SubmittedDocuments.AddRange(sDocumentList);
+                #endregion
+
+                _context.SaveChanges();
+
+
+
+                var submit = await _flow.CoqWorkFlow(coq.Id, Enum.GetName(typeof(AppActions), AppActions.Submit), "COQ Submitted", user.Id);
+                if (submit.Item1)
+                {
+                    transaction.Commit();
+
+                    return new ApiResponse
+                    {
+                        Message = submit.Item2,
+                        StatusCode = HttpStatusCode.OK,
+                        Success = true
+                    };
+                }
+                else
+                {
+                    transaction.Rollback();
+                    return new ApiResponse
+                    {
+                        Message = submit.Item2,
+                        StatusCode = HttpStatusCode.NotAcceptable,
+                        Success = false
+                    };
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+
+                return new ApiResponse
+                {
+                    Message = $"An error occur, COQ not created: {ex.Message}",
+                    Success = false,
+                    StatusCode = HttpStatusCode.InternalServerError
+                };
+            }
+
+            //return new ApiResponse
+            //{
+            //    Message = "COQ created successfully",
+            //    Success = true,
+            //    StatusCode = HttpStatusCode.OK
+            //};
         }
 
         public async Task<ApiResponse> GetCoqCreateRequirementsAsync(int depotId, int appId)
