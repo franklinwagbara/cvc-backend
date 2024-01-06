@@ -673,6 +673,8 @@ namespace Bunkering.Access.Services
                     
                 };
 
+                _context.CoQs.Add(coq);
+                _context.SaveChanges();
                 #endregion
 
                 #region Create COQ Tank
