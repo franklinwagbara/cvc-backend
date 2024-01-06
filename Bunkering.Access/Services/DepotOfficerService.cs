@@ -75,7 +75,7 @@ namespace Bunkering.Access.Services
                         StatusCode = HttpStatusCode.NotFound,
                         Success = false
                     };
-                    return _response;
+                    
                 }
 
                 else if(!userExists)
@@ -86,37 +86,44 @@ namespace Bunkering.Access.Services
                         StatusCode = HttpStatusCode.NotFound,
                         Success = false
                     };
-                    return _response;
+                    
                 }
-                else if(depotExists != null && userExists != null)
-                {
-                    _response = new ApiResponse
-                    {
-                        Message = "Officer is Already Assigned To This Depot",
-                        StatusCode = HttpStatusCode.Conflict,
-                        Success = false,
-                    };
 
-                }
                 else
                 {
-                    var map = new PlantFieldOfficer
+                    var existingMap = await _unitOfWork.PlantOfficer.FirstOrDefaultAsync(a => a.OfficerID == newDepotOfficer.UserID && a.PlantID == newDepotOfficer.DepotID);
+                    if (existingMap == null)
+
                     {
-                        PlantID = newDepotOfficer.DepotID,
-                        OfficerID = newDepotOfficer.UserID
+                        var map = new PlantFieldOfficer
+                        {
+                            PlantID = newDepotOfficer.DepotID,
+                            OfficerID = newDepotOfficer.UserID
 
-                    };
-                    await _unitOfWork.PlantOfficer.Add(map);
-                    await _unitOfWork.SaveChangesAsync("");
+                        };
+                        await _unitOfWork.PlantOfficer.Add(map);
+                        await _unitOfWork.SaveChangesAsync("");
 
-                    _response = new ApiResponse
+                        _response = new ApiResponse
+                        {
+                            Message = "Facility Officer mapping was added successfully.",
+                            StatusCode = HttpStatusCode.OK,
+                            Success = true,
+                        };
+
+                    }
+                    else
                     {
-                        Message = "Facility Officer mapping was added successfully.",
-                        StatusCode = HttpStatusCode.OK,
-                        Success = true,
-                    };
+                        _response = new ApiResponse
+                        {
+                            Message = "Officer is Already Assigned To This Depot",
+                            StatusCode = HttpStatusCode.Conflict,
+                            Success = false,
+                        };
 
+                    }
                 }
+                
 
             }
             catch (Exception ex)
