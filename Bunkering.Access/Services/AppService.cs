@@ -1061,7 +1061,8 @@ namespace Bunkering.Access.Services
             {
                 try
                 {
-                    var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id), "User.Company,Appointment,SubmittedDocuments,ApplicationType,Payments,Facility.VesselType,WorkFlow,Histories,Facility.Tanks.Product,Facility.FacilitySources.LGA.State,");
+                    var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id), "User.Company,Appointment,ApplicationType,Payments,Facility.VesselType,WorkFlow,Histories,Facility.Tanks.Product,Facility.FacilitySources.LGA.State,");
+
                     if (app != null)
                     {
                         var users = _userManager.Users.Include(c => c.Company).Include(ur => ur.UserRoles).ThenInclude(r => r.Role).ToList();
@@ -1100,6 +1101,11 @@ namespace Bunkering.Access.Services
                             s.ScheduleType,
                             ExpiryDate = s.ExpiryDate.ToString("MMM dd, yyyy HH:mm:ss")
                         });
+
+                        var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Utils.NOA));
+
+                        var appDocs = _unitOfWork.SubmittedDocument.Find(x => x.ApplicationId == app.Id && x.ApplicationTypeId == appType.Id);
+
                         var paymentStatus = "Payment pending";
                         if (app.Payments.FirstOrDefault()?.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted)) is true)
                         {
@@ -1139,7 +1145,7 @@ namespace Bunkering.Access.Services
                                 CurrentDesk = _userManager.Users.FirstOrDefault(x => x.Id.Equals(app.CurrentDeskId))?.Email,
                                 AppHistories = histories,
                                 Schedules = sch,
-                                Documents = app.SubmittedDocuments,
+                                Documents = appDocs,
                                 app.MarketerName,
                                 app.MotherVessel,
                                 app.Jetty,
