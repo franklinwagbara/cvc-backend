@@ -912,7 +912,7 @@ namespace Bunkering.Access.Services
                     Message = "Applications fetched successfully",
                     StatusCode = HttpStatusCode.OK,
                     Success = true,
-                    Data = apps.Select(x => new
+                    Data = apps.OrderByDescending(x => x.CreatedDate).Select(x => new
                     {
                         x.Id,
                         CompanyEmail = x.User.Email,
@@ -995,7 +995,7 @@ namespace Bunkering.Access.Services
                 Message = "Applications fetched successfully",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                Data = apps.Select(x => new
+                Data = apps.OrderByDescending(x => x.CreatedDate).Select(x => new
                 {
                     x.Id,
                     CompanyEmail = x.User.Email,
@@ -1025,7 +1025,7 @@ namespace Bunkering.Access.Services
                 Message = "Applications fetched successfully",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                Data = coqs.Select(x => new
+                Data = coqs.OrderByDescending(c => c.DateCreated).Select(x => new
                 {
                     x.Id,
                     AppId = x.AppId,
@@ -1221,36 +1221,13 @@ namespace Bunkering.Access.Services
                             _response.StatusCode = HttpStatusCode.OK;
                             _response.Success = true;
                             _response.Message = "Application has been pushed";
-                            _response.Data = flow.Item1;
+                            _response.Data = flow.Item2;
                         }
                         else
                         {
 
                             _response.Message = "Application cannot be pushed";
                         }
-
-                        //if (!flow.Item1)
-                        //{
-                        //	if (await _userManager.IsInRoleAsync(user, "Reviewer") && act.ToLower().Equals("approve"))
-                        //	{
-                        //		_response.Message = "Application cannot be pushed, awaiting FAD payment approval.";
-                        //		_response.StatusCode = HttpStatusCode.Unauthorized;
-                        //	}
-                        //}
-                        //else
-                        //{
-                        //	if (await _userManager.IsInRoleAsync(user, "FAD") && act.ToLower().Equals("approve"))
-                        //		_response.Message = "Payment was confirmed successfully. Application moved to the reviewer for further processing.";
-                        //	else
-                        //	{
-                        //		if (act.Equals(Enum.GetName(typeof(AppActions), AppActions.Approve)))
-                        //			_response.Message = "Application processed successfully and moved to the next processing staff";
-                        //		else
-                        //			_response.Message = "Application has been returned for review";
-                        //		_response.StatusCode = HttpStatusCode.OK;
-                        //		_response.Success = true;
-                        //	}
-                        //}
                     }
                 }
                 catch (Exception ex)
@@ -1331,7 +1308,7 @@ namespace Bunkering.Access.Services
                     Message = "Applications fetched successfully",
                     StatusCode = HttpStatusCode.OK,
                     Success = true,
-                    Data = applications
+                    Data = applications.OrderByDescending(c => c.CreatedDate).ToList()
                 };
             }
            
@@ -1366,7 +1343,7 @@ namespace Bunkering.Access.Services
                 return _response;
             }
             var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application");
-            var apps =  appDepots.Select(x => x.Application).ToList();
+            var apps =  appDepots.OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application).ToList();
 
             _response = new ApiResponse
             {

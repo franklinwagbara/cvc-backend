@@ -37,6 +37,12 @@ namespace Bunkering.Controllers.API
         [HttpGet]
         public async Task<IActionResult> GetAllPlants() => Response(await _plantService.GetAllPlants());
 
+
+        [AllowAnonymous]
+        [Route("get-all-depots-list")]
+        [HttpGet]
+        public async Task<IActionResult> GetAllDepotsFromDepotsOnline() => Response(await _plantService.GetDepotsList());
+
         [Route("get-all-PlantsByCompany")]
         [HttpGet]
         public async Task<IActionResult> GetAllPlantsByCompany() => Response(await _plantService.GetAllPlantsByCompany());
