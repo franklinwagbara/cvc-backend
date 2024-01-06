@@ -912,7 +912,7 @@ namespace Bunkering.Access.Services
                     Message = "Applications fetched successfully",
                     StatusCode = HttpStatusCode.OK,
                     Success = true,
-                    Data = apps.Select(x => new
+                    Data = apps.OrderByDescending(x => x.CreatedDate).Select(x => new
                     {
                         x.Id,
                         CompanyEmail = x.User.Email,
@@ -995,7 +995,7 @@ namespace Bunkering.Access.Services
                 Message = "Applications fetched successfully",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                Data = apps.Select(x => new
+                Data = apps.OrderByDescending(x => x.CreatedDate).Select(x => new
                 {
                     x.Id,
                     CompanyEmail = x.User.Email,
@@ -1025,7 +1025,7 @@ namespace Bunkering.Access.Services
                 Message = "Applications fetched successfully",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                Data = coqs.Select(x => new
+                Data = coqs.OrderByDescending(c => c.DateCreated).Select(x => new
                 {
                     x.Id,
                     AppId = x.AppId,
@@ -1331,7 +1331,7 @@ namespace Bunkering.Access.Services
                     Message = "Applications fetched successfully",
                     StatusCode = HttpStatusCode.OK,
                     Success = true,
-                    Data = applications
+                    Data = applications.OrderByDescending(c => c.CreatedDate).ToList()
                 };
             }
            
@@ -1366,7 +1366,7 @@ namespace Bunkering.Access.Services
                 return _response;
             }
             var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application");
-            var apps =  appDepots.Select(x => x.Application).ToList();
+            var apps =  appDepots.OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application).ToList();
 
             _response = new ApiResponse
             {
