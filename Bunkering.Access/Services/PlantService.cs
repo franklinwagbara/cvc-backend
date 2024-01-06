@@ -1,5 +1,6 @@
 ﻿using Bunkering.Access.DAL;
 using Bunkering.Access.IContracts;
+using Bunkering.Access.Query;
 using Bunkering.Core.Data;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
@@ -21,6 +22,8 @@ namespace Bunkering.Access.Services
         private string User;
         private readonly HttpClient _httpClient;
         private readonly IElps _elps;
+        private readonly PlantQueries _plantQueries;
+        private readonly ApplicationContext context;
 
         public PlantService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<ApplicationUser> userManager, IElps elps)
         {
@@ -31,6 +34,7 @@ namespace Bunkering.Access.Services
             _userManager = userManager;
             _httpClient = new HttpClient();
             _elps = elps;
+            _plantQueries = new PlantQueries(context);
         }
 
         public async Task<ApiResponse> GetAllPlants()
@@ -59,8 +63,9 @@ namespace Bunkering.Access.Services
                 };
                 return _response;
             }
+            //var plants = await _plantQueries.GetPlantsByCompanywithTanks(user.Email);
             var plants = await _unitOfWork.Plant.GetAll();
-            var filteredPlants = plants.Where(x => x.IsDeleted == false && x.Email == user.Email);
+            var filteredPlants = plants.Where(x => x.IsDeleted == false);
             return new ApiResponse
             {
                 Message = "All Plants for Company",
@@ -86,6 +91,12 @@ namespace Bunkering.Access.Services
         public async Task<ApiResponse> EditPlant(PlantDTO plant)
         {
             var user = await _userManager.FindByEmailAsync(User);
+
+            var companyDetails = _elps.GetCompanyDetailByEmail(user.Email);
+            var comName = companyDetails["name"];
+
+            
+
             var updatePlant = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id == plant.Id);
             if (updatePlant == null)
             {
@@ -183,14 +194,15 @@ namespace Bunkering.Access.Services
                     };
                     return _response;
                 }
-                //var companyDetails = _elps.GetCompanyDetailByEmail(user.Email);
-                
+                var companyDetails = _elps.GetCompanyDetailByEmail(user.Email);
+
+                var comName = companyDetails["name"];
                 var facility = new Plant
                 {
                     Name = plant.Name,
                     PlantType = 2,
                     State = plant.State,
-                    Company = user.Company?.Name,
+                    Company = comName,
                     Email = user.Email,
                     ElpsPlantId = plant.PlantElpsId,
                     CompanyElpsId = user.ElpsId,
@@ -418,18 +430,21 @@ namespace Bunkering.Access.Services
             var apiUrl = "https://depotonline.nmdpra.gov.ng/Application/DepotFacilityReports";
             try
             {
+                var depotsInDb = await _unitOfWork.Plant.GetAll();
+                List<Plant>  depotsExist = depotsInDb.ToList();
                 HttpResponseMessage response = await _httpClient.GetAsync(apiUrl);
                 response.EnsureSuccessStatusCode();
 
                 string jsonResponse = await response.Content.ReadAsStringAsync();
                 var data = JsonConvert.DeserializeObject<List<dynamic>>(jsonResponse);
-
+                
                 if (data.Any())
                 {
                     var depotList = new List<Plant>();
 
                     foreach (var item in data)
                     {
+                        
                         var plant = new Plant
                         {
                             Name = item.depotName,
@@ -437,9 +452,10 @@ namespace Bunkering.Access.Services
                             Email = item.email,
                             State = item.state,
                             Company = item.company,
+                            PlantType = 2,
                             CompanyElpsId = item.companyElpsId,
                         };
-
+                       
                         if (item.tanks != null)
                         {
                             var tankList = new List<PlantTank>();
@@ -457,29 +473,23 @@ namespace Bunkering.Access.Services
                             }
                             plant.Tanks = tankList;
                         }
-
-                        depotList.Add(plant);
+                        bool plantExist = depotsExist.Any(x => x.CompanyElpsId == plant.CompanyElpsId);
+                        if (!plantExist)
+                        {
+                            depotList.Add(plant);
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                        
                     }
-
-                    await _unitOfWork.Plant.AddRange(depotList);
+                    
+                    var distinctDepots = depotList.Distinct().ToList();
+                    await _unitOfWork.Plant.AddRange(distinctDepots);
                     await _unitOfWork.SaveChangesAsync("");
 
                 }
-
-                //var plantMap = new List<Plant>();
-                //var plantTankMap = new List<PlantTank>();
-                //foreach (var item in depotList)
-                //{
-                //    var plants = new Plant
-                //    {
-                //        Name = item.Name,
-                //    };
-                //    TankList.Add(plantTanks);
-                //}
-                
-               
-
-
                 _response = new ApiResponse
                 {
                     Message = "Successfully Pulled data from Depot project into Plant Table",
