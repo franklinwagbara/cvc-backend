@@ -24,6 +24,7 @@ namespace Bunkering.Access.Services
         private readonly MailSettings _mailSetting;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly AppSetting _appSetting;
+        private readonly PaymentService _paymentService;
         //private readonly Location _location;
         //private readonly Office _office;
 
@@ -36,7 +37,8 @@ namespace Bunkering.Access.Services
             IHostingEnvironment env,
             IOptions<MailSettings> mailSettings,
             IHttpContextAccessor httpContextAccessor,
-            IOptions<AppSetting> appSetting
+            IOptions<AppSetting> appSetting,
+            PaymentService paymentService
             //Location location,
             //Office office
             )
@@ -47,6 +49,7 @@ namespace Bunkering.Access.Services
             _mailSetting = mailSettings.Value;
             _httpContextAccessor = httpContextAccessor;
             _appSetting = appSetting.Value;
+            _paymentService = paymentService;
             //_location = location;
             //_office = office;
         }
@@ -80,23 +83,8 @@ namespace Bunkering.Access.Services
                     {
                         wkflow = await GetWorkFlow(action, currentUser, app.Facility.VesselTypeId);
                         if (wkflow != null) //get next processing staff
-                        {
-                            //if (action.ToLower().Equals("reject")
-                            //	&& currentUser.UserRoles.FirstOrDefault().Role.Name.ToLower().Equals("fad")
-                            //	&& currentUser.Location.Id && currentUser.Office.Id)
-                            //	nextprocessingofficer = app.User;
-                            //else if (action.ToLower().Equals("approve")
-                            //	&& currentUser.UserRoles.FirstOrDefault().Role.Name.ToLower().Equals("fad")
-                            //	&& currentUser.Location.Id
-                            //	&& currentUser.Office.Id)
-                            //	nextprocessingofficer = _userManager.Users
-                            //		.Include(lo => lo.Location)
-                            //		.Include(ol => ol.Office)
-                            //		.Include(ur => ur.UserRoles)
-                            //		.ThenInclude(r => r.Role).FirstOrDefault(x => x.Id.Equals(app.CurrentDeskId));
-                            //else
                             nextprocessingofficer = await GetNextStaff(appid, action, wkflow, currentUser, delUserId);
-                        }
+
                         if (nextprocessingofficer != null)
                         {
                             //update application
@@ -108,42 +96,6 @@ namespace Bunkering.Access.Services
                             if (action.Equals(Enum.GetName(typeof(AppActions), AppActions.Submit)))
                                 app.SubmittedDate = DateTime.Now.AddHours(1);
 
-                            //if (action.Equals(Enum.GetName(typeof(AppActions), AppActions.Submit)))
-                            //{
-                            //	app.SubmittedDate = DateTime.Now.AddHours(1);
-                            //	var fadusers = await _userManager.GetUsersInRoleAsync("FAD");
-                            //	if (fadusers.Count > 0)
-                            //	{
-                            //		var fadStaff = fadusers.Where(x => x.IsActive).OrderBy(x => x.LastJobDate).FirstOrDefault();
-                            //		if (fadStaff != null)
-                            //		{
-                            //			app.FADStaffId = fadStaff.Id;
-                            //			fadStaff.LastJobDate = DateTime.UtcNow.AddHours(1);
-                            //			await _userManager.UpdateAsync(fadStaff);
-                            //		}
-                            //	}
-                            //}
-                            //else if(action.ToLower().Equals("resubmit") && !app.FADApproved)
-                            //{
-                            //    var prevFadSTaff = await _unitOfWork.ApplicationHistory.Find(x => x.Action.ToLower().Equals())
-                            //}
-
-                            //on approval by FAD or Bunkering Reviewer
-                            //if (action.Equals(Enum.GetName(typeof(AppActions), AppActions.Approve)))
-                            //{
-                            //	if (currentUser.UserRoles.FirstOrDefault().Role.Name.ToLower().Equals("fad"))
-                            //	{
-                            //		var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.ApplicationId == appid);
-                            //		if (payment != null)
-                            //		{
-                            //			payment.Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted);
-                            //			payment.TransactionDate = DateTime.UtcNow.AddHours(1);
-                            //		}
-                            //		app.FADApproved = true;
-                            //	}
-                            //	if (currentUser.UserRoles.FirstOrDefault().Role.Name.ToLower().Equals("reviewer") && !app.FADApproved)
-                            //		return (false, string.Empty);
-                            //}
                             if (action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Approve).ToLower()))
                                 processingMsg = "Application processed successfully and moved to the next processing staff";
                             else if (action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Submit).ToLower()))
@@ -153,9 +105,6 @@ namespace Bunkering.Access.Services
                             else
                                 processingMsg = "Application has been returned for review";
 
-
-                            //await _unitOfWork.Application.Update(app);
-                            await _unitOfWork.SaveChangesAsync(currentUser.Id);
                             nextprocessingofficer.LastJobDate = DateTime.UtcNow.AddHours(1);
                             await _userManager.UpdateAsync(nextprocessingofficer);
                             //save action to history
@@ -165,9 +114,14 @@ namespace Bunkering.Access.Services
                             //Generate permit number on final approval
                             if (wkflow.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)))
                             {
+                                //await _unitOfWork.Application.Update(app);
+                                var nextSUrveyor = await _unitOfWork.NominatedSurveyor.GetNextAsync();
+                                if (nextSUrveyor != null)
+                                    app.SurveyorId = nextSUrveyor.Id;
+                                await _unitOfWork.SaveChangesAsync(currentUser.Id);
                                 var permit = await GeneratePermit(appid, currentUser.Id);
                                 if (permit.Item1)
-                                    processingMsg = $"Application with reference {app.Reference} has been approved and license {permit.Item2} has been generated successfully";
+                                    processingMsg = $"Application with reference {app.Reference} has been approved and clearance number {permit.Item2} has been generated successfully";
                             }
                             //send and save notification
                             await SendNotification(app, action, nextprocessingofficer, processingMsg);
@@ -233,8 +187,10 @@ namespace Bunkering.Access.Services
                 if (workFlow.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)))
                 {
                     var certificate = await GenerateCOQCertificate(coqId, currentUser.Id);
-                    if (certificate.Item1)
-                        message = $"COQ Application with reference {coq.Reference} has been approved and certificate {certificate.Item2} has been generated successfully";
+                    var debitnote = await _paymentService.GenerateDebitNote(coq.Id);
+
+                    if (certificate.Item1 && debitnote.Success)
+                        message = $"COQ Application has been approved and certificate {certificate.Item2} has been generated successfully. Additionally Debit note with RRR ({debitnote.Data}) has been generated for the COQ.";
                 }
                 //send and save notification
                 //await SendCOQNotification(coq, action, nextProcessingOfficer, message);
