@@ -1,5 +1,6 @@
 ﻿using Bunkering.Access;
 using Bunkering.Access.IContracts;
+using Bunkering.Core.Data;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -105,8 +106,11 @@ namespace Bunkering.Controllers.API
 				//var qrcode = Utils.GenerateQrCode($"{Request.Scheme}://{Request.Host}/License/ValidateQrCode/{license.ApplicationId}");
 				//license.QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length);
 				var depots = await _unitOfWork.ApplicationDepot.Find(x => x.AppId.Equals(license.ApplicationId), "Application,Depot,Product");
+                NominatedSurveyor nominatedSurveyor  = null;
+				if (depots.FirstOrDefault().Application.SurveyorId != null)
+					nominatedSurveyor = await _unitOfWork.NominatedSurveyor.FirstOrDefaultAsync(x => x.Id.Equals(nominatedSurveyor.Id));
 
-                var viewAsPdf = new ViewAsPdf
+                var viewAsPdf = new ViewAsPdf 
 				{
 					Model = new CertificareDTO
 					{
@@ -121,7 +125,8 @@ namespace Bunkering.Controllers.API
 							Product = y.Product.Name,
 							Volume = y.Volume
 						}).ToList(),
-						Jetty = license.Application.Jetty,					
+						Jetty = license.Application.Jetty,
+						Surveyor = nominatedSurveyor is not null ? nominatedSurveyor.Name : "N/A"
                     },
 					PageHeight = 327,
 					PageMargins = new Rotativa.AspNetCore.Options.Margins(10, 10, 10, 10),					

@@ -1221,36 +1221,13 @@ namespace Bunkering.Access.Services
                             _response.StatusCode = HttpStatusCode.OK;
                             _response.Success = true;
                             _response.Message = "Application has been pushed";
-                            _response.Data = flow.Item1;
+                            _response.Data = flow.Item2;
                         }
                         else
                         {
 
                             _response.Message = "Application cannot be pushed";
                         }
-
-                        //if (!flow.Item1)
-                        //{
-                        //	if (await _userManager.IsInRoleAsync(user, "Reviewer") && act.ToLower().Equals("approve"))
-                        //	{
-                        //		_response.Message = "Application cannot be pushed, awaiting FAD payment approval.";
-                        //		_response.StatusCode = HttpStatusCode.Unauthorized;
-                        //	}
-                        //}
-                        //else
-                        //{
-                        //	if (await _userManager.IsInRoleAsync(user, "FAD") && act.ToLower().Equals("approve"))
-                        //		_response.Message = "Payment was confirmed successfully. Application moved to the reviewer for further processing.";
-                        //	else
-                        //	{
-                        //		if (act.Equals(Enum.GetName(typeof(AppActions), AppActions.Approve)))
-                        //			_response.Message = "Application processed successfully and moved to the next processing staff";
-                        //		else
-                        //			_response.Message = "Application has been returned for review";
-                        //		_response.StatusCode = HttpStatusCode.OK;
-                        //		_response.Success = true;
-                        //	}
-                        //}
                     }
                 }
                 catch (Exception ex)
