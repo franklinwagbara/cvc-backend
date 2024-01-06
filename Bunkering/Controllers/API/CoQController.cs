@@ -137,7 +137,6 @@ namespace Bunkering.Controllers.API
         //[HttpPost]
         //public async Task<IActionResult> CreateCoQ([FromBody] CreateCoQViewModel Model) => Response(await _coqService.CreateCoQ(Model));
 
-        [AllowAnonymous]
 		[ProducesResponseType(typeof(ApiResponse), 200)]
 		[ProducesResponseType(typeof(ApiResponse), 404)]
 		[ProducesResponseType(typeof(ApiResponse), 405)]
@@ -146,6 +145,16 @@ namespace Bunkering.Controllers.API
 		[Route("coq_by_appId/{appId}")]
 		[HttpGet]
 		public async Task<IActionResult> GetCoqs(int appId) => Response(await _coqService.GetCoQsByAppId(appId));
+
+
+		[ProducesResponseType(typeof(ApiResponse), 200)]
+		[ProducesResponseType(typeof(ApiResponse), 404)]
+		[ProducesResponseType(typeof(ApiResponse), 405)]
+		[ProducesResponseType(typeof(ApiResponse), 500)]
+		[Produces("application/json")]
+		[Route("coq_by_depotId/{depotId}")]
+		[HttpGet]
+		public async Task<IActionResult> GetCoqsByDepot(int depotId) => Response(await _coqService.GetCoQsByDepotId(depotId));
 
 		[ProducesResponseType(typeof(ApiResponse), 200)]
 		[ProducesResponseType(typeof(ApiResponse), 404)]
