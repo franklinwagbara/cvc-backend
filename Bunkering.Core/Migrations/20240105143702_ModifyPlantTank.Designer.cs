@@ -4,6 +4,7 @@ using Bunkering.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bunkering.Core.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20240105143702_ModifyPlantTank")]
+    partial class ModifyPlantTank
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -666,6 +669,9 @@ namespace Bunkering.Core.Migrations
                     b.Property<double>("DepotPrice")
                         .HasColumnType("float");
 
+                    b.Property<double>("DifferenceBtwShipAndShoreFigure")
+                        .HasColumnType("float");
+
                     b.Property<double>("DischargeShipFigure")
                         .HasColumnType("float");
 
@@ -687,9 +693,8 @@ namespace Bunkering.Core.Migrations
                     b.Property<double>("MT_VAC")
                         .HasColumnType("float");
 
-                    b.Property<string>("NameConsignee")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<double>("PercentageDifference")
+                        .HasColumnType("float");
 
                     b.Property<int>("PlantId")
                         .HasColumnType("int");
