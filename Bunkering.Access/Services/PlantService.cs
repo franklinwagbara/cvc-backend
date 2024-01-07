@@ -148,6 +148,7 @@ namespace Bunkering.Access.Services
                     updatePlant.Product = tank.Product;
                     updatePlant.TankName = tank.TankName;
                     updatePlant.Capacity = tank.Capacity;
+                    updatePlant.Position = tank.Position;
                     updatePlant.IsDeleted = false;
 
                     var success = await _unitOfWork.SaveChangesAsync(user!.Id) > 0;
