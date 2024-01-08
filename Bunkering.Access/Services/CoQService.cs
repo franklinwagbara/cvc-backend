@@ -990,5 +990,28 @@ namespace Bunkering.Access.Services
                 Message = "fetched successfully"
             };
         }
+
+        public async Task<ApiResponse> GetByIdAsync(int id)
+        {
+            var coq = await _context.CoQs.Include(c => c.Application).FirstOrDefaultAsync(c => c.Id == id);
+            if (coq is null)
+            {
+                return new() { StatusCode = HttpStatusCode.NotFound, Success = false };
+            }
+            var tanks = await _context.COQTanks.Include(c => c.TankMeasurement).Where(c => c.CoQId == coq.Id).ToListAsync();
+            var docs = await _context.SubmittedDocuments.FirstOrDefaultAsync(c => c.ApplicationId == coq.Id);
+            return new()
+            {
+                Success = true,
+                StatusCode = HttpStatusCode.OK,
+                Data = new
+                {
+                    coq,
+                    tanks,
+                    docs
+                }
+            };
+        }
+
     }
 }
