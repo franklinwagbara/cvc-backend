@@ -1013,5 +1013,89 @@ namespace Bunkering.Access.Services
             };
         }
 
+
+        public async Task<ApiResponse> GetApprovedCoQsByFieldOfficer()
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(LoginUserEmail) ?? throw new Exception("Unathorise, this action is restricted to only authorise users");
+                var FieldOfficer = _httpCxtAccessor.HttpContext.User.IsInRole(RoleConstants.Field_Officer);
+                if (FieldOfficer == true)
+                {
+                    var depotsList = GetDepotsListforUSer(user.Id);
+
+                    List<CoQDTO> Coqs = new List<CoQDTO>();
+                    foreach (var item in depotsList)
+                    {
+                        var coqPerDepot = GetCoqApproved(item.PlantID);
+                        if (coqPerDepot is not null)
+                        {
+                            Coqs.Add(coqPerDepot);
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+
+                    _apiReponse = new ApiResponse
+                    {
+                        Success = true,
+                        StatusCode = HttpStatusCode.OK,
+                        Data = Coqs,
+                    };
+                }
+                else
+                {
+                    _apiReponse = new ApiResponse
+                    {
+                        Success = false,
+                        StatusCode = HttpStatusCode.MethodNotAllowed,
+                        Message = "Sorry only a Field Officer is allowed",
+                        Data = null
+                        
+                    };
+                }
+               
+
+                return _apiReponse;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private List<PlantFieldOfficer> GetDepotsListforUSer(string Id)
+        {
+            var plist =  _context.PlantFieldOfficers.Where(x => x.OfficerID.ToString() == Id).ToList();
+            return plist;
+        }
+
+        private CoQDTO GetCoqApproved(int Id)
+        {
+            var plist = _context.CoQs.FirstOrDefault(x => x.DepotId== Id && x.Status == "Approved");
+            if (plist == null)
+            {
+                return new CoQDTO();
+            }
+            CoQDTO cd = new CoQDTO
+            {
+                NoaAppId = plist.AppId,
+                PlantId = plist.PlantId,
+                ArrivalShipFigure = plist.ArrivalShipFigure,
+                DateOfSTAfterDischarge = plist.DateOfSTAfterDischarge,
+                DateOfVesselArrival = plist.DateOfVesselArrival,
+                DateOfVesselUllage = plist.DateOfVesselUllage,
+                DepotPrice = plist.DepotPrice,
+                DischargeShipFigure = plist.DischargeShipFigure,
+                NameConsignee = plist.NameConsignee,
+                QuauntityReflectedOnBill = plist.QuauntityReflectedOnBill
+
+            };
+            return cd;
+        }
+
     }
 }
