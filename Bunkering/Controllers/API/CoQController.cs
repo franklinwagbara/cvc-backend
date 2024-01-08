@@ -137,7 +137,6 @@ namespace Bunkering.Controllers.API
         //[HttpPost]
         //public async Task<IActionResult> CreateCoQ([FromBody] CreateCoQViewModel Model) => Response(await _coqService.CreateCoQ(Model));
 
-        [AllowAnonymous]
 		[ProducesResponseType(typeof(ApiResponse), 200)]
 		[ProducesResponseType(typeof(ApiResponse), 404)]
 		[ProducesResponseType(typeof(ApiResponse), 405)]

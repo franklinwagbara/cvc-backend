@@ -123,6 +123,28 @@ namespace Bunkering.Access.Services
             }
         }
 
+        public async Task<ApiResponse> GetCoQsByDepotId(int depotId)
+        {
+            try
+            {
+                var foundCOQ = await _unitOfWork.CoQ.Find(x => x.DepotId == depotId);
+                return new ApiResponse
+                {
+                    Data = foundCOQ,
+                    Message = "Successful",
+                    StatusCode = System.Net.HttpStatusCode.OK
+                };
+            }
+            catch (Exception e)
+            {
+                return _apiReponse = new ApiResponse
+                {
+                    Message = $"{e.Message} +++ {e.StackTrace} ~~~ {e.InnerException?.ToString()}\n",
+                    StatusCode = HttpStatusCode.InternalServerError
+                };
+            }
+        }
+
         public async Task<ApiResponse> DocumentUpload(int id)
         {
 
@@ -651,6 +673,8 @@ namespace Bunkering.Access.Services
                     
                 };
 
+                _context.CoQs.Add(coq);
+                _context.SaveChanges();
                 #endregion
 
                 #region Create COQ Tank

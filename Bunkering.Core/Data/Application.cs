@@ -43,7 +43,7 @@ namespace Bunkering.Core.Data
         public WorkFlow WorkFlow { get; set; }
         public virtual ICollection<Appointment> Appointment { get; set; }
         public virtual ICollection<Payment> Payments { get; set; }
-        public virtual ICollection<SubmittedDocument> SubmittedDocuments { get; set; }
+        //public virtual ICollection<SubmittedDocument> SubmittedDocuments { get; set; }
         public virtual ICollection<Message> Messages { get; set; }
         public virtual ICollection<ApplicationHistory> Histories { get; set; }
     }
