@@ -3,6 +3,7 @@ using Bunkering.Core.Data;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Security.Claims;
 
@@ -163,7 +164,7 @@ namespace Bunkering.Access.Services
             try
             {
                 var user = _contextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.PrimarySid)?.Value;
-
+                var coq = await _unitOfWork.CoQ.Query(c =>  c.AppId == AppId).Select(c => c.Id).ToListAsync();
                 var depotOffices = (await _unitOfWork.PlantOfficer.Find(c => c.OfficerID.ToString() == user && c.IsDeleted != true)).ToList();
 
                 if(!depotOffices.Any() )
@@ -181,6 +182,7 @@ namespace Bunkering.Access.Services
                 .Exists(a => a.PlantID == x.DepotId)).Select(x => x.Depot)
                 .ToList() ?? throw new Exception("Could find these depot(s)");
 
+                depots = depots.SkipWhile(d => coq.Exists(c => c == d.Id)).ToList();
                 return new ApiResponse
                 {
                     Data = depots,
