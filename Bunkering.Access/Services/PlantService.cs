@@ -51,6 +51,19 @@ namespace Bunkering.Access.Services
             };
         }
 
+        public async Task<ApiResponse> GetAllDepotsPlants()
+        {
+            var plants = GetAllDepotswithTanks();
+            var filteredPlants = plants.Where(x => x.IsDeleted == false);
+            return new ApiResponse
+            {
+                Message = "All Fees found",
+                StatusCode = HttpStatusCode.OK,
+                Success = true,
+                Data = filteredPlants
+            };
+        }
+
         public async Task<ApiResponse> GetAllPlantsByCompany()
         {
             var user = await _userManager.FindByEmailAsync(User);
@@ -565,6 +578,28 @@ namespace Bunkering.Access.Services
                             IsDeleted = x.IsDeleted,
                             Tanks = x.Tanks.Where(u => !u.IsDeleted).ToList()                            
                         })                        
+                        .ToList();
+            return plist;
+        }
+
+        private List<Plant> GetAllDepotswithTanks()
+        {
+
+            var plist = _unitOfWork.Plant.Query()
+                        .Select(x => new Plant
+                        {
+                            Name = x.Name,
+                            Id = x.Id,
+                            Company = x.Company,
+                            ElpsPlantId = x.ElpsPlantId,
+                            CompanyElpsId = x.ElpsPlantId,
+                            Email = x.Email,
+                            PlantType = x.PlantType,
+                            State = x.State,
+                            IsDeleted = x.IsDeleted,
+                            Tanks = x.Tanks.Where(u => !u.IsDeleted).ToList()
+                        })
+                        .Where(x => x.PlantType == 2 )
                         .ToList();
             return plist;
         }
