@@ -146,17 +146,17 @@ namespace Bunkering.Controllers.API
 		[HttpGet]
 		public async Task<IActionResult> GetCoqs(int appId) => Response(await _coqService.GetCoQsByAppId(appId));
 
+        
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Produces("application/json")]
+        [Route("approved_coq")]
+        [HttpGet]
+        public async Task<IActionResult> GetApprovedCoQsByDepot() => Response(await _coqService.GetApprovedCoQsByFieldOfficer());
 
-		[ProducesResponseType(typeof(ApiResponse), 200)]
-		[ProducesResponseType(typeof(ApiResponse), 404)]
-		[ProducesResponseType(typeof(ApiResponse), 405)]
-		[ProducesResponseType(typeof(ApiResponse), 500)]
-		[Produces("application/json")]
-		[Route("coq_by_depotId/{depotId}")]
-		[HttpGet]
-		public async Task<IActionResult> GetCoqsByDepot(int depotId) => Response(await _coqService.GetCoQsByDepotId(depotId));
-
-		[ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 200)]
 		[ProducesResponseType(typeof(ApiResponse), 404)]
 		[ProducesResponseType(typeof(ApiResponse), 405)]
 		[ProducesResponseType(typeof(ApiResponse), 500)]
