@@ -1104,7 +1104,7 @@ namespace Bunkering.Access.Services
 
                         var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Utils.NOA));
 
-                        var appDocs = _unitOfWork.SubmittedDocument.Find(x => x.ApplicationId == app.Id && x.ApplicationTypeId == appType.Id);
+                        var appDocs = await _unitOfWork.SubmittedDocument.Find(x => x.ApplicationId == app.Id && x.ApplicationTypeId == appType.Id);
 
                         var paymentStatus = "Payment pending";
                         if (app.Payments.FirstOrDefault()?.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted)) is true)
