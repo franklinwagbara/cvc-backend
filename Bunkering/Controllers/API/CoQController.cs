@@ -161,7 +161,6 @@ namespace Bunkering.Controllers.API
 		[ProducesResponseType(typeof(ApiResponse), 500)]
 		[Produces("application/json")]
 		[Route("coq_details/{id}")]
-        [AllowAnonymous]
 		[HttpGet]
 		public async Task<IActionResult> GetCoqsById(int id) => Response(await _coqService.GetByIdAsync(id));
         
