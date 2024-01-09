@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Dynamic;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -993,20 +996,78 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> GetByIdAsync(int id)
         {
-            var coq = await _context.CoQs.Include(c => c.Application).FirstOrDefaultAsync(c => c.Id == id);
+            var coq = await _context.CoQs
+                .Include(c => c.Application!.Facility.VesselType)
+                .Include(c => c.Application!.Payments)
+                .FirstOrDefaultAsync(c => c.Id == id);
             if (coq is null)
             {
                 return new() { StatusCode = HttpStatusCode.NotFound, Success = false };
             }
-            var tanks = await _context.COQTanks.Include(c => c.TankMeasurement).Where(c => c.CoQId == coq.Id).ToListAsync();
+            var tanks = await _context.COQTanks
+                .Include(c => c.TankMeasurement).Where(c => c.CoQId == coq.Id)
+                .Select(c => new
+                {
+                    c.TankId,
+                    c.Id,
+                    c.TankMeasurement,
+                    c.CoQId,
+                    TankName = _context.Tanks.Where(x => x.Id == c.TankId).Select(x => x.Name).FirstOrDefault()
+                })
+                .ToListAsync();
             var docs = await _context.SubmittedDocuments.FirstOrDefaultAsync(c => c.ApplicationId == coq.Id);
+            var dictionary = new Dictionary<string, object?>();
+            var props = coq?.GetType()?.GetProperties();
+            if (props?.Any() is true)
+            {
+                foreach (var property in props)
+                {
+                    dictionary.Add(property.Name, property.GetValue(coq));
+                }
+                dictionary.Add("Application.Vessel", coq.Application.Facility);
+                dictionary.Remove("Application.Facility");
+            }
+            var app = coq.Application;
+            if (dictionary.ContainsKey("Application"))
+            {
+                dictionary["Application"] = new
+                {
+                    app.Id,
+                    app.Status,
+                    app.Reference,
+                    CreatedDate = app.CreatedDate.ToString("MMM dd, yyyy HH:mm:ss"),
+                    SubmittedDate = app.SubmittedDate != null ? app.SubmittedDate.Value.ToString("MMM dd, yyyy HH:mm:ss") : null,
+                    TotalAmount = string.Format("{0:N}", app.Payments.Sum(x => x.Amount)),
+                    PaymentDescription = app.Payments.FirstOrDefault()?.Description,
+                    PaymnetDate = app.Payments.FirstOrDefault()?.TransactionDate.ToString("MMM dd, yyyy HH:mm:ss"),
+                    CurrentDesk = _userManager.Users.FirstOrDefault(x => x.Id.Equals(app.CurrentDeskId))?.Email,
+                    app.MarketerName,
+                    app.MotherVessel,
+                    app.Jetty,
+                    app.LoadingPort,
+                    NominatedSurveyor = (await _unitOfWork.NominatedSurveyor.Find(c => c.Id == app.SurveyorId)).FirstOrDefault(),
+                    Vessel = new
+                    {
+                        app.Facility.Name,
+                        VesselType = app.Facility.VesselType.Name,
+                        app.Facility.Capacity,
+                        app.Facility.DeadWeight,
+                        app.Facility.IMONumber,
+                        app.Facility.Flag,
+                        app.Facility.CallSIgn,
+                        app.Facility.Operator,
+                        app.LoadingPort,
+                    }
+                };
+
+            }
             return new()
             {
                 Success = true,
                 StatusCode = HttpStatusCode.OK,
                 Data = new
                 {
-                    coq,
+                    coq = dictionary,
                     tanks,
                     docs
                 }
