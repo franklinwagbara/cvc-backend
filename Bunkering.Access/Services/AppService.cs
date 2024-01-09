@@ -1365,7 +1365,7 @@ namespace Bunkering.Access.Services
                 };
                 return _response;
             }
-            var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application");
+            var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application.Facility");
             var apps =  appDepots.Select(x => x.Application).ToList();
 
             _response = new ApiResponse
