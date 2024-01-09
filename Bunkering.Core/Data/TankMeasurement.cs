@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Bunkering.Core.Data
 {
-    public class TankMeasurement
+    public class TankMeasurement  
     {
         public int Id { get; set; }
         public int COQTankId { get; set; }

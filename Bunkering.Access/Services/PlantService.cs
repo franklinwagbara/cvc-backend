@@ -218,7 +218,7 @@ namespace Bunkering.Access.Services
                     return _response;
                 }
                 var companyDetails = _elps.GetCompanyDetailByEmail(user.Email);
-
+                var lga = await _unitOfWork.LGA.FirstOrDefaultAsync(x => x.State.Name.ToLower().Contains("lagos"), "State");
                 var comName = companyDetails["name"];
                 var allExistingPlants = GetAllPlantsNamesInCompany(user.Email);
                 bool exist = allExistingPlants.Any(x => x.Name == plant.Name);
@@ -232,6 +232,47 @@ namespace Bunkering.Access.Services
                     };
                     return _response;
                 }
+                if (plant.PlantType == 1)
+                {
+                   
+
+                    var elpsFacility = _elps.CreateElpsFacility(new
+                    {
+                        Name = plant.Name,
+                        StreetAddress = $"{plant.Name} - {user.ElpsId}",
+                        CompanyId = user.ElpsId,
+                        DateAdded = DateTime.UtcNow.AddHours(1),
+                        City = lga.Name,
+                        lga.StateId,
+                        LGAId = lga.Id,
+                        FacilityType = "CVC Facility",
+                        FacilityDocuments = (string)null,
+                        Id = (string)null
+                    })?.Parse<Dictionary<string, string>>();
+
+                    var elpsId =  Convert.ToInt64(elpsFacility["id"]); 
+                    var item = new Plant
+                    {
+                        Name = plant.Name,
+                        PlantType = 1,
+                        State = plant.State,
+                        Company = comName,
+                        Email = user.Email,
+                        CompanyElpsId = user.ElpsId,
+                        ElpsPlantId = elpsId
+                    };
+                    await _unitOfWork.Plant.Add(item);
+                    await _unitOfWork.SaveChangesAsync(user.Id);
+
+                    _response = new ApiResponse
+                    {
+                        Message = "Processing Plant was added successfully.",
+                        StatusCode = HttpStatusCode.OK,
+                        Success = true
+                    };
+                    return _response;
+                }
+                
                 var facility = new Plant
                 {
                     Name = plant.Name,
@@ -243,6 +284,8 @@ namespace Bunkering.Access.Services
                     CompanyElpsId = user.ElpsId,
                     IsDeleted = false,
                 };
+                
+
                 await _unitOfWork.Plant.Add(facility);
                 await _unitOfWork.SaveChangesAsync(user.Id);
 
