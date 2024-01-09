@@ -172,6 +172,16 @@ namespace Bunkering.Controllers.API
         [Route("approved_coq")]
         [HttpGet]
         public async Task<IActionResult> GetApprovedCoQsByDepot() => Response(await _coqService.GetApprovedCoQsByFieldOfficer());
+        
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Produces("application/json")]
+        [Route("all-coq-cert")]
+        [HttpGet]
+        public async Task<IActionResult> GetAllCoQCertificates() => Response(await _coqService.GetAllCoQCertificates());
 
         [ProducesResponseType(typeof(ApiResponse), 200)]
 		[ProducesResponseType(typeof(ApiResponse), 404)]
