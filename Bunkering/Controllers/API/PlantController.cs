@@ -37,6 +37,12 @@ namespace Bunkering.Controllers.API
         [HttpGet]
         public async Task<IActionResult> GetAllPlants() => Response(await _plantService.GetAllPlants());
 
+
+        [AllowAnonymous]
+        [Route("get-all-depots-list")]
+        [HttpGet]
+        public async Task<IActionResult> GetAllDepotsFromDepotsOnline() => Response(await _plantService.GetDepotsList());
+
         [Route("get-all-PlantsByCompany")]
         [HttpGet]
         public async Task<IActionResult> GetAllPlantsByCompany() => Response(await _plantService.GetAllPlantsByCompany());
@@ -54,13 +60,13 @@ namespace Bunkering.Controllers.API
         [HttpPost]
         public async Task<IActionResult> AddPlantTank(PlantTankDTO model, int id) => Response(await _plantService.CreatePlantTank(model, id));
 
-        [Route("edit-plant/{plant}")]
+        [Route("edit-plant/{id}")]
         [HttpPut]
-        public async Task<IActionResult> EditPlant(PlantDTO model) => Response(await _plantService.EditPlant(model));
+        public async Task<IActionResult> EditPlant(int id, PlantDTO model) => Response(await _plantService.EditPlant(id, model));
 
-        [Route("edit-plantTank/{plantTank}")]
+        [Route("edit-plantTank/{id}")]
         [HttpPut]
-        public async Task<IActionResult> EditPlantTank(PlantTankDTO model) => Response(await _plantService.EditPlantTanks(model));
+        public async Task<IActionResult> EditPlantTank(int id, PlantTankDTO model) => Response(await _plantService.EditPlantTanks(id, model));
 
 
         [Route("get-plant/{id}")]
@@ -75,6 +81,15 @@ namespace Bunkering.Controllers.API
         [HttpDelete]
         public async Task<IActionResult> DeletePlantTank(int id) => Response(await _plantService.DeletePlantTank(id));
 
+
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("All-processing-plant")]
+        [HttpGet]
+
+        public async Task<IActionResult> AllProcessingPlants() => Response(await _plantService.GetAllProcessingPlants());
 
     }
 }

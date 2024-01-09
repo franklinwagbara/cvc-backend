@@ -912,7 +912,7 @@ namespace Bunkering.Access.Services
                     Message = "Applications fetched successfully",
                     StatusCode = HttpStatusCode.OK,
                     Success = true,
-                    Data = apps.Select(x => new
+                    Data = apps.OrderByDescending(x => x.CreatedDate).Select(x => new
                     {
                         x.Id,
                         CompanyEmail = x.User.Email,
@@ -987,15 +987,15 @@ namespace Bunkering.Access.Services
         {
             var apps = await _unitOfWork.Application.Find(x => x.CurrentDeskId.Equals(user.Id), "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
             if (await _userManager.IsInRoleAsync(user, "FAD"))
-                apps = await _unitOfWork.Application.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)), "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
+                apps = await _unitOfWork.Application.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)) && x.IsDeleted != true, "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
             else if (await _userManager.IsInRoleAsync(user, "Company"))
-                apps = await _unitOfWork.Application.Find(x => x.UserId.Equals(user.Id), "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
+                apps = await _unitOfWork.Application.Find(x => x.UserId.Equals(user.Id) && x.IsDeleted != true, "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
             return new ApiResponse
             {
                 Message = "Applications fetched successfully",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                Data = apps.Select(x => new
+                Data = apps.OrderByDescending(x => x.CreatedDate).Select(x => new
                 {
                     x.Id,
                     CompanyEmail = x.User.Email,
@@ -1015,17 +1015,17 @@ namespace Bunkering.Access.Services
 
         private async Task<ApiResponse> GetMyDeskFO(ApplicationUser? user)
         {
-            var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Application.ApplicationType,Application.User.Company,Depot");
+            var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Depot");
             // if (await _userManager.IsInRoleAsync(user, "FAD"))
             //     coqs = await _unitOfWork.CoQ.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)));
             if (await _userManager.IsInRoleAsync(user, "Company"))
-                coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Application.ApplicationType,Application.User.Company,Depot");
+                coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Depot");
             return new ApiResponse
             {
                 Message = "Applications fetched successfully",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                Data = coqs.Select(x => new
+                Data = coqs.OrderByDescending(c => c.DateCreated).Select(x => new
                 {
                     x.Id,
                     AppId = x.AppId,
@@ -1061,7 +1061,8 @@ namespace Bunkering.Access.Services
             {
                 try
                 {
-                    var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id), "User.Company,Appointment,SubmittedDocuments,ApplicationType,Payments,Facility.VesselType,WorkFlow,Histories,Facility.Tanks.Product,Facility.FacilitySources.LGA.State,");
+                    var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id), "User.Company,Appointment,ApplicationType,Payments,Facility.VesselType,WorkFlow,Histories,Facility.Tanks.Product,Facility.FacilitySources.LGA.State,");
+
                     if (app != null)
                     {
                         var users = _userManager.Users.Include(c => c.Company).Include(ur => ur.UserRoles).ThenInclude(r => r.Role).ToList();
@@ -1100,6 +1101,11 @@ namespace Bunkering.Access.Services
                             s.ScheduleType,
                             ExpiryDate = s.ExpiryDate.ToString("MMM dd, yyyy HH:mm:ss")
                         });
+
+                        var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Utils.NOA));
+
+                        var appDocs = await _unitOfWork.SubmittedDocument.Find(x => x.ApplicationId == app.Id && x.ApplicationTypeId == appType.Id);
+
                         var paymentStatus = "Payment pending";
                         if (app.Payments.FirstOrDefault()?.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted)) is true)
                         {
@@ -1139,7 +1145,7 @@ namespace Bunkering.Access.Services
                                 CurrentDesk = _userManager.Users.FirstOrDefault(x => x.Id.Equals(app.CurrentDeskId))?.Email,
                                 AppHistories = histories,
                                 Schedules = sch,
-                                Documents = app.SubmittedDocuments,
+                                Documents = appDocs,
                                 app.MarketerName,
                                 app.MotherVessel,
                                 app.Jetty,
@@ -1221,36 +1227,13 @@ namespace Bunkering.Access.Services
                             _response.StatusCode = HttpStatusCode.OK;
                             _response.Success = true;
                             _response.Message = "Application has been pushed";
-                            _response.Data = flow.Item1;
+                            _response.Data = flow.Item2;
                         }
                         else
                         {
 
                             _response.Message = "Application cannot be pushed";
                         }
-
-                        //if (!flow.Item1)
-                        //{
-                        //	if (await _userManager.IsInRoleAsync(user, "Reviewer") && act.ToLower().Equals("approve"))
-                        //	{
-                        //		_response.Message = "Application cannot be pushed, awaiting FAD payment approval.";
-                        //		_response.StatusCode = HttpStatusCode.Unauthorized;
-                        //	}
-                        //}
-                        //else
-                        //{
-                        //	if (await _userManager.IsInRoleAsync(user, "FAD") && act.ToLower().Equals("approve"))
-                        //		_response.Message = "Payment was confirmed successfully. Application moved to the reviewer for further processing.";
-                        //	else
-                        //	{
-                        //		if (act.Equals(Enum.GetName(typeof(AppActions), AppActions.Approve)))
-                        //			_response.Message = "Application processed successfully and moved to the next processing staff";
-                        //		else
-                        //			_response.Message = "Application has been returned for review";
-                        //		_response.StatusCode = HttpStatusCode.OK;
-                        //		_response.Success = true;
-                        //	}
-                        //}
                     }
                 }
                 catch (Exception ex)
@@ -1331,7 +1314,7 @@ namespace Bunkering.Access.Services
                     Message = "Applications fetched successfully",
                     StatusCode = HttpStatusCode.OK,
                     Success = true,
-                    Data = applications
+                    Data = applications.OrderByDescending(c => c.CreatedDate).ToList()
                 };
             }
            

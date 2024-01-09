@@ -69,6 +69,25 @@ namespace Bunkering.Access.DAL
 
             return await query.FirstOrDefaultAsync();
         }
+        public IQueryable<T> Query(Expression<Func<T, bool>> expression, string includeProperties = null)
+        {
+            IQueryable<T> query = _db;
+
+            if (expression != null)
+                query = query.Where(expression);
+
+            if (!string.IsNullOrEmpty(includeProperties))
+                foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                    query = query.Include(includeProperty);
+
+            return query;
+        }
+        public IQueryable<T> Query()
+        {
+            IQueryable<T> query = _db;          
+
+            return query;
+        }
 
         public async Task<IEnumerable<T>> GetAll(string includeProperties = null)
         {

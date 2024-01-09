@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Dynamic;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -106,6 +109,28 @@ namespace Bunkering.Access.Services
             try
             {
                 var foundCOQ = await _unitOfWork.CoQ.Find(x => x.AppId == appId);
+                return new ApiResponse
+                {
+                    Data = foundCOQ,
+                    Message = "Successful",
+                    StatusCode = System.Net.HttpStatusCode.OK
+                };
+            }
+            catch (Exception e)
+            {
+                return _apiReponse = new ApiResponse
+                {
+                    Message = $"{e.Message} +++ {e.StackTrace} ~~~ {e.InnerException?.ToString()}\n",
+                    StatusCode = HttpStatusCode.InternalServerError
+                };
+            }
+        }
+
+        public async Task<ApiResponse> GetCoQsByDepotId(int depotId)
+        {
+            try
+            {
+                var foundCOQ = await _unitOfWork.CoQ.Find(x => x.DepotId == depotId);
                 return new ApiResponse
                 {
                     Data = foundCOQ,
@@ -646,10 +671,13 @@ namespace Bunkering.Access.Services
                     CreatedBy = user.Id,
                     Status = Enum.GetName(typeof(AppStatus), AppStatus.Processing),
                     DateCreated = DateTime.UtcNow.AddHours(1),
+                    NameConsignee = model.NameConsignee,
                     //SubmittedDate = DateTime.UtcNow.AddHours(1),
                     
                 };
 
+                _context.CoQs.Add(coq);
+                _context.SaveChanges();
                 #endregion
 
                 #region Create COQ Tank
@@ -759,12 +787,155 @@ namespace Bunkering.Access.Services
                 };
             }
 
-            return new ApiResponse
+            //return new ApiResponse
+            //{
+            //    Message = "COQ created successfully",
+            //    Success = true,
+            //    StatusCode = HttpStatusCode.OK
+            //};
+        }
+
+
+        public async Task<ApiResponse> CreateCOQForLiquid(CreateCoQLiquidDto model)
+        {
+            var user = await _userManager.FindByEmailAsync(LoginUserEmail) ?? throw new Exception("Unathorise, this action is restricted to only authorise users");
+
+            var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name == Utils.COQ) ?? throw new Exception("Application type of COQ is not configured yet, please contact support");
+
+            using var transaction = _context.Database.BeginTransaction();
+            try
             {
-                Message = "COQ created successfully",
-                Success = true,
-                StatusCode = HttpStatusCode.OK
-            };
+                #region Create Coq
+                var coq = new CoQ
+                {
+                    AppId = model.NoaAppId,
+                    PlantId = model.PlantId,
+                    Reference = Utils.GenerateCoQRefrenceCode(),
+                    DepotId = model.PlantId,
+                    DateOfSTAfterDischarge = model.DateOfSTAfterDischarge,
+                    DateOfVesselArrival = model.DateOfVesselArrival,
+                    DateOfVesselUllage = model.DateOfVesselUllage,
+                    DepotPrice = model.DepotPrice,
+                    CreatedBy = user.Id,
+                    Status = Enum.GetName(typeof(AppStatus), AppStatus.Processing),
+                    DateCreated = DateTime.UtcNow.AddHours(1),
+                    //NameConsignee = model.NameConsignee,
+                    //SubmittedDate = DateTime.UtcNow.AddHours(1),
+                };
+
+                #endregion
+
+                #region Create COQ Tank
+                var coqTankList = new List<COQTank>();
+
+                foreach (var before in model.TankBeforeReadings)
+                {
+                    var newCoqTank = new COQTank
+                    {
+                        CoQId = coq.Id,
+                        TankId = before.TankId
+                    };
+
+                    var after = model.TankAfterReadings.FirstOrDefault(x => x.TankId == before.TankId);
+
+                    if (after != null && before.coQTankDTO != null)
+                    {
+                        var b = before.coQTankDTO;
+                        var a = after.coQTankDTO;
+
+                        var newBTankM = _mapper.Map<TankMeasurement>(b);
+                        newBTankM.MeasurementType = ReadingType.Before;
+
+                        var newATankM = _mapper.Map<TankMeasurement>(a);
+                        newATankM.MeasurementType = ReadingType.After;
+
+                        var newTankMeasurement = new List<TankMeasurement>
+                        {
+                            newBTankM, newATankM
+                        };
+
+                        newCoqTank.TankMeasurement = newTankMeasurement;
+
+                        coqTankList.Add(newCoqTank);
+                    }
+                }
+
+                _context.COQTanks.AddRange(coqTankList);
+                #endregion
+
+                #region Document Submission
+
+                //SubmitDocumentDto sDoc = model.SubmitDocuments.FirstOrDefault();
+                //var sDocument = _mapper.Map<SubmittedDocument>(sDoc);
+
+                var sDocumentList = new List<SubmittedDocument>();
+
+                model.SubmitDocuments.ForEach(x =>
+                {
+                    var newSDoc = new SubmittedDocument
+                    {
+                        DocId = x.DocId,
+                        FileId = x.FileId,
+                        DocName = x.DocName,
+                        DocSource = x.DocSource,
+                        DocType = x.DocType,
+                        ApplicationId = coq.Id,
+                        ApplicationTypeId = appType.Id,
+                    };
+
+                    sDocumentList.Add(newSDoc);
+                });
+
+                _context.SubmittedDocuments.AddRange(sDocumentList);
+                #endregion
+
+                _context.SaveChanges();
+
+
+
+                var submit = await _flow.CoqWorkFlow(coq.Id, Enum.GetName(typeof(AppActions), AppActions.Submit), "COQ Submitted", user.Id);
+                if (submit.Item1)
+                {
+                    transaction.Commit();
+
+                    return new ApiResponse
+                    {
+                        Message = submit.Item2,
+                        StatusCode = HttpStatusCode.OK,
+                        Success = true
+                    };
+                }
+                else
+                {
+                    transaction.Rollback();
+                    return new ApiResponse
+                    {
+                        Message = submit.Item2,
+                        StatusCode = HttpStatusCode.NotAcceptable,
+                        Success = false
+                    };
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+
+                return new ApiResponse
+                {
+                    Message = $"An error occur, COQ not created: {ex.Message}",
+                    Success = false,
+                    StatusCode = HttpStatusCode.InternalServerError
+                };
+            }
+
+            //return new ApiResponse
+            //{
+            //    Message = "COQ created successfully",
+            //    Success = true,
+            //    StatusCode = HttpStatusCode.OK
+            //};
         }
 
         public async Task<ApiResponse> GetCoqCreateRequirementsAsync(int depotId, int appId)
@@ -798,7 +969,7 @@ namespace Bunkering.Access.Services
 
             var tanks = plant.Tanks.Select(t => new TankDTO()
             {
-                Id = t.Id,
+                Id = t.PlantTankId,
                 Name = t.TankName
             }).ToList();
 
@@ -822,5 +993,190 @@ namespace Bunkering.Access.Services
                 Message = "fetched successfully"
             };
         }
+
+        public async Task<ApiResponse> GetByIdAsync(int id)
+        {
+            var coq = await _context.CoQs
+                .Include(c => c.Application!.Facility.VesselType)
+                .Include(c => c.Application!.Payments)
+                .FirstOrDefaultAsync(c => c.Id == id);
+            if (coq is null)
+            {
+                return new() { StatusCode = HttpStatusCode.NotFound, Success = false };
+            }
+            var tanks = await _context.COQTanks
+                .Include(c => c.TankMeasurement).Where(c => c.CoQId == coq.Id)
+                .Select(c => new
+                {
+                    c.TankId,
+                    c.Id,
+                    c.TankMeasurement,
+                    c.CoQId,
+                    TankName = _context.Tanks.Where(x => x.Id == c.TankId).Select(x => x.Name).FirstOrDefault()
+                })
+                .ToListAsync();
+            var docs = await _context.SubmittedDocuments.FirstOrDefaultAsync(c => c.ApplicationId == coq.Id);
+            var dictionary = new Dictionary<string, object?>();
+            var props = coq?.GetType()?.GetProperties();
+            if (props?.Any() is true)
+            {
+                foreach (var property in props)
+                {
+                    dictionary.Add(property.Name, property.GetValue(coq));
+                }
+                dictionary.Add("Application.Vessel", coq.Application.Facility);
+                dictionary.Remove("Application.Facility");
+            }
+            var app = coq.Application;
+            if (dictionary.ContainsKey("Application"))
+            {
+                dictionary["Application"] = new
+                {
+                    app.Id,
+                    app.Status,
+                    app.Reference,
+                    CreatedDate = app.CreatedDate.ToString("MMM dd, yyyy HH:mm:ss"),
+                    SubmittedDate = app.SubmittedDate != null ? app.SubmittedDate.Value.ToString("MMM dd, yyyy HH:mm:ss") : null,
+                    TotalAmount = string.Format("{0:N}", app.Payments.Sum(x => x.Amount)),
+                    PaymentDescription = app.Payments.FirstOrDefault()?.Description,
+                    PaymnetDate = app.Payments.FirstOrDefault()?.TransactionDate.ToString("MMM dd, yyyy HH:mm:ss"),
+                    CurrentDesk = _userManager.Users.FirstOrDefault(x => x.Id.Equals(app.CurrentDeskId))?.Email,
+                    app.MarketerName,
+                    app.MotherVessel,
+                    app.Jetty,
+                    app.LoadingPort,
+                    NominatedSurveyor = (await _unitOfWork.NominatedSurveyor.Find(c => c.Id == app.SurveyorId)).FirstOrDefault(),
+                    Vessel = new
+                    {
+                        app.Facility.Name,
+                        VesselType = app.Facility.VesselType.Name,
+                        app.Facility.Capacity,
+                        app.Facility.DeadWeight,
+                        app.Facility.IMONumber,
+                        app.Facility.Flag,
+                        app.Facility.CallSIgn,
+                        app.Facility.Operator,
+                        app.LoadingPort,
+                    }
+                };
+
+            }
+            return new()
+            {
+                Success = true,
+                StatusCode = HttpStatusCode.OK,
+                Data = new
+                {
+                    coq = dictionary,
+                    tanks,
+                    docs
+                }
+            };
+        }
+
+
+        public async Task<ApiResponse> GetApprovedCoQsByFieldOfficer()
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(LoginUserEmail) ?? throw new Exception("Unathorise, this action is restricted to only authorise users");
+                var FieldOfficer = _httpCxtAccessor.HttpContext.User.IsInRole(RoleConstants.Field_Officer);
+                if (FieldOfficer == true)
+                {
+                    var depotsList = GetDepotsListforUSer(user.Id);
+
+                    List<CoQDTO> Coqs = new List<CoQDTO>();
+                    foreach (var item in depotsList)
+                    {
+                        var coqPerDepot = GetCoqApproved(item.PlantID);
+                        if (coqPerDepot is not null)
+                        {
+                            Coqs.Add(coqPerDepot);
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+
+                    _apiReponse = new ApiResponse
+                    {
+                        Success = true,
+                        StatusCode = HttpStatusCode.OK,
+                        Data = Coqs,
+                    };
+                }
+                else
+                {
+                    _apiReponse = new ApiResponse
+                    {
+                        Success = false,
+                        StatusCode = HttpStatusCode.MethodNotAllowed,
+                        Message = "Sorry only a Field Officer is allowed",
+                        Data = null
+                        
+                    };
+                }
+               
+
+                return _apiReponse;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public async Task<ApiResponse> GetAllCoQCertificates()
+        {
+            try
+            {
+                var certList = await _unitOfWork.COQCertificate.GetAll();
+
+                _apiReponse = new ApiResponse { Success = true, StatusCode = HttpStatusCode.OK, Data = certList };
+            }
+            catch (Exception e)
+            {
+
+                _apiReponse = new ApiResponse { Success = false, StatusCode = HttpStatusCode.InternalServerError, Message = e.Message };
+                
+            }
+
+            return _apiReponse;
+        }
+
+       // public async Task<>
+
+        private List<PlantFieldOfficer> GetDepotsListforUSer(string Id)
+        {
+            var plist =  _context.PlantFieldOfficers.Where(x => x.OfficerID.ToString() == Id).ToList();
+            return plist;
+        }
+
+        private CoQDTO GetCoqApproved(int Id)
+        {
+            var plist = _context.CoQs.FirstOrDefault(x => x.DepotId== Id && x.Status == "Approved");
+            if (plist == null)
+            {
+                return new CoQDTO();
+            }
+            CoQDTO cd = new CoQDTO
+            {
+                NoaAppId = plist.AppId,
+                PlantId = plist.PlantId,
+                ArrivalShipFigure = plist.ArrivalShipFigure,
+                DateOfSTAfterDischarge = plist.DateOfSTAfterDischarge,
+                DateOfVesselArrival = plist.DateOfVesselArrival,
+                DateOfVesselUllage = plist.DateOfVesselUllage,
+                DepotPrice = plist.DepotPrice,
+                DischargeShipFigure = plist.DischargeShipFigure,
+                NameConsignee = plist.NameConsignee,
+                QuauntityReflectedOnBill = plist.QuauntityReflectedOnBill
+
+            };
+            return cd;
+        }
+
     }
 }

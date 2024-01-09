@@ -55,6 +55,7 @@ namespace Bunkering.Core.ViewModels
         public DateTime DateOfVesselUllage { get; set; }
         public DateTime DateOfSTAfterDischarge { get; set; }
         public double DepotPrice { get; set; }
+        public string NameConsignee { get; set; }
         public List<TankBeforeReading> TankBeforeReadings { get; set; }
         public List<TankAfterReading> TankAfterReadings { get; set; }
 

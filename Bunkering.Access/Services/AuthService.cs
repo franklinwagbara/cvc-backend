@@ -196,7 +196,7 @@ namespace Bunkering.Access.Services
 							Status = user.IsActive,
 							Location = user.Location?.Name,
 							Office = user.Office?.Name,
-							Token = GenerateToken(user)
+							Token = GenerateToken(user, user.UserRoles.FirstOrDefault(x => x.Role?.Name?.Equals("Staff") is false)?.Role?.Name)
 						},
 					};
 				}
@@ -209,7 +209,7 @@ namespace Bunkering.Access.Services
 			return _response;
 		}
 
-		private string GenerateToken(ApplicationUser user)
+		private string GenerateToken(ApplicationUser user, string? role)
 		{
 			var tokenHandler = new JwtSecurityTokenHandler();
 			var tokenKey = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]);
@@ -226,6 +226,11 @@ namespace Bunkering.Access.Services
 			{
 				claims.Add(new Claim("company", user.Company.Name));
 			}
+			if (role != null)
+			{
+				claims.Add(new Claim(ClaimTypes.Role, role));
+			}
+					
 			var tokenDescriptor = new SecurityTokenDescriptor
 			{
 				Subject = new ClaimsIdentity(new Claim[]

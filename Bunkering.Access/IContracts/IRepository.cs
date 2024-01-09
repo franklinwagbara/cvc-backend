@@ -17,6 +17,8 @@ namespace Bunkering.Access.IContracts
         Task<bool> RemoveRange(IEnumerable<T> entities);
         Task<IEnumerable<T>> GetAll(string includeProperties = null);
         Task<IEnumerable<T>> Find(Expression<Func<T, bool>> expression, string includeProperties = null);
+        IQueryable<T> Query(Expression<Func<T, bool>> expression, string includeProperties = null);
+        IQueryable<T> Query();
         Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> expression, string includeProperties = null);
     }
 }

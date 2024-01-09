@@ -4,6 +4,7 @@ using Bunkering.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bunkering.Core.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20240106140745_ModifyCOQ")]
+    partial class ModifyCOQ
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1361,7 +1364,7 @@ namespace Bunkering.Core.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("CompanyElpsId")
+                    b.Property<long>("CompanyElpsId")
                         .HasColumnType("bigint");
 
                     b.Property<long?>("ElpsPlantId")
@@ -1416,13 +1419,13 @@ namespace Bunkering.Core.Migrations
 
             modelBuilder.Entity("Bunkering.Core.Data.PlantTank", b =>
                 {
-                    b.Property<int>("PlantTankId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PlantTankId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal?>("Capacity")
+                    b.Property<decimal>("Capacity")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsDeleted")
@@ -1432,15 +1435,18 @@ namespace Bunkering.Core.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Position")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Product")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TankName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("PlantTankId");
+                    b.HasKey("Id");
 
                     b.HasIndex("PlantId");
 
@@ -1527,6 +1533,8 @@ namespace Bunkering.Core.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ApplicationId");
 
                     b.ToTable("SubmittedDocuments");
                 });
@@ -2481,6 +2489,15 @@ namespace Bunkering.Core.Migrations
                     b.Navigation("Country");
                 });
 
+            modelBuilder.Entity("Bunkering.Core.Data.SubmittedDocument", b =>
+                {
+                    b.HasOne("Bunkering.Core.Data.Application", null)
+                        .WithMany("SubmittedDocuments")
+                        .HasForeignKey("ApplicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Bunkering.Core.Data.Tank", b =>
                 {
                     b.HasOne("Bunkering.Core.Data.Facility", "Facility")
@@ -2561,6 +2578,8 @@ namespace Bunkering.Core.Migrations
                     b.Navigation("Messages");
 
                     b.Navigation("Payments");
+
+                    b.Navigation("SubmittedDocuments");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.ApplicationRole", b =>

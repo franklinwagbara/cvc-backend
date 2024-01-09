@@ -1,10 +1,13 @@
-﻿using Bunkering.Access.IContracts;
+﻿using Bunkering.Access.DAL;
+using Bunkering.Access.IContracts;
+using Bunkering.Access.Query;
 using Bunkering.Core.Data;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Diagnostics;
 using System.Net;
 using System.Security.Claims;
 
@@ -19,6 +22,8 @@ namespace Bunkering.Access.Services
         private string User;
         private readonly HttpClient _httpClient;
         private readonly IElps _elps;
+        private readonly PlantQueries _plantQueries;
+        private readonly ApplicationContext context;
 
         public PlantService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<ApplicationUser> userManager, IElps elps)
         {
@@ -29,11 +34,39 @@ namespace Bunkering.Access.Services
             _userManager = userManager;
             _httpClient = new HttpClient();
             _elps = elps;
+            
+           
         }
 
         public async Task<ApiResponse> GetAllPlants()
         {
-            var plants = await _unitOfWork.Plant.GetAll();
+            var plants = GetAllPlantswithTanks();
+            var filteredPlants = plants.Where(x => x.IsDeleted == false );
+            return new ApiResponse
+            {
+                Message = "All Fees found",
+                StatusCode = HttpStatusCode.OK,
+                Success = true,
+                Data = filteredPlants
+            };
+        }
+
+        public async Task<ApiResponse> GetAllDepotsPlants()
+        {
+            var plants = GetAllDepotswithTanks();
+            var filteredPlants = plants.Where(x => x.IsDeleted == false);
+            return new ApiResponse
+            {
+                Message = "All Fees found",
+                StatusCode = HttpStatusCode.OK,
+                Success = true,
+                Data = filteredPlants
+            };
+        }
+
+        public async Task<ApiResponse> GetAllProcessingPlants()
+        {
+            var plants = GetAllProcessingPlantsswithTanks();
             var filteredPlants = plants.Where(x => x.IsDeleted == false);
             return new ApiResponse
             {
@@ -57,7 +90,8 @@ namespace Bunkering.Access.Services
                 };
                 return _response;
             }
-            var plants = await _unitOfWork.Plant.GetAll();
+            var plants = GetPlantsByCompanywithTanks(user.Email);
+            //var plants = await _unitOfWork.Plant.GetAll();
             var filteredPlants = plants.Where(x => x.IsDeleted == false && x.Email == user.Email);
             return new ApiResponse
             {
@@ -81,10 +115,12 @@ namespace Bunkering.Access.Services
             };
         }
 
-        public async Task<ApiResponse> EditPlant(PlantDTO plant)
+        public async Task<ApiResponse> EditPlant(int Id, PlantDTO plant)
         {
-            var user = await _userManager.FindByEmailAsync(User);
-            var updatePlant = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id == plant.Id);
+            var user = await _userManager.FindByEmailAsync(User);          
+            
+
+            var updatePlant = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id == Id);
             if (updatePlant == null)
             {
                 _response = new ApiResponse
@@ -97,9 +133,8 @@ namespace Bunkering.Access.Services
             }
             else
             {
-                updatePlant.Name = plant.Name;
-                updatePlant.Company = user.Company.Name;
-                //updatePlant.PlantType = plant.PlantType;
+                updatePlant.Name = plant.Name;                
+                updatePlant.PlantType = plant.PlantType;
                 updatePlant.ElpsPlantId = plant.PlantElpsId;
                 updatePlant.CompanyElpsId = user.ElpsId;
                 updatePlant.Email = user.Email;
@@ -118,12 +153,12 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
-        public async Task<ApiResponse> EditPlantTanks(PlantTankDTO tank)
+        public async Task<ApiResponse> EditPlantTanks(int Id, PlantTankDTO tank)
         {
             try
             {
                 var user = await _userManager.FindByEmailAsync(User);
-                var updatePlant = await _unitOfWork.PlantTank.FirstOrDefaultAsync(x => x.Id == tank.Id);
+                var updatePlant = await _unitOfWork.PlantTank.FirstOrDefaultAsync(x => x.PlantTankId == Id);
                 if (updatePlant == null)
                 {
                     _response = new ApiResponse
@@ -139,6 +174,7 @@ namespace Bunkering.Access.Services
                     updatePlant.Product = tank.Product;
                     updatePlant.TankName = tank.TankName;
                     updatePlant.Capacity = tank.Capacity;
+                    updatePlant.Position = tank.Position;
                     updatePlant.IsDeleted = false;
 
                     var success = await _unitOfWork.SaveChangesAsync(user!.Id) > 0;
@@ -181,14 +217,27 @@ namespace Bunkering.Access.Services
                     };
                     return _response;
                 }
-                //var companyDetails = _elps.GetCompanyDetailByEmail(user.Email);
-                
+                var companyDetails = _elps.GetCompanyDetailByEmail(user.Email);
+
+                var comName = companyDetails["name"];
+                var allExistingPlants = GetAllPlantsNamesInCompany(user.Email);
+                bool exist = allExistingPlants.Any(x => x.Name == plant.Name);
+                if (exist)
+                {
+                    _response = new ApiResponse
+                    {
+                        Message = "A Plant that belongs to this company already has this Name",
+                        StatusCode = HttpStatusCode.MethodNotAllowed,
+                        Success = false
+                    };
+                    return _response;
+                }
                 var facility = new Plant
                 {
                     Name = plant.Name,
                     PlantType = 2,
                     State = plant.State,
-                    Company = user.Company?.Name,
+                    Company = comName,
                     Email = user.Email,
                     ElpsPlantId = plant.PlantElpsId,
                     CompanyElpsId = user.ElpsId,
@@ -196,24 +245,6 @@ namespace Bunkering.Access.Services
                 };
                 await _unitOfWork.Plant.Add(facility);
                 await _unitOfWork.SaveChangesAsync(user.Id);
-
-               /* int plantId = facility.Id;
-
-                var TankList = new List<PlantTank>();
-                foreach (var item in plant.Tanks)
-                {
-                    var plantTanks = new PlantTank
-                    {
-                        PlantId = plantId,
-                        Capacity = item.Capacity,
-                        Position = item.Position,
-                        Product = item.Product,
-                        TankName = item.TankName
-                    };
-                    TankList.Add(plantTanks);
-                }
-                await _unitOfWork.PlantTank.AddRange(TankList);
-                await _unitOfWork.SaveChangesAsync(user.Id);*/
 
                 _response = new ApiResponse
                 {
@@ -240,7 +271,18 @@ namespace Bunkering.Access.Services
             try
             {
                 var user = await _userManager.FindByEmailAsync(User);
+                if (user == null)
+                {
+                    _response = new ApiResponse
+                    {
+                        Message = "Please Log In to create a Tank",
+                        StatusCode = HttpStatusCode.Forbidden,
+                        Success = false
+                    };
+                    return _response;
+                }
                 var getPlant = await _unitOfWork.Plant.FirstOrDefaultAsync( x => x.Id == id);
+                var existingTankNames = GetAllTanksNamesInPlant(id);
                 if (getPlant.IsDeleted == true)
                 {
                     _response = new ApiResponse
@@ -249,6 +291,18 @@ namespace Bunkering.Access.Services
                         StatusCode = HttpStatusCode.NotFound,
                         Success = false
                     };
+                    return _response;
+                }
+                bool exist = existingTankNames.Any(x => x.TankName == plant.TankName);
+                if (exist)
+                {
+                    _response = new ApiResponse
+                    {
+                        Message = "This Tank Name exists in this Plant already.",
+                        StatusCode = HttpStatusCode.NotAcceptable,
+                        Success = false
+                    };
+                    return _response;
                 }
                 var tank = new PlantTank
                 {
@@ -367,7 +421,7 @@ namespace Bunkering.Access.Services
                         Success = true
                     };
                 }
-                var deactivePlantTank = await _unitOfWork.PlantTank.FirstOrDefaultAsync(a => a.Id == id);
+                var deactivePlantTank = await _unitOfWork.PlantTank.FirstOrDefaultAsync(a => a.PlantTankId == id);
                 if (deactivePlantTank != null)
                 {
                     if (!deactivePlantTank.IsDeleted)
@@ -416,18 +470,71 @@ namespace Bunkering.Access.Services
             var apiUrl = "https://depotonline.nmdpra.gov.ng/Application/DepotFacilityReports";
             try
             {
+                var depotsInDb = await _unitOfWork.Plant.GetAll();
+                List<Plant>  depotsExist = depotsInDb.ToList();
                 HttpResponseMessage response = await _httpClient.GetAsync(apiUrl);
                 response.EnsureSuccessStatusCode();
 
                 string jsonResponse = await response.Content.ReadAsStringAsync();
-                Plant depotList = JsonConvert.DeserializeObject<Plant>(jsonResponse);
+                var data = JsonConvert.DeserializeObject<List<dynamic>>(jsonResponse);
+                
+                if (data.Any())
+                {
+                    var depotList = new List<Plant>();
 
+                    foreach (var item in data)
+                    {
+                        
+                        var plant = new Plant
+                        {
+                            Name = item.depotName,
+                            ElpsPlantId = item.depotElpsId,
+                            Email = item.email,
+                            State = item.state,
+                            Company = item.company,
+                            PlantType = 2,
+                            CompanyElpsId = item.companyElpsId,
+                        };
+                       
+                        if (item.tanks != null)
+                        {
+                            var tankList = new List<PlantTank>();
+                            foreach (var tank in item.tanks)
+                            {
+                                var pTank = new PlantTank
+                                {
+                                    TankName = tank.tankName,
+                                    Product = tank.product,
+                                    Capacity = tank.capacity,
+                                    Position = tank.position
+                                };
+
+                                tankList.Add(pTank);
+                            }
+                            plant.Tanks = tankList;
+                        }
+                        bool plantExist = depotsExist.Any(x => x.CompanyElpsId == plant.CompanyElpsId);
+                        if (!plantExist)
+                        {
+                            depotList.Add(plant);
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                        
+                    }
+                    
+                    var distinctDepots = depotList.Distinct().ToList();
+                    await _unitOfWork.Plant.AddRange(distinctDepots);
+                    await _unitOfWork.SaveChangesAsync("");
+
+                }
                 _response = new ApiResponse
                 {
-                    Message = "You need to LogIn to Delete a Tank",
-                    StatusCode = HttpStatusCode.Forbidden,
-                    Success = true,
-                    Data = depotList
+                    Message = "Successfully Pulled data from Depot project into Plant Table",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true
 
                 };
 
@@ -444,6 +551,118 @@ namespace Bunkering.Access.Services
             }
             return _response;
 
+        }
+
+        private List<Plant> GetPlantsByCompanywithTanks(string email)
+        {
+           
+            var plist = _unitOfWork.Plant.Query()
+                .Select(x => new Plant
+                {
+                    Name = x.Name,
+                    Id = x.Id,
+                    Company = x.Company,
+                    ElpsPlantId = x.ElpsPlantId,
+                    CompanyElpsId = x.ElpsPlantId,
+                    Email = x.Email,
+                    PlantType = x.PlantType,
+                    State = x.State,
+                    IsDeleted = x.IsDeleted,
+                    Tanks = x.Tanks.Where(u => !u.IsDeleted).ToList()
+                })
+                .Where(x => x.Email == email).ToList();
+            return plist;
+        }
+
+        private List<Plant> GetAllPlantswithTanks()
+        {
+
+            var plist = _unitOfWork.Plant.Query()
+                        .Select(x => new Plant
+                        {
+                            Name = x.Name,
+                            Id = x.Id,
+                            Company = x.Company,
+                            ElpsPlantId = x.ElpsPlantId,
+                            CompanyElpsId = x.ElpsPlantId,
+                            Email = x.Email,
+                            PlantType = x.PlantType,
+                            State = x.State,
+                            IsDeleted = x.IsDeleted,
+                            Tanks = x.Tanks.Where(u => !u.IsDeleted).ToList()                            
+                        })                        
+                        .ToList();
+            return plist;
+        }
+
+        private List<Plant> GetAllDepotswithTanks()
+        {
+
+            var plist = _unitOfWork.Plant.Query()
+                        .Select(x => new Plant
+                        {
+                            Name = x.Name,
+                            Id = x.Id,
+                            Company = x.Company,
+                            ElpsPlantId = x.ElpsPlantId,
+                            CompanyElpsId = x.ElpsPlantId,
+                            Email = x.Email,
+                            PlantType = x.PlantType,
+                            State = x.State,
+                            IsDeleted = x.IsDeleted,
+                            Tanks = x.Tanks.Where(u => !u.IsDeleted).ToList()
+                        })
+                        .Where(x => x.PlantType == 2 )
+                        .ToList();
+            return plist;
+        }
+
+        private List<Plant> GetAllProcessingPlantsswithTanks()
+        {
+
+            var plist = _unitOfWork.Plant.Query()
+                        .Select(x => new Plant
+                        {
+                            Name = x.Name,
+                            Id = x.Id,
+                            Company = x.Company,
+                            ElpsPlantId = x.ElpsPlantId,
+                            CompanyElpsId = x.ElpsPlantId,
+                            Email = x.Email,
+                            PlantType = x.PlantType,
+                            State = x.State,
+                            IsDeleted = x.IsDeleted,
+                            Tanks = x.Tanks.Where(u => !u.IsDeleted).ToList()
+                        })
+                        .Where(x => x.PlantType == 1)
+                        .ToList();
+            return plist;
+        }
+
+        private List<Plant> GetAllPlantsNamesInCompany(string email)
+        {
+
+            var plist = _unitOfWork.Plant.Query()
+                        .Where(x => x.Email == email)
+                        .Select(x => new Plant
+                        {
+                            Name = x.Name                           
+                        })                        
+                        .ToList();
+            return plist;
+        }
+
+        private List<PlantTank> GetAllTanksNamesInPlant(int id)
+        {
+
+            var plist = _unitOfWork.PlantTank.Query()
+                        .Where(x => x.PlantId == id)
+                        .Select(x => new PlantTank
+                        {
+                            TankName = x.TankName
+                        })                        
+                        .ToList();
+            return plist;
         }
     }
 }
