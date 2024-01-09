@@ -1044,6 +1044,26 @@ namespace Bunkering.Access.Services
             }
         }
 
+        public async Task<ApiResponse> GetAllCoQCertificates()
+        {
+            try
+            {
+                var certList = await _unitOfWork.COQCertificate.GetAll();
+
+                _apiReponse = new ApiResponse { Success = true, StatusCode = HttpStatusCode.OK, Data = certList };
+            }
+            catch (Exception e)
+            {
+
+                _apiReponse = new ApiResponse { Success = false, StatusCode = HttpStatusCode.InternalServerError, Message = e.Message };
+                
+            }
+
+            return _apiReponse;
+        }
+
+       // public async Task<>
+
         private List<PlantFieldOfficer> GetDepotsListforUSer(string Id)
         {
             var plist =  _context.PlantFieldOfficers.Where(x => x.OfficerID.ToString() == Id).ToList();

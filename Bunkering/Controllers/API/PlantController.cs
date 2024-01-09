@@ -82,5 +82,14 @@ namespace Bunkering.Controllers.API
         public async Task<IActionResult> DeletePlantTank(int id) => Response(await _plantService.DeletePlantTank(id));
 
 
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("All-processing-plant")]
+        [HttpGet]
+
+        public async Task<IActionResult> AllProcessingPlants() => Response(await _plantService.GetAllProcessingPlants());
+
     }
 }

@@ -476,6 +476,8 @@ namespace Bunkering.Controllers.API
         [HttpGet]
 
         public async Task<IActionResult> AllDepot() => Response(await _plantService.GetAllDepotsPlants());
+        
+        
 
         /// <summary>
         /// This endpoint is used to get all Depot by noa id
