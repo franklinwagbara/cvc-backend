@@ -171,7 +171,7 @@ namespace Bunkering.Access.Services
                             {
                                 var total = (double)coq.GSV * (double)coq.DepotPrice * 0.1;
 
-                                var request = await _elps.GenerateDebitNotePaymentReference($"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}", total, coq.Application.User.Company.Name, coq.Application.User.Email, coq.Reference, coq.Depot.Name, coq.Application.User.ElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DebitNote), "");
+                                var request = await _elps.GenerateDebitNotePaymentReference($"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}", total, coq.Application.User.Company.Name, coq.Application.User.Email, coq.Reference, coq.Plant.Name, coq.Application.User.ElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DebitNote), "");
                                 _logger.LogRequest("Creation of payment split for application with reference:" + coq.Reference + "(" + coq.Application.User.Company.Name + ") by " + User, false, directory);
 
                                 if (request == null)
@@ -214,11 +214,11 @@ namespace Bunkering.Access.Services
                                             "<li>Payment Description: {3}</li>" +
                                             "<li>Vessel Name: {4}</li>" +
                                             "<p>Kindly note that your application will be pending until this payment is completed. </p>",
-                                            payment.Amount.ToString(), payment.RRR, payment.Status, payment.Description, $"{coq.Depot.Name}");
+                                            payment.Amount.ToString(), payment.RRR, payment.Status, payment.Description, $"{coq.Plant.Name}");
 
                                         #endregion
 
-                                        string successMsg = $"Debit Note RRR ({payment.RRR}) generated successfully for {coq.Depot.Name}";
+                                        string successMsg = $"Debit Note RRR ({payment.RRR}) generated successfully for {coq.Plant.Name}";
                                         _response = new ApiResponse
                                         {
                                             Message = successMsg,
@@ -269,9 +269,9 @@ namespace Bunkering.Access.Services
                         {
                             var total = payment.Amount * 0.10;
                             var reference = Utils.RefrenceCode();
-                            var description = $"Payment for non-payment of Debit note generated for {coq.Depot.Name} after 21 days as regulated";
+                            var description = $"Payment for non-payment of Debit note generated for {coq.Plant.Name} after 21 days as regulated";
 
-                            var request = await _elps.GenerateDebitNotePaymentReference($"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}", total, coq.Application.User.Company.Name, coq.Application.User.Email, coq.Reference, coq.Depot.Name, coq.Application.User.ElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DemandNotice), description);
+                            var request = await _elps.GenerateDebitNotePaymentReference($"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}", total, coq.Application.User.Company.Name, coq.Application.User.Email, coq.Reference, coq.Plant.Name, coq.Application.User.ElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DemandNotice), description);
                             _logger.LogRequest($"Creation of Demand notice payment for application with reference: {reference}for ({coq.Application.User.Company.Name}) as specified in the Authority regulations", false, directory);
 
                             if (request == null)
@@ -314,11 +314,11 @@ namespace Bunkering.Access.Services
                                         "<li>Payment Description: {3}</li>" +
                                         "<li>Vessel Name: {4}</li>" +
                                         "<p>Kindly note that your application will be pending until this payment is completed. </p>",
-                                        payment.Amount.ToString(), payment.RRR, payment.Status, payment.Description, $"{coq.Depot.Name}");
+                                        payment.Amount.ToString(), payment.RRR, payment.Status, payment.Description, $"{coq.Plant.Name}");
 
                                     #endregion
 
-                                    string successMsg = $"Debit Note RRR ({payment.RRR}) generated successfully for {coq.Depot.Name}";
+                                    string successMsg = $"Debit Note RRR ({payment.RRR}) generated successfully for {coq.Plant.Name}";
                                     _response = new ApiResponse
                                     {
                                         Message = successMsg,

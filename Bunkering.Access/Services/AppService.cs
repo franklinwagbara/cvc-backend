@@ -1034,8 +1034,8 @@ namespace Bunkering.Access.Services
                     VesselName = x.Application?.VesselName,
                     x.Reference,
                     x.Status,
-                    DepotName = x.Depot?.Name,
-                    DepotId = x.DepotId,
+                    DepotName = x.Plant?.Name,
+                    DepotId = x.PlantId,
                     DateOfVesselArrival = x.DateOfVesselArrival.ToShortDateString(),
                     DateOfVesselUllage = x.DateOfVesselUllage.ToShortDateString(),
                     DateOfSTAfterDischarge = x.DateOfSTAfterDischarge.ToShortDateString(),
@@ -1377,7 +1377,7 @@ namespace Bunkering.Access.Services
                 if (appDepot == null)
                     throw new Exception("The Select depot does not exist for this application!");
 
-                var depot = await _unitOfWork.Depot.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.DepotId));  
+                var depot = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.DepotId));  
                 var product = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.ProductId));
 
                 if (product == null)
@@ -1386,14 +1386,14 @@ namespace Bunkering.Access.Services
                     throw new Exception("Depot does not exist");
 
                 //Check if COQ exists
-                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.AppId == app.Id && x.DepotId == depot.Id);
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.AppId == app.Id && x.PlantId == depot.Id);
 
                 return new ApiResponse
                 {
                     Data = new
                     {
-                        MarketerName = depot.MarketerName,
-                        DepotCapacity = depot.Capacity,
+                        MarketerName = depot.Company,
+                        //DepotCapacity = depot.,
                         ProductName = product.Name,
                         Volume = appDepot.Volume,
                         VesselName = app.VesselName,

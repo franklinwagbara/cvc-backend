@@ -6,7 +6,7 @@ namespace Bunkering.Core.Data
     {
         public int Id { get; set; }
         public int? AppId { get; set; }  
-        public int DepotId { get; set; }
+        //public int DepotId { get; set; }
         public int PlantId { get; set; }
         public DateTime DateOfVesselArrival { get; set; }   
         public DateTime DateOfVesselUllage { get; set; }
@@ -34,7 +34,7 @@ namespace Bunkering.Core.Data
 
         [ForeignKey("AppId")]
         public Application? Application { get; set; }
-        [ForeignKey("DepotId")]
-        public Depot? Depot { get; set; }
+        [ForeignKey("PlantId")]
+        public Plant? Plant { get; set; }
     }
 }

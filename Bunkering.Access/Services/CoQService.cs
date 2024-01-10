@@ -130,7 +130,7 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var foundCOQ = await _unitOfWork.CoQ.Find(x => x.DepotId == depotId);
+                var foundCOQ = await _unitOfWork.CoQ.Find(x => x.PlantId == depotId);
                 return new ApiResponse
                 {
                     Data = foundCOQ,
@@ -779,7 +779,7 @@ namespace Bunkering.Access.Services
                     AppId = model.NoaAppId,
                     PlantId = model.PlantId,
                     Reference = Utils.GenerateCoQRefrenceCode(),
-                    DepotId = model.PlantId,
+                   // PlantId = model.PlantId,
                     DateOfSTAfterDischarge = model.DateOfSTAfterDischarge,
                     DateOfVesselArrival = model.DateOfVesselArrival,
                     DateOfVesselUllage = model.DateOfVesselUllage,
@@ -930,7 +930,7 @@ namespace Bunkering.Access.Services
                     AppId = model.NoaAppId,
                     PlantId = model.PlantId,
                     Reference = Utils.GenerateCoQRefrenceCode(),
-                    DepotId = model.PlantId,
+                   // DepotId = model.PlantId,
                     DateOfSTAfterDischarge = model.DateOfSTAfterDischarge,
                     DateOfVesselArrival = model.DateOfVesselArrival,
                     DateOfVesselUllage = model.DateOfVesselUllage,
@@ -1308,8 +1308,7 @@ namespace Bunkering.Access.Services
             return _apiReponse;
         }
 
-       // public async Task<>
-
+       
         private List<PlantFieldOfficer> GetDepotsListforUSer(string Id)
         {
             var plist =  _context.PlantFieldOfficers.Where(x => x.OfficerID.ToString() == Id).ToList();
@@ -1318,7 +1317,7 @@ namespace Bunkering.Access.Services
 
         private CoQDTO GetCoqApproved(int Id)
         {
-            var plist = _context.CoQs.FirstOrDefault(x => x.DepotId== Id && x.Status == "Approved");
+            var plist = _context.CoQs.FirstOrDefault(x => x.PlantId == Id && x.Status == "Approved");
             if (plist == null)
             {
                 return new CoQDTO();
@@ -1339,6 +1338,11 @@ namespace Bunkering.Access.Services
             };
             return cd;
         }
+
+        //private COQLiquidCertificateDTO certificateDTO(int coqId)
+        //{
+        //    var data  = _context.COQCertificates.Include(c => c.COQ).ThenInclude(ct => ct)
+        //}
 
     }
 }
