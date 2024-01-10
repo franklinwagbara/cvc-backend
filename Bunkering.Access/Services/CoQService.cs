@@ -527,7 +527,7 @@ namespace Bunkering.Access.Services
                     ApiData = new
                     {
                         CompanyElpsId = appp.CompanyElpsId,
-                        FacilityElpsId = appp.CompanyElpsId,
+                        FacilityElpsId = appp.ElpsPlantId,
                         ApiEmail = _setting.AppEmail,
                         ApiHash = $"{_setting.AppEmail}{_setting.AppId}".GenerateSha512()
                     }
