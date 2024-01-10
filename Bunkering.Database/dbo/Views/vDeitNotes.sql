@@ -1,10 +1,10 @@
 ﻿CREATE VIEW dbo.vDeitNotes
 AS
-SELECT dbo.Payments.COQId, dbo.Depots.Name AS DepotName, dbo.Payments.OrderId, dbo.Payments.PaymentDate, dbo.Payments.RRR, dbo.Payments.Description, dbo.Payments.Amount, dbo.Payments.Arrears, dbo.Payments.ServiceCharge, 
+SELECT dbo.Payments.COQId, dbo.Plants.Name AS DepotName, dbo.Payments.OrderId, dbo.Payments.PaymentDate, dbo.Payments.RRR, dbo.Payments.Description, dbo.Payments.Amount, dbo.Payments.Arrears, dbo.Payments.ServiceCharge, 
                   dbo.Payments.Status, dbo.Payments.ApplicationTypeId, dbo.Payments.Id, dbo.Payments.TransactionDate, dbo.Payments.ApplicationId, dbo.ApplicationTypes.Name AS ApptypeName
 FROM     dbo.Payments INNER JOIN
                   dbo.CoQs ON dbo.Payments.COQId = dbo.CoQs.Id INNER JOIN
-                  dbo.Depots ON dbo.CoQs.DepotId = dbo.Depots.Id INNER JOIN
+                  dbo.Plants ON dbo.CoQs.PlantId = dbo.Plants.Id INNER JOIN
                   dbo.ApplicationTypes ON dbo.Payments.ApplicationTypeId = dbo.ApplicationTypes.Id
 GO
 EXECUTE sp_addextendedproperty @name = N'MS_DiagramPaneCount', @value = 1, @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'VIEW', @level1name = N'vDeitNotes';
