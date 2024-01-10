@@ -1030,11 +1030,11 @@ namespace Bunkering.Access.Services
 
         private async Task<ApiResponse> GetMyDeskFO(ApplicationUser? user)
         {
-            var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Depot");
+            var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Plant");
             // if (await _userManager.IsInRoleAsync(user, "FAD"))
             //     coqs = await _unitOfWork.CoQ.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)));
             if (await _userManager.IsInRoleAsync(user, "Company"))
-                coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Depot");
+                coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Plant");
             return new ApiResponse
             {
                 Message = "Applications fetched successfully",
