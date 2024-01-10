@@ -1214,10 +1214,11 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> GetByIdAsync(int id)
         {
+
+           
             var coq = await _context.CoQs
-                .Include(c => c.Application!.Facility.VesselType)
-                .Include(c => c.Application!.Payments)
                 .FirstOrDefaultAsync(c => c.Id == id);
+
             if (coq is null)
             {
                 return new() { StatusCode = HttpStatusCode.NotFound, Success = false };
@@ -1234,17 +1235,22 @@ namespace Bunkering.Access.Services
                 })
                 .ToListAsync();
             var docs = await _context.SubmittedDocuments.FirstOrDefaultAsync(c => c.ApplicationId == coq.Id);
-            var dictionary = new Dictionary<string, object?>();
-            var props = coq?.GetType()?.GetProperties();
-            if (props?.Any() is true)
-            {
-                foreach (var property in props)
-                {
-                    dictionary.Add(property.Name, property.GetValue(coq));
-                }
-                dictionary.Add("Application.Vessel", coq.Application.Facility);
-                dictionary.Remove("Application.Facility");
-            }
+            //var dictionary = new Dictionary<string, object?>();
+            //var props = coq?.GetType()?.GetProperties();
+            var dictionary = coq.Stringify().Parse<Dictionary<string, object>>();
+            dictionary.Add("Application.Vessel", coq.Application.Facility);
+            dictionary.Remove("Application.Facility");
+            //var props = coq?.GetType()?.GetProperties();
+            //if (props?.Any() is true)
+            //    {
+            //        foreach (var property in props)
+            //        {
+            //            dictionary.Add(property.Name, property.GetValue(coq));
+            //        }
+
+            //        dictionary.Add("Application.Vessel", coq.Application.Facility);
+            //        dictionary.Remove("Application.Facility");
+            //    }
             var app = coq.Application;
             if (dictionary.ContainsKey("Application"))
             {
@@ -1290,6 +1296,7 @@ namespace Bunkering.Access.Services
                     docs
                 }
             };
+            
         }
 
 

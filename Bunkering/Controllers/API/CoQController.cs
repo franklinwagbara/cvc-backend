@@ -86,7 +86,7 @@ namespace Bunkering.Controllers.API
 		{
             try
             {
-                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id == id, "Application.User.Company,Depot");
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id == id, "Application.User.Company,Plant");
 
                 return Ok(new ApiResponse
                 {
