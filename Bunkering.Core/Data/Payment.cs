@@ -18,16 +18,16 @@ namespace Bunkering.Core.Data
 		public string RRR { get; set; }
 		public string Description { get; set; }
 		public string AppReceiptId { get; set; }
-		public decimal Amount { get; set; }
-		public decimal Arrears { get; set; }
-		public decimal ServiceCharge { get; set; }
+		public double Amount { get; set; }
+		public double Arrears { get; set; }
+		public double ServiceCharge { get; set; }
 		public string TxnMessage { get; set; }
 		public int RetryCount { get; set; }
 		public DateTime LastRetryDate { get; set; }
 		public string Account { get; set; }
 		public string BankCode { get; set; }
-		public decimal LateRenewalPenalty { get; set; }
-		public decimal NonRenewalPenalty { get; set; }
+		public double LateRenewalPenalty { get; set; }
+		public double NonRenewalPenalty { get; set; }
 		public string Status { get; set; }
 		[ForeignKey("ExtraPaymentId")]
 		public ExtraPayment? ExtraPayment { get; set; }
