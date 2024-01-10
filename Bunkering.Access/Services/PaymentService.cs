@@ -186,7 +186,7 @@ namespace Bunkering.Access.Services
                                         payment = new Payment
                                         {
                                             Account = "",
-                                            Amount = total,
+                                            Amount = (decimal)total,
                                             ApplicationId = coq.AppId,
                                             ApplicationTypeId = appType.Id,
                                             COQId = coq.Id,
@@ -267,7 +267,7 @@ namespace Bunkering.Access.Services
                             _response = new ApiResponse { Message = "Debit note does not exist for this Depot", StatusCode = HttpStatusCode.BadRequest };
                         else
                         {
-                            var total = payment.Amount * 0.10;
+                            var total = payment.Amount * 0.10m;
                             var reference = Utils.RefrenceCode();
                             var description = $"Payment for non-payment of Debit note generated for {coq.Plant.Name} after 21 days as regulated";
 

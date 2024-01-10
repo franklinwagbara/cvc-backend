@@ -188,9 +188,9 @@ namespace Bunkering.Controllers.API
 		[ProducesResponseType(typeof(ApiResponse), 405)]
 		[ProducesResponseType(typeof(ApiResponse), 500)]
 		[Produces("application/json")]
-		[Route("coq_requirement/{appId}")]
+		[Route("coq_requirement/{depotId}")]
 		[HttpGet]
-		public async Task<IActionResult> GetCoqRequirements(int appId, int depotId) => Response(await _coqService.GetCoqCreateRequirementsAsync(depotId, appId));
+		public async Task<IActionResult> GetCoqRequirements(int? appId, int depotId) => Response(await _coqService.GetCoqCreateRequirementsAsync(depotId, appId));
 
         [AllowAnonymous]
 		[ProducesResponseType(typeof(ApiResponse), 200)]
