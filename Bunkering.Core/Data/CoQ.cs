@@ -5,7 +5,7 @@ namespace Bunkering.Core.Data
     public class CoQ
     {
         public int Id { get; set; }
-        public int AppId { get; set; }  
+        public int? AppId { get; set; }  
         public int DepotId { get; set; }
         public int PlantId { get; set; }
         public DateTime DateOfVesselArrival { get; set; }   
