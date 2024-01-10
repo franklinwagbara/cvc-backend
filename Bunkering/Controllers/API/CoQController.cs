@@ -385,5 +385,23 @@ namespace Bunkering.Controllers.API
         [Route("create-coq-gas")]
         [HttpPost]
         public async Task<IActionResult> CreateCOQForGas(CreateGasProductCoQDto model) => Response(await _coqService.CreateCOQForGas(model));
+
+        //[ProducesResponseType(typeof(ApiResponse), 200)]
+        //[ProducesResponseType(typeof(ApiResponse), 404)]
+        //[ProducesResponseType(typeof(ApiResponse), 405)]
+        //[ProducesResponseType(typeof(ApiResponse), 500)]
+        //[Produces("application/json")]
+        //[Route("createCOQ")]
+        //[HttpPost]
+        //public async Task<IActionResult> CreateCoQ([FromBody] CreateCoQViewModel Model) => Response(await _coqService.CreateCoQ(Model));
+
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Produces("application/json")]
+        [Route("view_coq_liquid_coqId/{coqId}")]
+        [HttpGet]
+        public async Task<IActionResult> ViewLiquidCOQCertificate(int coqId) => Response(await _coqService.ViewCoQLiquidCertificate(coqId));
     }
 }
