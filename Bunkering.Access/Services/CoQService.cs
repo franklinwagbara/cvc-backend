@@ -1341,7 +1341,66 @@ namespace Bunkering.Access.Services
 
         //private COQLiquidCertificateDTO certificateDTO(int coqId)
         //{
-        //    var data  = _context.COQCertificates.Include(c => c.COQ).ThenInclude(ct => ct)
+        //    var data = _context.COQCertificates.Include(c => c.COQ)
+        //                .ThenInclude(ct => ct.Plant.Tanks);
+        //    var cqs = _context.CoQs.Include(x => x.Plant).Include(n => n.Application).FirstOrDefault(x => x.Id== coqId);
+        //    var tnks = _context.PlantTanks.FirstOrDefault(x => x.PlantId == cqs.Plant.Id);
+        //    var coQTanks = _context.COQTanks.Include(t => t.TankMeasurement)
+        //        .Where(c => c.CoQId == coqId).ToList();
+        //    var dat = new COQLiquidCertificateDTO
+        //    {
+        //        AfterTankMeasurement = coQTanks.SelectMany(x => x.TankMeasurement).Select(
+        //                                   tt => new CoQLiquidTankAfterReading
+        //                                   {
+        //                                      TankId = tt.COQTankId,
+        //                                      coQLiquidTank = new CoQLiquidTank { 
+        //                                            Density = tt.Density,
+        //                                            DIP = tt.DIP,
+        //                                            MeasurementType = tt.MeasurementType,
+        //                                            FloatRoofCorr = tt.FloatRoofCorr,
+        //                                            GOV = tt.GOV,
+        //                                            GSV = tt.GSV,
+        //                                            MTVAC = tt.MTVAC,
+        //                                            Tempearture = tt.Tempearture,
+        //                                            TOV = tt.TOV,
+        //                                            VCF = tt.VCF,
+        //                                            WaterDIP = tt.WaterDIP,
+        //                                            WaterVolume = tt.WaterVolume
+        //                                      }
+        //                                   }
+        //                                ).Where(t => t.coQLiquidTank.MeasurementType == "After").ToList(),
+
+        //        BeforeTankMeasurements = coQTanks.SelectMany(x => x.TankMeasurement).Select(
+        //                                   tt => new CoQLiquidTankBeforeReading
+        //                                   {
+        //                                       TankId = tt.COQTankId,
+        //                                       coQLiquidTank = new CoQLiquidTank
+        //                                       {
+        //                                           Density = tt.Density,
+        //                                           DIP = tt.DIP,
+        //                                           MeasurementType = tt.MeasurementType,
+        //                                           FloatRoofCorr = tt.FloatRoofCorr,
+        //                                           GOV = tt.GOV,
+        //                                           GSV = tt.GSV,
+        //                                           MTVAC = tt.MTVAC,
+        //                                           Tempearture = tt.Tempearture,
+        //                                           TOV = tt.TOV,
+        //                                           VCF = tt.VCF,
+        //                                           WaterDIP = tt.WaterDIP,
+        //                                           WaterVolume = tt.WaterVolume
+        //                                       }
+        //                                   }
+        //                                ).Where(t => t.coQLiquidTank.MeasurementType == "Before").ToList(),
+                
+        //        CompanyName = cqs.Plant.Company,
+        //        DateOfVesselArrival = cqs.DateOfVesselArrival,
+        //        DateOfVessselUllage = cqs.DateOfVesselUllage,
+        //        Jetty = cqs.Application.Jetty,
+        //        MotherVessel = cqs.Application.MotherVessel,
+        //        Product = tnks.Product,
+        //        //ReceivingTerminal
+
+        //    };
         //}
 
     }
