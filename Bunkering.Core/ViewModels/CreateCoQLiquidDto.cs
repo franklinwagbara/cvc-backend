@@ -21,7 +21,7 @@ namespace Bunkering.Core.ViewModels
         public double FloatRoofCorr { get; set; }
         public double GOV { get; set; }
         [Required]
-        public decimal Temp { get; set; }
+        public decimal Tempearture { get; set; }
         [Required]
         public double Density { get; set; }
         [Required]

@@ -957,6 +957,8 @@ namespace Bunkering.Access.Services
                     //SubmittedDate = DateTime.UtcNow.AddHours(1),
                 };
 
+                _context.CoQs.Add(coq);
+                _context.SaveChanges();
                 #endregion
 
                 #region Create COQ Tank
@@ -977,10 +979,34 @@ namespace Bunkering.Access.Services
                         var b = before.coQTankDTO;
                         var a = after.coQTankDTO;
 
-                        var newBTankM = _mapper.Map<TankMeasurement>(b);
+                        //var newBTankM = _mapper.Map<TankMeasurement>(b);
+                        var newBTankM = new TankMeasurement
+                        {
+                            DIP = b.DIP,
+                            WaterDIP = b.DIP,
+                            TOV = b.TOV,
+                            WaterVolume = b.WaterVolume,
+                            FloatRoofCorr = b.FloatRoofCorr,
+                            GOV = b.GOV,
+                            Tempearture = b.Tempearture,
+                            Density = b.Density,
+                            VCF = b.VCF,
+                        };
                         newBTankM.MeasurementType = ReadingType.Before;
 
-                        var newATankM = _mapper.Map<TankMeasurement>(a);
+                        //var newATankM = _mapper.Map<TankMeasurement>(a);
+                        var newATankM = new TankMeasurement
+                        {
+                            DIP = a.DIP,
+                            WaterDIP = a.DIP,
+                            TOV = a.TOV,
+                            WaterVolume = a.WaterVolume,
+                            FloatRoofCorr = a.FloatRoofCorr,
+                            GOV = a.GOV,
+                            Tempearture = a.Tempearture,
+                            Density = a.Density,
+                            VCF = a.VCF,
+                        };
                         newATankM.MeasurementType = ReadingType.After;
 
                         var newTankMeasurement = new List<TankMeasurement>
