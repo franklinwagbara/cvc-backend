@@ -1059,6 +1059,18 @@ namespace Bunkering.Access.Services
                 var submit = await _flow.CoqWorkFlow(coq.Id, Enum.GetName(typeof(AppActions), AppActions.Submit), "COQ Submitted", user.Id);
                 if (submit.Item1)
                 {
+                    var message = new Message
+                    {
+                        ApplicationId = coq.Id,
+                        Subject = $"COQ with reference {coq.Reference} Submitted",
+                        Content = $"COQ with reference {coq.Reference} has been submitted to your desk for further processing",
+                        UserId = user.Id,
+                        Date = DateTime.Now.AddHours(1),
+                    };
+
+                    _context.Messages.Add(message);
+                    _context.SaveChanges();
+
                     transaction.Commit();
 
                     return new ApiResponse

@@ -30,7 +30,7 @@ namespace Bunkering.Core.Data
         public string? Reference { get; set; } = string.Empty;
         public string? CurrentDeskId { get; set; }
         public bool? FADApproved { get; set; }
-        public string NameConsignee { get; set; }
+        public string? NameConsignee { get; set; }
 
         [ForeignKey("AppId")]
         public Application? Application { get; set; }
