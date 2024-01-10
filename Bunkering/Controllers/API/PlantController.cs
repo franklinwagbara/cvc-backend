@@ -52,7 +52,7 @@ namespace Bunkering.Controllers.API
         [HttpGet]
         public async Task<IActionResult> GetAllTanksByPlantId(int plantId) => Response(await _plantService.GetAllPlantTanksByPlantId(plantId));
 
-        [Route("add-plant")]
+        [Route("add-processing-plant")]
         [HttpPost]
         public async Task<IActionResult> AddPlant(PlantDTO model) => Response(await _plantService.CreatePlant(model));
         
@@ -81,6 +81,15 @@ namespace Bunkering.Controllers.API
         [HttpDelete]
         public async Task<IActionResult> DeletePlantTank(int id) => Response(await _plantService.DeletePlantTank(id));
 
+
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("All-processing-plant")]
+        [HttpGet]
+
+        public async Task<IActionResult> AllProcessingPlants() => Response(await _plantService.GetAllProcessingPlants());
 
     }
 }

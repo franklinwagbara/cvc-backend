@@ -186,7 +186,7 @@ namespace Bunkering.Access.Services
                                         payment = new Payment
                                         {
                                             Account = "",
-                                            Amount = total,
+                                            Amount = (decimal)total,
                                             ApplicationId = coq.AppId,
                                             ApplicationTypeId = appType.Id,
                                             COQId = coq.Id,
@@ -267,11 +267,11 @@ namespace Bunkering.Access.Services
                             _response = new ApiResponse { Message = "Debit note does not exist for this Depot", StatusCode = HttpStatusCode.BadRequest };
                         else
                         {
-                            var total = payment.Amount * 0.10;
+                            var total = payment.Amount * 0.10m;
                             var reference = Utils.RefrenceCode();
                             var description = $"Payment for non-payment of Debit note generated for {coq.Depot.Name} after 21 days as regulated";
 
-                            var request = await _elps.GenerateDebitNotePaymentReference($"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}", total, coq.Application.User.Company.Name, coq.Application.User.Email, coq.Reference, coq.Depot.Name, coq.Application.User.ElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DemandNotice), description);
+                            var request = await _elps.GenerateDebitNotePaymentReference($"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}", (double)total, coq.Application.User.Company.Name, coq.Application.User.Email, coq.Reference, coq.Depot.Name, coq.Application.User.ElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DemandNotice), description);
                             _logger.LogRequest($"Creation of Demand notice payment for application with reference: {reference}for ({coq.Application.User.Company.Name}) as specified in the Authority regulations", false, directory);
 
                             if (request == null)
@@ -339,8 +339,8 @@ namespace Bunkering.Access.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogRequest($"An error {ex.Message} occured while trying to generate extra payment RRR for this application by {User}", true, directory);
-                    _response = new ApiResponse { Message = "An error occured while generating this extra payment RRR. Please try again or contact support.", StatusCode = HttpStatusCode.InternalServerError };
+                    _logger.LogRequest($"An error {ex.Message} occurred while trying to generate extra payment RRR for this application by {User}", true, directory);
+                    _response = new ApiResponse { Message = "An error occurred while generating this extra payment RRR. Please try again or contact support.", StatusCode = HttpStatusCode.InternalServerError };
                 }
             }
             return _response;

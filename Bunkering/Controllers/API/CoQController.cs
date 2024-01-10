@@ -155,15 +155,42 @@ namespace Bunkering.Controllers.API
 		[Route("coq_by_depotId/{depotId}")]
 		[HttpGet]
 		public async Task<IActionResult> GetCoqsByDepot(int depotId) => Response(await _coqService.GetCoQsByDepotId(depotId));
-
 		[ProducesResponseType(typeof(ApiResponse), 200)]
 		[ProducesResponseType(typeof(ApiResponse), 404)]
 		[ProducesResponseType(typeof(ApiResponse), 405)]
 		[ProducesResponseType(typeof(ApiResponse), 500)]
 		[Produces("application/json")]
-		[Route("coq_requirement/{appId}")]
+		[Route("coq_details/{id}")]
 		[HttpGet]
-		public async Task<IActionResult> GetCoqRequirements(int appId, int depotId) => Response(await _coqService.GetCoqCreateRequirementsAsync(depotId, appId));
+		public async Task<IActionResult> GetCoqsById(int id) => Response(await _coqService.GetByIdAsync(id));
+        
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Produces("application/json")]
+        [Route("approved_coq")]
+        [HttpGet]
+        public async Task<IActionResult> GetApprovedCoQsByDepot() => Response(await _coqService.GetApprovedCoQsByFieldOfficer());
+        
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Produces("application/json")]
+        [Route("all-coq-cert")]
+        [HttpGet]
+        public async Task<IActionResult> GetAllCoQCertificates() => Response(await _coqService.GetAllCoQCertificates());
+
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+		[ProducesResponseType(typeof(ApiResponse), 404)]
+		[ProducesResponseType(typeof(ApiResponse), 405)]
+		[ProducesResponseType(typeof(ApiResponse), 500)]
+		[Produces("application/json")]
+		[Route("coq_requirement/{depotId}")]
+		[HttpGet]
+		public async Task<IActionResult> GetCoqRequirements(int? appId, int depotId) => Response(await _coqService.GetCoqCreateRequirementsAsync(depotId, appId));
 
         [AllowAnonymous]
 		[ProducesResponseType(typeof(ApiResponse), 200)]

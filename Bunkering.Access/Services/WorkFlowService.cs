@@ -308,10 +308,17 @@ namespace Bunkering.Access.Services
                                 .Include(ol => ol.Office)
                                 .Where(x => x.UserRoles.Any(y => y.Role.Name.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
                                 && x.LocationId == wkflow.ToLocationId && x.IsActive).ToList();
-                        nextprocessingofficer = users.OrderBy(x => x.LastJobDate).FirstOrDefault();
+                        nextprocessingofficer = users.OrderBy(x => x.LastJobDate).FirstOrDefault()!;
+                        foreach (var user in users)
+                        {
+                            if (!user.UserRoles.Any(c => c.Role.Name == RoleConstants.COMPANY) && user.LocationId != wkflow.ToLocationId)
+                            {
+                                users.Remove(user);
+                            }
+                        }
                     }
                 }
-                return nextprocessingofficer;
+                return nextprocessingofficer!;
             }
         }
 
@@ -322,7 +329,7 @@ namespace Bunkering.Access.Services
                 return _userManager.Users.Include(x => x.Company)
                     .Include(ur => ur.UserRoles).ThenInclude(r => r.Role)
                     .Include(lo => lo.Location).Include(ol => ol.Office)
-                    .FirstOrDefault(x => x.Id.Equals(delUserId) && x.IsActive);
+                    .FirstOrDefault(x => x.Id.Equals(delUserId) && x.IsActive)!;
             else
             {
                 // var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == appid, "User.UserRoles.Role");
@@ -339,7 +346,7 @@ namespace Bunkering.Access.Services
                     if (history != null)
                     {
                         nextprocessingofficer = _userManager.Users.Include(ur => ur.UserRoles).ThenInclude(r => r.Role).Include(lo => lo.Location).Include(ol => ol.Office)
-                                                    .FirstOrDefault(x => x.Id.Equals(history.TriggeredBy));
+                                                    .FirstOrDefault(x => x.Id.Equals(history.TriggeredBy))!;
                         if (nextprocessingofficer != null && !nextprocessingofficer.IsActive)
                         {
                             var users = _userManager.Users
@@ -364,13 +371,21 @@ namespace Bunkering.Access.Services
                                 .Include(lo => lo.Location)
                                 .Include(ol => ol.Office)
                                 .Where(x => x.UserRoles.Any(y => y.Role.Name.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
-                                && x.LocationId == wkflow.ToLocationId && x.IsActive && x.OfficeId == currentUser.OfficeId).ToList()
+                                && x.IsActive && x.OfficeId == currentUser.OfficeId).ToList()
                             : _userManager.Users.Include(x => x.Company).Include(f => f.Company).Include(ur => ur.UserRoles)
                                 .ThenInclude(r => r.Role)
                                 .Include(lo => lo.Location)
                                 .Include(ol => ol.Office)
                                 .Where(x => x.UserRoles.Any(y => y.Role.Name.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
-                                && x.LocationId == wkflow.ToLocationId && x.IsActive).ToList();
+                                && x.IsActive).ToList();
+
+                        foreach (var user in users)
+                        {
+                            if (!user.UserRoles.Any(c => c.Role.Name == RoleConstants.COMPANY) && user.LocationId != wkflow.ToLocationId)
+                            {
+                                users.Remove(user);
+                            }
+                        }
                         nextprocessingofficer = users.OrderBy(x => x.LastJobDate).FirstOrDefault();
                     }
                 }

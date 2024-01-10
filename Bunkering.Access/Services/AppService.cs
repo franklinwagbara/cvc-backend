@@ -495,7 +495,7 @@ namespace Bunkering.Access.Services
                     {
                         payment = new Payment
                         {
-                            Amount = total,
+                            Amount = (decimal)total,
                             Account = _setting.NMDPRAAccount,
                             ApplicationId = id,
                             OrderId = app.Reference,
@@ -504,7 +504,7 @@ namespace Bunkering.Access.Services
                             PaymentType = "NGN",
                             Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending),
                             TransactionDate = DateTime.UtcNow.AddHours(1),
-                            ServiceCharge = (double)fee.SerciveCharge,
+                            ServiceCharge = fee.SerciveCharge,
                             AppReceiptId = "",
                             RRR = "",
                             TransactionId = "",
@@ -517,7 +517,7 @@ namespace Bunkering.Access.Services
                     {
                         if (string.IsNullOrEmpty(payment.RRR))
                         {
-                            payment.Amount = total;
+                            payment.Amount = (decimal)total;
                             payment.OrderId = app.Reference;
                             payment.Description = $"Payment for CVC & COQ License ({app.Facility.Name})";
                             payment.Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending);
@@ -987,9 +987,9 @@ namespace Bunkering.Access.Services
         {
             var apps = await _unitOfWork.Application.Find(x => x.CurrentDeskId.Equals(user.Id), "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
             if (await _userManager.IsInRoleAsync(user, "FAD"))
-                apps = await _unitOfWork.Application.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)), "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
+                apps = await _unitOfWork.Application.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)) && x.IsDeleted != true, "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
             else if (await _userManager.IsInRoleAsync(user, "Company"))
-                apps = await _unitOfWork.Application.Find(x => x.UserId.Equals(user.Id), "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
+                apps = await _unitOfWork.Application.Find(x => x.UserId.Equals(user.Id) && x.IsDeleted != true, "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
             return new ApiResponse
             {
                 Message = "Applications fetched successfully",
@@ -1015,11 +1015,11 @@ namespace Bunkering.Access.Services
 
         private async Task<ApiResponse> GetMyDeskFO(ApplicationUser? user)
         {
-            var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Application.ApplicationType,Application.User.Company,Depot");
+            var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Depot");
             // if (await _userManager.IsInRoleAsync(user, "FAD"))
             //     coqs = await _unitOfWork.CoQ.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)));
             if (await _userManager.IsInRoleAsync(user, "Company"))
-                coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Application.ApplicationType,Application.User.Company,Depot");
+                coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Depot");
             return new ApiResponse
             {
                 Message = "Applications fetched successfully",
@@ -1104,7 +1104,7 @@ namespace Bunkering.Access.Services
 
                         var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Utils.NOA));
 
-                        var appDocs = _unitOfWork.SubmittedDocument.Find(x => x.ApplicationId == app.Id && x.ApplicationTypeId == appType.Id);
+                        var appDocs = await _unitOfWork.SubmittedDocument.Find(x => x.ApplicationId == app.Id && x.ApplicationTypeId == appType.Id);
 
                         var paymentStatus = "Payment pending";
                         if (app.Payments.FirstOrDefault()?.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted)) is true)
@@ -1348,7 +1348,8 @@ namespace Bunkering.Access.Services
                 };
                 return _response;
             }
-            var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application");
+            
+            var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application.Facility");
             var apps =  appDepots.OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application).ToList();
 
             _response = new ApiResponse
@@ -1497,6 +1498,7 @@ namespace Bunkering.Access.Services
             return _response;
 
         }
+
 
         public async Task<ApiResponse> GetAllVessels()
         {
