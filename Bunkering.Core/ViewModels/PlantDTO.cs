@@ -12,10 +12,10 @@ namespace Bunkering.Core.ViewModels
         public string Name { get; set; }
        // public string Company { get; set; }
        // public string Email { get; set; }
-        public string State { get; set; }
+        public int StateId { get; set; }
+        public string City { get; set; }
+        public int LGAID { get; set; }
         public long PlantElpsId { get; set; }
-       // public long CompanyElpsId { get; set; }
-        public int PlantType { get; set; }
     }
 
     public class PlantTankDTO

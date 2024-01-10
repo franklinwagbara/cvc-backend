@@ -1348,8 +1348,9 @@ namespace Bunkering.Access.Services
                 };
                 return _response;
             }
+            
             var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application.Facility");
-            var apps =  appDepots.Select(x => x.Application).ToList();
+            var apps =  appDepots.OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application).ToList();
 
             _response = new ApiResponse
             {
@@ -1497,6 +1498,7 @@ namespace Bunkering.Access.Services
             return _response;
 
         }
+
 
         public async Task<ApiResponse> GetAllVessels()
         {

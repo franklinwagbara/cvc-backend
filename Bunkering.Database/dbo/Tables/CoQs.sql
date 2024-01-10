@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[CoQs] (
     [Id]                       INT            IDENTITY (1, 1) NOT NULL,
-    [AppId]                    INT            NOT NULL,
+    [AppId]                    INT            NULL,
     [DepotId]                  INT            NOT NULL,
     [DateOfVesselArrival]      DATETIME2 (7)  NOT NULL,
     [DateOfVesselUllage]       DATETIME2 (7)  NOT NULL,
@@ -25,9 +25,11 @@
     [QuauntityReflectedOnBill] FLOAT (53)     DEFAULT ((0.0000000000000000e+000)) NOT NULL,
     [NameConsignee]            NVARCHAR (MAX) DEFAULT (N'') NOT NULL,
     CONSTRAINT [PK_CoQs] PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT [FK_CoQs_Applications_AppId] FOREIGN KEY ([AppId]) REFERENCES [dbo].[Applications] ([Id]) ON DELETE CASCADE,
+    CONSTRAINT [FK_CoQs_Applications_AppId] FOREIGN KEY ([AppId]) REFERENCES [dbo].[Applications] ([Id]),
     CONSTRAINT [FK_CoQs_Depots_DepotId] FOREIGN KEY ([DepotId]) REFERENCES [dbo].[Depots] ([Id]) ON DELETE CASCADE
 );
+
+
 
 
 
