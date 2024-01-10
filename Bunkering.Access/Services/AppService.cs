@@ -35,6 +35,7 @@ namespace Bunkering.Access.Services
         private readonly string directory = "Application";
         private readonly IConfiguration _configuration;
         private readonly ApplicationQueries _appQueries;
+        private readonly MessageService _messageService;
 
         public AppService(
             UserManager<ApplicationUser> userManager,
@@ -46,7 +47,8 @@ namespace Bunkering.Access.Services
             AppLogger logger,
             IOptions<AppSetting> setting,
             IConfiguration configuration,
-            ApplicationQueries appQueries)
+            ApplicationQueries appQueries,
+            MessageService messageService)
         {
             _userManager = userManager;
             _unitOfWork = unitOfWork;
@@ -59,6 +61,7 @@ namespace Bunkering.Access.Services
             _setting = setting.Value;
             _configuration = configuration;
             _appQueries = appQueries;
+            _messageService = messageService;
         }
 
         private async Task<Facility> CreateFacility(ApplictionViewModel model, ApplicationUser user)
@@ -782,6 +785,16 @@ namespace Bunkering.Access.Services
                         : await _flow.AppWorkFlow(id, Enum.GetName(typeof(AppActions), AppActions.Submit), "Application Submitted");
                     if (submit.Item1)
                     {
+                        var message = new MessageModel
+                        {
+                            ApplicationId = app.Id,
+                            Subject = $"Application with reference {app.Reference} Submitted",
+                            Content = $"Application with reference {app.Reference} has been submitted to your desk for further processing",
+                            UserId = user.Id,
+                        };
+
+                        _messageService.CreateMessageAsync(message);
+
                         _response = new ApiResponse
                         {
                             Message = submit.Item2,

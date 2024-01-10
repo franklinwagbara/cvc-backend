@@ -525,15 +525,15 @@ namespace Bunkering.Access.Services
             body = string.Format(body, content, DateTime.Now.Year, url);
             Utils.SendMail(_mailSetting.Stringify().Parse<Dictionary<string, string>>(), user.Email, subject, body);
 
-            await _unitOfWork.Message.Add(new Message
-            {
-                ApplicationId = app.Id,
-                Content = body,
-                Date = DateTime.Now.AddHours(1),
-                Subject = subject,
-                UserId = user.Id
-            });
-            await _unitOfWork.SaveChangesAsync(user.Id);
+            //await _unitOfWork.Message.Add(new Message
+            //{
+            //    ApplicationId = app.Id,
+            //    Content = body,
+            //    Date = DateTime.Now.AddHours(1),
+            //    Subject = subject,
+            //    UserId = user.Id
+            //});
+            //await _unitOfWork.SaveChangesAsync(user.Id);
         }
 
         public async Task SendCOQNotification(CoQ coq, string action, ApplicationUser user, string comment)
@@ -559,16 +559,16 @@ namespace Bunkering.Access.Services
             body = string.Format(body, content, DateTime.Now.Year, url);
             Utils.SendMail(_mailSetting.Stringify().Parse<Dictionary<string, string>>(), user.Email, subject, body);
 
-            await _unitOfWork.Message.Add(new Message
-            {
-                COQId = coq.Id,
-                IsCOQ = true,
-                Content = body,
-                Date = DateTime.Now.AddHours(1),
-                Subject = subject,
-                UserId = user.Id
-            });
-            await _unitOfWork.SaveChangesAsync(user.Id);
+            //await _unitOfWork.Message.Add(new Message
+            //{
+            //    COQId = coq.Id,
+            //    IsCOQ = true,
+            //    Content = body,
+            //    Date = DateTime.Now.AddHours(1),
+            //    Subject = subject,
+            //    UserId = user.Id
+            //});
+            //await _unitOfWork.SaveChangesAsync(user.Id);
         }
     }
 }
