@@ -1,6 +1,8 @@
 ﻿CREATE TABLE [dbo].[Payments] (
     [Id]                 INT             IDENTITY (1, 1) NOT NULL,
     [ApplicationId]      INT             NULL,
+    [COQId]              INT             NULL,
+    [ApplicationTypeId]  INT             NULL,
     [OrderId]            NVARCHAR (MAX)  NOT NULL,
     [ExtraPaymentId]     INT             NULL,
     [PaymentType]        NVARCHAR (MAX)  NOT NULL,
