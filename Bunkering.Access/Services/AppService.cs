@@ -498,7 +498,7 @@ namespace Bunkering.Access.Services
                     {
                         payment = new Payment
                         {
-                            Amount = (decimal)total,
+                            Amount = total,
                             Account = _setting.NMDPRAAccount,
                             ApplicationId = id,
                             OrderId = app.Reference,
@@ -507,7 +507,7 @@ namespace Bunkering.Access.Services
                             PaymentType = "NGN",
                             Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending),
                             TransactionDate = DateTime.UtcNow.AddHours(1),
-                            ServiceCharge = fee.SerciveCharge,
+                            ServiceCharge = (double)fee.SerciveCharge,
                             AppReceiptId = "",
                             RRR = "",
                             TransactionId = "",
@@ -520,7 +520,7 @@ namespace Bunkering.Access.Services
                     {
                         if (string.IsNullOrEmpty(payment.RRR))
                         {
-                            payment.Amount = (decimal)total;
+                            payment.Amount = total;
                             payment.OrderId = app.Reference;
                             payment.Description = $"Payment for CVC & COQ License ({app.Facility.Name})";
                             payment.Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending);
@@ -1049,8 +1049,8 @@ namespace Bunkering.Access.Services
                     VesselName = x.Application?.VesselName,
                     x.Reference,
                     x.Status,
-                    DepotName = x.Depot?.Name,
-                    DepotId = x.DepotId,
+                    DepotName = x.Plant?.Name,
+                    DepotId = x.PlantId,
                     DateOfVesselArrival = x.DateOfVesselArrival.ToShortDateString(),
                     DateOfVesselUllage = x.DateOfVesselUllage.ToShortDateString(),
                     DateOfSTAfterDischarge = x.DateOfSTAfterDischarge.ToShortDateString(),
@@ -1392,7 +1392,7 @@ namespace Bunkering.Access.Services
                 if (appDepot == null)
                     throw new Exception("The Select depot does not exist for this application!");
 
-                var depot = await _unitOfWork.Depot.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.DepotId));  
+                var depot = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.DepotId));  
                 var product = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.ProductId));
 
                 if (product == null)
@@ -1401,14 +1401,14 @@ namespace Bunkering.Access.Services
                     throw new Exception("Depot does not exist");
 
                 //Check if COQ exists
-                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.AppId == app.Id && x.DepotId == depot.Id);
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.AppId == app.Id && x.PlantId == depot.Id);
 
                 return new ApiResponse
                 {
                     Data = new
                     {
-                        MarketerName = depot.MarketerName,
-                        DepotCapacity = depot.Capacity,
+                        MarketerName = depot.Company,
+                        //DepotCapacity = depot.,
                         ProductName = product.Name,
                         Volume = appDepot.Volume,
                         VesselName = app.VesselName,

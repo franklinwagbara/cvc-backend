@@ -1,7 +1,6 @@
 ﻿CREATE TABLE [dbo].[CoQs] (
     [Id]                       INT            IDENTITY (1, 1) NOT NULL,
     [AppId]                    INT            NULL,
-    [DepotId]                  INT            NOT NULL,
     [DateOfVesselArrival]      DATETIME2 (7)  NOT NULL,
     [DateOfVesselUllage]       DATETIME2 (7)  NOT NULL,
     [DateOfSTAfterDischarge]   DATETIME2 (7)  NOT NULL,
@@ -26,7 +25,7 @@
     [NameConsignee]            NVARCHAR (MAX) DEFAULT (N'') NOT NULL,
     CONSTRAINT [PK_CoQs] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_CoQs_Applications_AppId] FOREIGN KEY ([AppId]) REFERENCES [dbo].[Applications] ([Id]),
-    CONSTRAINT [FK_CoQs_Depots_DepotId] FOREIGN KEY ([DepotId]) REFERENCES [dbo].[Depots] ([Id]) ON DELETE CASCADE
+    CONSTRAINT [FK_CoQs_Plants_PlantId] FOREIGN KEY ([PlantId]) REFERENCES [dbo].[Plants] ([Id]) ON DELETE CASCADE
 );
 
 
@@ -36,12 +35,18 @@
 
 
 
+
+
 GO
-CREATE NONCLUSTERED INDEX [IX_CoQs_DepotId]
-    ON [dbo].[CoQs]([DepotId] ASC);
+
 
 
 GO
 CREATE NONCLUSTERED INDEX [IX_CoQs_AppId]
     ON [dbo].[CoQs]([AppId] ASC);
+
+
+GO
+CREATE NONCLUSTERED INDEX [IX_CoQs_PlantId]
+    ON [dbo].[CoQs]([PlantId] ASC);
 
