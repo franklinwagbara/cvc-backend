@@ -145,9 +145,16 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var message = string.Empty;
+                var isProcessingPlant = false;
+                    //return (false, $"Application with Id={coq.AppId} was not found.");
                 var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id.Equals(coqId)) ?? throw new Exception($"COQ with Id={coqId} was not found.");
-                var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == coq.AppId, "User,Facility.VesselType,Payments") ?? throw new Exception($"Application with Id={coq.AppId} was not found.");
+                if (coq is not null && coq.AppId is null)
+                {
+                    isProcessingPlant = true;
+                }
+                var message = string.Empty;
+                var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == coq.AppId, "User,Facility.VesselType,Payments");
+                if(!isProcessingPlant && app is null) throw new Exception($"Application with Id={coq.AppId} was not found.");
 
                 currUserId = string.IsNullOrEmpty(currUserId) ? coq.CurrentDeskId : currUserId;
                 var currentUser = _userManager.Users
@@ -157,7 +164,7 @@ namespace Bunkering.Access.Services
                         .ThenInclude(r => r.Role)
                         .Include(lo => lo.Location)
                         .FirstOrDefault(x => x.Id.Equals(currUserId)) ?? throw new Exception($"User with Id={currUserId} was not found.");
-                var workFlow = (await GetWorkFlow(action, currentUser, app.Facility.VesselTypeId)) ?? throw new Exception($"Work Flow for this action was not found.");
+                var workFlow = (await GetWorkFlow(action, currentUser, app?.Facility?.VesselTypeId ?? 1)) ?? throw new Exception($"Work Flow for this action was not found.");
                 var nextProcessingOfficer = (await GetNextStaffCOQ(coqId, action, workFlow, currentUser, delUserId)) ?? throw new Exception($"No processing staff for this action was not found.");
 
                 coq.CurrentDeskId = nextProcessingOfficer.Id;
