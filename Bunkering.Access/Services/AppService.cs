@@ -746,6 +746,7 @@ namespace Bunkering.Access.Services
                                         DocSource = doc.source,
                                         DocType = item.DocType,
                                         FileId = doc.id,
+                                        ApplicationTypeId = app.ApplicationTypeId,
                                     });
                             }
                             else
@@ -760,6 +761,7 @@ namespace Bunkering.Access.Services
                                         DocSource = doc.Source,
                                         DocType = item.DocType,
                                         FileId = doc.Id,
+                                        ApplicationTypeId = app.ApplicationTypeId,
                                     });
                             }
                         }
@@ -1131,7 +1133,7 @@ namespace Bunkering.Access.Services
                                 app.Reference,
                                 CompanyName = app.User.Company.Name,
                                 app.User.Email,
-                                //FacilityAddress = app.Facility.Address,
+                                CompanyAddress = app.User.Company.Address,
                                 //State = app.Facility.LGA.State.Name,
                                 //LGA = app.Facility.LGA.Name,
                                 AppType = app.ApplicationType.Name,
