@@ -133,7 +133,7 @@ namespace Bunkering.Access.Services
             else
             {
                 updatePlant.Name = plant.Name;                
-                updatePlant.PlantType = 1;
+                updatePlant.PlantType = (int)PlantType.Processing;
                 updatePlant.ElpsPlantId = plant.PlantElpsId;
                 updatePlant.CompanyElpsId = user.ElpsId;
                 updatePlant.Email = user.Email;
@@ -252,7 +252,7 @@ namespace Bunkering.Access.Services
                 var item = new Plant
                 {
                     Name = plant.Name,
-                    PlantType = 1,
+                    PlantType = (int)PlantType.Processing,
                     State = StateName.Name,
                     Company = comName,
                     Email = user.Email,
@@ -509,7 +509,7 @@ namespace Bunkering.Access.Services
                             Email = item.email,
                             State = item.state,
                             Company = item.company,
-                            PlantType = 2,
+                            PlantType = (int)PlantType.Depot,
                             CompanyElpsId = item.companyElpsId,
                         };
                        
@@ -629,7 +629,7 @@ namespace Bunkering.Access.Services
                             IsDeleted = x.IsDeleted,
                             Tanks = x.Tanks.Where(u => !u.IsDeleted).ToList()
                         })
-                        .Where(x => x.PlantType == 2 )
+                        .Where(x => x.PlantType == (int)PlantType.Depot)
                         .ToList();
             return plist;
         }
@@ -651,7 +651,7 @@ namespace Bunkering.Access.Services
                             IsDeleted = x.IsDeleted,
                             Tanks = x.Tanks.Where(u => !u.IsDeleted).ToList()
                         })
-                        .Where(x => x.PlantType == 1)
+                        .Where(x => x.PlantType == (int)PlantType.Processing)
                         .ToList();
             return plist;
         }
