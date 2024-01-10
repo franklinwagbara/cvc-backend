@@ -24,8 +24,9 @@ namespace Bunkering.Access.Services
         private readonly IElps _elps;
         private readonly PlantQueries _plantQueries;
         private readonly ApplicationContext context;
+        private readonly LibraryService _libService;
 
-        public PlantService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<ApplicationUser> userManager, IElps elps)
+        public PlantService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<ApplicationUser> userManager, IElps elps, LibraryService libService)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
@@ -34,8 +35,7 @@ namespace Bunkering.Access.Services
             _userManager = userManager;
             _httpClient = new HttpClient();
             _elps = elps;
-            
-           
+            _libService = libService;
         }
 
         public async Task<ApiResponse> GetAllPlants()
@@ -117,10 +117,9 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> EditPlant(int Id, PlantDTO plant)
         {
-            var user = await _userManager.FindByEmailAsync(User);          
-            
-
+            var user = await _userManager.FindByEmailAsync(User);      
             var updatePlant = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id == Id);
+            var StateName = await _unitOfWork.State.FirstOrDefaultAsync(x => x.Id == plant.StateId);
             if (updatePlant == null)
             {
                 _response = new ApiResponse
@@ -134,11 +133,11 @@ namespace Bunkering.Access.Services
             else
             {
                 updatePlant.Name = plant.Name;                
-                updatePlant.PlantType = plant.PlantType;
+                updatePlant.PlantType = 1;
                 updatePlant.ElpsPlantId = plant.PlantElpsId;
                 updatePlant.CompanyElpsId = user.ElpsId;
                 updatePlant.Email = user.Email;
-                updatePlant.State = plant.State;
+                updatePlant.State = StateName.Name;
                 updatePlant.IsDeleted = false;
 
                 var success = await _unitOfWork.SaveChangesAsync(user!.Id) > 0;
@@ -218,7 +217,8 @@ namespace Bunkering.Access.Services
                     return _response;
                 }
                 var companyDetails = _elps.GetCompanyDetailByEmail(user.Email);
-                var lga = await _unitOfWork.LGA.FirstOrDefaultAsync(x => x.State.Name.ToLower().Contains("lagos"), "State");
+                var StateName = await _unitOfWork.State.FirstOrDefaultAsync(x => x.Id == plant.StateId);
+                //var lga = await _unitOfWork.LGA.FirstOrDefaultAsync(x => x.State.Name.ToLower().Contains("lagos"), "State");
                 var comName = companyDetails["name"];
                 var allExistingPlants = GetAllPlantsNamesInCompany(user.Email);
                 bool exist = allExistingPlants.Any(x => x.Name == plant.Name);
@@ -231,70 +231,44 @@ namespace Bunkering.Access.Services
                         Success = false
                     };
                     return _response;
-                }
-                if (plant.PlantType == 1)
-                {
+                }               
                    
 
-                    var elpsFacility = _elps.CreateElpsFacility(new
-                    {
-                        Name = plant.Name,
-                        StreetAddress = $"{plant.Name} - {user.ElpsId}",
-                        CompanyId = user.ElpsId,
-                        DateAdded = DateTime.UtcNow.AddHours(1),
-                        City = lga.Name,
-                        lga.StateId,
-                        LGAId = lga.Id,
-                        FacilityType = "CVC Facility",
-                        FacilityDocuments = (string)null,
-                        Id = (string)null
-                    })?.Parse<Dictionary<string, string>>();
-
-                    var elpsId =  Convert.ToInt64(elpsFacility["id"]); 
-                    var item = new Plant
-                    {
-                        Name = plant.Name,
-                        PlantType = 1,
-                        State = plant.State,
-                        Company = comName,
-                        Email = user.Email,
-                        CompanyElpsId = user.ElpsId,
-                        ElpsPlantId = elpsId
-                    };
-                    await _unitOfWork.Plant.Add(item);
-                    await _unitOfWork.SaveChangesAsync(user.Id);
-
-                    _response = new ApiResponse
-                    {
-                        Message = "Processing Plant was added successfully.",
-                        StatusCode = HttpStatusCode.OK,
-                        Success = true
-                    };
-                    return _response;
-                }
-                
-                var facility = new Plant
+                var elpsFacility = _elps.CreateElpsFacility(new
                 {
                     Name = plant.Name,
-                    PlantType = 2,
-                    State = plant.State,
+                    StreetAddress = $"{plant.Name} - {user.ElpsId}",
+                    CompanyId = user.ElpsId,
+                    DateAdded = DateTime.UtcNow.AddHours(1),
+                    plant.City,
+                    plant.StateId,
+                    LGAId = plant.LGAID,
+                    FacilityType = "CVC Facility",
+                    FacilityDocuments = (string)null,
+                    Id = (string)null
+                })?.Parse<Dictionary<string, string>>();
+
+                var elpsId =  Convert.ToInt64(elpsFacility["id"]); 
+                var item = new Plant
+                {
+                    Name = plant.Name,
+                    PlantType = 1,
+                    State = StateName.Name,
                     Company = comName,
                     Email = user.Email,
-                    ElpsPlantId = plant.PlantElpsId,
                     CompanyElpsId = user.ElpsId,
-                    IsDeleted = false,
+                    ElpsPlantId = elpsId
                 };
-                
-
-                await _unitOfWork.Plant.Add(facility);
+                await _unitOfWork.Plant.Add(item);
                 await _unitOfWork.SaveChangesAsync(user.Id);
 
                 _response = new ApiResponse
                 {
-                    Message = "Plant was added successfully.",
+                    Message = "Processing Plant was added successfully.",
                     StatusCode = HttpStatusCode.OK,
                     Success = true
                 };
+               
             }
             catch (Exception ex)
             {
