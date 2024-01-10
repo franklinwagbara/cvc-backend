@@ -35,6 +35,7 @@ namespace Bunkering.Access.Services
         private readonly string directory = "Application";
         private readonly IConfiguration _configuration;
         private readonly ApplicationQueries _appQueries;
+        private readonly MessageService _messageService;
 
         public AppService(
             UserManager<ApplicationUser> userManager,
@@ -46,7 +47,8 @@ namespace Bunkering.Access.Services
             AppLogger logger,
             IOptions<AppSetting> setting,
             IConfiguration configuration,
-            ApplicationQueries appQueries)
+            ApplicationQueries appQueries,
+            MessageService messageService)
         {
             _userManager = userManager;
             _unitOfWork = unitOfWork;
@@ -59,6 +61,7 @@ namespace Bunkering.Access.Services
             _setting = setting.Value;
             _configuration = configuration;
             _appQueries = appQueries;
+            _messageService = messageService;
         }
 
         private async Task<Facility> CreateFacility(ApplictionViewModel model, ApplicationUser user)
@@ -495,7 +498,7 @@ namespace Bunkering.Access.Services
                     {
                         payment = new Payment
                         {
-                            Amount = total,
+                            Amount = (decimal)total,
                             Account = _setting.NMDPRAAccount,
                             ApplicationId = id,
                             OrderId = app.Reference,
@@ -504,7 +507,7 @@ namespace Bunkering.Access.Services
                             PaymentType = "NGN",
                             Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending),
                             TransactionDate = DateTime.UtcNow.AddHours(1),
-                            ServiceCharge = (double)fee.SerciveCharge,
+                            ServiceCharge = fee.SerciveCharge,
                             AppReceiptId = "",
                             RRR = "",
                             TransactionId = "",
@@ -517,7 +520,7 @@ namespace Bunkering.Access.Services
                     {
                         if (string.IsNullOrEmpty(payment.RRR))
                         {
-                            payment.Amount = total;
+                            payment.Amount = (decimal)total;
                             payment.OrderId = app.Reference;
                             payment.Description = $"Payment for CVC & COQ License ({app.Facility.Name})";
                             payment.Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending);
@@ -746,6 +749,7 @@ namespace Bunkering.Access.Services
                                         DocSource = doc.source,
                                         DocType = item.DocType,
                                         FileId = doc.id,
+                                        ApplicationTypeId = app.ApplicationTypeId,
                                     });
                             }
                             else
@@ -760,6 +764,7 @@ namespace Bunkering.Access.Services
                                         DocSource = doc.Source,
                                         DocType = item.DocType,
                                         FileId = doc.Id,
+                                        ApplicationTypeId = app.ApplicationTypeId,
                                     });
                             }
                         }
@@ -780,6 +785,16 @@ namespace Bunkering.Access.Services
                         : await _flow.AppWorkFlow(id, Enum.GetName(typeof(AppActions), AppActions.Submit), "Application Submitted");
                     if (submit.Item1)
                     {
+                        var message = new MessageModel
+                        {
+                            ApplicationId = app.Id,
+                            Subject = $"Application with reference {app.Reference} Submitted",
+                            Content = $"Application with reference {app.Reference} has been submitted to your desk for further processing",
+                            UserId = user.Id,
+                        };
+
+                        _messageService.CreateMessageAsync(message);
+
                         _response = new ApiResponse
                         {
                             Message = submit.Item2,
@@ -1131,7 +1146,7 @@ namespace Bunkering.Access.Services
                                 app.Reference,
                                 CompanyName = app.User.Company.Name,
                                 app.User.Email,
-                                //FacilityAddress = app.Facility.Address,
+                                CompanyAddress = app.User.Company.Address,
                                 //State = app.Facility.LGA.State.Name,
                                 //LGA = app.Facility.LGA.Name,
                                 AppType = app.ApplicationType.Name,

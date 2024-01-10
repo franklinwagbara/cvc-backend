@@ -30,9 +30,11 @@ namespace Bunkering.Access.Services
         private readonly AppSetting _setting;
         private readonly WorkFlowService _flow;
         private readonly ApplicationContext _context;
+        private readonly MessageService _messageService;
 
 
-        public CoQService(IUnitOfWork unitOfWork, IHttpContextAccessor httpCxtAccessor, UserManager<ApplicationUser> userManager, IOptions<AppSetting> setting, IMapper mapper, IElps elps, WorkFlowService flow, ApplicationContext context)
+        public CoQService(IUnitOfWork unitOfWork, IHttpContextAccessor httpCxtAccessor, UserManager<ApplicationUser> userManager, 
+            IOptions<AppSetting> setting, IMapper mapper, IElps elps, WorkFlowService flow, ApplicationContext context, MessageService messageService)
         {
             _unitOfWork = unitOfWork;
             _httpCxtAccessor = httpCxtAccessor;
@@ -45,6 +47,7 @@ namespace Bunkering.Access.Services
             _setting = setting.Value;
             _flow = flow;
             _context = context;
+            _messageService = messageService;
         }
 
         //public async Task<ApiResponse> CreateCoQ(CreateCoQViewModel Model)
@@ -565,6 +568,7 @@ namespace Bunkering.Access.Services
                                         DocSource = doc.source,
                                         DocType = item.DocType,
                                         FileId = doc.id,
+                                        ApplicationTypeId = app.ApplicationTypeId,
                                     });
                             }
                             else
@@ -579,6 +583,7 @@ namespace Bunkering.Access.Services
                                         DocSource = doc.Source,
                                         DocType = item.DocType,
                                         FileId = doc.Id,
+                                        ApplicationTypeId = app.ApplicationTypeId,
                                     });
                             }
                         }
@@ -872,6 +877,16 @@ namespace Bunkering.Access.Services
                 var submit = await _flow.CoqWorkFlow(coq.Id, Enum.GetName(typeof(AppActions), AppActions.Submit), "COQ Submitted", user.Id);
                 if (submit.Item1)
                 {
+                    var message = new MessageModel
+                    {
+                        ApplicationId = coq.Id,
+                        Subject = $"COQ with reference {coq.Reference} Submitted",
+                        Content = $"COQ with reference {coq.Reference} has been submitted to your desk for further processing",
+                        UserId = user.Id,
+                    };
+
+                    _messageService.CreateMessageAsync(message);
+
                     transaction.Commit();
 
                     return new ApiResponse
