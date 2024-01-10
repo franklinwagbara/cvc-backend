@@ -495,7 +495,7 @@ namespace Bunkering.Access.Services
                     {
                         payment = new Payment
                         {
-                            Amount = total,
+                            Amount = (decimal)total,
                             Account = _setting.NMDPRAAccount,
                             ApplicationId = id,
                             OrderId = app.Reference,
@@ -504,7 +504,7 @@ namespace Bunkering.Access.Services
                             PaymentType = "NGN",
                             Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending),
                             TransactionDate = DateTime.UtcNow.AddHours(1),
-                            ServiceCharge = (double)fee.SerciveCharge,
+                            ServiceCharge = fee.SerciveCharge,
                             AppReceiptId = "",
                             RRR = "",
                             TransactionId = "",
@@ -517,7 +517,7 @@ namespace Bunkering.Access.Services
                     {
                         if (string.IsNullOrEmpty(payment.RRR))
                         {
-                            payment.Amount = total;
+                            payment.Amount = (decimal)total;
                             payment.OrderId = app.Reference;
                             payment.Description = $"Payment for CVC & COQ License ({app.Facility.Name})";
                             payment.Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending);

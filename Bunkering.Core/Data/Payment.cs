@@ -18,9 +18,9 @@ namespace Bunkering.Core.Data
 		public string RRR { get; set; }
 		public string Description { get; set; }
 		public string AppReceiptId { get; set; }
-		public double Amount { get; set; }
-		public double Arrears { get; set; }
-		public double ServiceCharge { get; set; }
+		public decimal Amount { get; set; }
+		public decimal Arrears { get; set; }
+		public decimal ServiceCharge { get; set; }
 		public string TxnMessage { get; set; }
 		public int RetryCount { get; set; }
 		public DateTime LastRetryDate { get; set; }
