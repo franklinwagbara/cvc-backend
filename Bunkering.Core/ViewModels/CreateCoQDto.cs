@@ -47,7 +47,7 @@ namespace Bunkering.Core.ViewModels
     public class CreateGasProductCoQDto
     {
         public int PlantId { get; set; }
-        public int NoaAppId { get; set; }
+        public int? NoaAppId { get; set; }
         public double QuauntityReflectedOnBill { get; set; }
         public double ArrivalShipFigure { get; set; }
         public double DischargeShipFigure { get; set; }

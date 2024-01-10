@@ -35,6 +35,7 @@ namespace Bunkering.Access.Services
         private readonly string directory = "Application";
         private readonly IConfiguration _configuration;
         private readonly ApplicationQueries _appQueries;
+        private readonly MessageService _messageService;
 
         public AppService(
             UserManager<ApplicationUser> userManager,
@@ -46,7 +47,8 @@ namespace Bunkering.Access.Services
             AppLogger logger,
             IOptions<AppSetting> setting,
             IConfiguration configuration,
-            ApplicationQueries appQueries)
+            ApplicationQueries appQueries,
+            MessageService messageService)
         {
             _userManager = userManager;
             _unitOfWork = unitOfWork;
@@ -59,6 +61,7 @@ namespace Bunkering.Access.Services
             _setting = setting.Value;
             _configuration = configuration;
             _appQueries = appQueries;
+            _messageService = messageService;
         }
 
         private async Task<Facility> CreateFacility(ApplictionViewModel model, ApplicationUser user)
@@ -746,6 +749,7 @@ namespace Bunkering.Access.Services
                                         DocSource = doc.source,
                                         DocType = item.DocType,
                                         FileId = doc.id,
+                                        ApplicationTypeId = app.ApplicationTypeId,
                                     });
                             }
                             else
@@ -760,6 +764,7 @@ namespace Bunkering.Access.Services
                                         DocSource = doc.Source,
                                         DocType = item.DocType,
                                         FileId = doc.Id,
+                                        ApplicationTypeId = app.ApplicationTypeId,
                                     });
                             }
                         }
@@ -780,6 +785,16 @@ namespace Bunkering.Access.Services
                         : await _flow.AppWorkFlow(id, Enum.GetName(typeof(AppActions), AppActions.Submit), "Application Submitted");
                     if (submit.Item1)
                     {
+                        var message = new MessageModel
+                        {
+                            ApplicationId = app.Id,
+                            Subject = $"Application with reference {app.Reference} Submitted",
+                            Content = $"Application with reference {app.Reference} has been submitted to your desk for further processing",
+                            UserId = user.Id,
+                        };
+
+                        _messageService.CreateMessageAsync(message);
+
                         _response = new ApiResponse
                         {
                             Message = submit.Item2,
@@ -987,9 +1002,9 @@ namespace Bunkering.Access.Services
         {
             var apps = await _unitOfWork.Application.Find(x => x.CurrentDeskId.Equals(user.Id), "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
             if (await _userManager.IsInRoleAsync(user, "FAD"))
-                apps = await _unitOfWork.Application.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)), "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
+                apps = await _unitOfWork.Application.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)) && x.IsDeleted != true, "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
             else if (await _userManager.IsInRoleAsync(user, "Company"))
-                apps = await _unitOfWork.Application.Find(x => x.UserId.Equals(user.Id), "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
+                apps = await _unitOfWork.Application.Find(x => x.UserId.Equals(user.Id) && x.IsDeleted != true, "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
             return new ApiResponse
             {
                 Message = "Applications fetched successfully",
@@ -1015,11 +1030,11 @@ namespace Bunkering.Access.Services
 
         private async Task<ApiResponse> GetMyDeskFO(ApplicationUser? user)
         {
-            var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Application.ApplicationType,Application.User.Company,Depot");
+            var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Plant");
             // if (await _userManager.IsInRoleAsync(user, "FAD"))
             //     coqs = await _unitOfWork.CoQ.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)));
             if (await _userManager.IsInRoleAsync(user, "Company"))
-                coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Application.ApplicationType,Application.User.Company,Depot");
+                coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Plant");
             return new ApiResponse
             {
                 Message = "Applications fetched successfully",
@@ -1034,8 +1049,8 @@ namespace Bunkering.Access.Services
                     VesselName = x.Application?.VesselName,
                     x.Reference,
                     x.Status,
-                    DepotName = x.Depot?.Name,
-                    DepotId = x.DepotId,
+                    DepotName = x.Plant?.Name,
+                    DepotId = x.PlantId,
                     DateOfVesselArrival = x.DateOfVesselArrival.ToShortDateString(),
                     DateOfVesselUllage = x.DateOfVesselUllage.ToShortDateString(),
                     DateOfSTAfterDischarge = x.DateOfSTAfterDischarge.ToShortDateString(),
@@ -1061,7 +1076,8 @@ namespace Bunkering.Access.Services
             {
                 try
                 {
-                    var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id), "User.Company,Appointment,SubmittedDocuments,ApplicationType,Payments,Facility.VesselType,WorkFlow,Histories,Facility.Tanks.Product,Facility.FacilitySources.LGA.State,");
+                    var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id), "User.Company,Appointment,ApplicationType,Payments,Facility.VesselType,WorkFlow,Histories,Facility.Tanks.Product,Facility.FacilitySources.LGA.State,");
+
                     if (app != null)
                     {
                         var users = _userManager.Users.Include(c => c.Company).Include(ur => ur.UserRoles).ThenInclude(r => r.Role).ToList();
@@ -1100,6 +1116,11 @@ namespace Bunkering.Access.Services
                             s.ScheduleType,
                             ExpiryDate = s.ExpiryDate.ToString("MMM dd, yyyy HH:mm:ss")
                         });
+
+                        var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Utils.NOA));
+
+                        var appDocs = await _unitOfWork.SubmittedDocument.Find(x => x.ApplicationId == app.Id && x.ApplicationTypeId == appType.Id);
+
                         var paymentStatus = "Payment pending";
                         if (app.Payments.FirstOrDefault()?.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted)) is true)
                         {
@@ -1125,7 +1146,7 @@ namespace Bunkering.Access.Services
                                 app.Reference,
                                 CompanyName = app.User.Company.Name,
                                 app.User.Email,
-                                //FacilityAddress = app.Facility.Address,
+                                CompanyAddress = app.User.Company.Address,
                                 //State = app.Facility.LGA.State.Name,
                                 //LGA = app.Facility.LGA.Name,
                                 AppType = app.ApplicationType.Name,
@@ -1139,7 +1160,7 @@ namespace Bunkering.Access.Services
                                 CurrentDesk = _userManager.Users.FirstOrDefault(x => x.Id.Equals(app.CurrentDeskId))?.Email,
                                 AppHistories = histories,
                                 Schedules = sch,
-                                Documents = app.SubmittedDocuments,
+                                Documents = appDocs,
                                 app.MarketerName,
                                 app.MotherVessel,
                                 app.Jetty,
@@ -1342,7 +1363,8 @@ namespace Bunkering.Access.Services
                 };
                 return _response;
             }
-            var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application");
+            
+            var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application.Facility");
             var apps =  appDepots.OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application).ToList();
 
             _response = new ApiResponse
@@ -1370,7 +1392,7 @@ namespace Bunkering.Access.Services
                 if (appDepot == null)
                     throw new Exception("The Select depot does not exist for this application!");
 
-                var depot = await _unitOfWork.Depot.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.DepotId));  
+                var depot = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.DepotId));  
                 var product = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.ProductId));
 
                 if (product == null)
@@ -1379,14 +1401,14 @@ namespace Bunkering.Access.Services
                     throw new Exception("Depot does not exist");
 
                 //Check if COQ exists
-                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.AppId == app.Id && x.DepotId == depot.Id);
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.AppId == app.Id && x.PlantId == depot.Id);
 
                 return new ApiResponse
                 {
                     Data = new
                     {
-                        MarketerName = depot.MarketerName,
-                        DepotCapacity = depot.Capacity,
+                        MarketerName = depot.Company,
+                        //DepotCapacity = depot.,
                         ProductName = product.Name,
                         Volume = appDepot.Volume,
                         VesselName = app.VesselName,
@@ -1491,6 +1513,7 @@ namespace Bunkering.Access.Services
             return _response;
 
         }
+
 
         public async Task<ApiResponse> GetAllVessels()
         {

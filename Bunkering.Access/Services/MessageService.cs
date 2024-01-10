@@ -44,6 +44,7 @@ namespace Bunkering.Access.Services
                     Content = model.Content,
                     Subject = model.Subject,
                     UserId = model.UserId,
+                    Date = DateTime.Now.AddHours(1),
 
                 };
 

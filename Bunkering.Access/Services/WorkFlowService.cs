@@ -145,9 +145,16 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var message = string.Empty;
+                var isProcessingPlant = false;
+                    //return (false, $"Application with Id={coq.AppId} was not found.");
                 var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id.Equals(coqId)) ?? throw new Exception($"COQ with Id={coqId} was not found.");
-                var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == coq.AppId, "User,Facility.VesselType,Payments") ?? throw new Exception($"Application with Id={coq.AppId} was not found.");
+                if (coq is not null && coq.AppId is null)
+                {
+                    isProcessingPlant = true;
+                }
+                var message = string.Empty;
+                var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == coq.AppId, "User,Facility.VesselType,Payments");
+                if(!isProcessingPlant && app is null) throw new Exception($"Application with Id={coq.AppId} was not found.");
 
                 currUserId = string.IsNullOrEmpty(currUserId) ? coq.CurrentDeskId : currUserId;
                 var currentUser = _userManager.Users
@@ -157,7 +164,7 @@ namespace Bunkering.Access.Services
                         .ThenInclude(r => r.Role)
                         .Include(lo => lo.Location)
                         .FirstOrDefault(x => x.Id.Equals(currUserId)) ?? throw new Exception($"User with Id={currUserId} was not found.");
-                var workFlow = (await GetWorkFlow(action, currentUser, app.Facility.VesselTypeId)) ?? throw new Exception($"Work Flow for this action was not found.");
+                var workFlow = (await GetWorkFlow(action, currentUser, app?.Facility?.VesselTypeId ?? 1)) ?? throw new Exception($"Work Flow for this action was not found.");
                 var nextProcessingOfficer = (await GetNextStaffCOQ(coqId, action, workFlow, currentUser, delUserId)) ?? throw new Exception($"No processing staff for this action was not found.");
 
                 coq.CurrentDeskId = nextProcessingOfficer.Id;
@@ -308,10 +315,17 @@ namespace Bunkering.Access.Services
                                 .Include(ol => ol.Office)
                                 .Where(x => x.UserRoles.Any(y => y.Role.Name.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
                                 && x.LocationId == wkflow.ToLocationId && x.IsActive).ToList();
-                        nextprocessingofficer = users.OrderBy(x => x.LastJobDate).FirstOrDefault();
+                        nextprocessingofficer = users.OrderBy(x => x.LastJobDate).FirstOrDefault()!;
+                        foreach (var user in users)
+                        {
+                            if (!user.UserRoles.Any(c => c.Role.Name == RoleConstants.COMPANY) && user.LocationId != wkflow.ToLocationId)
+                            {
+                                users.Remove(user);
+                            }
+                        }
                     }
                 }
-                return nextprocessingofficer;
+                return nextprocessingofficer!;
             }
         }
 
@@ -322,7 +336,7 @@ namespace Bunkering.Access.Services
                 return _userManager.Users.Include(x => x.Company)
                     .Include(ur => ur.UserRoles).ThenInclude(r => r.Role)
                     .Include(lo => lo.Location).Include(ol => ol.Office)
-                    .FirstOrDefault(x => x.Id.Equals(delUserId) && x.IsActive);
+                    .FirstOrDefault(x => x.Id.Equals(delUserId) && x.IsActive)!;
             else
             {
                 // var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == appid, "User.UserRoles.Role");
@@ -339,7 +353,7 @@ namespace Bunkering.Access.Services
                     if (history != null)
                     {
                         nextprocessingofficer = _userManager.Users.Include(ur => ur.UserRoles).ThenInclude(r => r.Role).Include(lo => lo.Location).Include(ol => ol.Office)
-                                                    .FirstOrDefault(x => x.Id.Equals(history.TriggeredBy));
+                                                    .FirstOrDefault(x => x.Id.Equals(history.TriggeredBy))!;
                         if (nextprocessingofficer != null && !nextprocessingofficer.IsActive)
                         {
                             var users = _userManager.Users
@@ -364,13 +378,21 @@ namespace Bunkering.Access.Services
                                 .Include(lo => lo.Location)
                                 .Include(ol => ol.Office)
                                 .Where(x => x.UserRoles.Any(y => y.Role.Name.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
-                                && x.LocationId == wkflow.ToLocationId && x.IsActive && x.OfficeId == currentUser.OfficeId).ToList()
+                                && x.IsActive && x.OfficeId == currentUser.OfficeId).ToList()
                             : _userManager.Users.Include(x => x.Company).Include(f => f.Company).Include(ur => ur.UserRoles)
                                 .ThenInclude(r => r.Role)
                                 .Include(lo => lo.Location)
                                 .Include(ol => ol.Office)
                                 .Where(x => x.UserRoles.Any(y => y.Role.Name.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
-                                && x.LocationId == wkflow.ToLocationId && x.IsActive).ToList();
+                                && x.IsActive).ToList();
+
+                        foreach (var user in users)
+                        {
+                            if (!user.UserRoles.Any(c => c.Role.Name == RoleConstants.COMPANY) && user.LocationId != wkflow.ToLocationId)
+                            {
+                                users.Remove(user);
+                            }
+                        }
                         nextprocessingofficer = users.OrderBy(x => x.LastJobDate).FirstOrDefault();
                     }
                 }
@@ -510,15 +532,15 @@ namespace Bunkering.Access.Services
             body = string.Format(body, content, DateTime.Now.Year, url);
             Utils.SendMail(_mailSetting.Stringify().Parse<Dictionary<string, string>>(), user.Email, subject, body);
 
-            await _unitOfWork.Message.Add(new Message
-            {
-                ApplicationId = app.Id,
-                Content = body,
-                Date = DateTime.Now.AddHours(1),
-                Subject = subject,
-                UserId = user.Id
-            });
-            await _unitOfWork.SaveChangesAsync(user.Id);
+            //await _unitOfWork.Message.Add(new Message
+            //{
+            //    ApplicationId = app.Id,
+            //    Content = body,
+            //    Date = DateTime.Now.AddHours(1),
+            //    Subject = subject,
+            //    UserId = user.Id
+            //});
+            //await _unitOfWork.SaveChangesAsync(user.Id);
         }
 
         public async Task SendCOQNotification(CoQ coq, string action, ApplicationUser user, string comment)
@@ -544,16 +566,16 @@ namespace Bunkering.Access.Services
             body = string.Format(body, content, DateTime.Now.Year, url);
             Utils.SendMail(_mailSetting.Stringify().Parse<Dictionary<string, string>>(), user.Email, subject, body);
 
-            await _unitOfWork.Message.Add(new Message
-            {
-                COQId = coq.Id,
-                IsCOQ = true,
-                Content = body,
-                Date = DateTime.Now.AddHours(1),
-                Subject = subject,
-                UserId = user.Id
-            });
-            await _unitOfWork.SaveChangesAsync(user.Id);
+            //await _unitOfWork.Message.Add(new Message
+            //{
+            //    COQId = coq.Id,
+            //    IsCOQ = true,
+            //    Content = body,
+            //    Date = DateTime.Now.AddHours(1),
+            //    Subject = subject,
+            //    UserId = user.Id
+            //});
+            //await _unitOfWork.SaveChangesAsync(user.Id);
         }
     }
 }

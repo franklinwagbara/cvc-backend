@@ -36,7 +36,7 @@ namespace Bunkering.Controllers.API
 		{
 			try
 			{
-                var coqs = await _unitOfWork.CoQ.GetAll("Application.User.Company,Depot");
+                var coqs = await _unitOfWork.CoQ.GetAll("Application.User.Company,Plant");
 
                 return Ok(new ApiResponse
                 {
@@ -48,8 +48,8 @@ namespace Bunkering.Controllers.API
 						AppId = c.AppId,
                         ImportName = c.Application?.User?.Company?.Name,
 						VesselName = c.Application?.VesselName,
-						DepotName = c.Depot?.Name,
-						DepotId = c.DepotId,
+						DepotName = c.Plant?.Name,
+						DepotId = c.PlantId,
                         DateOfVesselArrival = c.DateOfVesselArrival.ToShortDateString(),
                         DateOfVesselUllage = c.DateOfVesselUllage.ToShortDateString(),
                         DateOfSTAfterDischarge = c.DateOfSTAfterDischarge.ToShortDateString(),
@@ -97,8 +97,8 @@ namespace Bunkering.Controllers.API
                         AppId = coq.AppId,
                         ImportName = coq.Application?.User?.Company?.Name,
                         VesselName = coq.Application?.VesselName,
-                        DepotName = coq.Depot?.Name,
-                        DepotId = coq.DepotId,
+                        DepotName = coq.Plant?.Name,
+                        DepotId = coq.PlantId,
                         DateOfVesselArrival = coq.DateOfVesselArrival.ToShortDateString(),
                         DateOfVesselUllage = coq.DateOfVesselUllage.ToShortDateString(),
                         DateOfSTAfterDischarge = coq.DateOfSTAfterDischarge.ToShortDateString(),
@@ -155,15 +155,42 @@ namespace Bunkering.Controllers.API
 		[Route("coq_by_depotId/{depotId}")]
 		[HttpGet]
 		public async Task<IActionResult> GetCoqsByDepot(int depotId) => Response(await _coqService.GetCoQsByDepotId(depotId));
-
 		[ProducesResponseType(typeof(ApiResponse), 200)]
 		[ProducesResponseType(typeof(ApiResponse), 404)]
 		[ProducesResponseType(typeof(ApiResponse), 405)]
 		[ProducesResponseType(typeof(ApiResponse), 500)]
 		[Produces("application/json")]
-		[Route("coq_requirement/{appId}")]
+		[Route("coq_details/{id}")]
 		[HttpGet]
-		public async Task<IActionResult> GetCoqRequirements(int appId, int depotId) => Response(await _coqService.GetCoqCreateRequirementsAsync(depotId, appId));
+		public async Task<IActionResult> GetCoqsById(int id) => Response(await _coqService.GetByIdAsync(id));
+        
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Produces("application/json")]
+        [Route("approved_coq")]
+        [HttpGet]
+        public async Task<IActionResult> GetApprovedCoQsByDepot() => Response(await _coqService.GetApprovedCoQsByFieldOfficer());
+        
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Produces("application/json")]
+        [Route("all-coq-cert")]
+        [HttpGet]
+        public async Task<IActionResult> GetAllCoQCertificates() => Response(await _coqService.GetAllCoQCertificates());
+
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+		[ProducesResponseType(typeof(ApiResponse), 404)]
+		[ProducesResponseType(typeof(ApiResponse), 405)]
+		[ProducesResponseType(typeof(ApiResponse), 500)]
+		[Produces("application/json")]
+		[Route("coq_requirement/{depotId}")]
+		[HttpGet]
+		public async Task<IActionResult> GetCoqRequirements(int? appId, int depotId) => Response(await _coqService.GetCoqCreateRequirementsAsync(depotId, appId));
 
         [AllowAnonymous]
 		[ProducesResponseType(typeof(ApiResponse), 200)]

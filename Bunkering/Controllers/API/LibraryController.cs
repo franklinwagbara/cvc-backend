@@ -21,9 +21,10 @@ namespace Bunkering.Controllers.API
         private readonly DepotService _depotservice;
         private readonly NominatedSurveyorService _nominatedSurveyorService;
         private readonly AppStageDocService _appStageDocService;
+        private readonly PlantService _plantService;
 
 
-        public LibraryController(LibraryService libraryService_, AppStageDocService appStageDocService, JettyService jettyService, DepotService depotService, NominatedSurveyorService nominatedSurveyorService)
+        public LibraryController(LibraryService libraryService_, AppStageDocService appStageDocService, JettyService jettyService, DepotService depotService, NominatedSurveyorService nominatedSurveyorService, PlantService plantService)
         {
             this.libraryService = libraryService_;
 
@@ -31,7 +32,7 @@ namespace Bunkering.Controllers.API
             _jettyService = jettyService;
             _depotservice = depotService;
             _nominatedSurveyorService = nominatedSurveyorService;
-
+            _plantService = plantService;
         }
 
 
@@ -474,7 +475,9 @@ namespace Bunkering.Controllers.API
         [Route("All-Depot")]
         [HttpGet]
 
-        public async Task<IActionResult> AllDepot() => Response(await _depotservice.GetAllDepot());
+        public async Task<IActionResult> AllDepot() => Response(await _plantService.GetAllDepotsPlants());
+        
+        
 
         /// <summary>
         /// This endpoint is used to get all Depot by noa id

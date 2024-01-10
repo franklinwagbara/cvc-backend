@@ -21,7 +21,7 @@ namespace Bunkering.Core.ViewModels
         public double FloatRoofCorr { get; set; }
         public double GOV { get; set; }
         [Required]
-        public decimal Temp { get; set; }
+        public decimal Tempearture { get; set; }
         [Required]
         public double Density { get; set; }
         [Required]
@@ -45,7 +45,7 @@ namespace Bunkering.Core.ViewModels
     public class CreateCoQLiquidDto
     {
         public int PlantId { get; set; }
-        public int NoaAppId { get; set; }
+        public int? NoaAppId { get; set; }
         public DateTime DateOfVesselArrival { get; set; }
         public DateTime DateOfVesselUllage { get; set; }
         public DateTime DateOfSTAfterDischarge { get; set; }

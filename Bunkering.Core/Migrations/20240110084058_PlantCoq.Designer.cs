@@ -4,6 +4,7 @@ using Bunkering.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bunkering.Core.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20240110084058_PlantCoq")]
+    partial class PlantCoq
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -660,6 +663,9 @@ namespace Bunkering.Core.Migrations
                     b.Property<DateTime>("DateOfVesselUllage")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("DepotId")
+                        .HasColumnType("int");
+
                     b.Property<double>("DepotPrice")
                         .HasColumnType("float");
 
@@ -707,7 +713,7 @@ namespace Bunkering.Core.Migrations
 
                     b.HasIndex("AppId");
 
-                    b.HasIndex("PlantId");
+                    b.HasIndex("DepotId");
 
                     b.ToTable("CoQs");
                 });
@@ -1256,11 +1262,11 @@ namespace Bunkering.Core.Migrations
                     b.Property<DateTime>("LastRetryDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<double>("LateRenewalPenalty")
-                        .HasColumnType("float");
+                    b.Property<decimal>("LateRenewalPenalty")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<double>("NonRenewalPenalty")
-                        .HasColumnType("float");
+                    b.Property<decimal>("NonRenewalPenalty")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("OrderId")
                         .IsRequired()
@@ -2311,15 +2317,15 @@ namespace Bunkering.Core.Migrations
                         .WithMany()
                         .HasForeignKey("AppId");
 
-                    b.HasOne("Bunkering.Core.Data.Plant", "Plant")
+                    b.HasOne("Bunkering.Core.Data.Depot", "Depot")
                         .WithMany()
-                        .HasForeignKey("PlantId")
+                        .HasForeignKey("DepotId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Application");
 
-                    b.Navigation("Plant");
+                    b.Navigation("Depot");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.Depot", b =>

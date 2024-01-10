@@ -298,6 +298,7 @@ namespace Bunkering.Controllers.API
         [ProducesResponseType(typeof(ApiResponse), 405)]
         [ProducesResponseType(typeof(ApiResponse), 500)]
         [Route("view-application")]
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> ViewApplication(int id) => Response(await _appService.ViewApplication(id));
 

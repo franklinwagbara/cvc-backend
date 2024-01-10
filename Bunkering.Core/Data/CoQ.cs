@@ -5,8 +5,8 @@ namespace Bunkering.Core.Data
     public class CoQ
     {
         public int Id { get; set; }
-        public int AppId { get; set; }  
-        public int DepotId { get; set; }
+        public int? AppId { get; set; }  
+        //public int DepotId { get; set; }
         public int PlantId { get; set; }
         public DateTime DateOfVesselArrival { get; set; }   
         public DateTime DateOfVesselUllage { get; set; }
@@ -30,11 +30,11 @@ namespace Bunkering.Core.Data
         public string? Reference { get; set; } = string.Empty;
         public string? CurrentDeskId { get; set; }
         public bool? FADApproved { get; set; }
-        public string NameConsignee { get; set; }
+        public string? NameConsignee { get; set; }
 
         [ForeignKey("AppId")]
         public Application? Application { get; set; }
-        [ForeignKey("DepotId")]
-        public Depot? Depot { get; set; }
+        [ForeignKey("PlantId")]
+        public Plant? Plant { get; set; }
     }
 }
