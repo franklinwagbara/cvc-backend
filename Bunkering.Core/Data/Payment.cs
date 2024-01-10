@@ -6,7 +6,7 @@ namespace Bunkering.Core.Data
 	public class Payment
 	{
 		public int Id { get; set; }
-		public int ApplicationId { get; set; }
+		public int? ApplicationId { get; set; }
         public int? COQId { get; set; }
         public int? ApplicationTypeId { get; set; }
         public string OrderId { get; set; }
