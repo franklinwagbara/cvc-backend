@@ -45,7 +45,7 @@ namespace Bunkering.Core.ViewModels
     public class CreateCoQLiquidDto
     {
         public int PlantId { get; set; }
-        public int NoaAppId { get; set; }
+        public int? NoaAppId { get; set; }
         public DateTime DateOfVesselArrival { get; set; }
         public DateTime DateOfVesselUllage { get; set; }
         public DateTime DateOfSTAfterDischarge { get; set; }
