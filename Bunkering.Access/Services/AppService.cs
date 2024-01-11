@@ -981,9 +981,11 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var user = await _userManager.Users.Include(x => x.Location).FirstOrDefaultAsync(x => x.Email.Equals(User));
+                var user = await _userManager.Users.Include(x => x.Location).Include(ur => ur.UserRoles).ThenInclude(u => u.Role).FirstOrDefaultAsync(x => x.Email.Equals(User));
                 if(user.Location?.Name == LOCATION.FO)
                         return await GetMyDeskFO(user);
+                else if(user.UserRoles.FirstOrDefault().Role.Name.Equals("FAD"))
+                    return await GetMyDeskFO(user);
                 else 
                     return await GetMyDeskOthers(user);
             }
