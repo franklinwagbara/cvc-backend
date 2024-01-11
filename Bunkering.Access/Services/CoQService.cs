@@ -1275,6 +1275,7 @@ namespace Bunkering.Access.Services
                     dictionary.Add("LoadingPort", app.LoadingPort);
                     dictionary.Add("VesselName", app.Facility.Name);
                     dictionary.Add("NominatedSurveyor", (await _unitOfWork.NominatedSurveyor.FirstOrDefaultAsync(c => c.Id == app.SurveyorId)).Name);
+                    dictionary.Add("ProductType", product.ProductType);
                 }
             }
             if(product.ProductType.ToLower().Equals("gas"))
