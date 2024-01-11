@@ -1262,6 +1262,12 @@ namespace Bunkering.Access.Services
                     }
                 }
             }
+            else
+            {
+                var app = await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.Id.Equals(coq.AppId), "Product");
+                if (app != null)
+                    product = app.Product;
+            }
             var dictionary = coq.Stringify().Parse<Dictionary<string, object>>();
             
             if(coq.AppId != null)
