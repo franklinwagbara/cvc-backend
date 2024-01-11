@@ -30,7 +30,7 @@ namespace Bunkering.Core.ViewModels
 
     public enum PlantType
     {
-        Processing = 2,
-        Depot = 1
+        Processing = 1,
+        Depot = 2
     }
 }
