@@ -1276,6 +1276,12 @@ namespace Bunkering.Access.Services
                     dictionary.Add("VesselName", app.Facility.Name);
                     dictionary.Add("NominatedSurveyor", (await _unitOfWork.NominatedSurveyor.FirstOrDefaultAsync(c => c.Id == app.SurveyorId)).Name);
                     dictionary.Add("ProductType", product.ProductType);
+                    //remove deskid and replace with name
+                    dictionary.Remove("CurrentDeskId");
+                    dictionary.Add("CurrentDesk", _userManager.Users.FirstOrDefault(u => u.Id.Equals(coq.CurrentDeskId)).Email);
+                    //remove deskid and replace with name
+                    dictionary.Remove("Plant");
+                    dictionary.Add("Palnt", _context.Plants.FirstOrDefault(p => p.Id.Equals(coq.PlantId)).Name);
                 }
             }
             if(product.ProductType.ToLower().Equals("gas"))
