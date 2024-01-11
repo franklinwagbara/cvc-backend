@@ -2,6 +2,7 @@
 using Bunkering.Access.IContracts;
 using Bunkering.Access.Query;
 using Bunkering.Core.Data;
+using Bunkering.Core.Utils;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -133,7 +134,7 @@ namespace Bunkering.Access.Services
             else
             {
                 updatePlant.Name = plant.Name;                
-                updatePlant.PlantType = (int)PlantType.Processing;
+                updatePlant.PlantType = (int)PlantType.ProccessingPlant;
                 updatePlant.ElpsPlantId = plant.PlantElpsId;
                 updatePlant.CompanyElpsId = user.ElpsId;
                 updatePlant.Email = user.Email;
@@ -252,7 +253,7 @@ namespace Bunkering.Access.Services
                 var item = new Plant
                 {
                     Name = plant.Name,
-                    PlantType = (int)PlantType.Processing,
+                    PlantType = (int)PlantType.ProccessingPlant,
                     State = StateName.Name,
                     Company = comName,
                     Email = user.Email,
@@ -651,7 +652,7 @@ namespace Bunkering.Access.Services
                             IsDeleted = x.IsDeleted,
                             Tanks = x.Tanks.Where(u => !u.IsDeleted).ToList()
                         })
-                        .Where(x => x.PlantType == (int)PlantType.Processing)
+                        .Where(x => x.PlantType == (int)PlantType.ProccessingPlant)
                         .ToList();
             return plist;
         }

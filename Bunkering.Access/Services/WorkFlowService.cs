@@ -194,7 +194,7 @@ namespace Bunkering.Access.Services
                 if (workFlow.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)))
                 {
                     var plant = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id.Equals(coq.PlantId));
-                    var certificate = await GenerateCOQCertificate(coqId, currentUser.Id, plant.CompanyElpsId);
+                    var certificate = await GenerateCOQCertificate(coqId, currentUser.Id, plant.CompanyElpsId.ToString());
                     var debitnote = await _paymentService.GenerateDebitNote(coq.Id);
 
                     if (certificate.Item1 && debitnote.Success)
