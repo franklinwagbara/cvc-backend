@@ -1285,7 +1285,7 @@ namespace Bunkering.Access.Services
             //remove deskid and replace with name
             dictionary.Remove("Plant");
             dictionary.Add("Plant", _context.Plants.FirstOrDefault(p => p.Id.Equals(coq.PlantId)).Name);
-            if (product.ProductType.ToLower().Equals("gas"))
+            if (product.ProductType != null && product.ProductType.ToLower().Equals("gas"))
                  return new()
                 {
                     Success = true,
