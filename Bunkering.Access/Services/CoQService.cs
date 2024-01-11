@@ -1284,7 +1284,7 @@ namespace Bunkering.Access.Services
             dictionary.Add("CurrentDesk", _userManager.Users.FirstOrDefault(u => u.Id.Equals(coq.CurrentDeskId)).Email);
             //remove deskid and replace with name
             dictionary.Remove("Plant");
-            dictionary.Add("Palnt", _context.Plants.FirstOrDefault(p => p.Id.Equals(coq.PlantId)).Name);
+            dictionary.Add("Plant", _context.Plants.FirstOrDefault(p => p.Id.Equals(coq.PlantId)).Name);
             if (product.ProductType.ToLower().Equals("gas"))
                  return new()
                 {

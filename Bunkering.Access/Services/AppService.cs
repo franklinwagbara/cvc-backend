@@ -1001,9 +1001,7 @@ namespace Bunkering.Access.Services
         private async Task<ApiResponse> GetMyDeskOthers(ApplicationUser? user)
         {
             var apps = await _unitOfWork.Application.Find(x => x.CurrentDeskId.Equals(user.Id), "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
-            if (await _userManager.IsInRoleAsync(user, "FAD"))
-                apps = await _unitOfWork.Application.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)) && x.IsDeleted != true, "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
-            else if (await _userManager.IsInRoleAsync(user, "Company"))
+            if (await _userManager.IsInRoleAsync(user, "Company"))
                 apps = await _unitOfWork.Application.Find(x => x.UserId.Equals(user.Id) && x.IsDeleted != true, "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
             return new ApiResponse
             {
