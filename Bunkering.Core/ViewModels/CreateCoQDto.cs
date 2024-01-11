@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,11 +26,15 @@ namespace Bunkering.Core.ViewModels
         public double VapourPressure { get; set; }
         public double MolecularWeight { get; set; }
         public double VapourFactor { get; set; }
+        [NotMapped]
+        public string? MeasurementType { get; set; }
+        [NotMapped]
+        public string? TankName { get; set; }
         //public double VapourWeightVAC { get; set; }
         //public double VapourWeightAir { get; set; }
         //public double TotalGasWeightVAC { get; set; }
         //public double TotalGasWeightAir { get; set; }
-        
+
     }
 
     public class TankBeforeReading
@@ -47,6 +52,7 @@ namespace Bunkering.Core.ViewModels
     public class CreateGasProductCoQDto
     {
         public int PlantId { get; set; }
+        public int? ProductId { get; set; }
         public int? NoaAppId { get; set; }
         public double QuauntityReflectedOnBill { get; set; }
         public double ArrivalShipFigure { get; set; }
