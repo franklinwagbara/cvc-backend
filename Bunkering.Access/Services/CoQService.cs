@@ -299,6 +299,7 @@ namespace Bunkering.Access.Services
 
             return _apiReponse;
         }
+
         public async Task<object?> GetCoqRequiredDocuments(Application appp)
         {
 
@@ -418,6 +419,7 @@ namespace Bunkering.Access.Services
                 }
             };
         }
+
         public async Task<object?> GetCoqRequiredDocuments(Plant appp)
         {
 
@@ -789,6 +791,7 @@ namespace Bunkering.Access.Services
                     DateOfVesselArrival = model.DateOfVesselArrival,
                     DateOfVesselUllage = model.DateOfVesselUllage,
                     DepotPrice = model.DepotPrice,
+                    ProductId = model.ProductId,
                     ArrivalShipFigure = model.ArrivalShipFigure,
                     QuauntityReflectedOnBill = model.QuauntityReflectedOnBill,
                     DischargeShipFigure = model.DischargeShipFigure,
@@ -877,15 +880,18 @@ namespace Bunkering.Access.Services
                 var submit = await _flow.CoqWorkFlow(coq.Id, Enum.GetName(typeof(AppActions), AppActions.Submit), "COQ Submitted", user.Id);
                 if (submit.Item1)
                 {
-                    var message = new MessageModel
+                    var message = new Message
                     {
                         ApplicationId = coq.Id,
                         Subject = $"COQ with reference {coq.Reference} Submitted",
                         Content = $"COQ with reference {coq.Reference} has been submitted to your desk for further processing",
                         UserId = user.Id,
+                        Date = DateTime.Now.AddHours(1),
                     };
 
-                    _messageService.CreateMessageAsync(message);
+                    _context.Messages.Add(message);
+                    _context.SaveChanges();
+                    //_messageService.CreateMessageAsync(message);
 
                     transaction.Commit();
 
@@ -929,7 +935,6 @@ namespace Bunkering.Access.Services
             //};
         }
 
-
         public async Task<ApiResponse> CreateCOQForLiquid(CreateCoQLiquidDto model)
         {
             var user = await _userManager.FindByEmailAsync(LoginUserEmail) ?? throw new Exception("Unathorise, this action is restricted to only authorise users");
@@ -944,6 +949,7 @@ namespace Bunkering.Access.Services
                 {
                     AppId = model.NoaAppId,
                     PlantId = model.PlantId,
+                    ProductId = model.ProductId,
                     Reference = Utils.GenerateCoQRefrenceCode(),
                    // DepotId = model.PlantId,
                     DateOfSTAfterDischarge = model.DateOfSTAfterDischarge,
@@ -957,6 +963,8 @@ namespace Bunkering.Access.Services
                     //SubmittedDate = DateTime.UtcNow.AddHours(1),
                 };
 
+                _context.CoQs.Add(coq);
+                _context.SaveChanges();
                 #endregion
 
                 #region Create COQ Tank
@@ -977,10 +985,34 @@ namespace Bunkering.Access.Services
                         var b = before.coQTankDTO;
                         var a = after.coQTankDTO;
 
-                        var newBTankM = _mapper.Map<TankMeasurement>(b);
+                        //var newBTankM = _mapper.Map<TankMeasurement>(b);
+                        var newBTankM = new TankMeasurement
+                        {
+                            DIP = b.DIP,
+                            WaterDIP = b.DIP,
+                            TOV = b.TOV,
+                            WaterVolume = b.WaterVolume,
+                            FloatRoofCorr = b.FloatRoofCorr,
+                            GOV = b.GOV,
+                            Tempearture = b.Tempearture,
+                            Density = b.Density,
+                            VCF = b.VCF,
+                        };
                         newBTankM.MeasurementType = ReadingType.Before;
 
-                        var newATankM = _mapper.Map<TankMeasurement>(a);
+                        //var newATankM = _mapper.Map<TankMeasurement>(a);
+                        var newATankM = new TankMeasurement
+                        {
+                            DIP = a.DIP,
+                            WaterDIP = a.DIP,
+                            TOV = a.TOV,
+                            WaterVolume = a.WaterVolume,
+                            FloatRoofCorr = a.FloatRoofCorr,
+                            GOV = a.GOV,
+                            Tempearture = a.Tempearture,
+                            Density = a.Density,
+                            VCF = a.VCF,
+                        };
                         newATankM.MeasurementType = ReadingType.After;
 
                         var newTankMeasurement = new List<TankMeasurement>
@@ -1030,6 +1062,18 @@ namespace Bunkering.Access.Services
                 var submit = await _flow.CoqWorkFlow(coq.Id, Enum.GetName(typeof(AppActions), AppActions.Submit), "COQ Submitted", user.Id);
                 if (submit.Item1)
                 {
+                    var message = new Message
+                    {
+                        ApplicationId = coq.Id,
+                        Subject = $"COQ with reference {coq.Reference} Submitted",
+                        Content = $"COQ with reference {coq.Reference} has been submitted to your desk for further processing",
+                        UserId = user.Id,
+                        Date = DateTime.Now.AddHours(1),
+                    };
+
+                    _context.Messages.Add(message);
+                    _context.SaveChanges();
+
                     transaction.Commit();
 
                     return new ApiResponse
@@ -1151,9 +1195,6 @@ namespace Bunkering.Access.Services
                 }).ToList();
 
                 var docData = (await GetCoqRequiredDocuments(plant) as dynamic)?.Data;
-
-
-
                 var data = new CreateCoqGetDTO
                 {
 
@@ -1173,10 +1214,11 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> GetByIdAsync(int id)
         {
-            var coq = await _context.CoQs
-                .Include(c => c.Application!.Facility.VesselType)
-                .Include(c => c.Application!.Payments)
-                .FirstOrDefaultAsync(c => c.Id == id);
+            var coq = await _context.CoQs.FirstOrDefaultAsync(c => c.Id == id);
+            var gastankList = new List<List<CreateCoQGasTankDTO>>();
+            var liqtankList = new List<List<CreateCoQLiquidTankDto>>();
+            var product = new Product();
+
             if (coq is null)
             {
                 return new() { StatusCode = HttpStatusCode.NotFound, Success = false };
@@ -1189,66 +1231,90 @@ namespace Bunkering.Access.Services
                     c.Id,
                     c.TankMeasurement,
                     c.CoQId,
-                    TankName = _context.Tanks.Where(x => x.Id == c.TankId).Select(x => x.Name).FirstOrDefault()
+                    TankName = _context.Tanks.FirstOrDefault(x => x.Id == c.TankId)
                 })
                 .ToListAsync();
             var docs = await _context.SubmittedDocuments.FirstOrDefaultAsync(c => c.ApplicationId == coq.Id);
-            var dictionary = new Dictionary<string, object?>();
-            var props = coq?.GetType()?.GetProperties();
-            if (props?.Any() is true)
+            
+            if(coq.ProductId != null)
             {
-                foreach (var property in props)
+                product = await _unitOfWork.Product.FirstOrDefaultAsync(x =>x.Id.Equals(coq.ProductId));
+                if(product != null)
                 {
-                    dictionary.Add(property.Name, property.GetValue(coq));
-                }
-                dictionary.Add("Application.Vessel", coq.Application.Facility);
-                dictionary.Remove("Application.Facility");
-            }
-            var app = coq.Application;
-            if (dictionary.ContainsKey("Application"))
-            {
-                dictionary["Application"] = new
-                {
-                    app.Id,
-                    app.Status,
-                    app.Reference,
-                    CreatedDate = app.CreatedDate.ToString("MMM dd, yyyy HH:mm:ss"),
-                    SubmittedDate = app.SubmittedDate != null ? app.SubmittedDate.Value.ToString("MMM dd, yyyy HH:mm:ss") : null,
-                    TotalAmount = string.Format("{0:N}", app.Payments.Sum(x => x.Amount)),
-                    PaymentDescription = app.Payments.FirstOrDefault()?.Description,
-                    PaymnetDate = app.Payments.FirstOrDefault()?.TransactionDate.ToString("MMM dd, yyyy HH:mm:ss"),
-                    CurrentDesk = _userManager.Users.FirstOrDefault(x => x.Id.Equals(app.CurrentDeskId))?.Email,
-                    app.MarketerName,
-                    app.MotherVessel,
-                    app.Jetty,
-                    app.LoadingPort,
-                    NominatedSurveyor = (await _unitOfWork.NominatedSurveyor.Find(c => c.Id == app.SurveyorId)).FirstOrDefault(),
-                    Vessel = new
+                    switch(product.ProductType.ToLower())
                     {
-                        app.Facility.Name,
-                        VesselType = app.Facility.VesselType.Name,
-                        app.Facility.Capacity,
-                        app.Facility.DeadWeight,
-                        app.Facility.IMONumber,
-                        app.Facility.Flag,
-                        app.Facility.CallSIgn,
-                        app.Facility.Operator,
-                        app.LoadingPort,
+                        case "gas":
+                            foreach(var item in tanks)
+                            {
+                                var reading = _mapper.Map<List<CreateCoQGasTankDTO>>(item.TankMeasurement);
+                                reading.ForEach(x => x.TankName = _context.PlantTanks.FirstOrDefault(x => x.PlantTankId == item.TankId).TankName);
+                                gastankList.Add(reading);
+                            }
+                            break;
+                        default:
+                            foreach(var item in tanks)
+                            {
+                                var reading = _mapper.Map<List<CreateCoQLiquidTankDto>>(item.TankMeasurement);
+                                reading.ForEach(x => x.TankName = _context.PlantTanks.FirstOrDefault(x => x.PlantTankId == item.TankId).TankName);
+                                liqtankList.Add(reading);
+                            }
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                var app = await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.Id.Equals(coq.AppId), "Product");
+                if (app != null)
+                    product = app.Product;
+            }
+            var dictionary = coq.Stringify().Parse<Dictionary<string, object>>();
+            
+            if(coq.AppId != null)
+            {
+                var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(coq.AppId), "Facility");
+                if(app != null)
+                {
+                    dictionary.Add("MarketerName", app.MarketerName);
+                    dictionary.Add("MotherVessel", app.MotherVessel);
+                    dictionary.Add("Jetty", app.Jetty);
+                    dictionary.Add("LoadingPort", app.LoadingPort);
+                    dictionary.Add("VesselName", app.Facility.Name);
+                    dictionary.Add("NominatedSurveyor", (await _unitOfWork.NominatedSurveyor.FirstOrDefaultAsync(c => c.Id == app.SurveyorId)).Name);
+                    
+                }
+            }
+            dictionary.Add("ProductType", product.ProductType);
+            //remove deskid and replace with name
+            dictionary.Remove("CurrentDeskId");
+            dictionary.Add("CurrentDesk", _userManager.Users.FirstOrDefault(u => u.Id.Equals(coq.CurrentDeskId)).Email);
+            //remove deskid and replace with name
+            dictionary.Remove("Plant");
+            dictionary.Add("Plant", _context.Plants.FirstOrDefault(p => p.Id.Equals(coq.PlantId)).Name);
+            if (product.ProductType != null && product.ProductType.ToLower().Equals("gas"))
+                 return new()
+                {
+                    Success = true,
+                    StatusCode = HttpStatusCode.OK,
+                    Data = new
+                    {
+                        coq = dictionary,
+                        tankList = gastankList,
+                        docs
                     }
                 };
-
-            }
-            return new()
-            {
-                Success = true,
-                StatusCode = HttpStatusCode.OK,
-                Data = new
+            else
+                return new()
                 {
-                    coq = dictionary,
-                    tanks,
-                    docs
-                }
-            };
+                    Success = true,
+                    StatusCode = HttpStatusCode.OK,
+                    Data = new
+                    {
+                        coq = dictionary,
+                        tankList = gastankList,
+                        docs
+                    }
+                };
         }
 
 
@@ -1475,8 +1541,6 @@ namespace Bunkering.Access.Services
         }
 
 
-        //    };
-        //}
 
     }
 }
