@@ -33,6 +33,7 @@ namespace Bunkering.Access.Services
             try
             {
                 var allProducts = await _unitOfWork.Product.GetAll();
+                var allProduct = allProducts.Where(x => x.IsDeleted == null);
                 return new ApiResponse
                 {
                     Data = allProducts,
