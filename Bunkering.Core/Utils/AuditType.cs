@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,5 +41,12 @@ namespace Bunkering.Core.Utils
         AcceptInspection,
         FinalApproval,
         RejectInspection
+    }
+
+    public enum PlantType
+    {
+        Depot = 2,
+        [Display(Name = "Processing Plant")]
+        ProccessingPlant = 1
     }
 }
