@@ -1450,7 +1450,7 @@ namespace Bunkering.Access.Services
             return cd;
         }
 
-        private COQLiquidCertificateDTO GetGasCertificate(int coqId)
+        private COQLiquidCertificateDTO GetLiquidCertificate(int coqId)
         {
             try
             {
