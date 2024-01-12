@@ -145,9 +145,16 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var message = string.Empty;
+                var isProcessingPlant = false;
+                    //return (false, $"Application with Id={coq.AppId} was not found.");
                 var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id.Equals(coqId)) ?? throw new Exception($"COQ with Id={coqId} was not found.");
-                var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == coq.AppId, "User,Facility.VesselType,Payments") ?? throw new Exception($"Application with Id={coq.AppId} was not found.");
+                if (coq is not null && coq.AppId is null)
+                {
+                    isProcessingPlant = true;
+                }
+                var message = string.Empty;
+                var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == coq.AppId, "User,Facility.VesselType,Payments");
+                if(!isProcessingPlant && app is null) throw new Exception($"Application with Id={coq.AppId} was not found.");
 
                 currUserId = string.IsNullOrEmpty(currUserId) ? coq.CurrentDeskId : currUserId;
                 var currentUser = _userManager.Users
@@ -157,7 +164,7 @@ namespace Bunkering.Access.Services
                         .ThenInclude(r => r.Role)
                         .Include(lo => lo.Location)
                         .FirstOrDefault(x => x.Id.Equals(currUserId)) ?? throw new Exception($"User with Id={currUserId} was not found.");
-                var workFlow = (await GetWorkFlow(action, currentUser, app.Facility.VesselTypeId)) ?? throw new Exception($"Work Flow for this action was not found.");
+                var workFlow = (await GetWorkFlow(action, currentUser, app?.Facility?.VesselTypeId ?? 1)) ?? throw new Exception($"Work Flow for this action was not found.");
                 var nextProcessingOfficer = (await GetNextStaffCOQ(coqId, action, workFlow, currentUser, delUserId)) ?? throw new Exception($"No processing staff for this action was not found.");
 
                 coq.CurrentDeskId = nextProcessingOfficer.Id;
@@ -186,7 +193,8 @@ namespace Bunkering.Access.Services
                 //Generate permit number on final approval
                 if (workFlow.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)))
                 {
-                    var certificate = await GenerateCOQCertificate(coqId, currentUser.Id);
+                    var plant = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id.Equals(coq.PlantId));
+                    var certificate = await GenerateCOQCertificate(coqId, currentUser.Id, plant.CompanyElpsId.ToString());
                     var debitnote = await _paymentService.GenerateDebitNote(coq.Id);
 
                     if (certificate.Item1 && debitnote.Success)
@@ -449,13 +457,13 @@ namespace Bunkering.Access.Services
             return (false, null);
         }
 
-        internal async Task<(bool, string)> GenerateCOQCertificate(int id, string userid)
+        internal async Task<(bool, string)> GenerateCOQCertificate(int id, string userid, string CompanyElpsId)
         {
             var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id == id, "Application.ApplicationType,Application.User,Application.Facility.VesselType");
             if (coq != null)
             {
                 var year = DateTime.Now.Year.ToString();
-                var pno = $"NMDPRA/DSSRI/COQ/{coq.Application?.ApplicationType.Name.Substring(0, 1).ToUpper()}/{year.Substring(2)}/{coq.Id}";
+                var pno = $"NMDPRA/DSSRI/COQ/{year.Substring(2)}/{coq.Id}";
                 var qrcode = Utils.GenerateQrCode($"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/License/ValidateQrCode/{id}");
                 //license.QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length);
                 //save certificate to elps and portal
@@ -469,16 +477,16 @@ namespace Bunkering.Access.Services
                     QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length)
                 };
 
-                var req = await Utils.Send(_appSetting.ElpsUrl, new HttpRequestMessage(HttpMethod.Post, $"api/Permits/{coq.Application?.User.ElpsId}/{_appSetting.AppEmail}/{Utils.GenerateSha512($"{_appSetting.AppEmail}{_appSetting.AppId}")}")
+                var req = await Utils.Send(_appSetting.ElpsUrl, new HttpRequestMessage(HttpMethod.Post, $"api/Permits/{CompanyElpsId}/{_appSetting.AppEmail}/{Utils.GenerateSha512($"{_appSetting.AppEmail}{_appSetting.AppId}")}")
                 {
                     Content = new StringContent(new
                     {
                         Permit_No = pno,
                         OrderId = coq.Reference,
-                        Company_Id = coq.Application?.User.ElpsId,
+                        Company_Id = CompanyElpsId,
                         Date_Issued = certificate.IssuedDate.ToString("yyyy-MM-ddTHH:mm:ss.fff"),
                         Date_Expire = certificate.ExpireDate.ToString("yyyy-MM-ddTHH:mm:ss.fff"),
-                        CategoryName = $"COQ ({coq.Application?.Facility.VesselType.Name})",
+                        CategoryName = "COQ",
                         Is_Renewed = coq.Application?.ApplicationType.Name,
                         LicenseId = id,
                         Expired = false
@@ -525,15 +533,15 @@ namespace Bunkering.Access.Services
             body = string.Format(body, content, DateTime.Now.Year, url);
             Utils.SendMail(_mailSetting.Stringify().Parse<Dictionary<string, string>>(), user.Email, subject, body);
 
-            await _unitOfWork.Message.Add(new Message
-            {
-                ApplicationId = app.Id,
-                Content = body,
-                Date = DateTime.Now.AddHours(1),
-                Subject = subject,
-                UserId = user.Id
-            });
-            await _unitOfWork.SaveChangesAsync(user.Id);
+            //await _unitOfWork.Message.Add(new Message
+            //{
+            //    ApplicationId = app.Id,
+            //    Content = body,
+            //    Date = DateTime.Now.AddHours(1),
+            //    Subject = subject,
+            //    UserId = user.Id
+            //});
+            //await _unitOfWork.SaveChangesAsync(user.Id);
         }
 
         public async Task SendCOQNotification(CoQ coq, string action, ApplicationUser user, string comment)
@@ -559,16 +567,16 @@ namespace Bunkering.Access.Services
             body = string.Format(body, content, DateTime.Now.Year, url);
             Utils.SendMail(_mailSetting.Stringify().Parse<Dictionary<string, string>>(), user.Email, subject, body);
 
-            await _unitOfWork.Message.Add(new Message
-            {
-                COQId = coq.Id,
-                IsCOQ = true,
-                Content = body,
-                Date = DateTime.Now.AddHours(1),
-                Subject = subject,
-                UserId = user.Id
-            });
-            await _unitOfWork.SaveChangesAsync(user.Id);
+            //await _unitOfWork.Message.Add(new Message
+            //{
+            //    COQId = coq.Id,
+            //    IsCOQ = true,
+            //    Content = body,
+            //    Date = DateTime.Now.AddHours(1),
+            //    Subject = subject,
+            //    UserId = user.Id
+            //});
+            //await _unitOfWork.SaveChangesAsync(user.Id);
         }
     }
 }

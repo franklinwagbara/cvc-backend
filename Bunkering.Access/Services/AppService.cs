@@ -35,6 +35,7 @@ namespace Bunkering.Access.Services
         private readonly string directory = "Application";
         private readonly IConfiguration _configuration;
         private readonly ApplicationQueries _appQueries;
+        private readonly MessageService _messageService;
 
         public AppService(
             UserManager<ApplicationUser> userManager,
@@ -46,7 +47,8 @@ namespace Bunkering.Access.Services
             AppLogger logger,
             IOptions<AppSetting> setting,
             IConfiguration configuration,
-            ApplicationQueries appQueries)
+            ApplicationQueries appQueries,
+            MessageService messageService)
         {
             _userManager = userManager;
             _unitOfWork = unitOfWork;
@@ -59,6 +61,7 @@ namespace Bunkering.Access.Services
             _setting = setting.Value;
             _configuration = configuration;
             _appQueries = appQueries;
+            _messageService = messageService;
         }
 
         private async Task<Facility> CreateFacility(ApplictionViewModel model, ApplicationUser user)
@@ -495,7 +498,7 @@ namespace Bunkering.Access.Services
                     {
                         payment = new Payment
                         {
-                            Amount = (decimal)total,
+                            Amount = total,
                             Account = _setting.NMDPRAAccount,
                             ApplicationId = id,
                             OrderId = app.Reference,
@@ -504,7 +507,7 @@ namespace Bunkering.Access.Services
                             PaymentType = "NGN",
                             Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending),
                             TransactionDate = DateTime.UtcNow.AddHours(1),
-                            ServiceCharge = fee.SerciveCharge,
+                            ServiceCharge = (double)fee.SerciveCharge,
                             AppReceiptId = "",
                             RRR = "",
                             TransactionId = "",
@@ -517,7 +520,7 @@ namespace Bunkering.Access.Services
                     {
                         if (string.IsNullOrEmpty(payment.RRR))
                         {
-                            payment.Amount = (decimal)total;
+                            payment.Amount = total;
                             payment.OrderId = app.Reference;
                             payment.Description = $"Payment for CVC & COQ License ({app.Facility.Name})";
                             payment.Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending);
@@ -746,6 +749,7 @@ namespace Bunkering.Access.Services
                                         DocSource = doc.source,
                                         DocType = item.DocType,
                                         FileId = doc.id,
+                                        ApplicationTypeId = app.ApplicationTypeId,
                                     });
                             }
                             else
@@ -760,6 +764,7 @@ namespace Bunkering.Access.Services
                                         DocSource = doc.Source,
                                         DocType = item.DocType,
                                         FileId = doc.Id,
+                                        ApplicationTypeId = app.ApplicationTypeId,
                                     });
                             }
                         }
@@ -780,6 +785,16 @@ namespace Bunkering.Access.Services
                         : await _flow.AppWorkFlow(id, Enum.GetName(typeof(AppActions), AppActions.Submit), "Application Submitted");
                     if (submit.Item1)
                     {
+                        var message = new MessageModel
+                        {
+                            ApplicationId = app.Id,
+                            Subject = $"Application with reference {app.Reference} Submitted",
+                            Content = $"Application with reference {app.Reference} has been submitted to your desk for further processing",
+                            UserId = user.Id,
+                        };
+
+                        _messageService.CreateMessageAsync(message);
+
                         _response = new ApiResponse
                         {
                             Message = submit.Item2,
@@ -966,9 +981,11 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var user = await _userManager.Users.Include(x => x.Location).FirstOrDefaultAsync(x => x.Email.Equals(User));
+                var user = await _userManager.Users.Include(x => x.Location).Include(ur => ur.UserRoles).ThenInclude(u => u.Role).FirstOrDefaultAsync(x => x.Email.Equals(User));
                 if(user.Location?.Name == LOCATION.FO)
                         return await GetMyDeskFO(user);
+                else if(user.UserRoles.FirstOrDefault().Role.Name.Equals("FAD"))
+                    return await GetMyDeskFO(user);
                 else 
                     return await GetMyDeskOthers(user);
             }
@@ -986,9 +1003,7 @@ namespace Bunkering.Access.Services
         private async Task<ApiResponse> GetMyDeskOthers(ApplicationUser? user)
         {
             var apps = await _unitOfWork.Application.Find(x => x.CurrentDeskId.Equals(user.Id), "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
-            if (await _userManager.IsInRoleAsync(user, "FAD"))
-                apps = await _unitOfWork.Application.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)) && x.IsDeleted != true, "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
-            else if (await _userManager.IsInRoleAsync(user, "Company"))
+            if (await _userManager.IsInRoleAsync(user, "Company"))
                 apps = await _unitOfWork.Application.Find(x => x.UserId.Equals(user.Id) && x.IsDeleted != true, "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
             return new ApiResponse
             {
@@ -1015,11 +1030,11 @@ namespace Bunkering.Access.Services
 
         private async Task<ApiResponse> GetMyDeskFO(ApplicationUser? user)
         {
-            var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Depot");
+            var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Plant");
             // if (await _userManager.IsInRoleAsync(user, "FAD"))
             //     coqs = await _unitOfWork.CoQ.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)));
             if (await _userManager.IsInRoleAsync(user, "Company"))
-                coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Depot");
+                coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Plant");
             return new ApiResponse
             {
                 Message = "Applications fetched successfully",
@@ -1034,8 +1049,8 @@ namespace Bunkering.Access.Services
                     VesselName = x.Application?.VesselName,
                     x.Reference,
                     x.Status,
-                    DepotName = x.Depot?.Name,
-                    DepotId = x.DepotId,
+                    DepotName = x.Plant?.Name,
+                    DepotId = x.PlantId,
                     DateOfVesselArrival = x.DateOfVesselArrival.ToShortDateString(),
                     DateOfVesselUllage = x.DateOfVesselUllage.ToShortDateString(),
                     DateOfSTAfterDischarge = x.DateOfSTAfterDischarge.ToShortDateString(),
@@ -1131,7 +1146,7 @@ namespace Bunkering.Access.Services
                                 app.Reference,
                                 CompanyName = app.User.Company.Name,
                                 app.User.Email,
-                                //FacilityAddress = app.Facility.Address,
+                                CompanyAddress = app.User.Company.Address,
                                 //State = app.Facility.LGA.State.Name,
                                 //LGA = app.Facility.LGA.Name,
                                 AppType = app.ApplicationType.Name,
@@ -1377,7 +1392,7 @@ namespace Bunkering.Access.Services
                 if (appDepot == null)
                     throw new Exception("The Select depot does not exist for this application!");
 
-                var depot = await _unitOfWork.Depot.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.DepotId));  
+                var depot = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.DepotId));  
                 var product = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.ProductId));
 
                 if (product == null)
@@ -1386,14 +1401,14 @@ namespace Bunkering.Access.Services
                     throw new Exception("Depot does not exist");
 
                 //Check if COQ exists
-                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.AppId == app.Id && x.DepotId == depot.Id);
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.AppId == app.Id && x.PlantId == depot.Id);
 
                 return new ApiResponse
                 {
                     Data = new
                     {
-                        MarketerName = depot.MarketerName,
-                        DepotCapacity = depot.Capacity,
+                        MarketerName = depot.Company,
+                        //DepotCapacity = depot.,
                         ProductName = product.Name,
                         Volume = appDepot.Volume,
                         VesselName = app.VesselName,

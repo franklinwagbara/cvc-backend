@@ -28,9 +28,9 @@ namespace Bunkering.Core.ViewModels
         public string Position { get; set; }
     }
 
-    public enum PlantType
-    {
-        Processing = 2,
-        Depot = 1
-    }
+    //public enum PlantType
+    //{
+    //    Processing = 1,
+    //    Depot = 2
+    //}
 }
