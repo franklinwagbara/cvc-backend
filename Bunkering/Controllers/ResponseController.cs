@@ -4,7 +4,7 @@ using System.Net;
 
 namespace Bunkering.Controllers
 {
-	public class ResponseController : ControllerBase
+	public class ResponseController : Controller
 	{
 		protected new IActionResult Response(ApiResponse response)
 		{

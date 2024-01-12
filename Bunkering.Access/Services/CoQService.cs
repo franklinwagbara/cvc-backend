@@ -1330,6 +1330,36 @@ namespace Bunkering.Access.Services
             return plist;
         }
 
+        public async Task<ApiResponse> ViewCoQLiquidCertificate(int coqId)
+        {
+            try
+            {
+                //var user = await _userManager.FindByEmailAsync(LoginUserEmail) ?? throw new Exception("Unathorise, this action is restricted to only authorise users");
+
+                var dataforView = GetGasCertificate(coqId);
+                if (dataforView == null)
+                {
+                    _apiReponse = new ApiResponse
+                    {
+                        Message = "Unable to complete request",
+                        StatusCode = HttpStatusCode.NoContent,
+                        Data = null,
+                        Success = false
+                    };
+                    return _apiReponse;
+                }
+                _apiReponse= new ApiResponse { Success = true, StatusCode = HttpStatusCode.OK,Data = dataforView, Message = "Data returned"};
+
+                return _apiReponse;
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
         private CoQDTO GetCoqApproved(int Id)
         {
             var plist = _context.CoQs.FirstOrDefault(x => x.PlantId == Id && x.Status == "Approved");
@@ -1354,66 +1384,96 @@ namespace Bunkering.Access.Services
             return cd;
         }
 
-        //private COQLiquidCertificateDTO certificateDTO(int coqId)
-        //{
-        //    var data = _context.COQCertificates.Include(c => c.COQ)
-        //                .ThenInclude(ct => ct.Plant.Tanks);
-        //    var cqs = _context.CoQs.Include(x => x.Plant).Include(n => n.Application).FirstOrDefault(x => x.Id== coqId);
-        //    var tnks = _context.PlantTanks.FirstOrDefault(x => x.PlantId == cqs.Plant.Id);
-        //    var coQTanks = _context.COQTanks.Include(t => t.TankMeasurement)
-        //        .Where(c => c.CoQId == coqId).ToList();
-        //    var dat = new COQLiquidCertificateDTO
-        //    {
-        //        AfterTankMeasurement = coQTanks.SelectMany(x => x.TankMeasurement).Select(
-        //                                   tt => new CoQLiquidTankAfterReading
-        //                                   {
-        //                                      TankId = tt.COQTankId,
-        //                                      coQLiquidTank = new CoQLiquidTank { 
-        //                                            Density = tt.Density,
-        //                                            DIP = tt.DIP,
-        //                                            MeasurementType = tt.MeasurementType,
-        //                                            FloatRoofCorr = tt.FloatRoofCorr,
-        //                                            GOV = tt.GOV,
-        //                                            GSV = tt.GSV,
-        //                                            MTVAC = tt.MTVAC,
-        //                                            Tempearture = tt.Tempearture,
-        //                                            TOV = tt.TOV,
-        //                                            VCF = tt.VCF,
-        //                                            WaterDIP = tt.WaterDIP,
-        //                                            WaterVolume = tt.WaterVolume
-        //                                      }
-        //                                   }
-        //                                ).Where(t => t.coQLiquidTank.MeasurementType == "After").ToList(),
+        private COQLiquidCertificateDTO GetGasCertificate(int coqId)
+        {
+            try
+            {
+                //var data = _context.COQCertificates.Include(c => c.COQ)
+                //            .ThenInclude(ct => ct.Plant.Tanks);
+                var cqs = _context.CoQs.Include(x => x.Plant).Include(n => n.Application).FirstOrDefault(x => x.Id == coqId);
+                var tnks = _context.PlantTanks.Where(x => x.PlantId == cqs.Plant.Id).ToList();
+                var coQTanks = _context.COQTanks.Include(t => t.TankMeasurement)
+                    .Where(c => c.CoQId == coqId).ToList();
 
-        //        BeforeTankMeasurements = coQTanks.SelectMany(x => x.TankMeasurement).Select(
-        //                                   tt => new CoQLiquidTankBeforeReading
-        //                                   {
-        //                                       TankId = tt.COQTankId,
-        //                                       coQLiquidTank = new CoQLiquidTank
-        //                                       {
-        //                                           Density = tt.Density,
-        //                                           DIP = tt.DIP,
-        //                                           MeasurementType = tt.MeasurementType,
-        //                                           FloatRoofCorr = tt.FloatRoofCorr,
-        //                                           GOV = tt.GOV,
-        //                                           GSV = tt.GSV,
-        //                                           MTVAC = tt.MTVAC,
-        //                                           Tempearture = tt.Tempearture,
-        //                                           TOV = tt.TOV,
-        //                                           VCF = tt.VCF,
-        //                                           WaterDIP = tt.WaterDIP,
-        //                                           WaterVolume = tt.WaterVolume
-        //                                       }
-        //                                   }
-        //                                ).Where(t => t.coQLiquidTank.MeasurementType == "Before").ToList(),
-                
-        //        CompanyName = cqs.Plant.Company,
-        //        DateOfVesselArrival = cqs.DateOfVesselArrival,
-        //        DateOfVessselUllage = cqs.DateOfVesselUllage,
-        //        Jetty = cqs.Application.Jetty,
-        //        MotherVessel = cqs.Application.MotherVessel,
-        //        Product = tnks.Product,
-        //        //ReceivingTerminal
+                var dat = new COQLiquidCertificateDTO
+                {
+                    CompanyName = cqs.Plant.Company,
+                    DateOfVesselArrival = cqs.DateOfVesselArrival,
+                    DateOfVessselUllage = cqs.DateOfVesselUllage,
+                    Jetty = cqs.Application?.Jetty ?? string.Empty,
+                    MotherVessel = cqs.Application?.MotherVessel ?? string.Empty,
+                    Product = tnks.FirstOrDefault().Product,
+                    ReceivingTerminal = cqs.Plant.Name,
+                    VesselName = cqs.Application?.VesselName ?? string.Empty,
+                };
+                var tankList = new  List<CoQTanksDTO>();
+                foreach (var item in coQTanks)
+                {
+                    //var  tanks = new List<CoQTanksDTO>
+
+                    var tr = new CoQTanksDTO
+                    {
+                        AfterTankMeasurement = item.TankMeasurement.Select(
+                                             tt => new CoQLiquidTankAfterReading
+                                             {
+                                                 TankId = item.TankId,
+                                                 coQLiquidTank = new CoQLiquidTank
+                                                 {
+                                                     Density = tt.Density,
+                                                     DIP = tt.DIP,
+                                                     MeasurementType = tt.MeasurementType,
+                                                     FloatRoofCorr = tt.FloatRoofCorr,
+                                                     GOV = tt.GOV,
+                                                     GSV = tt.GSV,
+                                                     MTVAC = tt.MTVAC,
+                                                     Tempearture = tt.Tempearture,
+                                                     TOV = tt.TOV,
+                                                     VCF = tt.VCF,
+                                                     WaterDIP = tt.WaterDIP,
+                                                     WaterVolume = tt.WaterVolume
+                                                 }
+                                             }
+                                          ).Where(t => t.coQLiquidTank.MeasurementType == ReadingType.After).ToList(),
+                        BeforeTankMeasurements = item.TankMeasurement.Select(
+                                             tt => new CoQLiquidTankBeforeReading
+                                             {
+                                                 TankId = item.TankId,
+                                                 coQLiquidTank = new CoQLiquidTank
+                                                 {
+                                                     Density = tt.Density,
+                                                     DIP = tt.DIP,
+                                                     MeasurementType = tt.MeasurementType,
+                                                     FloatRoofCorr = tt.FloatRoofCorr,
+                                                     GOV = tt.GOV,
+                                                     GSV = tt.GSV,
+                                                     MTVAC = tt.MTVAC,
+                                                     Tempearture = tt.Tempearture,
+                                                     TOV = tt.TOV,
+                                                     VCF = tt.VCF,
+                                                     WaterDIP = tt.WaterDIP,
+                                                     WaterVolume = tt.WaterVolume
+                                                 }
+                                             }
+                                          ).Where(t => t.coQLiquidTank.MeasurementType == ReadingType.Before).ToList(),
+                        TankName = _context.PlantTanks.FirstOrDefault(t => t.PlantTankId == item.TankId).TankName
+                    };
+                    tankList.Add(tr);
+                }
+                   
+                    
+
+               dat.tanks = tankList;
+
+                return dat;
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
+           
+        }
+
 
         //    };
         //}
