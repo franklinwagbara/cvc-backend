@@ -17,6 +17,7 @@ namespace Bunkering.Access.DAL
         public IApplicationDepot ApplicationDepot { get; private set; }
         public IPlant Plant { get; private set; }
         public IPlantTank PlantTank { get; private set; }
+        public IEmailConfiguration EmailConfiguration { get; private set; }
         public IFacility Facility { get; private set; }
         public IFacilityType FacilityType { get; private set; }
         public IFacilityTypeDocuments FacilityTypeDocuments { get; private set; }
@@ -60,6 +61,7 @@ namespace Bunkering.Access.DAL
             Appointment = Appointment != null ? Appointment : new AppointmentRepository(_context);
             Country = Country != null ? Country : new CountryRepository(_context);
             Depot = Depot != null ? Depot : new DepotRepository(_context);
+            EmailConfiguration = EmailConfiguration != null ? EmailConfiguration : new EmailConfigurationRepository(_context);
             Facility = Facility != null ? Facility : new FacilityRepository(_context);
             FacilityType = FacilityType != null ? FacilityType : new FacilityTypeRepository(_context);
             FacilityTypeDocuments = FacilityTypeDocuments != null ? FacilityTypeDocuments : new FacilityTypeDocsRepository(_context);
