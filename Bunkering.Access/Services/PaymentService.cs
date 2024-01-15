@@ -345,7 +345,7 @@ namespace Bunkering.Access.Services
             }
             return _response;
         }
-
+      
         public async Task<ApiResponse> ConfirmPayment(int id, string orderId)
         {
             try
@@ -358,7 +358,7 @@ namespace Bunkering.Access.Services
                     {
                         if (!payment.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted)) && !string.IsNullOrEmpty(payment.RRR))
                         {
-                            //confirm payme nt status on remita via ELPS
+                            //confirm payment status on remita via ELPS
                             var http = await Utils.Send(_appSetting.ElpsUrl, new HttpRequestMessage(HttpMethod.Get, $"/Payment/checkifpaid?id=r{payment.RRR}"));
 
                             if (http.IsSuccessStatusCode)
@@ -378,6 +378,7 @@ namespace Bunkering.Access.Services
                                         //payment.tx = Convert.ToDecimal(dic.GetValue("amount"));
                                         //payment.Application.Status = Enum.GetName(typeof(AppStatus), 2);
 
+                                        
                                         await _unitOfWork.Payment.Update(payment);
                                         await _unitOfWork.SaveChangesAsync(app.UserId);
 

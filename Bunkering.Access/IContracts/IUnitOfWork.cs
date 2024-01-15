@@ -14,6 +14,7 @@ namespace Bunkering.Access.IContracts
         IAppointment Appointment { get; }
         ICountry Country { get; }
         IDepot Depot { get; }
+        IEmailConfiguration EmailConfiguration { get; }
         IFacility Facility { get; }
         IFacilityType FacilityType { get; }
         IFacilityTypeDocuments FacilityTypeDocuments { get; }

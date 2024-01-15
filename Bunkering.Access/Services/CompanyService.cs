@@ -16,6 +16,7 @@ namespace Bunkering.Access.Services
 		private readonly IHttpContextAccessor _contextAccessor;
 		private readonly string User;
 		private readonly UserManager<ApplicationUser> _userManager;
+		private readonly ApplicationContext _context;
 		ApiResponse _response;
 		private readonly IElps _elps;
 		private readonly WorkFlowService _flow;
@@ -25,9 +26,11 @@ namespace Bunkering.Access.Services
 			IHttpContextAccessor contextAccessor,
 			IElps elps,
 			UserManager<ApplicationUser> userManager,
+			ApplicationContext context,
 			WorkFlowService flow)
 		{
 			_unitOfWork = unitOfWork;
+			_context = context;
 			_contextAccessor = contextAccessor;
 			User = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
 			_elps = elps;
@@ -102,6 +105,10 @@ namespace Bunkering.Access.Services
 					companyAdd = _elps.GetCompanyRegAddressById(user.Company.AddressId.Value).Stringify().Parse<RegisteredAddress>();
 				else
 					companyAdd = _elps.GetCompanyRegAddress(user.ElpsId).FirstOrDefault();
+				
+				user.Company.Address = companyAdd?.address_1 ?? companyAdd?.address_2;
+				await _unitOfWork.SaveChangesAsync("");
+				
 
 				foreach (var country in countries)
 				{

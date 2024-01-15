@@ -24,7 +24,7 @@ namespace Bunkering.Controllers.API
 		///// <summary>
 		///// This endpoint is used to fetch company's dashboard info
 		///// </summary>
-		///// <returns>Returns a success message or rotherwise</returns>
+		///// <returns>Returns a success message or otherwise</returns>
 		///// <remarks>
 		///// 
 		///// Sample Request
