@@ -1590,8 +1590,6 @@ namespace Bunkering.Access.Services
             }
 
         }
-    }
-
 
         public IEnumerable<int> GetLongProcessingApps()
         {
