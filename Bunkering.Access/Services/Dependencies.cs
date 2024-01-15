@@ -39,6 +39,7 @@ namespace Bunkering.Access.Services
             services.AddScoped<RoleService>();
             services.AddScoped<PlantService>();
             services.AddScoped<ProductService>();
+            services.AddScoped<EmailConfigurationService>();
 
             services.AddAutoMapper(typeof(MappingProfile));
         }

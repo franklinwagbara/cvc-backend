@@ -68,16 +68,16 @@ namespace Bunkering.Access.Services
             var update = await _unitOfWork.EmailConfiguration.FirstOrDefaultAsync(x => x.Name == model.Name);
             if(update != null)
             {
-                model.Email = update.Email;
+                update.Email = model.Email;
 
                 await _unitOfWork.EmailConfiguration.Update(update);
-                await _unitOfWork.SaveChangesAsync("");
+                _unitOfWork.Save();
 
                 _response = new ApiResponse
                 {
 
                     Message = "Email Updated Successfully",
-                    StatusCode = System.Net.HttpStatusCode.OK,
+                    StatusCode = HttpStatusCode.OK,
                     Success = true
                 };
 
@@ -145,6 +145,21 @@ namespace Bunkering.Access.Services
 
 
             }
+            return _response;
+        }
+
+        public async Task<ApiResponse> AllEmailConfigurations()
+        {
+            var allEmail = await _unitOfWork.EmailConfiguration.GetAll();
+
+            _response = new ApiResponse
+            {
+                Data = allEmail,
+                Message = "Successful",
+                StatusCode = HttpStatusCode.OK,
+                Success = true,
+            };
+
             return _response;
         }
     }
