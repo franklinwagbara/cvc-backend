@@ -6,6 +6,7 @@ using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Rotativa.AspNetCore;
+using Rotativa.AspNetCore.Options;
 using System.Net;
 
 namespace Bunkering.Controllers.API
@@ -86,7 +87,7 @@ namespace Bunkering.Controllers.API
 		{
             try
             {
-                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id == id, "Application.User.Company,Depot");
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id == id, "Application.User.Company,Plant");
 
                 return Ok(new ApiResponse
                 {
@@ -218,6 +219,49 @@ namespace Bunkering.Controllers.API
 			}
 			return BadRequest();
 		}
+
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Produces("application/json")]
+        [Route("view_liquid-cert")]
+        [HttpGet]
+        public async Task<IActionResult> ViewLiquidCertificate(int id)
+        {
+            try
+            {
+                var license = await _coqService.ViewCoQLiquidCertificate(id);
+               /* return View("ViewCertificate", license.Data);*/
+                if (license != null)
+                {
+                    /* var qrcode = Utils.GenerateQrCode($"{Request.Scheme}://{Request.Host}/License/ValidateQrCode/{license.ApplicationId}");
+                     license.QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length);*/
+                    //var viewAsPdf = new ViewAsPdf
+                    //{
+                    //    Model = license.Data,
+                    //    PageHeight = 327,
+                    //    ViewName = "ViewCertificate"
+                    //};
+                    //var pdf = await viewAsPdf.BuildFile(ControllerContext);
+                    return new ViewAsPdf("ViewCertificate", license.Data)
+                    {
+                        PageSize = Size.A4,
+                        PageHeight = 327,
+                        PageOrientation = Orientation.Landscape,
+                        FileName = $"CoQ Certificate_{DateTime.Now.Day}-{DateTime.Now.Month}-{DateTime.Now.Year}.pdf",
+
+                    };
+                }
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+        }
 
         /// <summary>
         /// This endpoint is used to fetch documents required for a coq application
@@ -385,5 +429,23 @@ namespace Bunkering.Controllers.API
         [Route("create-coq-gas")]
         [HttpPost]
         public async Task<IActionResult> CreateCOQForGas(CreateGasProductCoQDto model) => Response(await _coqService.CreateCOQForGas(model));
+
+        //[ProducesResponseType(typeof(ApiResponse), 200)]
+        //[ProducesResponseType(typeof(ApiResponse), 404)]
+        //[ProducesResponseType(typeof(ApiResponse), 405)]
+        //[ProducesResponseType(typeof(ApiResponse), 500)]
+        //[Produces("application/json")]
+        //[Route("createCOQ")]
+        //[HttpPost]
+        //public async Task<IActionResult> CreateCoQ([FromBody] CreateCoQViewModel Model) => Response(await _coqService.CreateCoQ(Model));
+
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Produces("application/json")]
+        [Route("view_coq_liquid_coqId/{coqId}")]
+        [HttpGet]
+        public async Task<IActionResult> ViewLiquidCOQCertificate(int coqId) => Response(await _coqService.ViewCoQLiquidCertificate(coqId));
     }
 }

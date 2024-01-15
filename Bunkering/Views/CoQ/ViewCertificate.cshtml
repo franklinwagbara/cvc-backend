@@ -1,0 +1,166 @@
+﻿@model COQLiquidCertificateDTO
+@{
+    // Layout = null;
+    int count = 1;
+}
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div style="font-size: 1.5em !important;">
+        <div class="text-center">
+            <div>
+                <img src="~/assets/nmdpraLogo.png" alt="Logo" style="height: 250px; display: block; margin: 0 auto;" />
+            </div>
+            <div style="text-align: center;font-size: 2.5em; color: forestgreen;">
+                <b>
+                    NIGERIAN MIDSTREAM AND DOWNSTREAM PETROLEUM REGULATORY AUTHORITY
+                </b>
+            </div>
+            <div style="text-align: center; margin-top: -1em;">
+                <h5>Plot 1012 Cadastral Zone A00, Sani Abacha Way, Central Business District, Abuja, FCT, Nigeria.</h5>
+            </div>
+        </div>
+        <br />
+        <hr />
+        <table class="table table-borderless">
+            <tr>
+                <td>Marketer/PDT Owner: @Model.CompanyName</td>
+                <td>MOTHER VESEL: @Model.MotherVessel</td>
+                <td>DATE OF VESSEL ARRIVAL: @Model.DateOfVesselArrival</td>
+            </tr>
+            <tr>
+                <td>PRODUCT: @Model.Product</td>
+                <td>JETTY: @Model.Jetty</td>
+                <td>DATE OF VESSEL ULLAGE: @Model.DateOfVessselUllage</td>
+            </tr>
+            <tr>
+                <td>VESSEL NAME: @Model.VesselName</td>
+                <td>RECEIVING TERMINAL: @Model.ReceivingTerminal</td>
+                <td>DATE OF SHORE-TANK AFTER DISCHARGE:</td>
+            </tr>
+        </table>
+       
+       
+        <table style="width: 100%; font-size: 1em !important; border: 1px solid gray; padding: 5px;" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>TANK</th>
+                    <th>STATUS</th>
+                    <th>DIP(m)</th>
+                    <th>WATER DIP</th>
+                    <th>TOV(m<sup>3</sup>)</th>
+                    <th>Water Volume</th>
+                    <th>FLOAT ROOF CORR(m<sup>3</sup>)</th>
+                    <th>GOV(m<sup>3</sup>)</th>
+                    <th>TEMP(<sup>O</sup>C)</th>
+                    <th>DENSITY</th>
+                    <th>VCF</th>
+                    <th>GSV(m<sup>3</sup>)</th>
+                    <th>MT(VAC)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.tanks)
+                {
+                    <tr>
+                        <td rowspan="3">@item.TankName</td>
+                        <td>AFT</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.DIP</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.WaterDIP</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.TOV</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.WaterVolume</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.FloatRoofCorr</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.GOV</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.Tempearture</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.Density</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.VCF</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.GSV</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.MTVAC</td>                        
+                    </tr>
+                    <tr>
+                        
+                        <td>B/4</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.DIP</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.WaterDIP</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.TOV</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.WaterVolume</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.FloatRoofCorr</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.GOV</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.Tempearture</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.Density</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.VCF</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.GSV</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.MTVAC</td>
+                    </tr>
+                    <tr>
+
+                        <td>DIFF</td>
+                        <td></td>
+                        <td></td>
+                        <td>@{
+                                var tovDifference = (item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.TOV ?? 0)
+                                                     - (item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.TOV ?? 0);
+                            }
+                            @tovDifference
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            @{
+                                var govDifference = (item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.GOV ?? 0)
+                                - (item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.GOV ?? 0);
+                            }
+                            @govDifference
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            @{
+                                var gsvDifference = (item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.GSV ?? 0)
+                                - (item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.GSV ?? 0);
+                            }
+                            @gsvDifference
+                        </td>
+                        <td>
+                            @{
+                                var mtDifference = (item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.MTVAC ?? 0)
+                                - (item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.MTVAC ?? 0);
+                            }
+                            @mtDifference
+                        </td>
+                    </tr>
+                }
+                
+            </tbody>
+        </table>
+        <br />
+        <hr />
+        <div>
+            <b>
+                SUMMARY OF TOTAL SHORE-TANK RECEIPT
+            </b>
+        </div>
+        <table class="table table-borderless">
+            <tr>
+                <td>GOV(litres): @Model.CompanyName</td>
+                <td>Ex-Depot Price: @Model.MotherVessel</td>
+            </tr>
+            <tr>
+                <td>GSV(litres): @Model.Product</td>
+            </tr>
+            <tr>
+                <td>MT(VAC): @Model.Product</td>
+            </tr>
+            <tr>
+                <td>NAME/SIGN. OF NMDPRA REP: @Model.Product</td>
+                <td>WITNESSED BY: @Model.Product</td>
+            </tr>
+        </table>
+    </div>
+</body>
