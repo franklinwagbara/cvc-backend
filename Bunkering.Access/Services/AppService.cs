@@ -36,6 +36,7 @@ namespace Bunkering.Access.Services
         private readonly IConfiguration _configuration;
         private readonly ApplicationQueries _appQueries;
         private readonly MessageService _messageService;
+        private readonly ApplicationContext _context;
 
         public AppService(
             UserManager<ApplicationUser> userManager,
@@ -48,7 +49,8 @@ namespace Bunkering.Access.Services
             IOptions<AppSetting> setting,
             IConfiguration configuration,
             ApplicationQueries appQueries,
-            MessageService messageService)
+            MessageService messageService,
+            ApplicationContext context)
         {
             _userManager = userManager;
             _unitOfWork = unitOfWork;
@@ -62,6 +64,7 @@ namespace Bunkering.Access.Services
             _configuration = configuration;
             _appQueries = appQueries;
             _messageService = messageService;
+            _context = context;
         }
 
         private async Task<Facility> CreateFacility(ApplictionViewModel model, ApplicationUser user)
@@ -1241,7 +1244,7 @@ namespace Bunkering.Access.Services
 
                         if (flow.Item1)
                         {
-                            if (app.Status.Equals(Enum.GetName(typeof(AppActions), AppActions.Approve)))
+                            if (act.Equals(Enum.GetName(typeof(AppActions), AppActions.Approve).ToLower()))
                             {
                                 var s = await PostDischargeId(app.Id, user.Id);
                                 if(s is false)
@@ -1570,14 +1573,14 @@ namespace Bunkering.Access.Services
         }
         public async Task<bool> PostDischargeId(int id,string  userId)
         {
-            var appDepots = (await _unitOfWork.ApplicationDepot.Find(x => x.AppId == id, "Product")).ToList();
+            var appDepots = await _context.ApplicationDepots.Where(a => a.AppId == id).Include(x => x.Product).ToListAsync();
             foreach (var appDepot in appDepots)
             {
                 appDepot.DischargeId = GenerateDischargeID(appDepot.Product.Name);
             }
             
-            await _unitOfWork.ApplicationDepot.UpdateRange(appDepots);
-            var s = await _unitOfWork.SaveChangesAsync(userId);
+            _context.ApplicationDepots.UpdateRange(appDepots);
+            var s = await _context.SaveChangesAsync();
             if(s > 0)
             {
                 return true;
