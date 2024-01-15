@@ -50,6 +50,7 @@ namespace Bunkering.Access.DAL
         public IvPayment vPayment { get; private set; }
         public IvDebitNote vDebitNote { get; private set; }
         public IApplicationSurveyor ApplicationSurveyor { get; private set; }
+        public IVesselDischargeClearance VesselDischargeClearance { get; set; }
 
         public UnitOfWork(ApplicationContext context)
         {
@@ -81,6 +82,7 @@ namespace Bunkering.Access.DAL
             SubmittedDocument = SubmittedDocument != null ? SubmittedDocument : new SubmittedDocumentRepository(_context);
             Tank = Tank != null ? Tank : new TankRepository(_context);
             ValidatiionResponse = ValidatiionResponse != null ? ValidatiionResponse : new ValidatiionResponseRepo(_context);
+            VesselDischargeClearance = VesselDischargeClearance != null ? VesselDischargeClearance : new VesselDischargeClearanceRepository(_context);
             Workflow = Workflow != null ? Workflow : new WorkflowRepository(_context);
             VesselType = VesselType != null ? VesselType : new VeseelTypeRepository(_context);
             CoQ = CoQ != null ? CoQ : new CoQRepository(_context);
@@ -98,6 +100,7 @@ namespace Bunkering.Access.DAL
             PlantOfficer = PlantOfficer ?? new PlantOfficerRepository(_context);
             Plant = Plant ?? new PlantRepository(_context);
             PlantTank = PlantTank ?? new PlantTankRepository(_context);
+            
         }
 
         public int Save() => _context.SaveChanges();
