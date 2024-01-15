@@ -185,6 +185,7 @@ namespace Bunkering.Access.Services
                         MotherVessel = model.MotherVessel,
                         Jetty = model.Jetty,
                         ETA = model.ETA,
+                      
                     };
 
                     var newApp = await _unitOfWork.Application.Add(app);
@@ -199,7 +200,7 @@ namespace Bunkering.Access.Services
                             d.AppId = newApp.Id;
                             depotList.Add(d);
                         });
-                        await _unitOfWork.ApplicationDepot.AddRange(_mapper.Map<List<ApplicationDepot>>(depotList));
+                        var s = await _unitOfWork.ApplicationDepot.AddRange(_mapper.Map<List<ApplicationDepot>>(depotList));
                         await _unitOfWork.SaveChangesAsync(user.Id);
                     }
                     else
@@ -1232,6 +1233,7 @@ namespace Bunkering.Access.Services
                     _response = new ApiResponse();
                     if (app != null && user != null)
                     {
+
                         //var flow = await _userManager.IsInRoleAsync(user, "FAD")
                         //	? await _flow.AppWorkFlow(id, act, comment, app.FADStaffId)
                         //	: await _flow.AppWorkFlow(id, act, comment);
@@ -1239,6 +1241,19 @@ namespace Bunkering.Access.Services
 
                         if (flow.Item1)
                         {
+                            if (app.Status.Equals(Enum.GetName(typeof(AppActions), AppActions.Approve)))
+                            {
+                                var s = await PostDischargeId(app.Id, user.Id);
+                                if(s is false)
+                                {
+                                    return new ApiResponse
+                                    {
+                                        StatusCode = HttpStatusCode.BadRequest,
+                                        Message = "Discharge Id not generated",
+                                        Success = false,
+                                    };
+                                }
+                            }
                             _response.StatusCode = HttpStatusCode.OK;
                             _response.Success = true;
                             _response.Message = "Application has been pushed";
@@ -1414,7 +1429,7 @@ namespace Bunkering.Access.Services
                         VesselName = app.VesselName,
                         MotherVessel = app.MotherVessel,
                         Jetty = app.Jetty,
-                        ETA = app.ETA,
+                        ETA = app,
                         RecievingTerminal = depot.Name,
                         COQExist = coq == null? false: true,
                         coqId = coq?.Id,
@@ -1546,5 +1561,33 @@ namespace Bunkering.Access.Services
 
             return _response;
         }
+        public string GenerateDischargeID(string product)
+        {
+            Random random = new Random();
+            string _token = random.Next(100001, 999999).ToString();
+
+            return $"{product.ToUpper()}/{_token}";
+        }
+        public async Task<bool> PostDischargeId(int id,string  userId)
+        {
+            var appDepots = (await _unitOfWork.ApplicationDepot.Find(x => x.AppId == id, "Product")).ToList();
+            foreach (var appDepot in appDepots)
+            {
+                appDepot.DischargeId = GenerateDischargeID(appDepot.Product.Name);
+            }
+            
+            await _unitOfWork.ApplicationDepot.UpdateRange(appDepots);
+            var s = await _unitOfWork.SaveChangesAsync(userId);
+            if(s > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
     }
+
 }
