@@ -13,6 +13,7 @@
         public const string COMPANY = "Company";
         public const string SUPER_ADMIN = "SuperAdmin";
         public const string Field_Officer = "Field_Officer";
+        public const string COORDINATOR = "Coordinator";
     }
 
     public static class LOCATION

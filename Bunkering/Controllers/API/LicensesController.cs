@@ -3,6 +3,7 @@ using Bunkering.Access.IContracts;
 using Bunkering.Core.Data;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Rotativa.AspNetCore;
 using System.Drawing.Printing;
@@ -17,14 +18,16 @@ namespace Bunkering.Controllers.API
 	public class LicensesController : ResponseController
 	{
 		private readonly IUnitOfWork _unitOfWork;
+		private readonly UserManager<ApplicationUser> _userManager;
 
-		public LicensesController(IUnitOfWork unitOfWork)
-		{
-			_unitOfWork = unitOfWork;
-		}
+        public LicensesController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
+        {
+            _unitOfWork = unitOfWork;
+            _userManager = userManager;
+        }
 
 
-		[ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 200)]
 		[ProducesResponseType(typeof(ApiResponse), 404)]
 		[ProducesResponseType(typeof(ApiResponse), 405)]
 		[ProducesResponseType(typeof(ApiResponse), 500)]
@@ -105,11 +108,18 @@ namespace Bunkering.Controllers.API
 			{
 				//var qrcode = Utils.GenerateQrCode($"{Request.Scheme}://{Request.Host}/License/ValidateQrCode/{license.ApplicationId}");
 				//license.QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length);
-				var depots = await _unitOfWork.ApplicationDepot.Find(x => x.AppId.Equals(license.ApplicationId), "Application,Depot,Product");
+				var depots = await _unitOfWork.ApplicationDepot.Find(x => x.AppId.Equals(license.ApplicationId), "Application.Histories,Depot,Product");
                 NominatedSurveyor nominatedSurveyor  = null;
-				if (depots.FirstOrDefault().Application.SurveyorId != null)
-					nominatedSurveyor = await _unitOfWork.NominatedSurveyor.FirstOrDefaultAsync(x => x.Id.Equals(nominatedSurveyor.Id));
+				if (depots.FirstOrDefault()?.Application.SurveyorId != null)
+				{
+					var surveyorId = depots.FirstOrDefault()?.Application.SurveyorId;
 
+                    nominatedSurveyor = await _unitOfWork.NominatedSurveyor.FirstOrDefaultAsync(x => x.Id.Equals(surveyorId));
+				}
+				var  user = await _userManager.FindByIdAsync(depots?.FirstOrDefault()?
+					.Application.Histories?
+					.OrderByDescending(a => a.Date)
+					.LastOrDefault()?.TargetedTo ?? string.Empty);
                 var viewAsPdf = new ViewAsPdf 
 				{
 					Model = new CertificareDTO
@@ -126,7 +136,8 @@ namespace Bunkering.Controllers.API
 							Volume = y.Volume
 						}).ToList(),
 						Jetty = license.Application.Jetty,
-						Surveyor = nominatedSurveyor is not null ? nominatedSurveyor.Name : "N/A"
+						Surveyor = nominatedSurveyor is not null ? nominatedSurveyor.Name : "N/A",
+						Signature = user?.Signature ?? string.Empty
                     },
 					PageHeight = 327,
 					PageMargins = new Rotativa.AspNetCore.Options.Margins(10, 10, 10, 10),					
