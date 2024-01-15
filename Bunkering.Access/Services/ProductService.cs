@@ -33,6 +33,7 @@ namespace Bunkering.Access.Services
             try
             {
                 var allProducts = await _unitOfWork.Product.GetAll();
+                var allProduct = allProducts.Where(x => x.IsDeleted == null);
                 return new ApiResponse
                 {
                     Data = allProducts,
@@ -46,6 +47,32 @@ namespace Bunkering.Access.Services
                 return new ApiResponse { Data = ex };
             }
 
+        }
+        public async Task<ApiResponse> GetProductsById(int id)
+        {
+            var getById = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(id));
+            if(getById != null)
+            {
+                _response = new ApiResponse
+                {
+                    Message = "Successful",
+                    Data = getById,
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true
+
+                };
+            }
+            else
+            {
+                _response = new ApiResponse
+                {
+
+                    Message = "Product Not Found",
+                    StatusCode = HttpStatusCode.NotFound,
+                    Success = false
+                };
+            }
+            return _response;
         }
         public async Task<ApiResponse> CreateProduct(ProductViewModel model)
         {
@@ -111,8 +138,48 @@ namespace Bunkering.Access.Services
             }
             return _response;
         }
-      
+        public async Task<ApiResponse> DeleteProduct(int id)
+        {
+            var delProduct = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(id));
+            if (delProduct != null)
+            {
+                if (!delProduct.IsDeleted)
+                {
+                    delProduct.IsDeleted = true;
+                    await _unitOfWork.Product.Update(delProduct);
+                    _unitOfWork.Save();
 
-      
+                    _response = new ApiResponse
+                    {
+                        Message = "Successful",
+                        Data = delProduct,
+                        StatusCode = HttpStatusCode.OK,
+                        Success = true,
+                    };
+                }
+                else
+                {
+                    _response = new ApiResponse
+                    {
+                        Message = "Product already deleted",
+                        StatusCode = HttpStatusCode.BadRequest,
+                        Success = true,
+                    };
+                }
+
+
+            }
+            else
+            {
+                _response = new ApiResponse
+                {
+                    Message = "Product doesnt exist",
+                    StatusCode = HttpStatusCode.NotFound,
+                    Success = false,
+                };
+            }
+            return _response;
+        }
+
     }
 }

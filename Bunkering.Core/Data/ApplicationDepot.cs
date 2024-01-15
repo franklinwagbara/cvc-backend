@@ -15,6 +15,7 @@ namespace Bunkering.Core.Data
         public int ProductId { get; set; }
         [ForeignKey(nameof(ProductId))]
         public Product Product { get; set; }
+        public string? DischargeId { get; set; } = string.Empty;
 
     }
 }

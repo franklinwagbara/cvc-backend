@@ -4,6 +4,7 @@ using Bunkering.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bunkering.Core.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20240115131158_EmailConfigurationsTable")]
+    partial class EmailConfigurationsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,9 +79,6 @@ namespace Bunkering.Core.Migrations
 
                     b.Property<int>("DeportStateId")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("DeskMovementDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("ETA")
                         .HasColumnType("datetime2");
@@ -163,9 +163,6 @@ namespace Bunkering.Core.Migrations
 
                     b.Property<int>("DepotId")
                         .HasColumnType("int");
-
-                    b.Property<string>("DischargeId")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -380,9 +377,6 @@ namespace Bunkering.Core.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Signature")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")

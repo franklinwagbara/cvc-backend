@@ -4,6 +4,7 @@ using Bunkering.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bunkering.Core.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20240115114026_DischargeID")]
+    partial class DischargeID
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,9 +79,6 @@ namespace Bunkering.Core.Migrations
 
                     b.Property<int>("DeportStateId")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("DeskMovementDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("ETA")
                         .HasColumnType("datetime2");
@@ -380,9 +380,6 @@ namespace Bunkering.Core.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Signature")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -694,12 +691,10 @@ namespace Bunkering.Core.Migrations
                         .HasColumnType("float");
 
                     b.Property<string>("NameConsignee")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PlantId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ProductId")
                         .HasColumnType("int");
 
                     b.Property<double>("QuauntityReflectedOnBill")
@@ -817,30 +812,6 @@ namespace Bunkering.Core.Migrations
                     b.HasIndex("StateId");
 
                     b.ToTable("Depots");
-                });
-
-            modelBuilder.Entity("Bunkering.Core.Data.EmailConfiguration", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("EmailConfigurations");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.ExtraPayment", b =>
@@ -1486,9 +1457,6 @@ namespace Bunkering.Core.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()

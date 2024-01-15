@@ -55,7 +55,7 @@ namespace Bunkering.Access.Services
         public async Task<ApiResponse> GetAllDepotsPlants()
         {
             var plants = GetAllDepotswithTanks();
-            var filteredPlants = plants.Where(x => x.IsDeleted == false);
+            var filteredPlants = plants.Where(x => x.IsDeleted == false).OrderBy(x => x.Name).ToList();
             return new ApiResponse
             {
                 Message = "All Fees found",
@@ -228,7 +228,7 @@ namespace Bunkering.Access.Services
                     _response = new ApiResponse
                     {
                         Message = "A Plant that belongs to this company already has this Name",
-                        StatusCode = HttpStatusCode.MethodNotAllowed,
+                        StatusCode = HttpStatusCode.BadRequest,
                         Success = false
                     };
                     return _response;
@@ -356,13 +356,29 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> GetPlantById(int id)
         {
-            Plant? mapping = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id == id);
+           var mapping = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id == id);
+            var state = await _unitOfWork.State.FirstOrDefaultAsync(x => x.Name == mapping.State);
+            var data = new GetPlantDTO
+            {
+                StateId = state.Id,
+                Company = mapping.Company,
+                CompanyElpsId = mapping.CompanyElpsId,
+                ElpsPlantId = mapping.ElpsPlantId,
+                Email = mapping.Email,
+                Id = mapping.Id,
+                IsDeleted = mapping.IsDeleted,
+                Name = mapping.Name,
+                PlantType = mapping.PlantType,
+                State = mapping.State,
+                Tanks = mapping.Tanks
+            };
+            
             return new ApiResponse
             {
                 Message = "All Mapping found",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                Data = mapping
+                Data = data
             };
         }
 
@@ -495,12 +511,30 @@ namespace Bunkering.Access.Services
 
                 string jsonResponse = await response.Content.ReadAsStringAsync();
                 var data = JsonConvert.DeserializeObject<List<dynamic>>(jsonResponse);
-                
-                if (data.Any())
+                //var k = data?.Select(item => new Plant
+                //{
+                //    Name = item.depotName,
+                //    ElpsPlantId = item.depotElpsId,
+                //    Email = item.email,
+                //    State = item.state,
+                //    Company = item.company,
+                //    PlantType = 2,
+                //    CompanyElpsId = item.companyElpsId,
+                //    Tanks = ((List<dynamic>)item.tanks).Select(tank => new PlantTank
+                //    {
+                //        TankName = tank.tankName,
+                //        Product = tank.product,
+                //        Capacity = tank.capacity,
+                //        Position = tank.position
+                //    }).ToList(),
+                //}).Where(c=> c.ElpsPlantId ).ToList();
+
+                var distinctDepots = data.DistinctBy(c => c.depotElpsId ).ToList();
+                if (distinctDepots.Any())
                 {
                     var depotList = new List<Plant>();
 
-                    foreach (var item in data)
+                    foreach (var item in distinctDepots)
                     {
                         
                         var plant = new Plant
@@ -524,14 +558,14 @@ namespace Bunkering.Access.Services
                                     TankName = tank.tankName,
                                     Product = tank.product,
                                     Capacity = tank.capacity,
-                                    Position = tank.position
+                                    Position = tank.position ?? string.Empty
                                 };
 
                                 tankList.Add(pTank);
                             }
                             plant.Tanks = tankList;
                         }
-                        bool plantExist = depotsExist.Any(x => x.CompanyElpsId == plant.CompanyElpsId);
+                        bool plantExist = depotsExist.Any(x => x.ElpsPlantId == plant.ElpsPlantId);
                         if (!plantExist)
                         {
                             depotList.Add(plant);
@@ -543,8 +577,8 @@ namespace Bunkering.Access.Services
                         
                     }
                     
-                    var distinctDepots = depotList.Distinct().ToList();
-                    await _unitOfWork.Plant.AddRange(distinctDepots);
+                   
+                    await _unitOfWork.Plant.AddRange(depotList);
                     await _unitOfWork.SaveChangesAsync("");
 
                 }

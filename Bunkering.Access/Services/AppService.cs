@@ -36,6 +36,7 @@ namespace Bunkering.Access.Services
         private readonly IConfiguration _configuration;
         private readonly ApplicationQueries _appQueries;
         private readonly MessageService _messageService;
+        private readonly ApplicationContext _context;
 
         public AppService(
             UserManager<ApplicationUser> userManager,
@@ -48,7 +49,8 @@ namespace Bunkering.Access.Services
             IOptions<AppSetting> setting,
             IConfiguration configuration,
             ApplicationQueries appQueries,
-            MessageService messageService)
+            MessageService messageService,
+            ApplicationContext context)
         {
             _userManager = userManager;
             _unitOfWork = unitOfWork;
@@ -62,6 +64,7 @@ namespace Bunkering.Access.Services
             _configuration = configuration;
             _appQueries = appQueries;
             _messageService = messageService;
+            _context = context;
         }
 
         private async Task<Facility> CreateFacility(ApplictionViewModel model, ApplicationUser user)
@@ -185,6 +188,7 @@ namespace Bunkering.Access.Services
                         MotherVessel = model.MotherVessel,
                         Jetty = model.Jetty,
                         ETA = model.ETA,
+                      
                     };
 
                     var newApp = await _unitOfWork.Application.Add(app);
@@ -199,7 +203,7 @@ namespace Bunkering.Access.Services
                             d.AppId = newApp.Id;
                             depotList.Add(d);
                         });
-                        await _unitOfWork.ApplicationDepot.AddRange(_mapper.Map<List<ApplicationDepot>>(depotList));
+                        var s = await _unitOfWork.ApplicationDepot.AddRange(_mapper.Map<List<ApplicationDepot>>(depotList));
                         await _unitOfWork.SaveChangesAsync(user.Id);
                     }
                     else
@@ -1232,12 +1236,26 @@ namespace Bunkering.Access.Services
                     _response = new ApiResponse();
                     if (app != null && user != null)
                     {
+
                         //var flow = await _userManager.IsInRoleAsync(user, "FAD")
                         //	? await _flow.AppWorkFlow(id, act, comment, app.FADStaffId)
                         //	: await _flow.AppWorkFlow(id, act, comment);
                         var flow = await _flow.AppWorkFlow(id, act, comment);
                         if (flow.Item1)
                         {
+                            if (act.Equals(Enum.GetName(typeof(AppActions), AppActions.Approve).ToLower()))
+                            {
+                                var s = await PostDischargeId(app.Id, user.Id);
+                                if(s is false)
+                                {
+                                    return new ApiResponse
+                                    {
+                                        StatusCode = HttpStatusCode.BadRequest,
+                                        Message = "Discharge Id not generated",
+                                        Success = false,
+                                    };
+                                }
+                            }
                             _response.StatusCode = HttpStatusCode.OK;
                             _response.Success = true;
                             _response.Message = "Application has been pushed";
@@ -1413,7 +1431,7 @@ namespace Bunkering.Access.Services
                         VesselName = app.VesselName,
                         MotherVessel = app.MotherVessel,
                         Jetty = app.Jetty,
-                        ETA = app.ETA,
+                        ETA = app,
                         RecievingTerminal = depot.Name,
                         COQExist = coq == null? false: true,
                         coqId = coq?.Id,
@@ -1522,7 +1540,7 @@ namespace Bunkering.Access.Services
                 _response = new ApiResponse
                 {
                     Message = "Vessels was found",
-                    StatusCode = HttpStatusCode.NotFound,
+                    StatusCode = HttpStatusCode.OK,
                     Success = true,
                     Data = vessel.Select(x => new
                     {
@@ -1545,6 +1563,35 @@ namespace Bunkering.Access.Services
 
             return _response;
         }
+        public string GenerateDischargeID(string product)
+        {
+            Random random = new Random();
+            string _token = random.Next(100001, 999999).ToString();
+
+            return $"{product.ToUpper()}/{_token}";
+        }
+        public async Task<bool> PostDischargeId(int id,string  userId)
+        {
+            var appDepots = await _context.ApplicationDepots.Where(a => a.AppId == id).Include(x => x.Product).ToListAsync();
+            foreach (var appDepot in appDepots)
+            {
+                appDepot.DischargeId = GenerateDischargeID(appDepot.Product.Name);
+            }
+            
+            _context.ApplicationDepots.UpdateRange(appDepots);
+            var s = await _context.SaveChangesAsync();
+            if(s > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+    }
+
 
         public IEnumerable<int> GetLongProcessingApps()
         {
