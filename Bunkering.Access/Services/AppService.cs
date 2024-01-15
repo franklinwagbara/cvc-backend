@@ -1236,7 +1236,6 @@ namespace Bunkering.Access.Services
                         //	? await _flow.AppWorkFlow(id, act, comment, app.FADStaffId)
                         //	: await _flow.AppWorkFlow(id, act, comment);
                         var flow = await _flow.AppWorkFlow(id, act, comment);
-
                         if (flow.Item1)
                         {
                             _response.StatusCode = HttpStatusCode.OK;
@@ -1545,6 +1544,12 @@ namespace Bunkering.Access.Services
             
 
             return _response;
+        }
+
+        public IEnumerable<int> GetLongProcessingApps()
+        {
+            return _unitOfWork.Application.Query(c => c.DeskMovementDate.HasValue
+            && c.DeskMovementDate.Value.AddMinutes(-15) >= DateTime.Now).Select(c => c.Id).ToList();
         }
     }
 }
