@@ -124,7 +124,7 @@ namespace Bunkering.Access.Services
                                     processingMsg = $"Application with reference {app.Reference} has been approved and clearance number {permit.Item2} has been generated successfully";
                             }
                             //send and save notification
-                            await SendNotification(app, action, nextprocessingofficer, processingMsg);
+                            //await SendNotification(app, action, nextprocessingofficer, processingMsg);
                         }
                         else
                         {
