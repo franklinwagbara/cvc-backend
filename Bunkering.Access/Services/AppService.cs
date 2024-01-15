@@ -1523,7 +1523,7 @@ namespace Bunkering.Access.Services
                 _response = new ApiResponse
                 {
                     Message = "Vessels was found",
-                    StatusCode = HttpStatusCode.NotFound,
+                    StatusCode = HttpStatusCode.OK,
                     Success = true,
                     Data = vessel.Select(x => new
                     {

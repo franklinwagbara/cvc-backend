@@ -4,6 +4,7 @@ using Bunkering.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bunkering.Core.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20240105144926_ProductisDeleted")]
+    partial class ProductisDeleted
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -632,7 +635,7 @@ namespace Bunkering.Core.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AppId")
+                    b.Property<int>("AppId")
                         .HasColumnType("int");
 
                     b.Property<double>("ArrivalShipFigure")
@@ -660,7 +663,13 @@ namespace Bunkering.Core.Migrations
                     b.Property<DateTime>("DateOfVesselUllage")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("DepotId")
+                        .HasColumnType("int");
+
                     b.Property<double>("DepotPrice")
+                        .HasColumnType("float");
+
+                    b.Property<double>("DifferenceBtwShipAndShoreFigure")
                         .HasColumnType("float");
 
                     b.Property<double>("DischargeShipFigure")
@@ -684,9 +693,8 @@ namespace Bunkering.Core.Migrations
                     b.Property<double>("MT_VAC")
                         .HasColumnType("float");
 
-                    b.Property<string>("NameConsignee")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<double>("PercentageDifference")
+                        .HasColumnType("float");
 
                     b.Property<int>("PlantId")
                         .HasColumnType("int");
@@ -707,7 +715,7 @@ namespace Bunkering.Core.Migrations
 
                     b.HasIndex("AppId");
 
-                    b.HasIndex("PlantId");
+                    b.HasIndex("DepotId");
 
                     b.ToTable("CoQs");
                 });
@@ -1230,7 +1238,7 @@ namespace Bunkering.Core.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ApplicationId")
+                    b.Property<int>("ApplicationId")
                         .HasColumnType("int");
 
                     b.Property<int?>("ApplicationTypeId")
@@ -1256,11 +1264,11 @@ namespace Bunkering.Core.Migrations
                     b.Property<DateTime>("LastRetryDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<double>("LateRenewalPenalty")
-                        .HasColumnType("float");
+                    b.Property<decimal>("LateRenewalPenalty")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<double>("NonRenewalPenalty")
-                        .HasColumnType("float");
+                    b.Property<decimal>("NonRenewalPenalty")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("OrderId")
                         .IsRequired()
@@ -1358,7 +1366,7 @@ namespace Bunkering.Core.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("CompanyElpsId")
+                    b.Property<long>("CompanyElpsId")
                         .HasColumnType("bigint");
 
                     b.Property<long?>("ElpsPlantId")
@@ -1413,13 +1421,13 @@ namespace Bunkering.Core.Migrations
 
             modelBuilder.Entity("Bunkering.Core.Data.PlantTank", b =>
                 {
-                    b.Property<int>("PlantTankId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PlantTankId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal?>("Capacity")
+                    b.Property<decimal>("Capacity")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsDeleted")
@@ -1429,15 +1437,18 @@ namespace Bunkering.Core.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Position")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Product")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TankName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("PlantTankId");
+                    b.HasKey("Id");
 
                     b.HasIndex("PlantId");
 
@@ -1527,6 +1538,8 @@ namespace Bunkering.Core.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ApplicationId");
 
                     b.ToTable("SubmittedDocuments");
                 });
@@ -2312,17 +2325,19 @@ namespace Bunkering.Core.Migrations
                 {
                     b.HasOne("Bunkering.Core.Data.Application", "Application")
                         .WithMany()
-                        .HasForeignKey("AppId");
+                        .HasForeignKey("AppId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("Bunkering.Core.Data.Plant", "Plant")
+                    b.HasOne("Bunkering.Core.Data.Depot", "Depot")
                         .WithMany()
-                        .HasForeignKey("PlantId")
+                        .HasForeignKey("DepotId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Application");
 
-                    b.Navigation("Plant");
+                    b.Navigation("Depot");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.Depot", b =>
@@ -2426,7 +2441,9 @@ namespace Bunkering.Core.Migrations
                 {
                     b.HasOne("Bunkering.Core.Data.Application", null)
                         .WithMany("Payments")
-                        .HasForeignKey("ApplicationId");
+                        .HasForeignKey("ApplicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Bunkering.Core.Data.ExtraPayment", "ExtraPayment")
                         .WithMany()
@@ -2475,6 +2492,15 @@ namespace Bunkering.Core.Migrations
                         .IsRequired();
 
                     b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.SubmittedDocument", b =>
+                {
+                    b.HasOne("Bunkering.Core.Data.Application", null)
+                        .WithMany("SubmittedDocuments")
+                        .HasForeignKey("ApplicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.Tank", b =>
@@ -2557,6 +2583,8 @@ namespace Bunkering.Core.Migrations
                     b.Navigation("Messages");
 
                     b.Navigation("Payments");
+
+                    b.Navigation("SubmittedDocuments");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.ApplicationRole", b =>
