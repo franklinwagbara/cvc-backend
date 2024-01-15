@@ -18,9 +18,16 @@ namespace Bunkering.Core.ViewModels
         public string VesselName { get; set; }
         public string ReceivingTerminal { get; set; }
         
+        public List<CoQTanksDTO> tanks { get; set; }
+       
+    }
+
+    public class CoQTanksDTO
+    {
+        public string  TankName { get; set; }
         public List<CoQLiquidTankBeforeReading> BeforeTankMeasurements { get; set; }
         public List<CoQLiquidTankAfterReading> AfterTankMeasurement { get; set; }
-        public List<CoQLiquidTankAfterReading> Difference { get; set; }
+       // public List<CoQLiquidTankAfterReading> Difference { get; set; }
     }
 
     public class CoQLiquidTank
