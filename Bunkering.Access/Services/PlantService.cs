@@ -55,7 +55,7 @@ namespace Bunkering.Access.Services
         public async Task<ApiResponse> GetAllDepotsPlants()
         {
             var plants = GetAllDepotswithTanks();
-            var filteredPlants = plants.Where(x => x.IsDeleted == false);
+            var filteredPlants = plants.Where(x => x.IsDeleted == false).OrderBy(x => x.Name).ToList();
             return new ApiResponse
             {
                 Message = "All Fees found",
