@@ -127,6 +127,7 @@
     <Build Include="dbo\Tables\COQTanks_1.sql" />
     <Build Include="dbo\Tables\PlantFieldOfficers.sql" />
     <Build Include="dbo\Tables\EmailConfigurations.sql" />
+    <Build Include="dbo\Tables\VesselDischargeClearances.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Snapshots\Bunkering.Database_20230810_10-01-52.dacpac" />
