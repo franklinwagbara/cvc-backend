@@ -150,7 +150,7 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> AllEmailConfigurations()
         {
-            var allEmail = await _unitOfWork.EmailConfiguration.GetAll();
+            var allEmail = await _unitOfWork.EmailConfiguration.Find(c => c.IsActive);
 
             _response = new ApiResponse
             {

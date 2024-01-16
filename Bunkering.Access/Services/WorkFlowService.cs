@@ -474,7 +474,8 @@ namespace Bunkering.Access.Services
                     IssuedDate = DateTime.Now,
                     CertifcateNo = pno,
                     Signature = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/wwwroot/assets/fa.png",
-                    QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length)
+                    QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length),
+                    ProductId = coq.ProductId
                 };
 
                 var req = await Utils.Send(_appSetting.ElpsUrl, new HttpRequestMessage(HttpMethod.Post, $"api/Permits/{CompanyElpsId}/{_appSetting.AppEmail}/{Utils.GenerateSha512($"{_appSetting.AppEmail}{_appSetting.AppId}")}")
