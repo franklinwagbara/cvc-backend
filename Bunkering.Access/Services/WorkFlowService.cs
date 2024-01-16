@@ -92,7 +92,7 @@ namespace Bunkering.Access.Services
                             app.Status = wkflow.Status;
                             app.FlowId = wkflow.Id;
                             app.ModifiedDate = DateTime.UtcNow.AddHours(1);
-
+                            app.DeskMovementDate = DateTime.Now;
                             if (action.Equals(Enum.GetName(typeof(AppActions), AppActions.Submit)))
                                 app.SubmittedDate = DateTime.Now.AddHours(1);
 
