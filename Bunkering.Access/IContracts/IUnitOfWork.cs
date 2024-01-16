@@ -36,6 +36,7 @@ namespace Bunkering.Access.IContracts
         ISubmittedDocument SubmittedDocument { get; }
         ITank Tank { get; }
         IValidatiionResponse ValidatiionResponse { get; }
+        IVesselDischargeClearance VesselDischargeClearance { get; }
         IWorkflow Workflow { get; }
         IVesselType VesselType { get; }
         ICoQ CoQ { get; }
