@@ -92,7 +92,7 @@ namespace Bunkering.Access.Services
                             app.Status = wkflow.Status;
                             app.FlowId = wkflow.Id;
                             app.ModifiedDate = DateTime.UtcNow.AddHours(1);
-
+                            app.DeskMovementDate = DateTime.Now;
                             if (action.Equals(Enum.GetName(typeof(AppActions), AppActions.Submit)))
                                 app.SubmittedDate = DateTime.Now.AddHours(1);
 
@@ -124,7 +124,7 @@ namespace Bunkering.Access.Services
                                     processingMsg = $"Application with reference {app.Reference} has been approved and clearance number {permit.Item2} has been generated successfully";
                             }
                             //send and save notification
-                            await SendNotification(app, action, nextprocessingofficer, processingMsg);
+                            //await SendNotification(app, action, nextprocessingofficer, processingMsg);
                         }
                         else
                         {

@@ -146,6 +146,7 @@ namespace Bunkering.Access.Services
 					x.CreatedBy,
 					DateCreated = x.CreatedOn,
 					x.IsActive,
+					x.Signature,
 					AppCount = apps != null && apps.Count() != 0? apps.Count(y => y.UserId.Equals(x.Id)): 0,
 
 				})
@@ -182,7 +183,14 @@ namespace Bunkering.Access.Services
                 }
 				if (staff == null)
 				{
-					staff = new ApplicationUser
+                    using (var ms = new MemoryStream())
+                    {
+                        model.SignatureFile?.CopyTo(ms);
+                        var fileBytes = ms.ToArray();
+                        model.Signature = Convert.ToBase64String(fileBytes);
+                    }
+
+                    staff = new ApplicationUser
 					{
 						ElpsId = model.ElpsId,
 						Email = model.Email,
@@ -196,8 +204,11 @@ namespace Bunkering.Access.Services
 						OfficeId = model.OfficeId,
 						CreatedBy = user.Email,
 						CreatedOn = DateTime.UtcNow.AddHours(1),
-
 					};
+					if (model.SignatureFile is not null)
+					{
+						staff.Signature = model.Signature;
+					}
 					await _userManager.CreateAsync(staff);
 
 					var role = await _roleManager.FindByIdAsync(model.RoleId);
@@ -276,7 +287,18 @@ namespace Bunkering.Access.Services
 					user.LastName = model.LastName;
 					user.IsActive = model.IsActive;
 
-					await _userManager.UpdateAsync(user);
+                    if (model.SignatureFile?.Length > 0)
+                    {
+                        using (var ms = new MemoryStream())
+                        {
+                            model.SignatureFile.CopyTo(ms);
+                            var fileBytes = ms.ToArray();
+                            user.Signature = Convert.ToBase64String(fileBytes);
+                        }
+
+                    }
+
+                    await _userManager.UpdateAsync(user);
 
 					if (!await _userManager.IsInRoleAsync(user, role.Name))
 					{

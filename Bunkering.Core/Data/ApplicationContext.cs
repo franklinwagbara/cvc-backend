@@ -60,6 +60,7 @@ namespace Bunkering.Core.Data
         public DbSet<MeasurementType> MeasurementTypes { get; set; }
         public DbSet<TankMeasurement> TankMeasurements { get; set; }
         public DbSet<EmailConfiguration> EmailConfigurations { get; set; }
+        public DbSet<VesselDischargeClearance> VesselDischargeClearances {  get; set; }
 
         //public virtual DbContextOptionsBuilder EnableDetailedErrors(bool detailedErrorsEnabled = true) => detailedErrorsEnabled;
         //public virtual DbContextOptionsBuilder EnableDetailedErrors(bool detailedErrorEnabled) => DbContextOptionsBuilder;

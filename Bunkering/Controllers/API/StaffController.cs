@@ -113,7 +113,7 @@ namespace Bunkering.Controllers.API
         /// <response code="400">Internal server error - bad request </response>
         [Route("edit-user")]
         [HttpPost]
-        public async Task<IActionResult> Edit(UserViewModel model) => Response(await _staffService.Edit(model));
+        public async Task<IActionResult> Edit([FromForm] UserViewModel model) => Response(await _staffService.Edit(model));
 
 
         /// <summary>
