@@ -487,7 +487,7 @@ namespace Bunkering.Access.Services
                         Success = false
                     };
                     
-                    var fee = await _unitOfWork.AppFee.FirstOrDefaultAsync(x => x.ApplicationTypeId.Equals(app.ApplicationTypeId));
+                    var fee = await _unitOfWork.AppFee.FirstOrDefaultAsync(x => x.ApplicationTypeId.Equals(app.ApplicationTypeId) && x.IsDeleted != true);
                     if (fee is null) return new ApiResponse()
                     {
                         StatusCode = HttpStatusCode.NotFound,
