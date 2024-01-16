@@ -4,6 +4,7 @@ using Bunkering.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bunkering.Core.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20240116094253_coqCertificateProductId")]
+    partial class coqCertificateProductId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1736,8 +1739,9 @@ namespace Bunkering.Core.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("Density")
-                        .HasColumnType("float");
+                    b.Property<string>("Density")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("DepotId")
                         .HasColumnType("int");
@@ -1745,14 +1749,9 @@ namespace Bunkering.Core.Migrations
                     b.Property<int>("DischargeId")
                         .HasColumnType("int");
 
-                    b.Property<double>("FinalBoilingPoint")
-                        .HasColumnType("float");
-
-                    b.Property<double>("FlashPoint")
-                        .HasColumnType("float");
-
-                    b.Property<bool>("IsAllowed")
-                        .HasColumnType("bit");
+                    b.Property<string>("FlashPoint")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Odour")
                         .IsRequired()

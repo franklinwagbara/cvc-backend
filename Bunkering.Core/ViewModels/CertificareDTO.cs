@@ -25,5 +25,6 @@ namespace Bunkering.Core.ViewModels
         public string Name { get; set; }
         public decimal Volume { get; set; }
         public string Product { get; set; }
+        public string? DischargeId { get; set; }
     }
 }
