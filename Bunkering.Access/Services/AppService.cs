@@ -1243,19 +1243,19 @@ namespace Bunkering.Access.Services
                         var flow = await _flow.AppWorkFlow(id, act, comment);
                         if (flow.Item1)
                         {
-                            if (act.Equals(Enum.GetName(typeof(AppActions), AppActions.Approve).ToLower()))
-                            {
-                                var s = await PostDischargeId(app.Id, user.Id);
-                                if(s is false)
-                                {
-                                    return new ApiResponse
-                                    {
-                                        StatusCode = HttpStatusCode.BadRequest,
-                                        Message = "Discharge Id not generated",
-                                        Success = false,
-                                    };
-                                }
-                            }
+                            //var appStatusCheck = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id)).Result.Status;
+                            //{
+                            //    var s = await PostDischargeId(app.Id, user.Id);
+                            //    if(s is false)
+                            //    {
+                            //        return new ApiResponse
+                            //        {
+                            //            StatusCode = HttpStatusCode.BadRequest,
+                            //            Message = "Discharge Id not generated",
+                            //            Success = false,
+                            //        };
+                            //    }
+                            //}
                             _response.StatusCode = HttpStatusCode.OK;
                             _response.Success = true;
                             _response.Message = "Application has been pushed";
@@ -1563,33 +1563,33 @@ namespace Bunkering.Access.Services
 
             return _response;
         }
-        public string GenerateDischargeID(string product)
-        {
-            Random random = new Random();
-            string _token = random.Next(100001, 999999).ToString();
+        //public string GenerateDischargeID(string product)
+        //{
+        //    Random random = new Random();
+        //    string _token = random.Next(100001, 999999).ToString();
 
-            return $"{product.ToUpper()}/{_token}";
-        }
-        public async Task<bool> PostDischargeId(int id,string  userId)
-        {
-            var appDepots = await _context.ApplicationDepots.Where(a => a.AppId == id).Include(x => x.Product).ToListAsync();
-            foreach (var appDepot in appDepots)
-            {
-                appDepot.DischargeId = GenerateDischargeID(appDepot.Product.Name);
-            }
+        //    return $"{product.ToUpper()}/{_token}";
+        //}
+        //public async Task<bool> PostDischargeId(int id,string  userId)
+        //{
+        //    var appDepots = await _context.ApplicationDepots.Where(a => a.AppId == id).Include(x => x.Product).ToListAsync();
+        //    foreach (var appDepot in appDepots)
+        //    {
+        //        appDepot.DischargeId = GenerateDischargeID(appDepot.Product.Name);
+        //    }
             
-            _context.ApplicationDepots.UpdateRange(appDepots);
-            var s = await _context.SaveChangesAsync();
-            if(s > 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+        //    _context.ApplicationDepots.UpdateRange(appDepots);
+        //    var s = await _context.SaveChangesAsync();
+        //    if(s > 0)
+        //    {
+        //        return true;
+        //    }
+        //    else
+        //    {
+        //        return false;
+        //    }
 
-        }
+        //}
 
         public IEnumerable<int> GetLongProcessingApps()
         {
