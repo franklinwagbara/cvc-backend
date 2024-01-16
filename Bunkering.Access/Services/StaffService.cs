@@ -161,6 +161,7 @@ namespace Bunkering.Access.Services
 				var staff = await _userManager.FindByEmailAsync(model.Email);
 				var locationExists = await _unitOfWork.Location.FirstOrDefaultAsync(l => l.Id == model.LocationId) is not null;
 				var officeExists = await _unitOfWork.Office.FirstOrDefaultAsync(l => l.Id == model.OfficeId) is not null;
+				var role = await _roleManager.FindByIdAsync(model.RoleId);
                 if (!locationExists)
                 {
 					return new ApiResponse
@@ -183,6 +184,15 @@ namespace Bunkering.Access.Services
                 }
 				if (staff == null)
 				{
+					if (role?.Name is Roles.ACE or  Roles.FO or Roles.Reviewer or Roles.Supervisor && model.SignatureFile?.Length is null or <= 0)
+					{
+						return new ApiResponse
+						{
+							Message = "Signature is required for this role.",
+							StatusCode = HttpStatusCode.BadRequest,
+							Success = false
+						};
+					}
                     using (var ms = new MemoryStream())
                     {
                         model.SignatureFile?.CopyTo(ms);
@@ -211,7 +221,6 @@ namespace Bunkering.Access.Services
 					}
 					await _userManager.CreateAsync(staff);
 
-					var role = await _roleManager.FindByIdAsync(model.RoleId);
 					if (role != null)
 						await _userManager.AddToRoleAsync(staff, role.Name);
 
@@ -268,7 +277,17 @@ namespace Bunkering.Access.Services
 
 					}
 					var role = await _roleManager.FindByIdAsync(model.RoleId);
-					var apps = await _unitOfWork.Application.Find(x => x.CurrentDeskId.Equals(user.Id));
+                    if (role?.Name is Roles.ACE or Roles.FO or Roles.Reviewer or Roles.Supervisor && model.SignatureFile?.Length is null or <= 0)
+                    {
+                        return new ApiResponse
+                        {
+                            Message = "Signature is required for this role.",
+                            StatusCode = HttpStatusCode.BadRequest,
+                            Success = false
+                        };
+                    }
+
+                    var apps = await _unitOfWork.Application.Find(x => x.CurrentDeskId.Equals(user.Id));
 					if (apps != null && apps.Count() > 0)
 					{
 						if (role != null && !await _userManager.IsInRoleAsync(user, role.Name))

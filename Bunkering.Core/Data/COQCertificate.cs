@@ -5,7 +5,8 @@ namespace Bunkering.Core.Data
     public class COQCertificate
     {
         public int Id { get; set; }
-        public int COQId { get; set; }
+        public int? COQId { get; set; }
+        public int? ProductId { get; set; }
         public int ElpsId { get; set; }
         public DateTime ExpireDate { get; set; }
         public DateTime IssuedDate { get; set; }
@@ -14,5 +15,8 @@ namespace Bunkering.Core.Data
         public string QRCode { get; set; } = string.Empty;
         [ForeignKey(nameof(COQId))]
         public CoQ? COQ { get; set; }
+
+        [ForeignKey(nameof(ProductId))]
+        public Product? Product { get; set; }
     }
 }
