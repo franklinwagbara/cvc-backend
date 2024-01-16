@@ -480,6 +480,7 @@ namespace Bunkering.Access.Services
                         Success = false
                     };
                     var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id), "ApplicationType,Facility.VesselType,Payments");
+                    var appDepots = (await _unitOfWork.ApplicationDepot.Find(x => x.AppId.Equals(id))).Select(c => c.Depot).ToList();
                     if (app is null) return new ApiResponse()
                     {
                         StatusCode = HttpStatusCode.NotFound,
@@ -495,7 +496,7 @@ namespace Bunkering.Access.Services
                         Success = false
                     };
 
-                    var total = (double)fee.COQFee + (double)fee.SerciveCharge + (double)fee.NOAFee;
+                    var total = (double)(fee.COQFee * appDepots.Count) + (double)fee.SerciveCharge + (double)fee.NOAFee;
 
                     var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.ApplicationId.Equals(id));
                     if (payment == null)
@@ -507,7 +508,12 @@ namespace Bunkering.Access.Services
                             ApplicationId = id,
                             OrderId = app.Reference,
                             BankCode = _setting.NMDPRAAccount,
-                            Description = $"Payment for CVC & COQ License ({app.Facility.Name})",
+                            Description = $"Payment for CVC & COQ License ({app.Facility.Name}) |" +
+                            $" NoA Fee: ₦ {fee.NOAFee:#,#.##} |" +
+                            $" Depots: {appDepots.Count} |" +
+                            $" CoQ Fee (per Depot): ₦ {fee.COQFee:#,#.##} |" +
+                            $" Total CoQ Fee: ₦ {(fee.COQFee * appDepots.Count):#,#.##} |" +
+                            $" Total Amount: ₦ {total:#,#.##}",
                             PaymentType = "NGN",
                             Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending),
                             TransactionDate = DateTime.UtcNow.AddHours(1),
