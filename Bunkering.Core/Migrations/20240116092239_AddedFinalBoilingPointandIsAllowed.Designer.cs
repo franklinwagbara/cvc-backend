@@ -4,6 +4,7 @@ using Bunkering.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bunkering.Core.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20240116092239_AddedFinalBoilingPointandIsAllowed")]
+    partial class AddedFinalBoilingPointandIsAllowed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,9 +79,6 @@ namespace Bunkering.Core.Migrations
 
                     b.Property<int>("DeportStateId")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("DeskMovementDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("ETA")
                         .HasColumnType("datetime2");
@@ -382,9 +382,6 @@ namespace Bunkering.Core.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Signature")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -541,7 +538,7 @@ namespace Bunkering.Core.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("COQId")
+                    b.Property<int>("COQId")
                         .HasColumnType("int");
 
                     b.Property<string>("CertifcateNo")
@@ -557,9 +554,6 @@ namespace Bunkering.Core.Migrations
                     b.Property<DateTime>("IssuedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ProductId")
-                        .HasColumnType("int");
-
                     b.Property<string>("QRCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -571,8 +565,6 @@ namespace Bunkering.Core.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("COQId");
-
-                    b.HasIndex("ProductId");
 
                     b.ToTable("COQCertificates");
                 });
@@ -2411,15 +2403,11 @@ namespace Bunkering.Core.Migrations
                 {
                     b.HasOne("Bunkering.Core.Data.CoQ", "COQ")
                         .WithMany()
-                        .HasForeignKey("COQId");
-
-                    b.HasOne("Bunkering.Core.Data.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId");
+                        .HasForeignKey("COQId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("COQ");
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.CoQ", b =>
