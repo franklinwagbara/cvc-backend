@@ -16,12 +16,12 @@
             <div>
                 <img src="~/assets/nmdpraLogo.png" alt="Logo" style="height: 250px; display: block; margin: 0 auto;" />
             </div>
-            <div style="text-align: center;font-size: 2.5em; color: forestgreen;">
+            <div style="text-align: center;font-size: 2em; color: forestgreen;">
                 <b>
                     NIGERIAN MIDSTREAM AND DOWNSTREAM PETROLEUM REGULATORY AUTHORITY
                 </b>
             </div>
-            <div style="text-align: center; margin-top: -1em;">
+                <div style="text-align: center; margin-top: -1em; font-size: 1em;">
                 <h5>Plot 1012 Cadastral Zone A00, Sani Abacha Way, Central Business District, Abuja, FCT, Nigeria.</h5>
             </div>
         </div>
@@ -29,19 +29,23 @@
         <hr />
         <table class="table table-borderless">
             <tr>
+                
                 <td>Marketer/PDT Owner: @Model.CompanyName</td>
-                <td>MOTHER VESEL: @Model.MotherVessel</td>
-                <td>DATE OF VESSEL ARRIVAL: @Model.DateOfVesselArrival</td>
+                <td>
+                    MOTHER VESSEL: @(string.IsNullOrEmpty(Model.MotherVessel) ? "N/A" : Model.MotherVessel) 
+                   
+                </td>
+                <td>DATE OF VESSEL ARRIVAL: @Model.DateOfVesselArrival.ToString("dd/MM/yyyy")</td>
             </tr>
             <tr>
                 <td>PRODUCT: @Model.Product</td>
-                <td>JETTY: @Model.Jetty</td>
-                <td>DATE OF VESSEL ULLAGE: @Model.DateOfVessselUllage</td>
+                <td>JETTY: @(string.IsNullOrEmpty(Model.Jetty) ? "N/A" : Model.Jetty) </td>
+                <td>DATE OF VESSEL ULLAGE: @Model.DateOfVessselUllage.ToString("dd/MM/yyyy")</td>
             </tr>
             <tr>
-                <td>VESSEL NAME: @Model.VesselName</td>
+                <td>VESSEL NAME: @(string.IsNullOrEmpty(Model.VesselName) ? "N/A" : Model.VesselName) </td>
                 <td>RECEIVING TERMINAL: @Model.ReceivingTerminal</td>
-                <td>DATE OF SHORE-TANK AFTER DISCHARGE:</td>
+                <td>DATE OF SHORE-TANK AFTER DISCHARGE: @Model.DateAfterDischarge.ToString("dd/MM/yyyy")</td>
             </tr>
         </table>
        
@@ -148,19 +152,43 @@
         </div>
         <table class="table table-borderless">
             <tr>
-                <td>GOV(litres): @Model.CompanyName</td>
-                <td>Ex-Depot Price: @Model.MotherVessel</td>
+                <td>GOV(litres): <span style="text-align:center">@Model.GOV</span></td>
+                <td>Ex-Depot Price: @Model.DepotPrice</td>
             </tr>
             <tr>
-                <td>GSV(litres): @Model.Product</td>
+                <td>GSV(litres): @Model.GSV</td>
             </tr>
             <tr>
-                <td>MT(VAC): @Model.Product</td>
+                <td>MT(VAC): @Model.MTVAC</td>
             </tr>
             <tr>
-                <td>NAME/SIGN. OF NMDPRA REP: @Model.Product</td>
-                <td>WITNESSED BY: @Model.Product</td>
+                <td>NAME/SIGN. OF NMDPRA REP: @Model.Cosignee</td>
+                <td>WITNESSED BY: Witness</td>
             </tr>
         </table>
     </div>
+
 </body>
+
+</html>
+
+<style>
+    body {
+        /*background: url("../../Images/coat-of-arm.jpg") no-repeat;*/
+        /*opacity: 0.1;*/
+        background-position: center;
+        background-size: contain;
+        font-family: Candara;
+        border: 5px solid;
+        padding: 3em;
+        justify-content: center;
+        position: relative;
+    }
+
+    /* table {
+            border-collapse: separate;
+            border-spacing: 0 15px;
+        } */
+
+   
+</style>

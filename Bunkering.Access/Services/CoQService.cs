@@ -1280,7 +1280,7 @@ namespace Bunkering.Access.Services
                 var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(coq.AppId), "Facility");
                 if(app != null)
                 {
-                    
+                    coqData.Reference = app.Reference;
                     coqData.MarketerName = app?.MarketerName ?? string.Empty;
                     coqData.MotherVessel = app.MotherVessel;
                     coqData.Jetty = app.Jetty;
@@ -1288,6 +1288,8 @@ namespace Bunkering.Access.Services
                     coqData.Vessel.Name = app.Facility.Name;
                     coqData.Vessel.VesselType = app.Facility?.VesselType?.Name?? string.Empty;
                     coqData.NominatedSurveyor = (await _unitOfWork.NominatedSurveyor.FirstOrDefaultAsync(c => c.Id == app.SurveyorId)).Name;
+                    coqData.AppId = app.Id;
+                    
                     //dictionary.Add("MarketerName", app.MarketerName);
                     //dictionary.Add("MotherVessel", app.MotherVessel);
                     //dictionary.Add("Jetty", app.Jetty);
@@ -1590,6 +1592,14 @@ namespace Bunkering.Access.Services
                     Product = tnks.FirstOrDefault().Product,
                     ReceivingTerminal = cqs.Plant.Name,
                     VesselName = cqs.Application?.VesselName ?? string.Empty,
+                    Cosignee = cqs.NameConsignee ?? string.Empty,
+                    DepotPrice = cqs.DepotPrice,
+                    GOV = cqs.GOV,
+                    GSV = cqs.GSV,
+                    MTVAC = cqs.MT_VAC,
+                    DateAfterDischarge = cqs.DateOfSTAfterDischarge
+
+                    
                 };
                 var tankList = new  List<CoQTanksDTO>();
                 foreach (var item in coQTanks)
