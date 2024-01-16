@@ -1383,7 +1383,7 @@ namespace Bunkering.Access.Services
             
             var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application.Facility");
             var apps =  appDepots.OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application).ToList();
-
+            
             _response = new ApiResponse
             {
                 Message = "Applications fetched successfully",
@@ -1596,5 +1596,10 @@ namespace Bunkering.Access.Services
             return _unitOfWork.Application.Query(c => c.DeskMovementDate.HasValue
             && c.DeskMovementDate.Value.AddMinutes(-15) >= DateTime.Now).Select(c => c.Id).ToList();
         }
+
+        //private List<Application> GetApplications()
+        //{
+
+        //}
     }
 }

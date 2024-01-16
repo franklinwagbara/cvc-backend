@@ -1272,10 +1272,8 @@ namespace Bunkering.Access.Services
             var dictionary = coq.Stringify().Parse<Dictionary<string, object>>();
             var coqData = new CoQsDataDTO()
             {
-                coqData = new()
-                {
-                    Vessel = new()
-                }
+                Vessel = new()
+                
             };
             if(coq.AppId != null)
             {
@@ -1283,13 +1281,13 @@ namespace Bunkering.Access.Services
                 if(app != null)
                 {
                     
-                    coqData.coqData.MarketerName = app?.MarketerName ?? string.Empty;
-                    coqData.coqData.MotherVessel = app.MotherVessel;
-                    coqData.coqData.Jetty = app.Jetty;
-                    coqData.coqData.LoadingPort = app.LoadingPort;
-                    coqData.coqData.Vessel.Name = app.Facility.Name;
-                    coqData.coqData.Vessel.VesselType = app.Facility?.VesselType?.Name?? string.Empty;
-                    coqData.coqData.NominatedSurveyor = (await _unitOfWork.NominatedSurveyor.FirstOrDefaultAsync(c => c.Id == app.SurveyorId)).Name;
+                    coqData.MarketerName = app?.MarketerName ?? string.Empty;
+                    coqData.MotherVessel = app.MotherVessel;
+                    coqData.Jetty = app.Jetty;
+                    coqData.LoadingPort = app.LoadingPort;
+                    coqData.Vessel.Name = app.Facility.Name;
+                    coqData.Vessel.VesselType = app.Facility?.VesselType?.Name?? string.Empty;
+                    coqData.NominatedSurveyor = (await _unitOfWork.NominatedSurveyor.FirstOrDefaultAsync(c => c.Id == app.SurveyorId)).Name;
                     //dictionary.Add("MarketerName", app.MarketerName);
                     //dictionary.Add("MotherVessel", app.MotherVessel);
                     //dictionary.Add("Jetty", app.Jetty);
@@ -1299,9 +1297,9 @@ namespace Bunkering.Access.Services
                     
                 }
             }
-            coqData.coqData.ProductType = product.ProductType;
-            coqData.coqData.CurrentDesk = _userManager.Users.FirstOrDefault(u => u.Id.Equals(coq.CurrentDeskId)).Email;
-            coqData.coqData.Plant = _context.Plants.FirstOrDefault(p => p.Id.Equals(coq.PlantId)).Name;
+            coqData.ProductType = product.ProductType;
+            coqData.CurrentDesk = _userManager.Users.FirstOrDefault(u => u.Id.Equals(coq.CurrentDeskId)).Email;
+            coqData.Plant = _context.Plants.FirstOrDefault(p => p.Id.Equals(coq.PlantId)).Name;
             //dictionary.Add("ProductType", product.ProductType);
             ////remove deskid and replace with name
             //dictionary.Remove("CurrentDeskId");
