@@ -23,6 +23,9 @@ namespace Bunkering.Core.ViewModels
         public double TotalBeforeWeightAir { get; set; } 
         public double TotalAfterWeightVac { get; set; }
         public double TotalBeforeWeightVac { get; set; }
+        public double QuantityReflectedOnBill { get; set; }
+        public double ArrivalShipFigure { get; set; }
+        public double DischargeShipFigure { get; set; }
         public List<COQGasTankDTO> tanks { get; set; }
     }
 

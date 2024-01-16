@@ -60,13 +60,17 @@
         <hr />
         <table class="table table-borderless">
            <tr>
-                <td>NAME OF JETTY/DEPOT: @Model.Jetty/  </td>
-                <td>NAME OF VESSEL: @Model.VesselName</td>
-                <td>NAME OF PRODUCT: @Model.Product</td>
-                <td>DATE OF ARRIVAL OF THE VESSEL: @Model.DateOfVesselArrival</td>
-                <td>DATE OF COMMENCEMENT OF PRODUCT DISCHARGE: @Model.Product</td>
-                <td>DATE OF COMPLETION OF PRODUCT DISCHARGE: @Model.Product</td>
-            </tr>          
+                <td>NAME OF JETTY/DEPOT: @Model.Jetty  </td>
+            </tr>
+            <tr><td>NAME OF VESSEL: @Model.VesselName</td></tr>
+            <tr><td>NAME OF PRODUCT: @Model.Product</td></tr>
+            <tr><td>DATE OF ARRIVAL OF THE VESSEL: @Model.DateOfVesselArrival</td></tr>
+            <tr><td>DATE OF COMMENCEMENT OF PRODUCT DISCHARGE: @Model.Product</td></tr>
+            <tr><td>DATE OF COMPLETION OF PRODUCT DISCHARGE: @Model.Product</td></tr>
+                
+                
+                
+                     
         </table>
         
  
@@ -350,25 +354,42 @@
       
         <table class="table table-borderless">
             <tr>
-                <td>Quantity Reflected on Bill of Landing (MT Air): @Model.CompanyName</td>
-                <td>NMDPRA REP NAME: @Model.CompanyName</td>
-                <td>ENDORSED BY: @Model.CompanyName</td>
+                <td>Quantity Reflected on Bill of Landing (MT Air): @Model.QuantityReflectedOnBill</td>
+                <td>NMDPRA REP NAME: </td>
+                <td>ENDORSED BY: </td>
                 
             </tr>
             <tr>
-                @* <td>Arrival Ship Figure (MT Air): @Model.MotherVessel</td> *@
-                <td>NMDPRA REP SIGN: @Model.Product</td>
+                <td>Arrival Ship Figure (MT Air): @Model.ArrivalShipFigure</td>
+                
             </tr>
             <tr>
-                <td>Actual Quantity Received Into Shore Tanks(MT Air): @Model.Product</td>
-                <td>STAMP & DATE: @Model.Product</td>
+                <td>SHIP Figure (DISCHARGED) (MT Air): @Model.DischargeShipFigure</td>
+                <td>NMDPRA REP SIGN: </td>
             </tr>
             <tr>
-                <td>Difference Between Ship’s figure(DISCH)/Shore figure (MT Air): @Model.Product</td>
+                <td>Actual Quantity Received Into Shore Tanks(MT Air): @totalWeightAir</td>
+                <td>STAMP & DATE: </td>
+            </tr>
+            <tr>
+                <td>
+                    Difference Between Ship’s figure(DISCH)/Shore figure (MT Air): 
+                    @{
+                        var difference = (Model.DischargeShipFigure)
+                        - (@totalWeightAir);
+                    }
+                    @difference
+                </td>
                 <td>WITNESSED BY: @Model.Product</td>
             </tr> 
             <tr>
-                <td>% Difference: @Model.Product</td>
+                <td>
+                    % Difference:  @{
+                        var differencePercent = @difference
+                        / (Model.DischargeShipFigure)*100;
+                    }
+                    @differencePercent
+                </td>
             </tr> 
             <tr>
                 <td>Name of Consignor/Consignee: @Model.Consignee</td>

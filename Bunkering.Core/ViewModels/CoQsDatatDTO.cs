@@ -10,13 +10,6 @@ namespace Bunkering.Core.ViewModels
 
     public class CoQsDataDTO
     {
-        public Coq? coq { get; set; }
-        public List<CreateCoQGasTankDTO> tankList { get; set; }
-        public SubmittedDocument docs { get; set; }
-    }
-
-    public class Coq
-    {
         public int? Id { get; set; }
         public int? AppId { get; set; }
         public int? PlantId { get; set; }
@@ -51,7 +44,14 @@ namespace Bunkering.Core.ViewModels
         public Vessel? Vessel { get; set; }
         public string? NominatedSurveyor { get; set; }
         public string? ProductType { get; set; }
+        public List<CreateCoQGasTankDTO> tankList { get; set; }
+        public SubmittedDocument docs { get; set; }
     }
+
+    //public class Coq
+    //{
+      
+    //}
 
     
     public class Vessel

@@ -1272,10 +1272,8 @@ namespace Bunkering.Access.Services
             var dictionary = coq.Stringify().Parse<Dictionary<string, object>>();
             var coqData = new CoQsDataDTO()
             {
-                coq = new()
-                {
-                    Vessel = new()
-                }
+                Vessel = new()
+                
             };
             if(coq.AppId != null)
             {
@@ -1283,13 +1281,13 @@ namespace Bunkering.Access.Services
                 if(app != null)
                 {
                     
-                    coqData.coq.MarketerName = app?.MarketerName ?? string.Empty;
-                    coqData.coq.MotherVessel = app.MotherVessel;
-                    coqData.coq.Jetty = app.Jetty;
-                    coqData.coq.LoadingPort = app.LoadingPort;
-                    coqData.coq.Vessel.Name = app.Facility.Name;
-                    coqData.coq.Vessel.VesselType = app.Facility?.VesselType?.Name?? string.Empty;
-                    coqData.coq.NominatedSurveyor = (await _unitOfWork.NominatedSurveyor.FirstOrDefaultAsync(c => c.Id == app.SurveyorId)).Name;
+                    coqData.MarketerName = app?.MarketerName ?? string.Empty;
+                    coqData.MotherVessel = app.MotherVessel;
+                    coqData.Jetty = app.Jetty;
+                    coqData.LoadingPort = app.LoadingPort;
+                    coqData.Vessel.Name = app.Facility.Name;
+                    coqData.Vessel.VesselType = app.Facility?.VesselType?.Name?? string.Empty;
+                    coqData.NominatedSurveyor = (await _unitOfWork.NominatedSurveyor.FirstOrDefaultAsync(c => c.Id == app.SurveyorId)).Name;
                     //dictionary.Add("MarketerName", app.MarketerName);
                     //dictionary.Add("MotherVessel", app.MotherVessel);
                     //dictionary.Add("Jetty", app.Jetty);
@@ -1299,9 +1297,9 @@ namespace Bunkering.Access.Services
                     
                 }
             }
-            coqData.coq.ProductType = product.ProductType;
-            coqData.coq.CurrentDesk = _userManager.Users.FirstOrDefault(u => u.Id.Equals(coq.CurrentDeskId)).Email;
-            coqData.coq.Plant = _context.Plants.FirstOrDefault(p => p.Id.Equals(coq.PlantId)).Name;
+            coqData.ProductType = product.ProductType;
+            coqData.CurrentDesk = _userManager.Users.FirstOrDefault(u => u.Id.Equals(coq.CurrentDeskId)).Email;
+            coqData.Plant = _context.Plants.FirstOrDefault(p => p.Id.Equals(coq.PlantId)).Name;
             //dictionary.Add("ProductType", product.ProductType);
             ////remove deskid and replace with name
             //dictionary.Remove("CurrentDeskId");
@@ -1680,6 +1678,10 @@ namespace Bunkering.Access.Services
                     Product = tnks.FirstOrDefault().Product,
                     ReceivingTerminal = cqs.Plant.Name,
                     VesselName = cqs.Application?.VesselName ?? string.Empty,
+                    QuantityReflectedOnBill = cqs.QuauntityReflectedOnBill,
+                    ArrivalShipFigure = cqs.ArrivalShipFigure,
+                    DischargeShipFigure = cqs.DischargeShipFigure
+                    
                 };
                 var tankList = new List<COQGasTankDTO>();
 
