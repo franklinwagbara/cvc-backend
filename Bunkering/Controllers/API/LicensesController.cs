@@ -123,7 +123,8 @@ namespace Bunkering.Controllers.API
 						{
 							Name = y.Depot.Name,
 							Product = y.Product.Name,
-							Volume = y.Volume
+							Volume = y.Volume,
+							DischargeId = y.DischargeId,
 						}).ToList(),
 						Jetty = license.Application.Jetty,
 						Surveyor = nominatedSurveyor is not null ? nominatedSurveyor.Name : "N/A"
