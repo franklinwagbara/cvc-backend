@@ -10,7 +10,7 @@ namespace Bunkering.Core.ViewModels
 
     public class CoQsDataDTO
     {
-        public Coq? coq { get; set; }
+        public Coq? coqData { get; set; }
         public List<CreateCoQGasTankDTO> tankList { get; set; }
         public SubmittedDocument docs { get; set; }
     }
