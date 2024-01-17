@@ -388,6 +388,7 @@ namespace Bunkering.Controllers.API
         [ProducesResponseType(typeof(ApiResponse), 405)]
         [ProducesResponseType(typeof(ApiResponse), 500)]
         [Route("get-app-naval-letter")]
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetNavalLetter()
         {
@@ -406,7 +407,7 @@ namespace Bunkering.Controllers.API
                 Model = model,
                 PageHeight = 327,
                 PageMargins = new Rotativa.AspNetCore.Options.Margins(10, 10, 10, 10),
-                ViewName = "ViewLicense"
+                ViewName = "NavalLetter"
             };
             var pdf = await viewAsPdf.BuildFile(ControllerContext);
             return File(new MemoryStream(pdf), "application/pdf");
