@@ -15,7 +15,7 @@
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
     <style type="text/css">
         body{
-            border: 2px solid;
+            /* border: 2px solid; */
         }
         table {
             /*     border-collapse: collapse;
@@ -54,6 +54,7 @@
 </head>
 <body>
     <div style="font-size: 1.5em !important;">
+        <div style="page-break-after: always; border: 2px solid;">
         <div class="text-center">
             <div>
                 <img src="~/assets/nmdpraLogo.png" alt="Logo" style="height: 120px; display: block; margin: 0 auto;" />
@@ -177,38 +178,47 @@
                         <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.ShrinkageFactorLiquid</td>
                     }
                 </tr>
-                <tr>
-                    <th style="text-align: left; font-size: 14px;" scope="row">Corrected Liquid Volume (m³)</th>
-                    @foreach (var item in Model.tanks)
-                    {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.CorrectedLiquidVolumeM3</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.CorrectedLiquidVolumeM3</td>
-                    }
-                </tr>
-                <tr>
-                    <th style="text-align: left; font-size: 14px;" scope="row">VCF (ASTM Table 54)</th>
-                    @foreach (var item in Model.tanks)
-                    {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.Vcf</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.Vcf</td>
-                    }
-                </tr>
-                <tr>
-                    <th style="text-align: left; font-size: 14px;" scope="row">Gross Standard Volume (m³)</th>
-                    @foreach (var item in Model.tanks)
-                    {
-                        <td style="text-align:center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.GrossStandardVolumeGas</td>
-                        <td style="text-align:center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.GrossStandardVolumeGas</td>
-                    }
-                </tr>
-                <tr>
-                    <th style="text-align: left; font-size: 14px;" scope="row">Liquid Weight (MT Vac)</th>
-                    @foreach (var item in Model.tanks)
-                    {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.LiquidWeightVAC</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.LiquidWeightVAC</td>
-                    }
-                </tr>
+                    <tr>
+                        <th style="text-align: left; font-size: 14px;" scope="row">Corrected Liquid Volume (m³)</th>
+                        @foreach (var item in Model.tanks)
+                        {
+                            <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.CorrectedLiquidVolumeM3</td>
+                            <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.CorrectedLiquidVolumeM3</td>
+                        }
+                    </tr>
+                    <tr style="page-break-after: always;">
+                        <th style="text-align: left; font-size: 14px;" scope="row">VCF (ASTM Table 54)</th>
+                        @foreach (var item in Model.tanks)
+                        {
+                            <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.Vcf</td>
+                            <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.Vcf</td>
+                        }
+                    </tr>
+                    <tr>
+                        <th style="text-align: left; font-size: 14px;" scope="row">Gross Standard Volume (m³)</th>
+                        @foreach (var item in Model.tanks)
+                        {
+                            <td style="text-align:center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.GrossStandardVolumeGas</td>
+                            <td style="text-align:center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.GrossStandardVolumeGas</td>
+                        }
+                    </tr>
+                    <tr>
+                        <th style="text-align: left; font-size: 14px;" scope="row">Liquid Weight (MT Vac)</th>
+                        @foreach (var item in Model.tanks)
+                        {
+                            <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.LiquidWeightVAC</td>
+                            <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.LiquidWeightVAC</td>
+                        }
+                    </tr>
+
+                </tbody>
+            </table>
+                </div>
+
+        <div style="border: 2px solid;">
+        <table style="width: 100%; border: 1px solid gray; padding: 5px;" class="table table-bordered">
+            <tbody>
+                
                 @* <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Liquid Weight (MT Air)</th>
                     @foreach (var item in Model.tanks)
@@ -404,5 +414,7 @@
                 <td>Name of Consignor/Consignee: @Model.Cosignee</td>
             </tr>
         </table>
+
+        </div>
     </div>
 </body>
