@@ -206,7 +206,13 @@ namespace Bunkering.Access.Services
                                     TransactionDate = DateTime.UtcNow.AddHours(1),
                                     BankCode = string.Empty,
                                     Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending),
-
+                                    LateRenewalPenalty = 0,
+                                    NonRenewalPenalty = 0,
+                                    Arrears = 0,
+                                    LastRetryDate = DateTime.UtcNow,
+                                    RetryCount = 0,
+                                    ServiceCharge = 0,
+                                    TransactionId = string.Empty,
                                 };
                                 await _unitOfWork.Payment.Add(payment);
                                 await _unitOfWork.SaveChangesAsync(user.Id);
