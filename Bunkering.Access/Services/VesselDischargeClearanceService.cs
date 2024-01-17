@@ -28,8 +28,10 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var create = await _unitOfWork.VesselDischargeClearance.FirstOrDefaultAsync(x => x.VesselName == model.VesselName);
-                var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == model.AppId);
+                var create = await _unitOfWork.VesselDischargeClearance
+                    .FirstOrDefaultAsync(x => x.AppId == model.AppId);
+                var app = await _unitOfWork.Application
+                    .FirstOrDefaultAsync(x => x.Id == model.AppId);
                 if (create == null)
                 {
                     var vesselDischargeClearance = new VesselDischargeClearance
