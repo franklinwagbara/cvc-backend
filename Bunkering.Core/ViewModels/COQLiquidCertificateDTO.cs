@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Sources;
 
 namespace Bunkering.Core.ViewModels
 {
-    public class COQLiquidCertificateDTO
+    public class COQGASCertificateDTO
     {
         public string CompanyName { get; set; }
         public string MotherVessel { get; set; }
@@ -32,9 +33,39 @@ namespace Bunkering.Core.ViewModels
         public double QuantityReflectedOnBill { get; set; }
         public double ArrivalShipFigure { get; set; }
         public double DischargeShipFigure { get; set; }
-        
+        public double TotalWeightAir => TotalAfterWeightAir - TotalBeforeWeightAir;
+        public double TotalWeightVAC => TotalAfterWeightVac - TotalBeforeWeightVac;
+        public double TotalWeightKg => TotalWeightVAC * 1000;
+        public double DebitNoteAmount => TotalWeightVAC * DepotPrice * 0.01;
+
         public List<CoQTanksDTO> tanks { get; set; }
        
+    }
+
+    public class COQNonGasCertificateDTO
+    {
+        public string CompanyName { get; set; }
+        public string MotherVessel { get; set; }
+        public DateTime DateOfVesselArrival { get; set; }
+        public string Product { get; set; }
+        public string ProductType { get; set; }
+        public string Jetty { get; set; }
+        public DateTime DateOfVessselUllage { get; set; }
+        public string VesselName { get; set; }
+        public string ReceivingTerminal { get; set; }
+        public string Cosignee { get; set; }
+        public double GSV { get; set; }
+        public double GOV { get; set; }
+        public double MTVAC { get; set; }
+        public double DepotPrice { get; set; }
+        public DateTime DateAfterDischarge { get; set; }
+        public double QuantityReflectedOnBill { get; set; }
+        public double ArrivalShipFigure { get; set; }
+        public double DischargeShipFigure { get; set; }
+        public double DebitNoteAmount => GSV * DepotPrice * 0.01;
+
+        public List<CoQNonGasTanksDTO> tanks { get; set; }
+
     }
 
     public class CoQTanksDTO
@@ -105,5 +136,41 @@ namespace Bunkering.Core.ViewModels
     {
         public int TankId { get; set; }
         public CoqCertTank coQCertTank { get; set; }
+    }
+
+    public class CoQNonGasTanksDTO
+    {
+        public string TankName { get; set; }
+        public List<COQTankNonGasBefore> BeforeTankMeasurements { get; set; }
+        public List<COQTankNonGasAfter> AfterTankMeasurement { get; set; }
+        // public List<CoQLiquidTankAfterReading> Difference { get; set; }
+    }
+
+    public class CoQCertTankNonGas
+    {
+        public string MeasurementType { get; set; }
+        public double DIP { get; set; }
+        public double WaterDIP { get; set; }
+        public double TOV { get; set; }
+        public double Vcf { get; set; }
+        public double WaterVolume { get; set; }
+        public double FloatRoofCorr { get; set; }
+        public double GOV { get; set; }
+        public decimal Tempearture { get; set; }
+        public double Density { get; set; }
+        public double GSV => GOV * Vcf;
+        public double MTVAC { get; set; }
+    }
+
+    public class COQTankNonGasBefore
+    {
+        public int TankId { get; set; }
+        public CoQCertTankNonGas CoQCertTankNonGas { get; set; }
+    }
+
+    public class COQTankNonGasAfter
+    {
+        public int TankId { get; set; }
+        public CoQCertTankNonGas CoQCertTankNonGas { get; set; }
     }
 }

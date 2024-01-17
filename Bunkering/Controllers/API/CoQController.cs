@@ -243,7 +243,7 @@ namespace Bunkering.Controllers.API
             {
                 var license = await _coqService.ViewCoQCertificate(id);
 
-                var coqData = license.Data as COQLiquidCertificateDTO;
+                var coqData = license.Data as COQGASCertificateDTO;
 
                 if (coqData != null && coqData.ProductType == "Gas")
                 {
