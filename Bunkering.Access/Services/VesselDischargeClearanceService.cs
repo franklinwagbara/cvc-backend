@@ -51,7 +51,7 @@ namespace Bunkering.Access.Services
                     
                     await _unitOfWork.VesselDischargeClearance.Add(vesselDischargeClearance);
                     await _unitOfWork.SaveChangesAsync("");
-                    app.IsVesselCleared = true;
+                    app.HasCleared = true;
                     await _unitOfWork.Application.Update(app);
                     _unitOfWork.Save();
                     
