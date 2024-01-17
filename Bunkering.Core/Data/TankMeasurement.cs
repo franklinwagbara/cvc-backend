@@ -20,6 +20,7 @@ namespace Bunkering.Core.Data
         public decimal Tempearture { get; set; } = 0;
         public double Density { get; set; } = 0;
         public double VCF { get; set; } = 0;
+
         public double GSV { get; set; } = 0;
         public double MTVAC { get; set; } = 0;
         public double LiquidDensityVac { get; set; } = 0;

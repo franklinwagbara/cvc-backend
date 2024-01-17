@@ -1240,34 +1240,35 @@ namespace Bunkering.Access.Services
             if(coq.ProductId != null)
             {
                 product = await _unitOfWork.Product.FirstOrDefaultAsync(x =>x.Id.Equals(coq.ProductId));
-                if(product != null)
-                {
-                    switch(product.ProductType.ToLower())
-                    {
-                        case "gas":
-                            foreach(var item in tanks)
-                            {
-                                var reading = _mapper.Map<List<CreateCoQGasTankDTO>>(item.TankMeasurement);
-                                reading.ForEach(x => x.TankName = _context.PlantTanks.FirstOrDefault(x => x.PlantTankId == item.TankId).TankName);
-                                gastankList.Add(reading);
-                            }
-                            break;
-                        default:
-                            foreach(var item in tanks)
-                            {
-                                var reading = _mapper.Map<List<CreateCoQLiquidTankDto>>(item.TankMeasurement);
-                                reading.ForEach(x => x.TankName = _context.PlantTanks.FirstOrDefault(x => x.PlantTankId == item.TankId).TankName);
-                                liqtankList.Add(reading);
-                            }
-                            break;
-                    }
-                }
+               
             }
             else
             {
                 var app = await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.Id.Equals(coq.AppId), "Product");
                 if (app != null)
                     product = app.Product;
+            }
+            if (product != null)
+            {
+                switch (product.ProductType.ToLower())
+                {
+                    case "gas":
+                        foreach (var item in tanks)
+                        {
+                            var reading = _mapper.Map<List<CreateCoQGasTankDTO>>(item.TankMeasurement);
+                            reading.ForEach(x => x.TankName = _context.PlantTanks.FirstOrDefault(x => x.PlantTankId == item.TankId).TankName);
+                            gastankList.Add(reading);
+                        }
+                        break;
+                    default:
+                        foreach (var item in tanks)
+                        {
+                            var reading = _mapper.Map<List<CreateCoQLiquidTankDto>>(item.TankMeasurement);
+                            reading.ForEach(x => x.TankName = _context.PlantTanks.FirstOrDefault(x => x.PlantTankId == item.TankId).TankName);
+                            liqtankList.Add(reading);
+                        }
+                        break;
+                }
             }
             var dictionary = coq.Stringify().Parse<Dictionary<string, object>>();
             var coqData = new CoQsDataDTO()

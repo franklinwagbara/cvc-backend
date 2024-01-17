@@ -15,7 +15,7 @@ namespace Bunkering.Core.ViewModels
         public double LiquidTemperature { get; set; }
         public double ObservedLiquidVolume { get; set; }
         public double ShrinkageFactorLiquid { get; set; }
-        public double Vcf { get; set; }
+        public double VCF { get; set; }
         //public double LiquidWeightVAC { get; set; }
         //public double LiquidWeightAir { get; set; }
         public double TankVolume { get; set; }
