@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Application>
+﻿@model IEnumerable<NavalLetterDto>
 @{
     Layout = null;
     int count = 0;
@@ -28,69 +28,95 @@
             <h3>@DateTime.Now.ToShortDateString()</h3>
         </div>
         <div style="float: right; position: relative; margin-top: 1em; margin-bottom: 1em;">
-            <h2><span>Clearance No:</span> <span style="padding: 0 50px 0 10px; font-weight: bold;">NMDPRA/DSSRI/CVC/LDS/V.1/099</span></h2>
+            @{ var refVolume = 2024 - DateTime.Today.Year + 1;}
+            <h2><span>Clearance No:</span> <span style="padding: 0 50px 0 10px; font-weight: bold;">NMDPRA/DSSRI/CVC/LDS/V.@refVolume/@DateTime.Today.DayOfYear</span></h2>
         </div>
         <div style="width: 100%; text-align: center; position: absolute; top: 50%; margin-top: -400px;">
             <img src="~/assets/coat-of-arm.jpg" style="width: 920px; opacity: 0.1; margin-left: -5em;;" />
         </div>
         <br /> <br />
         <br /> <br />
-        <p>
-            As approved by the ACE, please find below details of the vessel clearance for your kind attention:
+        <p style="text-align:left">
+            Chief of the Naval Staff,<br/>
+            Nigerian Navy,<br />
+            Nigerian Navy Headquarters,<br />
+            Abuja.<br />
+            Dear Sir,<br />
         </p>
+        <h2>NMDPRA PETROLEUM PRODUCTS LOADING AND DISCHARGE SCHEDULE – @DateTime.Today.DayOfYear/2024</h2>
+        <p>
+            Please find attached schedule @Model.Count() conveying the details of @Model.Count() vessel
+            clearances issued to Oil and Gas marketing companies for Loading/discharge
+            petroleum products. This is submitted for your information.
+        </p>
+        <p>
+            Please accept the assurances of the Authority Chief Executive’s, Nigerian Midstream
+            and Downstream Petroleum Regulatory Authority's esteemed regards.
+        </p>
+        <p>
+            Yours faithfully,<br />
+            For: <strong>Nigerian Midstream and Downstream Petroleum Regulatory Authority</strong>
+        </p>
+
+
+        <img src="#" height="20"/>
+        <strong>
+            Rabiu D. Jibrin
+        </strong><br />
+        For: Deputy Director Operation
+
+        <br />
         <p>
             <table style="width: 100%; font-size: 1em !important; border: 1px solid gray; padding: 5px;">
                 <thead>
                     <tr>
+                        <th colspan="6">PETROLEUM PRODUCTS APPROVED LOADING/DISCHARGE SCHEDULE </th>
+                        <th></th>
+                        <th>Date</th>
+                        <th>@DateTime.Today.ToShortDateString()</th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th>Schedule</th>
+                        <th>NMDPRA/CVC/@DateTime.Today.DayOfYear/@DateTime.Now.Year</th>
+                    </tr>
+                    <tr>
                         <th>S/N</th>
-                        <th>DISCHARGE ID</th>
-                        <th>VESSEL/<br />TRUCK</th>
-                        <th>PRODUCT</th>
-                        <th>QTY(MTS)</th>
+                        <th>VESSEL</th>
                         <th>ETA</th>
+                        <th>PRODUCT</th>
+                        <th>QUANTITY (MT)</th>
                         <th>LOAD PORT</th>
                         <th>DESTINATION</th>
                         <th>JETTY</th>
-                        <th>NOMINATED <br />SURVEYOR</th>
+                        <th>CONSIGNEE/OWNER</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model.Destinations)
+                    @foreach (var item in Model)
                     {
                         count++;
                         <tr>
                             <td>@count</td>
-                            <td>@item.DischargeId</td>
-                            <td>@Model.Vessel</td>
-                            <td>@item.Product</td>
-                            <td>@item.Volume.ToString("N2")</td>
-                            <td>@Model.ETA.ToString("dd MMM yyyy")</td>
-                            <td>@Model.LoadPort</td>
-                            <td>@item.Name</td>
-                            <td>@Model.Jetty</td>
-                            <td>@Model.Surveyor</td>
+                            <td>@item.VesselName</td>
+                            <td>@item.ETA</td>
+                            <td>@item.ProductName</td>
+                            <td>@item.Volume</td>
+                            <td>@item.LoadingPort</td>
+                            <td>@item.Destination</td>
+                            <td>@item.Jetty</td>
+                            <td>@item.MarketerName</td>
                         </tr>
                     }
                 </tbody>
             </table>
         </p>
-        <p>
-            Please allow the vessel to discharge/loading and ensure complete recertification.
-        </p>
-        <div style="margin-top: 2em;">
-            <div style="float: left !important;">
-                <img src="data:imaage/png;base64,@Model.QRCode" width="170" height="170" />
-            </div>
-            <div style="float: right !important;">
-                <div class="text-center">
-                    <img src="data:imaage/png;base64,@Model.Signature" height="130" />
-                </div>
-                <div style="font-size: large; text-align: center; border-top: dotted 2px; padding: 0 10px 0 10px;">
-                    <span>For: Authority Chief Executive</span>
-                </div>
-
-            </div>
-        </div>
     </div>
 </body>
 </html>

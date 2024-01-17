@@ -1473,6 +1473,21 @@ namespace Bunkering.Access.Services
             }
         }
 
+        public async Task<IEnumerable<NavalLetterDto>> GetClearedVessels()
+        {
+            var apps = await _unitOfWork.Application.Find(c => c.HasCleared);
+            var data = new List<NavalLetterDto>();
+            foreach (var app in apps)
+            {
+                var appDepot = (await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.AppId == app.Id));
+                var product = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.ProductId));
+                data.Add(new NavalLetterDto(app.MarketerName, product.Name, appDepot.Volume,
+                    app.VesselName, app.MotherVessel, app.Jetty, app.ETA, app.LoadingPort, appDepot.Depot.Name
+                ));
+            }
+            return data;
+        }
+
         public async Task<ApiResponse> IMONumberVerification(string imoNumber)
         {
             var verifyIMO = await _unitOfWork.Facility.FirstOrDefaultAsync(x => x.IMONumber.Equals(imoNumber));
@@ -1675,4 +1690,5 @@ namespace Bunkering.Access.Services
         }
 
     }
+
 }
