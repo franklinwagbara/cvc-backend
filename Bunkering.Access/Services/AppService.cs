@@ -17,7 +17,7 @@ using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Bunkering.Access.Query;
-using System.Reflection.Metadata.Ecma335;
+using System.ComponentModel.Design;
 
 namespace Bunkering.Access.Services
 {
@@ -125,8 +125,8 @@ namespace Bunkering.Access.Services
             {
                 //querying the database to retrieve a user along with their associated roles
                 var user = _userManager.Users.Include(ur => ur.UserRoles).ThenInclude(r => r.Role).FirstOrDefault(x => x.Email.Equals(User));
-                
-                if(user == null)
+
+                if (user == null)
                 {
                     return new ApiResponse
                     {
@@ -136,9 +136,9 @@ namespace Bunkering.Access.Services
                     };
                 }
                 // get app configuration for notice of arrival
-                var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Utils.NOA)); 
+                var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Utils.NOA));
 
-                if(appType == null)
+                if (appType == null)
                 {
                     return new ApiResponse
                     {
@@ -189,7 +189,7 @@ namespace Bunkering.Access.Services
                         MotherVessel = model.MotherVessel,
                         Jetty = model.Jetty,
                         ETA = model.ETA,
-                      
+
                     };
 
                     var newApp = await _unitOfWork.Application.Add(app);
@@ -200,7 +200,8 @@ namespace Bunkering.Access.Services
                     {
                         var depotList = new List<AppDepotViewModel>();
 
-                        model.DepotList.ForEach(d => {
+                        model.DepotList.ForEach(d =>
+                        {
                             d.AppId = newApp.Id;
                             depotList.Add(d);
                         });
@@ -481,6 +482,7 @@ namespace Bunkering.Access.Services
                         Success = false
                     };
                     var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id), "ApplicationType,Facility.VesselType,Payments");
+                    var appDepots = (await _unitOfWork.ApplicationDepot.Find(x => x.AppId.Equals(id))).Select(c => c.Depot).ToList();
                     if (app is null) return new ApiResponse()
                     {
                         StatusCode = HttpStatusCode.NotFound,
@@ -488,7 +490,7 @@ namespace Bunkering.Access.Services
                         Success = false
                     };
                     
-                    var fee = await _unitOfWork.AppFee.FirstOrDefaultAsync(x => x.ApplicationTypeId.Equals(app.ApplicationTypeId));
+                    var fee = await _unitOfWork.AppFee.FirstOrDefaultAsync(x => x.ApplicationTypeId.Equals(app.ApplicationTypeId) && x.IsDeleted != true);
                     if (fee is null) return new ApiResponse()
                     {
                         StatusCode = HttpStatusCode.NotFound,
@@ -496,7 +498,7 @@ namespace Bunkering.Access.Services
                         Success = false
                     };
 
-                    var total = (double)fee.COQFee + (double)fee.SerciveCharge + (double)fee.NOAFee;
+                    var total = (double)(fee.COQFee * appDepots.Count) + (double)fee.SerciveCharge + (double)fee.NOAFee;
 
                     var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.ApplicationId.Equals(id));
                     if (payment == null)
@@ -508,7 +510,12 @@ namespace Bunkering.Access.Services
                             ApplicationId = id,
                             OrderId = app.Reference,
                             BankCode = _setting.NMDPRAAccount,
-                            Description = $"Payment for CVC & COQ License ({app.Facility.Name})",
+                            Description = $"Payment for CVC & COQ License ({app.Facility.Name}) |" +
+                            $" NoA Fee: ₦ {fee.NOAFee:#,#.##} |" +
+                            $" Depots: {appDepots.Count} |" +
+                            $" CoQ Fee (per Depot): ₦ {fee.COQFee:#,#.##} |" +
+                            $" Total CoQ Fee: ₦ {(fee.COQFee * appDepots.Count):#,#.##} |" +
+                            $" Total Amount: ₦ {total:#,#.##}",
                             PaymentType = "NGN",
                             Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending),
                             TransactionDate = DateTime.UtcNow.AddHours(1),
@@ -987,11 +994,11 @@ namespace Bunkering.Access.Services
             try
             {
                 var user = await _userManager.Users.Include(x => x.Location).Include(ur => ur.UserRoles).ThenInclude(u => u.Role).FirstOrDefaultAsync(x => x.Email.Equals(User));
-                if(user.Location?.Name == LOCATION.FO)
-                        return await GetMyDeskFO(user);
+                if (user.Location?.Name == LOCATION.FO)
+                    return await GetMyDeskFO(user);
                 else if (user.UserRoles.FirstOrDefault().Role.Name.Equals("FAD"))
                     return await GetMyDeskFO(user);
-                else 
+                else
                     return await GetMyDeskOthers(user);
             }
             catch (Exception e)
@@ -1313,19 +1320,19 @@ namespace Bunkering.Access.Services
                         var flow = await _flow.AppWorkFlow(id, act, comment);
                         if (flow.Item1)
                         {
-                            if (act.Equals(Enum.GetName(typeof(AppActions), AppActions.Approve).ToLower()))
-                            {
-                                var s = await PostDischargeId(app.Id, user.Id);
-                                if(s is false)
-                                {
-                                    return new ApiResponse
-                                    {
-                                        StatusCode = HttpStatusCode.BadRequest,
-                                        Message = "Discharge Id not generated",
-                                        Success = false,
-                                    };
-                                }
-                            }
+                            //var appStatusCheck = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id)).Result.Status;
+                            //{
+                            //    var s = await PostDischargeId(app.Id, user.Id);
+                            //    if(s is false)
+                            //    {
+                            //        return new ApiResponse
+                            //        {
+                            //            StatusCode = HttpStatusCode.BadRequest,
+                            //            Message = "Discharge Id not generated",
+                            //            Success = false,
+                            //        };
+                            //    }
+                            //}
                             _response.StatusCode = HttpStatusCode.OK;
                             _response.Success = true;
                             _response.Message = "Application has been pushed";
@@ -1407,7 +1414,7 @@ namespace Bunkering.Access.Services
         public async Task<ApiResponse> AllApplicationsByDepot(int depotId)
         {
             var appDepot = await _unitOfWork.ApplicationDepot.Find(x => x.DepotId.Equals(depotId));
-            var applications = await  _unitOfWork.Application.Find(x => appDepot.Any(a => a.AppId == x.Id && x.Status == Enum.GetName(AppStatus.Completed)) == true);
+            var applications = await _unitOfWork.Application.Find(x => appDepot.Any(a => a.AppId == x.Id && x.Status == Enum.GetName(AppStatus.Completed)) == true);
             if (applications != null)
             {
                 var filteredapps = applications.Where(x => x.IsDeleted == false);
@@ -1419,8 +1426,8 @@ namespace Bunkering.Access.Services
                     Data = applications.OrderByDescending(c => c.CreatedDate).ToList()
                 };
             }
-           
-           
+
+
 
             return _response;
         }
@@ -1429,7 +1436,7 @@ namespace Bunkering.Access.Services
         {
             var user = await _userManager.FindByEmailAsync(User);
 
-            if (user is  null)
+            if (user is null)
             {
                 _response = new ApiResponse
                 {
@@ -1450,16 +1457,29 @@ namespace Bunkering.Access.Services
                 };
                 return _response;
             }
-            
+
             var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application.Facility");
-            var apps =  appDepots.OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application).ToList();
-            
+            //var apps = appDepots.OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application).ToList();
+
+            var depList = new List<int>();
+            foreach (var item in appDepots)
+            {
+                depList.Add(item.AppId);
+            }
+            List<ViewApplicationsByFieldOfficerDTO> appsDto = new List<ViewApplicationsByFieldOfficerDTO>();
+            foreach (var app in depList)
+            {
+                var apps = GetApplications(app);
+                appsDto.Add(apps);
+            }
+
+
             _response = new ApiResponse
             {
                 Message = "Applications fetched successfully",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                Data = apps
+                Data = appsDto
             };
 
             return _response;
@@ -1479,7 +1499,7 @@ namespace Bunkering.Access.Services
                 if (appDepot == null)
                     throw new Exception("The Select depot does not exist for this application!");
 
-                var depot = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.DepotId));  
+                var depot = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.DepotId));
                 var product = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.ProductId));
 
                 if (product == null)
@@ -1503,7 +1523,7 @@ namespace Bunkering.Access.Services
                         Jetty = app.Jetty,
                         ETA = app,
                         RecievingTerminal = depot.Name,
-                        COQExist = coq == null? false: true,
+                        COQExist = coq == null ? false : true,
                         coqId = coq?.Id,
                     },
                     Message = "Successfull.",
@@ -1532,16 +1552,16 @@ namespace Bunkering.Access.Services
                     Message = "Verified",
                     Data = new
                     {
-                       Id = verifyIMO.Id,
-                       IMONumber = verifyIMO.IMONumber,
-                       Name = verifyIMO.Name
-                    },  
+                        Id = verifyIMO.Id,
+                        IMONumber = verifyIMO.IMONumber,
+                        Name = verifyIMO.Name
+                    },
                     StatusCode = HttpStatusCode.OK,
                     Success = true
                 };
 
                 return _response;
-              
+
             }
             else
             {
@@ -1551,7 +1571,7 @@ namespace Bunkering.Access.Services
                     StatusCode = HttpStatusCode.NotFound,
                     Success = false
                 };
-                
+
             }
 
             return _response;
@@ -1629,37 +1649,37 @@ namespace Bunkering.Access.Services
                     Success = false,
                 };
             }
-            
+
 
             return _response;
         }
-        public string GenerateDischargeID(string product)
-        {
-            Random random = new Random();
-            string _token = random.Next(100001, 999999).ToString();
+        //public string GenerateDischargeID(string product)
+        //{
+        //    Random random = new Random();
+        //    string _token = random.Next(100001, 999999).ToString();
 
-            return $"{product.ToUpper()}/{_token}";
-        }
-        public async Task<bool> PostDischargeId(int id,string  userId)
-        {
-            var appDepots = await _context.ApplicationDepots.Where(a => a.AppId == id).Include(x => x.Product).ToListAsync();
-            foreach (var appDepot in appDepots)
-            {
-                appDepot.DischargeId = GenerateDischargeID(appDepot.Product.Name);
-            }
+        //    return $"{product.ToUpper()}/{_token}";
+        //}
+        //public async Task<bool> PostDischargeId(int id,string  userId)
+        //{
+        //    var appDepots = await _context.ApplicationDepots.Where(a => a.AppId == id).Include(x => x.Product).ToListAsync();
+        //    foreach (var appDepot in appDepots)
+        //    {
+        //        appDepot.DischargeId = GenerateDischargeID(appDepot.Product.Name);
+        //    }
             
-            _context.ApplicationDepots.UpdateRange(appDepots);
-            var s = await _context.SaveChangesAsync();
-            if(s > 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+        //    _context.ApplicationDepots.UpdateRange(appDepots);
+        //    var s = await _context.SaveChangesAsync();
+        //    if(s > 0)
+        //    {
+        //        return true;
+        //    }
+        //    else
+        //    {
+        //        return false;
+        //    }
 
-        }
+        //}
 
         public IEnumerable<int> GetLongProcessingApps()
         {
@@ -1667,9 +1687,61 @@ namespace Bunkering.Access.Services
             && c.DeskMovementDate.Value.AddMinutes(-15) >= DateTime.Now).Select(c => c.Id).ToList();
         }
 
-        //private List<Application> GetApplications()
-        //{
+        private ViewApplicationsByFieldOfficerDTO GetApplications(int Id)
+        {
+            var result = new ViewApplicationsByFieldOfficerDTO();
 
-        //}
+            var apps = _unitOfWork.ApplicationDepot.Query()
+                        .Include(x => x.Application)
+                        .Include(x => x.Depot)
+                        .FirstOrDefault(x => x.AppId == Id);
+            var vessel = _unitOfWork.Facility.Query().FirstOrDefault(x => x.Id == apps.Application.FacilityId);
+
+            var app = new ViewApplicationsByFieldOfficerDTO
+            {
+                ApplicationTypeId = apps?.Application.ApplicationTypeId ?? 0,
+                CreatedDate = apps.Application.CreatedDate,
+                CurrentDeskId = apps.Application.CurrentDeskId,
+                DeportStateId = apps.Application.DeportStateId,
+                DeskMovementDate = apps.Application.DeskMovementDate,
+                ETA = apps.Application.ETA,
+                FacilityId = apps.Application.FacilityId,
+                FADApproved = apps.Application.FADApproved,
+                Jetty = apps.Application.Jetty,
+                LoadingPort = apps.Application.LoadingPort,
+                FADStaffId = apps.Application.FADStaffId,
+                FlowId = apps.Application.FlowId,
+                IsDeleted = apps.Application.IsDeleted,
+                MarketerName = apps.Application.MarketerName,
+                ModifiedDate = apps.Application.ModifiedDate,
+                MotherVessel = apps.Application.MotherVessel,
+                Status = apps.Application.Status,
+                Reference = apps.Application.Reference,
+                VesselName = apps.Application.VesselName,
+                SubmittedDate = apps.Application.SubmittedDate,
+                SurveyorId = apps.Application.SurveyorId,
+                UserId = apps.Application.UserId,
+                CompanyId = vessel.CompanyId,
+                IMONumber = vessel.IMONumber,
+                IsLicensed = vessel.IsLicensed,
+                Id = vessel.Id,
+                CallSIgn = vessel.CallSIgn,
+                Capacity = vessel.Capacity,
+                DeadWeight = vessel.DeadWeight,
+                ElpsId = vessel.ElpsId,
+                Flag = vessel.Flag,
+                Name = vessel.Name,
+                Operator = vessel.Operator,
+                PlaceOfBuild = vessel.PlaceOfBuild,
+                VesselTypeId = vessel.VesselTypeId,
+                YearOfBuild = vessel.YearOfBuild,
+                DischargeId = apps.DischargeId,
+                HasCleared = apps.Application.HasCleared
+            };
+
+            return app;
+
+        }
+
     }
 }

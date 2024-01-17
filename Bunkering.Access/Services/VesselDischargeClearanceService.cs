@@ -29,7 +29,7 @@ namespace Bunkering.Access.Services
             try
             {
                 var create = await _unitOfWork.VesselDischargeClearance.FirstOrDefaultAsync(x => x.VesselName == model.VesselName);
-
+                var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == model.AppId);
                 if (create == null)
                 {
                     var vesselDischargeClearance = new VesselDischargeClearance
@@ -48,10 +48,13 @@ namespace Bunkering.Access.Services
                         Others = model.Others,
                         Comment = model.Comment,
                     };
-
+                    
                     await _unitOfWork.VesselDischargeClearance.Add(vesselDischargeClearance);
                     await _unitOfWork.SaveChangesAsync("");
-
+                    app.HasCleared = true;
+                    await _unitOfWork.Application.Update(app);
+                    _unitOfWork.Save();
+                    
                     model.Id = vesselDischargeClearance.Id;
 
                     _response = new ApiResponse

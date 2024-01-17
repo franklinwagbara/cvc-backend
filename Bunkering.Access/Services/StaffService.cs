@@ -277,7 +277,7 @@ namespace Bunkering.Access.Services
 
 					}
 					var role = await _roleManager.FindByIdAsync(model.RoleId);
-                    if (role?.Name is Roles.ACE or Roles.FO or Roles.Reviewer or Roles.Supervisor && model.SignatureFile?.Length is null or <= 0)
+                    if (role?.Name is Roles.ACE or Roles.FO or Roles.Reviewer or Roles.Supervisor && model.SignatureFile?.Length is null or <= 0  && user.Signature == null)
                     {
                         return new ApiResponse
                         {

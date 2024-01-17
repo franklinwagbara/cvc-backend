@@ -235,25 +235,30 @@ namespace Bunkering.Controllers.API
         [ProducesResponseType(typeof(ApiResponse), 405)]
         [ProducesResponseType(typeof(ApiResponse), 500)]
         [Produces("application/json")]
-        [Route("view_liquid-cert")]
+        [Route("view_CoQ_cert")]
         [HttpGet]
-        public async Task<IActionResult> ViewLiquidCertificate(int id)
+        public async Task<IActionResult> ViewCertificate(int id)
         {
             try
             {
-                var license = await _coqService.ViewCoQLiquidCertificate(id);
-               /* return View("ViewCertificate", license.Data);*/
-                if (license != null)
+                var license = await _coqService.ViewCoQCertificate(id);
+
+                var coqData = license.Data as COQLiquidCertificateDTO;
+
+                if (coqData != null && coqData.ProductType == "Gas")
                 {
-                    /* var qrcode = Utils.GenerateQrCode($"{Request.Scheme}://{Request.Host}/License/ValidateQrCode/{license.ApplicationId}");
-                     license.QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length);*/
-                    //var viewAsPdf = new ViewAsPdf
-                    //{
-                    //    Model = license.Data,
-                    //    PageHeight = 327,
-                    //    ViewName = "ViewCertificate"
-                    //};
-                    //var pdf = await viewAsPdf.BuildFile(ControllerContext);
+                    //return View("ViewGasCertificate", license.Data);
+                    return new ViewAsPdf("ViewGasCertificate", license.Data)
+                    {
+                        PageSize = Size.A4,
+                        PageHeight = 327,
+                        PageOrientation = Orientation.Landscape,
+                        FileName = $"CoQ Certificate_{DateTime.Now.Day}-{DateTime.Now.Month}-{DateTime.Now.Year}.pdf",
+
+                    };
+                }
+                else
+                {
                     return new ViewAsPdf("ViewCertificate", license.Data)
                     {
                         PageSize = Size.A4,
@@ -263,7 +268,8 @@ namespace Bunkering.Controllers.API
 
                     };
                 }
-                return BadRequest();
+               
+                
             }
             catch (Exception ex)
             {
@@ -498,6 +504,6 @@ namespace Bunkering.Controllers.API
         [Produces("application/json")]
         [Route("view_coq_liquid_coqId/{coqId}")]
         [HttpGet]
-        public async Task<IActionResult> ViewLiquidCOQCertificate(int coqId) => Response(await _coqService.ViewCoQLiquidCertificate(coqId));
+        public async Task<IActionResult> ViewLiquidCOQCertificate(int coqId) => Response(await _coqService.ViewCoQCertificate(coqId));
     }
 }
