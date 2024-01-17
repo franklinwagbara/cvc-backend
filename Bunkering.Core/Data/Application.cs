@@ -48,6 +48,6 @@ namespace Bunkering.Core.Data
         public virtual ICollection<Message> Messages { get; set; }
         public virtual ICollection<ApplicationHistory> Histories { get; set; }
 
-        public bool IsVesselCleared { get; set; }
+        public bool HasCleared { get; set; }
     }
 }

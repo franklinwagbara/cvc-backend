@@ -1545,6 +1545,8 @@ namespace Bunkering.Access.Services
                 DischargeShipFigure = plist.DischargeShipFigure,
                 NameConsignee = plist.NameConsignee,
                 QuauntityReflectedOnBill = plist.QuauntityReflectedOnBill
+               
+
 
             };
             return cd;
