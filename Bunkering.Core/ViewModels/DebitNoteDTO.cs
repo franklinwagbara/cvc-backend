@@ -6,12 +6,12 @@
         public DateTime PayableBefore { get; }
         public string Marketer { get; }
         public string DepotName { get; }
-        public decimal Price { get; }
-        public decimal Levy { get; }
-        public decimal Volume { get; }
-        public decimal WholesalePrice { get; }
+        public double Price { get; }
+        public double Levy { get; }
+        public double Volume { get; }
+        public double WholesalePrice { get; }
 
-        public DebitNoteDTO(DateTime vesselDischargeDate, DateTime payableBefore, string marketer, string depotName, decimal price, decimal levy, decimal volume, decimal wholesalePrice)
+        public DebitNoteDTO(DateTime vesselDischargeDate, DateTime payableBefore, string marketer, string depotName, double price, double levy, double volume, double wholesalePrice)
         {
             VesselDischargeDate = vesselDischargeDate;
             PayableBefore = payableBefore;
