@@ -701,13 +701,11 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> GetDebitNote(int id)
         {
-                var coq = await _unitOfWork.Payment.FirstOrDefaultAsync(c => c.Id == id, "Depot");
-
-
+            var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(c => c.Id == id,"Plant.Tanks");
             if (coq is not null)
             {
-                var app = await _unitOfWork.Application.FirstOrDefaultAsync(a => a.Id == coq.Id);
-                if (app is null)
+                var app = await _unitOfWork.Application.FirstOrDefaultAsync(a => a.Id == id);
+                if (app is null && coq.AppId is not null)
                 {
                     return new ApiResponse
                     {
@@ -716,23 +714,28 @@ namespace Bunkering.Access.Services
                         Success = false
                     };
                 }
-                //var price = coq.MT_VAC * coq.DepotPrice;
-                //var result = new DebitNoteDTO(
-                //coq.DateOfSTAfterDischarge,
-                //coq.DateOfSTAfterDischarge.AddDays(21),
-                //app.MarketerName,
-                //coq.Depot!.Name,
-                //price,
-                //coq.DepotPrice * 0.01m,
-                //coq.Depot!.Capacity,
-                //price / coq.Depot!.Capacity
-                //);
+                var price = coq.MT_VAC * coq.DepotPrice;
+                var capacity = coq.Plant?.Tanks.Sum(c => c.Capacity);
+                var wholeSalePrice = 0m;
+                if (capacity > 0)
+                {
+                    wholeSalePrice = (decimal)price / capacity.Value;
+                }
+                var result = new DebitNoteDTO(
+                coq.DateOfSTAfterDischarge,
+                coq.DateOfSTAfterDischarge.AddDays(21),
+                app.MarketerName,
+                coq.Plant!.Name,
+                (decimal)price,
+                (decimal)coq.DepotPrice * 0.01m,
+                capacity ?? 0,
+                wholeSalePrice);
                 return new ApiResponse
                 {
                     Message = $"Debit note fetched successfully",
                     StatusCode = HttpStatusCode.OK,
                     Success = true,
-                    //Data = result
+                    Data = result
                 };
             }
             else
