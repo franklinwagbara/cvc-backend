@@ -12,6 +12,8 @@ namespace Bunkering.Core.ViewModels
     {
         public int? Id { get; set; }
         public int? AppId { get; set; }
+        public int? ApplicationTypeId { get; set; }
+        public string ApplicationType { get; set; }
         public int? PlantId { get; set; }
         public int? ProductId { get; set; }
         public DateTime? DateOfVesselArrival { get; set; }

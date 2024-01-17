@@ -74,32 +74,32 @@
                     <tr>
                         <td rowspan="3">@item.TankName</td>
                         <td>AFT</td>
-                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.DIP</td>
-                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.WaterDIP</td>
-                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.TOV</td>
-                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.WaterVolume</td>
-                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.FloatRoofCorr</td>
-                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.GOV</td>
-                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.Tempearture</td>
-                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.Density</td>
-                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.VCF</td>
-                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.GSV</td>
-                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.MTVAC</td>                        
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.DIP</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.WaterDIP</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.TOV</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.WaterVolume</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.FloatRoofCorr</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.GOV</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.Tempearture</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.Density</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.Vcf</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.GSV</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.MTVAC</td>                        
                     </tr>
                     <tr>
                         
                         <td>B/4</td>
-                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.DIP</td>
-                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.WaterDIP</td>
-                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.TOV</td>
-                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.WaterVolume</td>
-                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.FloatRoofCorr</td>
-                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.GOV</td>
-                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.Tempearture</td>
-                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.Density</td>
-                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.VCF</td>
-                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.GSV</td>
-                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.MTVAC</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.DIP</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.WaterDIP</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.TOV</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.WaterVolume</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.FloatRoofCorr</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.GOV</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.Tempearture</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.Density</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.Vcf</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.GSV</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.MTVAC</td>
                     </tr>
                     <tr>
 
@@ -107,8 +107,8 @@
                         <td></td>
                         <td></td>
                         <td>@{
-                                var tovDifference = (item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.TOV ?? 0)
-                                                     - (item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.TOV ?? 0);
+                                var tovDifference = (item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.TOV ?? 0)
+                                                     - (item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.TOV ?? 0);
                             }
                             @tovDifference
                         </td>
@@ -116,8 +116,8 @@
                         <td></td>
                         <td>
                             @{
-                                var govDifference = (item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.GOV ?? 0)
-                                - (item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.GOV ?? 0);
+                                var govDifference = (item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.GOV ?? 0)
+                                - (item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.GOV ?? 0);
                             }
                             @govDifference
                         </td>
@@ -126,15 +126,15 @@
                         <td></td>
                         <td>
                             @{
-                                var gsvDifference = (item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.GSV ?? 0)
-                                - (item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.GSV ?? 0);
+                                var gsvDifference = (item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.GSV ?? 0)
+                                - (item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.GSV ?? 0);
                             }
                             @gsvDifference
                         </td>
                         <td>
                             @{
-                                var mtDifference = (item.AfterTankMeasurement.FirstOrDefault()?.coQLiquidTank.MTVAC ?? 0)
-                                - (item.BeforeTankMeasurements.FirstOrDefault()?.coQLiquidTank.MTVAC ?? 0);
+                                var mtDifference = (item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.MTVAC ?? 0)
+                                - (item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.MTVAC ?? 0);
                             }
                             @mtDifference
                         </td>
@@ -163,7 +163,7 @@
             </tr>
             <tr>
                 <td>NAME/SIGN. OF NMDPRA REP: @Model.Cosignee</td>
-                <td>WITNESSED BY: Witness</td>
+                <td>Approved BY: </td>
             </tr>
         </table>
     </div>

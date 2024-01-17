@@ -1,4 +1,4 @@
-﻿@model COQGasCertficateDTO
+﻿@model COQLiquidCertificateDTO
 @{
     // Layout = null;
     int count = 1;
@@ -96,216 +96,216 @@
                     <th style="text-align: left; font-size: 14px;" scope="row">Liquid Density at 15°C (Kg/l),  Vac</th>
                    @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.LiquidDensityVac</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.LiquidDensityVac</td>
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.LiquidDensityVac</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.LiquidDensityVac</td>
                     }  
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Liquid Density at 15°C (Kg/l),  Air</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.LiquidDensityAir</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.LiquidDensityAir</td>
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.LiquidDensityAir</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.LiquidDensityAir</td>
                     }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Observed Sounding (m)</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.ObservedSounding</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.ObservedSounding</td>
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.ObservedSounding</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.ObservedSounding</td>
                     }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Tape Correction (m)</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.TapeCorrection</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.TapeCorrection</td>
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.TapeCorrection</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.TapeCorrection</td>
                     }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Corrected Liquid Level (m)</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.CorrectedLiquidLevel</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.CorrectedLiquidLevel</td>
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.CorrectedLiquidLevel</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.CorrectedLiquidLevel</td>
                     }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Liquid Temperature (°C)</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align:center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.LiquidTemperature</td>
-                        <td style="text-align:center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.LiquidTemperature</td>
+                        <td style="text-align:center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.LiquidTemperature</td>
+                        <td style="text-align:center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.LiquidTemperature</td>
                     }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Observed Sounding (m)</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.ObservedSounding</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.ObservedSounding</td>
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.ObservedSounding</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.ObservedSounding</td>
                     }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Observed Liquid Volume (m³)</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.ObservedLiquidVolume</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.ObservedLiquidVolume</td>
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.ObservedLiquidVolume</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.ObservedLiquidVolume</td>
                     }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Shrinkage Factor Liquid</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.ShrinkageFactorLiquid</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.ShrinkageFactorLiquid</td>
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.ShrinkageFactorLiquid</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.ShrinkageFactorLiquid</td>
                     }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Corrected Liquid Volume (m³)</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.CorrectedLiquidVolumeM3</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.CorrectedLiquidVolumeM3</td>
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.CorrectedLiquidVolumeM3</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.CorrectedLiquidVolumeM3</td>
                     }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">VCF (ASTM Table 54)</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.Vcf</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.Vcf</td>
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.Vcf</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.Vcf</td>
                     }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Gross Standard Volume (m³)</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align:center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.GrossStandardVolumeGas</td>
-                        <td style="text-align:center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.GrossStandardVolumeGas</td>
+                        <td style="text-align:center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.GrossStandardVolumeGas</td>
+                        <td style="text-align:center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.GrossStandardVolumeGas</td>
                     }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Liquid Weight (MT Vac)</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.LiquidWeightVAC</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.LiquidWeightVAC</td>
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.LiquidWeightVAC</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.LiquidWeightVAC</td>
                     }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Liquid Weight (MT Air)</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.LiquidWeightAir</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.LiquidWeightAir</td>
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.LiquidWeightAir</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.LiquidWeightAir</td>
                     }
                 </tr>
                 <tr>
                 <th style="text-align: left; font-size: 14px;" scope="row">Liquid Weight (MT Air)</th>
                 @foreach (var item in Model.tanks)
                 {
-                    <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.LiquidWeightAir</td>
-                    <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.LiquidWeightAir</td>
+                    <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.LiquidWeightAir</td>
+                    <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.LiquidWeightAir</td>
                 }
             </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">100% Tank Volume (m³)</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.TankVolume</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.TankVolume</td>
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.TankVolume</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.TankVolume</td>
                     }
                 </tr>
                 <tr>
                 <th style="text-align: left; font-size: 14px;" scope="row">Vapour Volume (m³)</th>
                 @foreach (var item in Model.tanks)
                 {
-                    <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.VapourVolume</td>
-                    <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.VapourVolume</td>
+                    <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.VapourVolume</td>
+                    <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.VapourVolume</td>
                 }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Shrinkage Factor Vapour</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.ShrinkageFactorVapour</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.ShrinkageFactorVapour</td>
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.ShrinkageFactorVapour</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.ShrinkageFactorVapour</td>
                     }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Corrected Vapour Volume (m³)</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.CorrectedVapourVolume</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.CorrectedVapourVolume</td>
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.CorrectedVapourVolume</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.CorrectedVapourVolume</td>
                     }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Vapour Temperature (°C)</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align:center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.VapourTemperature</td>
-                        <td style="text-align:center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.VapourTemperature</td>
+                        <td style="text-align:center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.VapourTemperature</td>
+                        <td style="text-align:center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.VapourTemperature</td>
                     }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Vapour Pressure (Bar)</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.VapourPressure</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.VapourPressure</td>
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.VapourPressure</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.VapourPressure</td>
                     }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Molecular Weight (Kg/mol)</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.MolecularWeight</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.MolecularWeight</td>
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.MolecularWeight</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.MolecularWeight</td>
                     }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Vapour Factor</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.VapourFactor</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.VapourFactor</td>
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.VapourFactor</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.VapourFactor</td>
                     }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Vapour Weight (MT Vac)</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.VapourWeightVAC</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.VapourWeightVAC</td>
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.VapourWeightVAC</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.VapourWeightVAC</td>
                     }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Vapour Weight (MT Air)</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.VapourWeightAir</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.VapourWeightAir</td>
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.VapourWeightAir</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.VapourWeightAir</td>
                     }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Total Weight (MT Vac)</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.TotalGasWeightVAC</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.TotalGasWeightVAC</td>
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.TotalGasWeightVAC</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.TotalGasWeightVAC</td>
                     }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Total Weight (MT Air)</th>
                     @foreach (var item in Model.tanks)
                     {
-                        <td style="text-align: center; font-size: 12px;">@item.BeforeMeasuremnts.FirstOrDefault()?.coQGasTank.TotalGasWeightAir</td>
-                        <td style="text-align: center; font-size: 12px;">@item.AfterMeasurements.FirstOrDefault()?.coQGasTank.TotalGasWeightAir</td>
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.TotalGasWeightAir</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.TotalGasWeightAir</td>
                     }
                 </tr>
                 <tr>
@@ -375,7 +375,7 @@
                     }
                     @difference
                 </td>
-                <td>WITNESSED BY: @Model.Product</td>
+                <td>WITNESSED BY: Witness</td>
             </tr> 
             <tr>
                 <td>
@@ -387,7 +387,7 @@
                 </td>
             </tr> 
             <tr>
-                <td>Name of Consignor/Consignee: @Model.Consignee</td>
+                <td>Name of Consignor/Consignee: @Model.Cosignee</td>
             </tr> 
         </table>
     </div>

@@ -1660,7 +1660,8 @@ namespace Bunkering.Access.Services
                 PlaceOfBuild = vessel.PlaceOfBuild,
                 VesselTypeId = vessel.VesselTypeId,
                 YearOfBuild = vessel.YearOfBuild,
-                DischargeId = apps.DischargeId
+                DischargeId = apps.DischargeId,
+                IsVesselCleared = apps.Application.IsVesselCleared
             };
 
             return app;

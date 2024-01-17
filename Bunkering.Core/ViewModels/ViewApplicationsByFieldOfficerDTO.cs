@@ -13,6 +13,7 @@ namespace Bunkering.Core.ViewModels
         public int Id { get; set; }
         public int ApplicationTypeId { get; set; }
         public int DeportStateId { get; set; } = 0;
+        public bool IsVesselCleared { get; set; }
         public string UserId { get; set; }
         public int FacilityId { get; set; }
         public string Reference { get; set; }

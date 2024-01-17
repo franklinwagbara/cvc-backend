@@ -10,11 +10,11 @@ namespace Bunkering.Core.ViewModels
     public class COQGasCertficateDTO
     {
         public string CompanyName { get; set; }
-        //public string MotherVessel { get; set; }
+        public string MotherVessel { get; set; }
         public DateTime DateOfVesselArrival { get; set; }
         public string Product { get; set; }
         public string Jetty { get; set; }
-        // public DateTime DateOfVessselUllage { get; set; }
+        public DateTime DateOfVessselUllage { get; set; }
         public DateTime ShoreDate { get; set; }
         public string VesselName { get; set; }
         public string ReceivingTerminal { get; set; }
@@ -26,7 +26,13 @@ namespace Bunkering.Core.ViewModels
         public double QuantityReflectedOnBill { get; set; }
         public double ArrivalShipFigure { get; set; }
         public double DischargeShipFigure { get; set; }
+        public double GSV { get; set; }
+        public double GOV { get; set; }
+        public double MTVAC { get; set; }
+        public double DepotPrice { get; set; }
         public List<COQGasTankDTO> tanks { get; set; }
+        public DateTime DateAfterDischarge { get; set; }
+
     }
 
     public class COQGasTankDTO

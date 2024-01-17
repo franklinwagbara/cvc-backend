@@ -47,5 +47,7 @@ namespace Bunkering.Core.Data
         //public virtual ICollection<SubmittedDocument> SubmittedDocuments { get; set; }
         public virtual ICollection<Message> Messages { get; set; }
         public virtual ICollection<ApplicationHistory> Histories { get; set; }
+
+        public bool IsVesselCleared { get; set; }
     }
 }
