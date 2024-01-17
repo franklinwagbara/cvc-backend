@@ -1076,15 +1076,14 @@ namespace Bunkering.Access.Services
                         Success = true,
                         Data = pendingCoqs.Select(c => new
                         {
+                            c.Id,
                             c.Reference,
                             c.Application?.User.Company.Name,
                             DepotName = c.Plant?.Name,
-                            DepotPrice = c.DepotPrice,
-                            c.GSV,
-                            DebitNote = (c.GSV * c.DepotPrice * 0.01),
-
+                            c.DepotPrice,
+                            Volume = c.GSV == 0 ? c.MT_VAC : c.GSV,
+                            DebitNote = c.GSV == 0 ? c.MT_VAC * c.DepotPrice * 0.01 : c.GSV * c.DepotPrice * 0.01,
                         }).ToList(),
-
                     };
             }
 
