@@ -1,0 +1,168 @@
+﻿@model IEnumerable<NavalLetterDto>
+@{
+    Layout = null;
+    int count = 0;
+}
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div style="font-size: 1.5em !important;">
+        <div class="text-center">
+            <div>
+                <img src="~/assets/nmdpraLogo.png" alt="Logo" style="height: 250px; display: block; margin: 0 auto;" />
+            </div>
+            <div style="text-align: center;font-size: 2.5em; color: forestgreen;">
+                <b>
+                    NIGERIAN MIDSTREAM AND DOWNSTREAM PETROLEUM REGULATORY AUTHORITY
+                </b>
+            </div>
+            <p style="text-align: center;">
+                Plot 1012,Cadastral Zone AOO, Central Business District, P.M.B, 609, Garki GPO, Abuja, Nigeria.
+                Tel: +234(0) 9-460-5033 authorityccsm@nmdpra.gov.ng www.nmdpra.gov.ng
+            </p>
+            <hr/>
+            <h3>@DateTime.Now.ToShortDateString()</h3>
+        </div>
+        <div style="float: right; position: relative; margin-top: 1em; margin-bottom: 1em;">
+            @{ var refVolume = 2024 - DateTime.Today.Year + 1;}
+            <h2><span>Clearance No:</span> <span style="padding: 0 50px 0 10px; font-weight: bold;">NMDPRA/DSSRI/CVC/LDS/V.@refVolume/@DateTime.Today.DayOfYear</span></h2>
+        </div>
+        <div style="width: 100%; text-align: center; position: absolute; top: 50%; margin-top: -400px;">
+            <img src="~/assets/coat-of-arm.jpg" style="width: 920px; opacity: 0.1; margin-left: -5em;;" />
+        </div>
+        <br /> <br />
+        <br /> <br />
+        <p style="text-align:left">
+            Chief of the Naval Staff,<br/>
+            Nigerian Navy,<br />
+            Nigerian Navy Headquarters,<br />
+            Abuja.<br />
+            Dear Sir,<br />
+        </p>
+        <h2>NMDPRA PETROLEUM PRODUCTS LOADING AND DISCHARGE SCHEDULE – @DateTime.Today.DayOfYear/2024</h2>
+        <p>
+            Please find attached schedule @Model.Count() conveying the details of @Model.Count() vessel
+            clearances issued to Oil and Gas marketing companies for Loading/discharge
+            petroleum products. This is submitted for your information.
+        </p>
+        <p>
+            Please accept the assurances of the Authority Chief Executive’s, Nigerian Midstream
+            and Downstream Petroleum Regulatory Authority's esteemed regards.
+        </p>
+        <p>
+            Yours faithfully,<br />
+            For: <strong>Nigerian Midstream and Downstream Petroleum Regulatory Authority</strong>
+        </p>
+
+
+        <img src="#" height="20"/>
+        <strong>
+            Rabiu D. Jibrin
+        </strong><br />
+        For: Deputy Director Operation
+
+        <br />
+        <p>
+            <table style="width: 100%; font-size: 1em !important; border: 1px solid gray; padding: 5px;">
+                <thead>
+                    <tr>
+                        <th colspan="6">PETROLEUM PRODUCTS APPROVED LOADING/DISCHARGE SCHEDULE </th>
+                        <th></th>
+                        <th>Date</th>
+                        <th>@DateTime.Today.ToShortDateString()</th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th>Schedule</th>
+                        <th>NMDPRA/CVC/@DateTime.Today.DayOfYear/@DateTime.Now.Year</th>
+                    </tr>
+                    <tr>
+                        <th>S/N</th>
+                        <th>VESSEL</th>
+                        <th>ETA</th>
+                        <th>PRODUCT</th>
+                        <th>QUANTITY (MT)</th>
+                        <th>LOAD PORT</th>
+                        <th>DESTINATION</th>
+                        <th>JETTY</th>
+                        <th>CONSIGNEE/OWNER</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        count++;
+                        <tr>
+                            <td>@count</td>
+                            <td>@item.VesselName</td>
+                            <td>@item.ETA</td>
+                            <td>@item.ProductName</td>
+                            <td>@item.Volume</td>
+                            <td>@item.LoadingPort</td>
+                            <td>@item.Destination</td>
+                            <td>@item.Jetty</td>
+                            <td>@item.MarketerName</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </p>
+    </div>
+</body>
+</html>
+
+@functions {
+    private string DateSub(int day)
+    {
+        switch (day)
+        {
+            case 1:
+            case 21:
+            case 31:
+                return "st";
+            case 2:
+            case 22:
+                return "nd";
+            case 3:
+            case 23:
+                return "rd";
+            default:
+                return "th";
+        }
+    }
+}
+<style>
+    body {
+        /*background: url("../../Images/coat-of-arm.jpg") no-repeat;*/
+        /*opacity: 0.1;*/
+        background-position: center;
+        background-size: contain;
+        font-family: Candara;
+        border: 5px solid;
+        padding: 3em;
+        justify-content: center;
+        position: relative;
+    }
+
+    /* table {
+            border-collapse: separate;
+            border-spacing: 0 15px;
+        } */
+
+    td, th {
+        text-align: center;
+        width: 160px;
+        padding: 3px;
+        border: 1px dotted #999;
+    }
+</style>

@@ -78,10 +78,10 @@ public class NavalReportJob : IHostedService, IDisposable
     {
         using (var scope = _serviceScopeFactory.CreateScope())
         {
-            //var navalService = scope.ServiceProvider.GetRequiredService<NavalReportService>();
+            //var appService = scope.ServiceProvider.GetRequiredService<AppService>();
 
             // Call your service here.
-            //navalService.SendReport();
+
         }
     }
 
