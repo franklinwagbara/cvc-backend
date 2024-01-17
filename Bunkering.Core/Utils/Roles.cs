@@ -20,6 +20,8 @@
 		public const string GMOps = "GMOps|General Manager Operations";
 		public const string Manager = "Manager|Manager";
 		public const string FO = "Field_Officer|Field Officer";
+		public const string Approver = "Approver";
+		public const string Controller = "Controller";
 
 	}
 }
