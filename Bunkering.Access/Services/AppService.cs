@@ -1012,6 +1012,21 @@ namespace Bunkering.Access.Services
             }
         }
 
+        public async Task<IEnumerable<NavalLetterDto>> GetClearedVessels()
+        {
+            var apps = (await _unitOfWork.Application.Find(c => c.HasCleared)).ToList();
+            var data = new List<NavalLetterDto>();
+            foreach (var app in apps)
+            {
+                var appDepot = (await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.AppId == app.Id, "Depot"));
+                var product = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.ProductId));
+                data.Add(new NavalLetterDto(app.MarketerName, product.Name, appDepot.Volume,
+                    app.VesselName, app.MotherVessel, app.Jetty, app.ETA, app.LoadingPort, appDepot.Depot.Name
+                ));
+            }
+            return data;
+        }
+
         private async Task<ApiResponse> GetMyDeskOthers(ApplicationUser? user)
         {
             var apps = await _unitOfWork.Application.Find(x => x.CurrentDeskId.Equals(user.Id), "User.Company,Facility.VesselType,ApplicationType,WorkFlow,Payments");
