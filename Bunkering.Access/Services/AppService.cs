@@ -1709,7 +1709,7 @@ namespace Bunkering.Access.Services
             var apps = _unitOfWork.ApplicationDepot.Query()
                         .Include(x => x.Application)
                         .Include(x => x.Depot)
-                        .FirstOrDefault(x => x.AppId == Id);
+                        .FirstOrDefault(x => x.AppId == Id );
             var vessel = _unitOfWork.Facility.Query().FirstOrDefault(x => x.Id == apps.Application.FacilityId);
 
             var app = new ViewApplicationsByFieldOfficerDTO
