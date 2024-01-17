@@ -17,7 +17,14 @@ namespace Bunkering.Core.ViewModels
         public DateTime DateOfVessselUllage { get; set; }
         public string VesselName { get; set; }
         public string ReceivingTerminal { get; set; }
-        
+        public string Cosignee { get; set; }
+        public double GSV {  get; set; }
+        public double GOV {  get; set; }
+        public double MTVAC {  get; set; }
+        public double DepotPrice {  get; set; }
+        public DateTime DateAfterDischarge { get; set; }
+
+
         public List<CoQTanksDTO> tanks { get; set; }
        
     }

@@ -48,10 +48,7 @@ namespace Bunkering.Core.ViewModels
         public SubmittedDocument docs { get; set; }
     }
 
-    //public class Coq
-    //{
-      
-    //}
+
 
     
     public class Vessel
