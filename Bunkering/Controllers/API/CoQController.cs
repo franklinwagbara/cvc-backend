@@ -247,6 +247,7 @@ namespace Bunkering.Controllers.API
 
                 if (coqData != null && coqData.ProductType == "Gas")
                 {
+                    //return View("ViewGasCertificate", license.Data);
                     return new ViewAsPdf("ViewGasCertificate", license.Data)
                     {
                         PageSize = Size.A4,
