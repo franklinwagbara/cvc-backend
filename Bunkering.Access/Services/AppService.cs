@@ -994,10 +994,10 @@ namespace Bunkering.Access.Services
             try
             {
                 var user = await _userManager.Users.Include(x => x.Location).Include(ur => ur.UserRoles).ThenInclude(u => u.Role).FirstOrDefaultAsync(x => x.Email.Equals(User));
-                if (user.Location?.Name == LOCATION.FO)
+                if (user.Location?.Name == LOCATION.FO && !user.UserRoles.FirstOrDefault().Role.Name.Equals("FAD"))
                     return await GetMyDeskFO(user);
                 else if (user.UserRoles.FirstOrDefault().Role.Name.Equals("FAD"))
-                    return await GetMyDeskFO(user);
+                    return await GetMyDeskFAD();
                 else
                     return await GetMyDeskOthers(user);
             }
@@ -1040,8 +1040,60 @@ namespace Bunkering.Access.Services
             };
         }
 
-        private async Task<ApiResponse> GetMyDeskFO(ApplicationUser? user)
+        private async Task<ApiResponse> GetMyDeskFAD()
         {
+            //checked 
+            var coq = await _unitOfWork.CoQ.Find(x => x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)));
+            ApplicationType? apptype = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));
+            //&& !x.Application.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));
+
+            var payment = await _unitOfWork.Payment.Find(x => x.ApplicationTypeId.Equals(apptype.Id));
+
+            if (payment.Count() > 0)
+            {
+                var pendingCoqs = coq.ToList().Where(c => payment.ToList().Any(p => !p.COQId.Equals(c.Id)));
+
+                if (coq != null)
+                    return new ApiResponse
+                    {
+                        Message = "Successful",
+                        StatusCode = HttpStatusCode.OK,
+                        Success = true,
+                        Data = pendingCoqs.Select(c => new
+                        {
+                            c.Reference,
+                            c.Application?.User.Company.Name,
+                            DepotName = c.Plant?.Name,
+                            DepotPrice = c.DepotPrice,
+                            c.GSV,
+                            DebitNote = (c.GSV * c.DepotPrice * 0.01),
+
+                        }).ToList(),
+
+                    };
+            }
+
+            return new ApiResponse
+            {
+                Message = "Successful",
+                StatusCode = HttpStatusCode.OK,
+                Success = true,
+                Data = coq.Select(c => new
+                {
+                    c.Reference,
+                    c.Application?.User.Company.Name,
+                    DepotName = c.Plant?.Name,
+                    DepotPrice = c.DepotPrice,
+                    c.GSV,
+                    DebitNote = (c.GSV * c.DepotPrice * 0.01),
+
+                }).ToList(),
+
+            };
+        }
+
+            private async Task<ApiResponse> GetMyDeskFO(ApplicationUser? user)
+            {
             var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Plant");
             // if (await _userManager.IsInRoleAsync(user, "FAD"))
             //     coqs = await _unitOfWork.CoQ.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)));

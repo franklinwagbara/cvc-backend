@@ -702,38 +702,27 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> GetDebitNote(int id)
         {
-                var coq = await _unitOfWork.Payment.FirstOrDefaultAsync(c => c.Id == id, "Depot");
-
-
-            if (coq is not null)
+            var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(c => c.Id == id);
+            
+            if (payment is not null)
             {
-                var app = await _unitOfWork.Application.FirstOrDefaultAsync(a => a.Id == coq.Id);
-                if (app is null)
-                {
-                    return new ApiResponse
-                    {
-                        Message = "Application Not Found",
-                        StatusCode = HttpStatusCode.NotFound,
-                        Success = false
-                    };
-                }
-                //var price = coq.MT_VAC * coq.DepotPrice;
-                //var result = new DebitNoteDTO(
-                //coq.DateOfSTAfterDischarge,
-                //coq.DateOfSTAfterDischarge.AddDays(21),
-                //app.MarketerName,
-                //coq.Depot!.Name,
-                //price,
-                //coq.DepotPrice * 0.01m,
-                //coq.Depot!.Capacity,
-                //price / coq.Depot!.Capacity
-                //);
+               var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id == payment.COQId, "Plant");
+                var capacity = coq.MT_VAC == 0 ? coq.GSV : coq.MT_VAC;
+                var result = new DebitNoteDTO(
+                coq.DateOfSTAfterDischarge,
+                payment.TransactionDate.AddDays(21),
+                "",
+                coq.Plant!.Name,
+                coq.DepotPrice,
+                payment.Amount,
+                capacity,
+                coq.DepotPrice);
                 return new ApiResponse
                 {
                     Message = $"Debit note fetched successfully",
                     StatusCode = HttpStatusCode.OK,
                     Success = true,
-                    //Data = result
+                    Data = result
                 };
             }
             else
@@ -746,6 +735,52 @@ namespace Bunkering.Access.Services
                 };
             }
         }
+
+        //public async Task<ApiResponse> GetDebitNote(int id)
+        //{
+        //   var coq = await _unitOfWork.Payment.FirstOrDefaultAsync(c => c.Id == id, "PLant");
+
+        //    if (coq is not null)
+        //    {
+        //        var app = await _unitOfWork.Application.FirstOrDefaultAsync(a => a.Id == coq.Id);
+        //        if (app is null)
+        //        {
+        //            return new ApiResponse
+        //            {
+        //                Message = "Application Not Found",
+        //                StatusCode = HttpStatusCode.NotFound,
+        //                Success = false
+        //            };
+        //        }
+        //        //var price = coq.MT_VAC * coq.DepotPrice;
+        //        //var result = new DebitNoteDTO(
+        //        //coq.DateOfSTAfterDischarge,
+        //        //coq.DateOfSTAfterDischarge.AddDays(21),
+        //        //app.MarketerName,
+        //        //coq.Depot!.Name,
+        //        //price,
+        //        //coq.DepotPrice * 0.01m,
+        //        //coq.Depot!.Capacity,
+        //        //price / coq.Depot!.Capacity
+        //        //);
+        //        return new ApiResponse
+        //        {
+        //            Message = $"Debit note fetched successfully",
+        //            StatusCode = HttpStatusCode.OK,
+        //            Success = true,
+        //            //Data = result
+        //        };
+        //    }
+        //    else
+        //    {
+        //        return new ApiResponse
+        //        {
+        //            Message = "CoQ Not Found",
+        //            StatusCode = HttpStatusCode.NotFound,
+        //            Success = false
+        //        };
+        //    }
+        //}
 
         //public async Task<ApiResponse> AddCoqTank(COQCrudeTankDTO model) 
         //{
@@ -873,9 +908,7 @@ namespace Bunkering.Access.Services
                 _context.SubmittedDocuments.AddRange(sDocumentList);
                 #endregion
 
-                _context.SaveChanges();
-
-               
+                _context.SaveChanges();               
 
                 var submit = await _flow.CoqWorkFlow(coq.Id, Enum.GetName(typeof(AppActions), AppActions.Submit), "COQ Submitted", user.Id);
                 if (submit.Item1)
@@ -1656,9 +1689,9 @@ namespace Bunkering.Access.Services
             }
             catch (Exception e)
             {
-                throw;
+
             }
-           
+            return null;
         }
 
         private COQGASCertificateDTO GetGasCOQCalculationList(List<PlantTank> tnks, List<COQTank> coQTanks, COQGASCertificateDTO dat)
