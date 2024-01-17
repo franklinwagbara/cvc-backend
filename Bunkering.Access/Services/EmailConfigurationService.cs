@@ -70,6 +70,7 @@ namespace Bunkering.Access.Services
             {
                 update.Name = model.Name;
                 update.Email = model.Email;
+                update.IsActive = model.IsActive;
 
                 await _unitOfWork.EmailConfiguration.Update(update);
                 _unitOfWork.Save();

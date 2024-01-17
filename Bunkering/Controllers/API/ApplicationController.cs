@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Bunkering.Access;
+using Bunkering.Access.DAL;
 using Bunkering.Access.IContracts;
 using Bunkering.Access.Services;
 using Bunkering.Core.Data;
@@ -10,6 +11,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Rotativa.AspNetCore;
+using System.ComponentModel;
+using System.Net;
 
 namespace Bunkering.Controllers.API
 {
@@ -365,6 +369,48 @@ namespace Bunkering.Controllers.API
         [HttpGet]
         public async Task<IActionResult> GetAppVesselInfo(int Id, int DepotId) => Response(await _appService.GetAppVesselInfo(Id, DepotId));
 
-
+        /// <summary>
+        /// This endpoint is used to fetch details of an NOA Vessel
+        /// </summary>
+        /// <returns>Returns an application info</returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// GET: api/application/get-app-vessel-info
+        /// 
+        /// </remarks>
+        /// <response code="200">Returns an application / vessel info </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("get-app-naval-letter")]
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetNavalLetter()
+        {
+            var model = await _appService.GetClearedVessels();
+            if (!model.Any())
+            {
+                return Response(new ApiResponse
+                {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Message = "No cleared vessel",
+                    Success = true
+                }) ;
+            }
+            var viewAsPdf = new ViewAsPdf
+            {
+                Model = model,
+                PageHeight = 327,
+                PageMargins = new Rotativa.AspNetCore.Options.Margins(10, 10, 10, 10),
+                ViewName = "NavalLetter"
+            };
+            var pdf = await viewAsPdf.BuildFile(ControllerContext);
+            return File(new MemoryStream(pdf), "application/pdf");
+        }
     }
 }
