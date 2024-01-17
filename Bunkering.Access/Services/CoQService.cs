@@ -1599,9 +1599,10 @@ namespace Bunkering.Access.Services
                     productName = prd.Product?.Name ?? string.Empty;
                     productType = prd.Product?.ProductType ?? string.Empty;
                 }
+                var fieldofficer = _userManager.FindByIdAsync(cqs.CreatedBy).Result;
+                //var coqHistory = _unitOfWork.COQHistory.Find(x => x.TargetRole)
 
                 if (productType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.Gas)))
-
                 {
                     var dat = new COQGASCertificateDTO
                     {
@@ -1620,7 +1621,9 @@ namespace Bunkering.Access.Services
                         DateAfterDischarge = cqs.DateOfSTAfterDischarge,
                         QuantityReflectedOnBill = cqs.QuauntityReflectedOnBill,
                         ArrivalShipFigure = cqs.ArrivalShipFigure,
-                        DischargeShipFigure = cqs.DischargeShipFigure
+                        DischargeShipFigure = cqs.DischargeShipFigure,
+                        FieldOfficerName = $"{fieldofficer.FirstName} {fieldofficer.LastJobDate}",
+                        FieldOfficerSignature = $"{fieldofficer.Signature}"
                     };
                     dat = GetGasCOQCalculationList(tnks, coQTanks, dat);
                     dat.Product = productName;
@@ -1640,7 +1643,9 @@ namespace Bunkering.Access.Services
                         VesselName = cqs.Application?.VesselName ?? string.Empty,
                         Cosignee = cqs.NameConsignee ?? string.Empty,
                         DepotPrice = cqs.DepotPrice,
-                        DateAfterDischarge = cqs.DateOfSTAfterDischarge
+                        DateAfterDischarge = cqs.DateOfSTAfterDischarge,
+                        FieldOfficerName = $"{fieldofficer.FirstName} {fieldofficer.LastJobDate}",
+                        FieldOfficerSignature = $"{fieldofficer.Signature}",
                     };
                     dat = GetNonGasCOQCalculationList(tnks, coQTanks, dat);
                     dat.Product = productName;

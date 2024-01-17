@@ -2,6 +2,8 @@
 @{
     // Layout = null;
     int count = 1;
+    ViewData["TiTle"] = "COQ Certificate";
+    int colsp = Model.tanks.Count * 2;
 }
 
 <html lang="en">
@@ -12,6 +14,9 @@
     <title></title>
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
     <style type="text/css">
+        body{
+            border: 2px solid;
+        }
         table {
             /*     border-collapse: collapse;
                 width: 100%;
@@ -35,58 +40,56 @@
             text-align: left; */
             padding: 0px;
         }
-            td
+        td
 
         {
-            style: width: 100%;
+            width: 100%;
             font-size: 14px !important;
         }
 
-        
-
-        .full-width-colspan {
-            /* Set the colspan to span all columns in the row */
-            grid-column: 1 / -1;
+        .breakhere {
+            page-break-after: always
         }
     </style>
 </head>
-<div style="font-size: 1.5em !important;">
 <body>
     <div style="font-size: 1.5em !important;">
         <div class="text-center">
             <div>
-                <img src="~/assets/nmdpraLogo.png" alt="Logo" style="height: 75px; display: block; margin: 0 auto;" />
+                <img src="~/assets/nmdpraLogo.png" alt="Logo" style="height: 120px; display: block; margin: 0 auto;" />
             </div>
-            <div style="text-align: center;font-size: 1em; color: forestgreen;">
+            <div style="text-align: center;font-size: 1.5em; color: forestgreen;">
                 <b>
                     NIGERIAN MIDSTREAM AND DOWNSTREAM PETROLEUM REGULATORY AUTHORITY
                 </b>
             </div>
-                <div style="text-align: center;  font-size: 1em;">
+            <div style="text-align: center;  font-size: 1em;">
                 <h5>Plot 1012 Cadastral Zone A00, Sani Abacha Way, Central Business District, Abuja, FCT, Nigeria.</h5>
             </div>
         </div>
         <br />
-        
+
         <table class="table table-borderless">
-           <tr>
-                <td>NAME OF JETTY/DEPOT: @Model.Jetty  </td>
+            <tr>
+                <td style=" border: none;">
+                    NAME OF JETTY/DEPOT: @Model.Jetty
+                </td>
             </tr>
-                <tr><td>NAME OF VESSEL: @Model.VesselName</td></tr>
-            <tr><td>NAME OF PRODUCT: @Model.Product</td></tr>
-            <tr><td>DATE OF ARRIVAL OF THE VESSEL: @Model.DateOfVesselArrival</td></tr>
-            <tr><td>DATE OF COMMENCEMENT OF PRODUCT DISCHARGE: @Model.Product</td></tr>
-            <tr><td>DATE OF COMPLETION OF PRODUCT DISCHARGE: @Model.DateAfterDischarge</td></tr>
+            <tr><td style=" border: none;">NAME OF VESSEL: @Model.VesselName</td></tr>
+            <tr><td style=" border: none;">NAME OF PRODUCT: @Model.Product</td></tr>
+            <tr><td style=" border: none;">DATE OF ARRIVAL OF THE VESSEL: @Model.DateOfVesselArrival</td></tr>
+            <tr><td style=" border: none;">DATE OF COMMENCEMENT OF PRODUCT DISCHARGE: @Model.Product</td></tr>
+            <tr><td style=" border: none;">DATE OF COMPLETION OF PRODUCT DISCHARGE: @Model.DateAfterDischarge</td></tr>
         </table>
-        
-        <table style="width: 100%; font-size: 1em !important; border: 1px solid gray; padding: 5px;" class="table table-bordered">
-            <thead>
-                    <tr style="page-break-inside: avoid !important">
+
+        <table style="width: 100%; border: 1px solid gray; padding: 5px;" class="table table-bordered">
+            @* <thead> *@
+                <tr style="page-break-inside: avoid !important">
                     <th style="text-align: left;">Tank Identification</th>
                     @foreach (var item in Model.tanks)
                     {
                         <th colspan="2" scope="col" style="text-align: center; font-size: 14px">@item.TankName</th>
-                       
+
                     }
                 </tr>
 
@@ -97,18 +100,18 @@
                         <th style="text-align: center; font-size: 14px" scope="col">Before</th>
                         <th style="text-align: center; font-size: 14px" scope="col">After</th>
                     }
-                   
+
                 </tr>
 
-            </thead>
+            @* </thead> *@
             <tbody>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Liquid Density at 15°C (Kg/l),  Vac</th>
-                   @foreach (var item in Model.tanks)
+                    @foreach (var item in Model.tanks)
                     {
                         <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.LiquidDensityVac</td>
                         <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.LiquidDensityVac</td>
-                    }  
+                    }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Liquid Density at 15°C (Kg/l),  Air</th>
@@ -206,6 +209,15 @@
                         <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.LiquidWeightVAC</td>
                     }
                 </tr>
+                @* <tr>
+                    <th style="text-align: left; font-size: 14px;" scope="row">Liquid Weight (MT Air)</th>
+                    @foreach (var item in Model.tanks)
+                    {
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.LiquidWeightAir</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.LiquidWeightAir</td>
+                    }
+                </tr> *@
+
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Liquid Weight (MT Air)</th>
                     @foreach (var item in Model.tanks)
@@ -215,14 +227,6 @@
                     }
                 </tr>
                 <tr>
-                <th style="text-align: left; font-size: 14px;" scope="row">Liquid Weight (MT Air)</th>
-                @foreach (var item in Model.tanks)
-                {
-                    <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.LiquidWeightAir</td>
-                    <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.LiquidWeightAir</td>
-                }
-            </tr>
-                <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">100% Tank Volume (m³)</th>
                     @foreach (var item in Model.tanks)
                     {
@@ -231,12 +235,12 @@
                     }
                 </tr>
                 <tr>
-                <th style="text-align: left; font-size: 14px;" scope="row">Vapour Volume (m³)</th>
-                @foreach (var item in Model.tanks)
-                {
-                    <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.VapourVolume</td>
-                    <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.VapourVolume</td>
-                }
+                    <th style="text-align: left; font-size: 14px;" scope="row">Vapour Volume (m³)</th>
+                    @foreach (var item in Model.tanks)
+                    {
+                        <td style="text-align: center; font-size: 12px;">@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.VapourVolume</td>
+                        <td style="text-align: center; font-size: 12px;">@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.VapourVolume</td>
+                    }
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Shrinkage Factor Vapour</th>
@@ -321,85 +325,84 @@
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Grand Total Weight (MT Vac)</th>
 
-                    <td class="full-width-colspan" style="text-align: center; font-size: 12px;">
+                    <td class="full-width-colspan" style="text-align: center; font-size: 12px;" colspan="@colsp">
                         @{
-                            var totalWeightVac = (Model.TotalAfterWeightVac)
-                            - (Model.TotalBeforeWeightVac);
+                            // var totalWeightVac = (Model.TotalAfterWeightVac)
+                            // - (Model.TotalBeforeWeightVac);
                         }
-                        @totalWeightVac
+                        @Model.TotalWeightVAC
                     </td>
 
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Grand Total Weight (MT Air)</th>
 
-                    <td style="text-align: center; font-size: 12px;">
+                    <td style="text-align: center; font-size: 12px;" colspan="@colsp">
                         @{
-                            var totalWeightAir = (Model.TotalAfterWeightAir)
-                            - (Model.TotalBeforeWeightAir);
+                            // var totalWeightAir = (Model.TotalAfterWeightAir)
+                            // - (Model.TotalBeforeWeightAir);
                         }
-                        @totalWeightAir
-                    </td>  
+                        @Model.TotalWeightAir
+                    </td>
                 </tr>
                 <tr>
                     <th style="text-align: left; font-size: 14px;" scope="row">Grand Total Weight (KG)</th>
 
-                    <td style="text-align: center; font-size: 12px;">
+                    <td style="text-align: center; font-size: 12px;" colspan="@colsp">
                         @{
-                            var totalWeightKG = @totalWeightAir * 1000;
+                            // var totalWeightKG = @totalWeightAir * 1000;
                         }
-                        @totalWeightKG
+                        @Model.TotalWeightKg
                     </td>
                 </tr>
-                
-            </tbody> 
+
+            </tbody>
         </table>
         <br />
         <hr />
-      
+
         <table class="table table-borderless">
             <tr>
                 <td>Quantity Reflected on Bill of Landing (MT Air): @Model.QuantityReflectedOnBill</td>
-                <td>NMDPRA REP NAME: </td>
+                <td>NMDPRA REP NAME: @Model.FieldOfficerName</td>
                 <td>ENDORSED BY: </td>
-                
+
             </tr>
             <tr>
                 <td>Arrival Ship Figure (MT Air): @Model.ArrivalShipFigure</td>
-                
+
             </tr>
             <tr>
                 <td>SHIP Figure (DISCHARGED) (MT Air): @Model.DischargeShipFigure</td>
                 <td>NMDPRA REP SIGN: </td>
             </tr>
             <tr>
-                <td>Actual Quantity Received Into Shore Tanks(MT Air): @totalWeightAir</td>
+                <td>Actual Quantity Received Into Shore Tanks(MT Air): @Model.TotalWeightAir</td>
                 <td>STAMP & DATE: </td>
             </tr>
             <tr>
-                <td>
-                    Difference Between Ship’s figure(DISCH)/Shore figure (MT Air): 
+                <td colspan="2">
+                    Difference Between Ship’s figure(DISCH)/Shore figure (MT Air):
                     @{
-                        var difference = (Model.DischargeShipFigure)
-                        - (@totalWeightAir);
+                        var difference = Model.DischargeShipFigure
+                        - Model.TotalWeightAir;
                     }
                     @difference
                 </td>
-                <td>WITNESSED BY: Witness</td>
-            </tr> 
+                @* <td>WITNESSED BY: Witness</td> *@
+            </tr>
             <tr>
                 <td>
                     % Difference:  @{
                         var differencePercent = @difference
-                        / (Model.DischargeShipFigure)*100;
+                        / (Model.DischargeShipFigure) * 100;
                     }
                     @differencePercent
                 </td>
-            </tr> 
+            </tr>
             <tr>
                 <td>Name of Consignor/Consignee: @Model.Cosignee</td>
-            </tr> 
+            </tr>
         </table>
     </div>
 </body>
-</div>

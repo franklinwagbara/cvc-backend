@@ -38,6 +38,11 @@ namespace Bunkering.Core.ViewModels
         public double TotalWeightKg => TotalWeightVAC * 1000;
         public double DebitNoteAmount => TotalWeightVAC * DepotPrice * 0.01;
 
+        public string FieldOfficerName { get; set; }
+        public string FieldOfficerSignature { get; set; }
+        public string ApproverName { get; set; }
+        public string ApproverSignature { get; set; }
+
         public List<CoQTanksDTO> tanks { get; set; }
        
     }
@@ -63,6 +68,11 @@ namespace Bunkering.Core.ViewModels
         public double ArrivalShipFigure { get; set; }
         public double DischargeShipFigure { get; set; }
         public double DebitNoteAmount => GSV * DepotPrice * 0.01;
+
+        public string FieldOfficerName { get; set; }
+        public string FieldOfficerSignature { get; set; }
+        public string ApproverName { get; set; }
+        public string ApproverSignature { get; set; }
 
         public List<CoQNonGasTanksDTO> tanks { get; set; }
 

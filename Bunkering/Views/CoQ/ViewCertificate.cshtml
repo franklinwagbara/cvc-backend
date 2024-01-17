@@ -1,6 +1,7 @@
-﻿@model COQGASCertificateDTO
+﻿@model COQNonGasCertificateDTO
 @{
     // Layout = null;
+    ViewData["TiTle"] = "COQ Certificate";
     int count = 1;
 }
 <html lang="en">
@@ -8,26 +9,66 @@
     <meta name="viewport" content="width=device-width" />
     <title></title>
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <style type="text/css">
+        body{
+            font-family: Candara !important;
+            /* background-position: center; */
+            background-size:cover;
+            border: 2px solid;
+            padding: 2em;
+            justify-content: center;
+            position: relative;
+        }
+        table {
+            /*     border-collapse: collapse;
+                        width: 100%;
+                    }
+
+
+
+                    th {
+                        position: sticky;
+                        top: 0;
+                        background-color: #f2f2f2;
+                    }
+
+                    thead {
+                        display: table-header-group;
+                    } */
+            th, td
+
+        {
+            /* border: 1px solid #dddddd;
+                    text-align: left; */
+            padding: 0px;
+        }
+
+        td {
+            width: 100%;
+            font-size: 12px !important;
+        }
+
+    </style>
+
 </head>
 
 <body>
     <div style="font-size: 1.5em !important;">
         <div class="text-center">
             <div>
-                <img src="~/assets/nmdpraLogo.png" alt="Logo" style="height: 250px; display: block; margin: 0 auto;" />
+                <img src="~/assets/nmdpraLogo.png" alt="Logo" style="height: 95px; display: block; margin: 0 auto;" />
             </div>
-            <div style="text-align: center;font-size: 2em; color: forestgreen;">
+            <div style="text-align: center;font-size: 1.5em; color: forestgreen;">
                 <b>
                     NIGERIAN MIDSTREAM AND DOWNSTREAM PETROLEUM REGULATORY AUTHORITY
                 </b>
             </div>
-                <div style="text-align: center; margin-top: -1em; font-size: 1em;">
+                <div style="text-align: center; margin-top: -0.5em; font-size: 1em;">
                 <h5>Plot 1012 Cadastral Zone A00, Sani Abacha Way, Central Business District, Abuja, FCT, Nigeria.</h5>
             </div>
         </div>
         <br />
-        <hr />
-        <table class="table table-borderless">
+        <table class="table">
             <tr>
                 
                 <td>Marketer/PDT Owner: @Model.CompanyName</td>
@@ -50,7 +91,7 @@
         </table>
        
        
-        <table style="width: 100%; font-size: 1em !important; border: 1px solid gray; padding: 5px;" class="table table-bordered">
+        <table style="width: 100%; font-size: 1em !important;" class="table table-bordered">
             <thead>
                 <tr>
                     <th>TANK</th>
@@ -74,32 +115,32 @@
                     <tr>
                         <td rowspan="3">@item.TankName</td>
                         <td>AFT</td>
-                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.DIP</td>
-                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.WaterDIP</td>
-                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.TOV</td>
-                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.WaterVolume</td>
-                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.FloatRoofCorr</td>
-                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.GOV</td>
-                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.Tempearture</td>
-                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.Density</td>
-                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.Vcf</td>
-                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.GSV</td>
-                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.MTVAC</td>                        
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.CoQCertTankNonGas.DIP</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.CoQCertTankNonGas.WaterDIP</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.CoQCertTankNonGas.TOV</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.CoQCertTankNonGas.WaterVolume</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.CoQCertTankNonGas.FloatRoofCorr</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.CoQCertTankNonGas.GOV</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.CoQCertTankNonGas.Tempearture</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.CoQCertTankNonGas.Density</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.CoQCertTankNonGas.Vcf</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.CoQCertTankNonGas.GSV</td>
+                        <td>@item.AfterTankMeasurement.FirstOrDefault()?.CoQCertTankNonGas.MTVAC</td>                        
                     </tr>
                     <tr>
                         
                         <td>B/4</td>
-                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.DIP</td>
-                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.WaterDIP</td>
-                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.TOV</td>
-                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.WaterVolume</td>
-                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.FloatRoofCorr</td>
-                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.GOV</td>
-                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.Tempearture</td>
-                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.Density</td>
-                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.Vcf</td>
-                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.GSV</td>
-                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.MTVAC</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.CoQCertTankNonGas.DIP</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.CoQCertTankNonGas.WaterDIP</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.CoQCertTankNonGas.TOV</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.CoQCertTankNonGas.WaterVolume</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.CoQCertTankNonGas.FloatRoofCorr</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.CoQCertTankNonGas.GOV</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.CoQCertTankNonGas.Tempearture</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.CoQCertTankNonGas.Density</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.CoQCertTankNonGas.Vcf</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.CoQCertTankNonGas.GSV</td>
+                        <td>@item.BeforeTankMeasurements.FirstOrDefault()?.CoQCertTankNonGas.MTVAC</td>
                     </tr>
                     <tr>
 
@@ -107,8 +148,8 @@
                         <td></td>
                         <td></td>
                         <td>@{
-                                var tovDifference = (item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.TOV ?? 0)
-                                                     - (item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.TOV ?? 0);
+                                var tovDifference = (item.AfterTankMeasurement.FirstOrDefault()?.CoQCertTankNonGas.TOV ?? 0)
+                                                     - (item.BeforeTankMeasurements.FirstOrDefault()?.CoQCertTankNonGas.TOV ?? 0);
                             }
                             @tovDifference
                         </td>
@@ -116,8 +157,8 @@
                         <td></td>
                         <td>
                             @{
-                                var govDifference = (item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.GOV ?? 0)
-                                - (item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.GOV ?? 0);
+                                var govDifference = (item.AfterTankMeasurement.FirstOrDefault()?.CoQCertTankNonGas.GOV ?? 0)
+                                - (item.BeforeTankMeasurements.FirstOrDefault()?.CoQCertTankNonGas.GOV ?? 0);
                             }
                             @govDifference
                         </td>
@@ -126,15 +167,15 @@
                         <td></td>
                         <td>
                             @{
-                                var gsvDifference = (item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.GSV ?? 0)
-                                - (item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.GSV ?? 0);
+                                var gsvDifference = (item.AfterTankMeasurement.FirstOrDefault()?.CoQCertTankNonGas.GSV ?? 0)
+                                - (item.BeforeTankMeasurements.FirstOrDefault()?.CoQCertTankNonGas.GSV ?? 0);
                             }
                             @gsvDifference
                         </td>
                         <td>
                             @{
-                                var mtDifference = (item.AfterTankMeasurement.FirstOrDefault()?.coQCertTank.MTVAC ?? 0)
-                                - (item.BeforeTankMeasurements.FirstOrDefault()?.coQCertTank.MTVAC ?? 0);
+                                var mtDifference = (item.AfterTankMeasurement.FirstOrDefault()?.CoQCertTankNonGas.MTVAC ?? 0)
+                                - (item.BeforeTankMeasurements.FirstOrDefault()?.CoQCertTankNonGas.MTVAC ?? 0);
                             }
                             @mtDifference
                         </td>
@@ -171,24 +212,3 @@
 </body>
 
 </html>
-
-<style>
-    body {
-        /*background: url("../../Images/coat-of-arm.jpg") no-repeat;*/
-        /*opacity: 0.1;*/
-        background-position: center;
-        background-size: contain;
-        font-family: Candara;
-        border: 5px solid;
-        padding: 3em;
-        justify-content: center;
-        position: relative;
-    }
-
-    /* table {
-            border-collapse: separate;
-            border-spacing: 0 15px;
-        } */
-
-   
-</style>

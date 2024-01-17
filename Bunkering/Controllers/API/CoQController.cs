@@ -248,27 +248,30 @@ namespace Bunkering.Controllers.API
                 if (coqData != null && coqData.ProductType == "Gas")
                 {
                     //return View("ViewGasCertificate", license.Data);
-                    return new ViewAsPdf("ViewGasCertificate", license.Data)
+                    var viewAsPdf =  new ViewAsPdf("ViewGasCertificate", license.Data)
                     {
                         PageSize = Size.A4,
-                        PageHeight = 327,
+                        //PageHeight = 327,
                         PageOrientation = Orientation.Landscape,
                         FileName = $"CoQ Certificate_{DateTime.Now.Day}-{DateTime.Now.Month}-{DateTime.Now.Year}.pdf",
 
                     };
+                    var pdf = await viewAsPdf.BuildFile(ControllerContext);
+                    return File(new MemoryStream(pdf), "application/pdf");
                 }
                 else
                 {
-                    return new ViewAsPdf("ViewCertificate", license.Data)
+                    var viewAsPdf = new ViewAsPdf("ViewCertificate", license.Data)
                     {
                         PageSize = Size.A4,
-                        PageHeight = 327,
+                        //PageHeight = 327,
                         PageOrientation = Orientation.Landscape,
                         FileName = $"CoQ Certificate_{DateTime.Now.Day}-{DateTime.Now.Month}-{DateTime.Now.Year}.pdf",
 
                     };
-                }
-               
+                    var pdf = await viewAsPdf.BuildFile(ControllerContext);
+                    return File(new MemoryStream(pdf), "application/pdf");
+                }              
                 
             }
             catch (Exception ex)
