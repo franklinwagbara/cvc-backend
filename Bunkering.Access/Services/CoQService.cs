@@ -701,7 +701,8 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> GetDebitNote(int id)
         {
-                var coq = await _unitOfWork.Payment.FirstOrDefaultAsync(c => c.Id == id, "Depot");
+                var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(c => c.COQId == id);
+            var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id == id);
 
 
             if (coq is not null)
