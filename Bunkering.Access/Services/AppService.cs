@@ -482,14 +482,15 @@ namespace Bunkering.Access.Services
                         Success = false
                     };
                     var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id), "ApplicationType,Facility.VesselType,Payments");
+                    var appDepots = (await _unitOfWork.ApplicationDepot.Find(x => x.AppId.Equals(id))).Select(c => c.Depot).ToList();
                     if (app is null) return new ApiResponse()
                     {
                         StatusCode = HttpStatusCode.NotFound,
                         Message = "application not found",
                         Success = false
                     };
-
-                    var fee = await _unitOfWork.AppFee.FirstOrDefaultAsync(x => x.ApplicationTypeId.Equals(app.ApplicationTypeId));
+                    
+                    var fee = await _unitOfWork.AppFee.FirstOrDefaultAsync(x => x.ApplicationTypeId.Equals(app.ApplicationTypeId) && x.IsDeleted != true);
                     if (fee is null) return new ApiResponse()
                     {
                         StatusCode = HttpStatusCode.NotFound,
@@ -497,7 +498,7 @@ namespace Bunkering.Access.Services
                         Success = false
                     };
 
-                    var total = (double)fee.COQFee + (double)fee.SerciveCharge + (double)fee.NOAFee;
+                    var total = (double)(fee.COQFee * appDepots.Count) + (double)fee.SerciveCharge + (double)fee.NOAFee;
 
                     var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.ApplicationId.Equals(id));
                     if (payment == null)
@@ -509,7 +510,12 @@ namespace Bunkering.Access.Services
                             ApplicationId = id,
                             OrderId = app.Reference,
                             BankCode = _setting.NMDPRAAccount,
-                            Description = $"Payment for CVC & COQ License ({app.Facility.Name})",
+                            Description = $"Payment for CVC & COQ License ({app.Facility.Name}) |" +
+                            $" NoA Fee: ₦ {fee.NOAFee:#,#.##} |" +
+                            $" Depots: {appDepots.Count} |" +
+                            $" CoQ Fee (per Depot): ₦ {fee.COQFee:#,#.##} |" +
+                            $" Total CoQ Fee: ₦ {(fee.COQFee * appDepots.Count):#,#.##} |" +
+                            $" Total Amount: ₦ {total:#,#.##}",
                             PaymentType = "NGN",
                             Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending),
                             TransactionDate = DateTime.UtcNow.AddHours(1),
@@ -1245,19 +1251,19 @@ namespace Bunkering.Access.Services
                         var flow = await _flow.AppWorkFlow(id, act, comment);
                         if (flow.Item1)
                         {
-                            if (act.Equals(Enum.GetName(typeof(AppActions), AppActions.Approve).ToLower()))
-                            {
-                                var s = await PostDischargeId(app.Id, user.Id);
-                                if (s is false)
-                                {
-                                    return new ApiResponse
-                                    {
-                                        StatusCode = HttpStatusCode.BadRequest,
-                                        Message = "Discharge Id not generated",
-                                        Success = false,
-                                    };
-                                }
-                            }
+                            //var appStatusCheck = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id)).Result.Status;
+                            //{
+                            //    var s = await PostDischargeId(app.Id, user.Id);
+                            //    if(s is false)
+                            //    {
+                            //        return new ApiResponse
+                            //        {
+                            //            StatusCode = HttpStatusCode.BadRequest,
+                            //            Message = "Discharge Id not generated",
+                            //            Success = false,
+                            //        };
+                            //    }
+                            //}
                             _response.StatusCode = HttpStatusCode.OK;
                             _response.Success = true;
                             _response.Message = "Application has been pushed";
@@ -1578,33 +1584,33 @@ namespace Bunkering.Access.Services
 
             return _response;
         }
-        public string GenerateDischargeID(string product)
-        {
-            Random random = new Random();
-            string _token = random.Next(100001, 999999).ToString();
+        //public string GenerateDischargeID(string product)
+        //{
+        //    Random random = new Random();
+        //    string _token = random.Next(100001, 999999).ToString();
 
-            return $"{product.ToUpper()}/{_token}";
-        }
-        public async Task<bool> PostDischargeId(int id, string userId)
-        {
-            var appDepots = await _context.ApplicationDepots.Where(a => a.AppId == id).Include(x => x.Product).ToListAsync();
-            foreach (var appDepot in appDepots)
-            {
-                appDepot.DischargeId = GenerateDischargeID(appDepot.Product.Name);
-            }
+        //    return $"{product.ToUpper()}/{_token}";
+        //}
+        //public async Task<bool> PostDischargeId(int id,string  userId)
+        //{
+        //    var appDepots = await _context.ApplicationDepots.Where(a => a.AppId == id).Include(x => x.Product).ToListAsync();
+        //    foreach (var appDepot in appDepots)
+        //    {
+        //        appDepot.DischargeId = GenerateDischargeID(appDepot.Product.Name);
+        //    }
+            
+        //    _context.ApplicationDepots.UpdateRange(appDepots);
+        //    var s = await _context.SaveChangesAsync();
+        //    if(s > 0)
+        //    {
+        //        return true;
+        //    }
+        //    else
+        //    {
+        //        return false;
+        //    }
 
-            _context.ApplicationDepots.UpdateRange(appDepots);
-            var s = await _context.SaveChangesAsync();
-            if (s > 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-
-        }
+        //}
 
         public IEnumerable<int> GetLongProcessingApps()
         {

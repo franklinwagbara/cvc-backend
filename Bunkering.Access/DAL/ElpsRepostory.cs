@@ -490,7 +490,7 @@ namespace Bunkering.Access.DAL
 			return null;
 		}
 
-		public async Task<RemitaResponse> GeneratePaymentReference(string baseUrl, Application application, decimal totalAmount, decimal serviceCharge)
+		public async Task<RemitaResponse> GeneratePaymentReference(string baseUrl, Application application, AppFee fee, int depots)
 		{
 			try
 			{
@@ -505,7 +505,8 @@ namespace Bunkering.Access.DAL
 				//Charge for IGR payments
 
 				//var type = application.Facility.FacilityType;
-				var amountdue = totalAmount - serviceCharge;
+				var totalAmount = fee.NOAFee + (fee.COQFee * depots) + fee.ApplicationFee + fee.SerciveCharge;
+				var amountdue = fee.NOAFee;
 				var remitaObject = new
 				{
 					serviceTypeId = _appSetting.ServiceTypeId,
@@ -513,7 +514,7 @@ namespace Bunkering.Access.DAL
 					totalAmount = Decimal.ToInt32(totalAmount).ToString(),
 					payerName = TruncateText(application.User.Company.Name, 25),
 					payerEmail = application.User.Email,
-					serviceCharge = Decimal.ToInt32(serviceCharge).ToString(),
+					serviceCharge = Decimal.ToInt32(fee.SerciveCharge).ToString(),
 					amountDue = Decimal.ToInt32(amountdue).ToString(),
 					orderId = application.Reference,
 					returnSuccessUrl = $"{baseUrl}/api/Payment/Remita?id={application.Id}",
@@ -527,7 +528,7 @@ namespace Bunkering.Access.DAL
 							beneficiaryName = _appSetting.NMDPRABName,
 							bankCode = _appSetting.NMDPRABankCode,
 							beneficiaryAccount = _appSetting.NMDPRAAccount,
-							beneficiaryAmount = $"{(double)amountdue + ((double)serviceCharge * 0.5)}",
+							beneficiaryAmount = $"{(double)(totalAmount - fee.SerciveCharge) + ((double)fee.SerciveCharge * 0.5)}",
 							deductFeeFrom = "0"
 						},
 						new RPartner
@@ -536,7 +537,7 @@ namespace Bunkering.Access.DAL
 							beneficiaryName = _appSetting.BOBName,
 							bankCode = _appSetting.BOBankCode,
 							beneficiaryAccount = _appSetting.BOAccount,
-							beneficiaryAmount = $"{(double)serviceCharge * 0.5}",
+							beneficiaryAmount = $"{(double)fee.SerciveCharge * 0.5}",
 							deductFeeFrom = "1"
 						}
 					},

@@ -35,7 +35,6 @@ namespace Bunkering.Access.Services
                     var vesselDischargeClearance = new VesselDischargeClearance
                     {
                         AppId = model.AppId,
-                        DepotId = model.DepotId,
                         DischargeId = model.DischargeId,
                         VesselName = model.VesselName,
                         VesselPort = model.VesselPort,

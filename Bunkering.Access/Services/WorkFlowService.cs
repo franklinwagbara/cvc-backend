@@ -13,6 +13,7 @@ using Bunkering.Access;
 using Bunkering.Core.ViewModels;
 using Bunkering.Access.DAL;
 using AutoMapper.Internal;
+using System.Net;
 
 namespace Bunkering.Access.Services
 {
@@ -25,6 +26,7 @@ namespace Bunkering.Access.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly AppSetting _appSetting;
         private readonly PaymentService _paymentService;
+        private readonly ApplicationContext _context;
         //private readonly Location _location;
         //private readonly Office _office;
 
@@ -38,7 +40,8 @@ namespace Bunkering.Access.Services
             IOptions<MailSettings> mailSettings,
             IHttpContextAccessor httpContextAccessor,
             IOptions<AppSetting> appSetting,
-            PaymentService paymentService
+            PaymentService paymentService,
+            ApplicationContext context
             //Location location,
             //Office office
             )
@@ -50,6 +53,7 @@ namespace Bunkering.Access.Services
             _httpContextAccessor = httpContextAccessor;
             _appSetting = appSetting.Value;
             _paymentService = paymentService;
+            _context = context;
             //_location = location;
             //_office = office;
         }
@@ -119,9 +123,22 @@ namespace Bunkering.Access.Services
                                 if (nextSUrveyor != null)
                                     app.SurveyorId = nextSUrveyor.Id;
                                 await _unitOfWork.SaveChangesAsync(currentUser.Id);
+
                                 var permit = await GeneratePermit(appid, currentUser.Id);
-                                if (permit.Item1)
-                                    processingMsg = $"Application with reference {app.Reference} has been approved and clearance number {permit.Item2} has been generated successfully";
+                                var s = await PostDischargeId(app.Id);
+                                if (s is false)
+                                {
+                                    res = false;
+                                    processingMsg = "Discharge Id not generated";
+
+                                }
+                                else
+                                {
+                                    if (permit.Item1)
+                                        processingMsg = $"Application with reference {app.Reference} has been approved and clearance number {permit.Item2} has been generated successfully";
+                                }
+
+                               
                             }
                             //send and save notification
                             //await SendNotification(app, action, nextprocessingofficer, processingMsg);
@@ -474,7 +491,8 @@ namespace Bunkering.Access.Services
                     IssuedDate = DateTime.Now,
                     CertifcateNo = pno,
                     Signature = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/wwwroot/assets/fa.png",
-                    QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length)
+                    QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length),
+                    ProductId = coq.ProductId
                 };
 
                 var req = await Utils.Send(_appSetting.ElpsUrl, new HttpRequestMessage(HttpMethod.Post, $"api/Permits/{CompanyElpsId}/{_appSetting.AppEmail}/{Utils.GenerateSha512($"{_appSetting.AppEmail}{_appSetting.AppId}")}")
@@ -577,6 +595,34 @@ namespace Bunkering.Access.Services
             //    UserId = user.Id
             //});
             //await _unitOfWork.SaveChangesAsync(user.Id);
+        }
+
+        public string GenerateDischargeID(string product)
+        {
+            Random random = new Random();
+            string _token = random.Next(100001, 999999).ToString();
+
+            return $"{product.ToUpper()}/{_token}";
+        }
+        public async Task<bool> PostDischargeId(int id)
+        {
+            var appDepots = await _context.ApplicationDepots.Where(a => a.AppId == id).Include(x => x.Product).ToListAsync();
+            foreach (var appDepot in appDepots)
+            {
+                appDepot.DischargeId = GenerateDischargeID(appDepot.Product.Name);
+            }
+
+            _context.ApplicationDepots.UpdateRange(appDepots);
+            var s = await _context.SaveChangesAsync();
+            if (s > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
         }
     }
 }

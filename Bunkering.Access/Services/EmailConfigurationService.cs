@@ -65,9 +65,10 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> UpdateEmailConfiguration(EmailConfigurationViewModel model)
         {
-            var update = await _unitOfWork.EmailConfiguration.FirstOrDefaultAsync(x => x.Name == model.Name);
+            var update = await _unitOfWork.EmailConfiguration.FirstOrDefaultAsync(x => x.Id == model.Id);
             if(update != null)
             {
+                update.Name = model.Name;
                 update.Email = model.Email;
 
                 await _unitOfWork.EmailConfiguration.Update(update);
@@ -150,7 +151,7 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> AllEmailConfigurations()
         {
-            var allEmail = await _unitOfWork.EmailConfiguration.GetAll();
+            var allEmail = await _unitOfWork.EmailConfiguration.Find(c => c.IsActive);
 
             _response = new ApiResponse
             {
