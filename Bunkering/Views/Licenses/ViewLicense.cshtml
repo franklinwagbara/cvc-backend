@@ -1,0 +1,139 @@
+﻿@model CertificareDTO
+@{
+    Layout = null;
+    int count = 0;
+}
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div style="font-size: 1.5em !important;">
+        <div class="text-center">
+            <div>
+                <img src="~/assets/nmdpraLogo.png" alt="Logo" style="height: 250px; display: block; margin: 0 auto;" />
+            </div>
+            <div style="text-align: center;font-size: 2.5em; color: forestgreen;">
+                <b>
+                    NIGERIAN MIDSTREAM AND DOWNSTREAM PETROLEUM REGULATORY AUTHORITY
+                </b>
+            </div>
+            <div style="color: forestgreen; text-align: center; margin-top: -1em;">
+                <h1>COASTAL VESSEL CLEARANCE</h1>
+            </div>
+        </div>
+        <div style="float: right; position: relative; margin-top: 1em; margin-bottom: 1em;">
+            <h2><span>Clearance No:</span> <span style="padding: 0 50px 0 10px; font-weight: bold;">@Model.PermitNo</span></h2>
+        </div>
+        <div style="width: 100%; text-align: center; position: absolute; top: 50%; margin-top: -400px;">
+            <img src="~/assets/coat-of-arm.jpg" style="width: 920px; opacity: 0.1; margin-left: -5em;;" />
+        </div>
+        <br /> <br />
+        <br /> <br />
+        <p>
+            As approved by the ACE, please find below details of the vessel clearance for your kind attention:
+        </p>
+        <p>
+            <table style="width: 100%; font-size: 1em !important; border: 1px solid gray; padding: 5px;">
+                <thead>
+                    <tr>
+                        <th>S/N</th>
+                        <th>DISCHARGE ID</th>
+                        <th>VESSEL/<br />TRUCK</th>
+                        <th>PRODUCT</th>
+                        <th>QTY(MTS)</th>
+                        <th>ETA</th>
+                        <th>LOAD PORT</th>
+                        <th>DESTINATION</th>
+                        <th>JETTY</th>
+                        <th>NOMINATED <br />SURVEYOR</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Destinations)
+                    {
+                        count++;
+                        <tr>
+                            <td>@count</td>
+                            <td>@item.DischargeId</td>
+                            <td>@Model.Vessel</td>
+                            <td>@item.Product</td>
+                            <td>@item.Volume.ToString("N2")</td>
+                            <td>@Model.ETA.ToString("dd MMM yyyy")</td>
+                            <td>@Model.LoadPort</td>
+                            <td>@item.Name</td>
+                            <td>@Model.Jetty</td>
+                            <td>@Model.Surveyor</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </p>
+        <p>
+            Please allow the vessel to discharge/loading and ensure complete recertification.
+        </p>
+        <div style="margin-top: 2em;">
+            <div style="float: left !important;">
+                <img src="data:imaage/png;base64,@Model.QRCode" width="170" height="170" />
+            </div>
+            <div style="float: right !important;">
+                <div class="text-center">
+                    <img src="data:imaage/png;base64,@Model.Signature" height="130" />
+                </div>
+                <div style="font-size: large; text-align: center; border-top: dotted 2px; padding: 0 10px 0 10px;">
+                    <span>For: Authority Chief Executive</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+@functions{
+    private string DateSub(int day)
+    {
+        switch (day)
+        {
+            case 1:
+            case 21:
+            case 31:
+                return "st";
+            case 2:
+            case 22:
+                return "nd";
+            case 3:
+            case 23:
+                return "rd";
+            default:
+                return "th";
+        }
+    }
+}
+<style>
+    body {
+        /*background: url("../../Images/coat-of-arm.jpg") no-repeat;*/
+        /*opacity: 0.1;*/
+        background-position: center;
+        background-size: contain;
+        font-family: Candara;
+        border: 5px solid;
+        padding: 3em;
+        justify-content: center;
+        position:relative;
+    }
+
+    /* table {
+        border-collapse: separate;
+        border-spacing: 0 15px;
+    } */
+
+    td, th {
+        text-align:center;
+        width: 160px;
+        padding: 3px;
+        border: 1px dotted #999;
+    }
+</style>

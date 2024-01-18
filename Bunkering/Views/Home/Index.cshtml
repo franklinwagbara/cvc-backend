@@ -1,0 +1,98 @@
+﻿@using Bunkering.Access
+@inject AppSetting _appConfig
+@{
+    ViewData["Title"] = "Login - ";
+    var elpsBaseUrl = _appConfig.ElpsUrl;
+    var pk = _appConfig.PublicKey;
+    var guidelineUrl = ViewData["guidelineUrl"];
+    string login = elpsBaseUrl + "/Account/Login?appid=" + pk;
+    string register = elpsBaseUrl + "/Account/Register?appid=" + pk;
+    string verify = elpsBaseUrl + "/Permit/VerifyPermit?appid=" + pk;
+    string fpassword = elpsBaseUrl + "/Account/ForgotPassword?appid=" + pk;
+}
+<div class="" style="background-image: url('./assets/background.jpg'); background-size: cover; font-family: Candara;">
+    <div class="overlay">
+        <div class="main-area">
+            <div class="logo-wrapper">
+                <img src="./assets/nmdpraLogo.png" alt="logo" />
+                <h1 style="font-weight: bold; color: #17411D;">NMDPRA</h1>
+            </div>
+            <div class="buttons-wrapper">
+                <div>
+                    <a href="@login"><button type="submit">PORTAL LOGIN</button></a>
+                    <a href="@register"><button class="yellow">REGISTRATION</button></a>
+                </div>
+                <div>
+                    <a href="@verify"><button class="blue">VERIFY PERMIT</button></a>
+                    <a href="@fpassword"><button class="red">FORGOT PASSWORD</button></a>
+                </div>
+            </div>
+        </div>
+        <div class="side-area">
+            <div class="title-wrapper text-center">
+                <h2>ONLINE BUNKERING LICENSING SYSTEM</h2>
+            </div>
+            <div class="cards-wrapper">
+                <div class="card">
+                    <p>User Guide</p>
+                    <img src="./assets/icon1.png" alt="logo" />
+                    <ul>
+                        <li><a href="">Online Application Guide</a></li>
+                        <li><a href="">Resend Activation Email</a></li>
+                        <li><a href="">Verify a Permit</a></li>
+                        <li><a href="">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <p>Account Creation</p>
+                    <img src="./assets/icon2.png" alt="logo" />
+                    <ul>
+                        <li>
+                            <a href="">
+                                Create an account to use
+                                <br />resources on this portal. Note
+                                <br />that account creation is not
+                                <br /> required to validate permit.
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <p>Online App. Processing</p>
+                    <img src="./assets/icon3.png" alt="logo" />
+                    <ul>
+                        <li><a href="">Login to apply for a new</a></li>
+                        <li><a href="">application form, renew or</a></li>
+                        <li><a href="">manage your permits</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-wrapper">
+                <div class="images-container">
+                    <img src="./assets/visa.png"
+                         width="80px"
+                         height="48.44px"
+                         alt="visa icon" />
+                    <img src="./assets/master-icon.png"
+                         width="80px"
+                         height="80px"
+                         alt="visa icon" />
+                    <img src="./assets/verve.png"
+                         width="80px"
+                         height="80px"
+                         alt="visa icon" />
+                    <img src="./assets/remita.png"
+                         width="80px"
+                         height="22.16px"
+                         alt="visa icon" />
+                </div>
+
+                <div class="others-container">
+                    <p>INTERNET BANKING</p>
+                    <p>MOBILE BANKING</p>
+                    <p>BANK BRANCHES</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
