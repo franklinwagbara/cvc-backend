@@ -27,20 +27,26 @@ namespace Bunkering.Access.Services
         private readonly string directory = "Payment";
         private readonly IElps _elps;
         private readonly AppSetting _appSetting;
+        private readonly ApplicationContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public PaymentService(
             IUnitOfWork unitOfWork,
             IHttpContextAccessor contextAccessor,
             AppLogger logger,
             IElps elps,
-            IOptions<AppSetting> appSetting)
+            ApplicationContext context,
+            IOptions<AppSetting> appSetting,
+            UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
             User = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
             _logger = logger;
             _elps = elps;
+            _context = context;
             _appSetting = appSetting.Value;
+            _userManager = userManager;
         }
 
         public async Task<ApiResponse> CreatePayment(int id)
@@ -155,7 +161,9 @@ namespace Bunkering.Access.Services
 
                 try
                 {
-                    var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id.Equals(id) && x.IsDeleted == false, "Application.User.Company,Facility.VesselType");
+                    //var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id.Equals(id) && x.IsDeleted == false, "Application.User.Company,Facility.VesselType");
+                    var user = await _userManager.FindByEmailAsync(User);
+                    var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id.Equals(id) && (x.IsDeleted.Value == false || x.IsDeleted == null), "Plant");
                     if (coq == null)
                         _response = new ApiResponse { Message = "This COQ record does not exist or has been removed from the system, kindly contact support.", StatusCode = HttpStatusCode.NotFound };
                     else
@@ -163,77 +171,122 @@ namespace Bunkering.Access.Services
                         var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));
                         var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.ApplicationTypeId.Equals(appType.Id) && x.COQId.Equals(coq.Id) && x.ApplicationId.Equals(coq.AppId));
 
-                        if (payment != null && !string.IsNullOrEmpty(payment.RRR))
+                        if (payment != null)
                             _response = new ApiResponse { Message = "Debit note already exists", StatusCode = HttpStatusCode.BadRequest };
                         else
                         {
                             if (payment == null)
                             {
-                                var total = (double)coq.GSV * (double)coq.DepotPrice * 0.1;
-
-                                var request = await _elps.GenerateDebitNotePaymentReference($"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}", total, coq.Application.User.Company.Name, coq.Application.User.Email, coq.Reference, coq.Plant.Name, coq.Application.User.ElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DebitNote), "");
-                                _logger.LogRequest("Creation of payment split for application with reference:" + coq.Reference + "(" + coq.Application.User.Company.Name + ") by " + User, false, directory);
-
-                                if (request == null)
+                                string productType = string.Empty;
+                                if (coq.AppId is null)
                                 {
-                                    _logger.LogRequest($"Payment output from Remita:: {request.Stringify()} by {User}", true, directory);
-                                    _response = new ApiResponse { Message = "An error occured while generating this payment RRR. Please try again or contact support.", StatusCode = HttpStatusCode.InternalServerError };
+                                    var prdct = _context.Products.FirstOrDefault(x => x.Id == coq.ProductId);
+                                    productType = prdct?.ProductType ?? string.Empty;
                                 }
                                 else
                                 {
-                                    if (!string.IsNullOrEmpty(request.RRR))
-                                    {
-                                        payment = new Payment
-                                        {
-                                            Account = "",
-                                            Amount = total,
-                                            ApplicationId = coq.AppId,
-                                            ApplicationTypeId = appType.Id,
-                                            COQId = coq.Id,
-                                            Description = "",
-                                            OrderId = coq.Reference,
-                                            RRR = request.RRR,
-                                            PaymentType = "NGN",
-                                            TransactionDate = DateTime.UtcNow.AddHours(1),
-                                            Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending),
-
-                                        };
-                                        await _unitOfWork.Payment.Add(payment);
-                                        await _unitOfWork.SaveChangesAsync(coq.Application.UserId);
-
-                                        _logger.LogRequest($"Payment for debit note with RRR: {payment.RRR} saved for {coq.Reference} by {User}", false, directory);
-
-                                        #region Send Payment E-Mail To Company
-                                        string subject = $"Generation of Debit Note For COQ with reference: {coq.Reference}";
-
-                                        var emailBody = string.Format($"A Payment RRR: {payment.RRR} has been generated for your COQ with reference number: {coq.Reference}" +
-                                            "<br /><ul>" +
-                                            "<li>Amount Generated: {0}</li>" +
-                                            "<li>Remita RRR: {1}</li>" +
-                                            "<li>Payment Status: {2}</li>" +
-                                            "<li>Payment Description: {3}</li>" +
-                                            "<li>Vessel Name: {4}</li>" +
-                                            "<p>Kindly note that your application will be pending until this payment is completed. </p>",
-                                            payment.Amount.ToString(), payment.RRR, payment.Status, payment.Description, $"{coq.Plant.Name}");
-
-                                        #endregion
-
-                                        string successMsg = $"Debit Note RRR ({payment.RRR}) generated successfully for {coq.Plant.Name}";
-                                        _response = new ApiResponse
-                                        {
-                                            Message = successMsg,
-                                            Data = new { rrr = payment.RRR },
-                                            StatusCode = HttpStatusCode.OK,
-                                            Success = true
-                                        };
-                                    }
-                                    else
-                                        _response = new ApiResponse
-                                        {
-                                            Message = "Unable to generate RRR, pls try again",
-                                            StatusCode = HttpStatusCode.InternalServerError
-                                        };
+                                    var prd = _context.ApplicationDepots.Include(p => p.Product).FirstOrDefault(x => x.AppId == coq.AppId);
+                                    productType = prd.Product?.ProductType ?? string.Empty;
                                 }
+                                var total = productType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.Gas)) ? coq.MT_VAC * coq.DepotPrice * 0.01 : coq.GSV * coq.DepotPrice * 0.01;
+
+                                payment = new Payment
+                                {
+                                    Account = "",
+                                    Amount = total,
+                                    ApplicationId = coq.AppId,
+                                    ApplicationTypeId = appType.Id,
+                                    COQId = coq.Id,
+                                    Description = "",
+                                    OrderId = coq.Reference,
+                                    RRR = string.Empty,
+                                    AppReceiptId = string.Empty,
+                                    TxnMessage = string.Empty,
+                                    PaymentType = "NGN",
+                                    TransactionDate = DateTime.UtcNow.AddHours(1),
+                                    BankCode = string.Empty,
+                                    Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending),
+                                    LateRenewalPenalty = 0,
+                                    NonRenewalPenalty = 0,
+                                    Arrears = 0,
+                                    LastRetryDate = DateTime.UtcNow,
+                                    RetryCount = 0,
+                                    ServiceCharge = 0,
+                                    TransactionId = string.Empty,
+                                };
+                                await _unitOfWork.Payment.Add(payment);
+                                await _unitOfWork.SaveChangesAsync(user.Id);
+
+                                _logger.LogRequest($"Debit Note saved for {coq.Reference} by {User}", false, directory);
+                                #region Send Payment E-Mail To Company
+                                string subject = $"Generation of Debit Note For COQ with reference: {coq.Reference}";
+
+                                var emailBody = string.Format($"Debit Note has been generated for your COQ with reference number: {coq.Reference}" +
+                                    "<br /><ul>" +
+                                    "<li>Amount Generated: {0}</li>" +
+                                    //"<li>Remita RRR: {1}</li>" +
+                                    "<li>Payment Status: {1}</li>" +
+                                    "<li>Payment Description: {2}</li>" +
+                                    "<li>Vessel Name: {3}</li>" +
+                                    "<p>Kindly visit the <a hhref=''>portal to generate RRR for payment. </p>",
+                                    payment.Amount.ToString(), payment.Status, payment.Description, $"{coq.Plant.Name}");
+
+                                #endregion
+
+                                string successMsg = $"Debit Note RRR ({payment.RRR}) generated successfully for {coq.Plant.Name}";
+                                _response = new ApiResponse
+                                {
+                                    Message = successMsg,
+                                    StatusCode = HttpStatusCode.OK,
+                                    Success = true
+                                };
+
+
+                                //var request = await _elps.GenerateDebitNotePaymentReference($"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}", total, coq.Application.User.Company.Name, coq.Application.User.Email, coq.Reference, coq.Plant.Name, coq.Application.User.ElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DebitNote), "");
+                                //_logger.LogRequest("Creation of payment split for application with reference:" + coq.Reference + "(" + coq.Application.User.Company.Name + ") by " + User, false, directory);
+
+                                //if (request == null)
+                                //{
+                                //    _logger.LogRequest($"Payment output from Remita:: {request.Stringify()} by {User}", true, directory);
+                                //    _response = new ApiResponse { Message = "An error occured while generating this payment RRR. Please try again or contact support.", StatusCode = HttpStatusCode.InternalServerError };
+                                //}
+                                //else
+                                //{
+                                //if (!string.IsNullOrEmpty(request.RRR))
+                                //    {
+
+
+                                //        #region Send Payment E-Mail To Company
+                                //        string subject = $"Generation of Debit Note For COQ with reference: {coq.Reference}";
+
+                                //        var emailBody = string.Format($"A Payment RRR: {payment.RRR} has been generated for your COQ with reference number: {coq.Reference}" +
+                                //            "<br /><ul>" +
+                                //            "<li>Amount Generated: {0}</li>" +
+                                //            "<li>Remita RRR: {1}</li>" +
+                                //            "<li>Payment Status: {2}</li>" +
+                                //            "<li>Payment Description: {3}</li>" +
+                                //            "<li>Vessel Name: {4}</li>" +
+                                //            "<p>Kindly note that your application will be pending until this payment is completed. </p>",
+                                //            payment.Amount.ToString(), payment.RRR, payment.Status, payment.Description, $"{coq.Plant.Name}");
+
+                                //        #endregion
+
+                                //        string successMsg = $"Debit Note RRR ({payment.RRR}) generated successfully for {coq.Plant.Name}";
+                                //        _response = new ApiResponse
+                                //        {
+                                //            Message = successMsg,
+                                //            Data = new { rrr = payment.RRR },
+                                //            StatusCode = HttpStatusCode.OK,
+                                //            Success = true
+                                //        };
+                                //    }
+                                //    else
+                                //        _response = new ApiResponse
+                                //        {
+                                //            Message = "Unable to generate RRR, pls try again",
+                                //            StatusCode = HttpStatusCode.InternalServerError
+                                //        };
+                                //}
                             }
                         }
                     }

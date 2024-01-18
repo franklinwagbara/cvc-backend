@@ -212,10 +212,10 @@ namespace Bunkering.Access.Services
                 {
                     var plant = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id.Equals(coq.PlantId));
                     var certificate = await GenerateCOQCertificate(coqId, currentUser.Id, plant.CompanyElpsId.ToString());
-                    var debitnote = await _paymentService.GenerateDebitNote(coq.Id);
+                    //var debitnote = await _paymentService.GenerateDebitNote(coq.Id);
 
-                    if (certificate.Item1 && debitnote.Success)
-                        message = $"COQ Application has been approved and certificate {certificate.Item2} has been generated successfully. Additionally Debit note with RRR ({debitnote.Data}) has been generated for the COQ.";
+                    if (certificate.Item1)
+                        message = $"COQ Application has been approved and certificate {certificate.Item2} has been generated successfully.";
                 }
                 //send and save notification
                 //await SendCOQNotification(coq, action, nextProcessingOfficer, message);

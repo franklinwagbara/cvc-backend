@@ -109,6 +109,38 @@ namespace Bunkering.Access
             smtp.Send(mail);
         }
 
+        public static void SendMail(Dictionary<string, string> mailsettings, string[] toEmails, string subject, string body, string bcc = null)
+        {
+            var credentials = new NetworkCredential(mailsettings.GetValue("UserName"), mailsettings.GetValue("mailPass"));
+            var smtp = new SmtpClient(mailsettings.GetValue("mailHost"), int.Parse(mailsettings.GetValue("ServerPort")))
+            {
+                EnableSsl = bool.Parse(mailsettings.GetValue("UseSsl")),
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = credentials
+            };
+
+
+            var mail = new MailMessage {From = new MailAddress(mailsettings.GetValue("mailSender"))};
+            foreach (var toEmail in toEmails)
+            {
+                mail.To.Add(new MailAddress(toEmail));
+            }
+
+            if (!string.IsNullOrEmpty(bcc))
+            {
+                var copies = bcc.Split(',');
+                foreach (var email in copies)
+                    mail.Bcc.Add(new MailAddress(email));
+            }
+            
+            mail.Subject = subject;
+            mail.Body = body;
+            mail.IsBodyHtml = true;
+
+            smtp.Send(mail);
+        }
+
         public static string ReadTextFile(string webrootpath, string filename)
         {
             string body;

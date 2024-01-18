@@ -510,7 +510,7 @@ namespace Bunkering.Access.Services
                             ApplicationId = id,
                             OrderId = app.Reference,
                             BankCode = _setting.NMDPRAAccount,
-                            Description = $"Payment for CVC & COQ License ({app.Facility.Name}) |" +
+                            Description = $"Payment for CVC & COQ({app.Facility.Name}) |" +
                             $" NoA Fee: ₦ {fee.NOAFee:#,#.##} |" +
                             $" Depots: {appDepots.Count} |" +
                             $" CoQ Fee (per Depot): ₦ {fee.COQFee:#,#.##} |" +
@@ -560,7 +560,8 @@ namespace Bunkering.Access.Services
                             ServiceCharge = fee.SerciveCharge,
                             Total = total,
                             payment.RRR,
-                            PaymentStatus = payment.Status
+                            PaymentStatus = payment.Status,
+                            payment.Description
                         }
                     };
                 }
@@ -994,10 +995,10 @@ namespace Bunkering.Access.Services
             try
             {
                 var user = await _userManager.Users.Include(x => x.Location).Include(ur => ur.UserRoles).ThenInclude(u => u.Role).FirstOrDefaultAsync(x => x.Email.Equals(User));
-                if (user.Location?.Name == LOCATION.FO)
+                if (user.Location?.Name == LOCATION.FO && !user.UserRoles.FirstOrDefault().Role.Name.Equals("FAD"))
                     return await GetMyDeskFO(user);
                 else if (user.UserRoles.FirstOrDefault().Role.Name.Equals("FAD"))
-                    return await GetMyDeskFO(user);
+                    return await GetMyDeskFAD();
                 else
                     return await GetMyDeskOthers(user);
             }
@@ -1012,6 +1013,20 @@ namespace Bunkering.Access.Services
             }
         }
 
+        public async Task<IEnumerable<NavalLetterDto>> GetClearedVessels()
+        {
+            var apps = (await _unitOfWork.Application.Find(c => c.HasCleared)).ToList();
+            var data = new List<NavalLetterDto>();
+            foreach (var app in apps)
+            {
+                var appDepot = (await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.AppId == app.Id, "Depot"));
+                var product = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.ProductId));
+                data.Add(new NavalLetterDto(app.MarketerName, product.Name, appDepot.Volume,
+                    app.VesselName, app.MotherVessel, app.Jetty, app.ETA, app.LoadingPort, appDepot.Depot.Name
+                ));
+            }
+            return data;
+        }
 
         private async Task<ApiResponse> GetMyDeskOthers(ApplicationUser? user)
         {
@@ -1041,115 +1056,96 @@ namespace Bunkering.Access.Services
             };
         }
 
-        private async Task<ApiResponse> GetMyDeskFO(ApplicationUser? user)  
+        private async Task<ApiResponse> GetMyDeskFAD()
         {
-            var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Plant");
-            // if (await _userManager.IsInRoleAsync(user, "FAD"))
-            //     coqs = await _unitOfWork.CoQ.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)));
-            if (await _userManager.IsInRoleAsync(user, "Company"))
+            //checked 
+            var coq = await _unitOfWork.CoQ.Find(x => x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)));
+            ApplicationType? apptype = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));
+            //&& !x.Application.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));
+
+            var payment = await _unitOfWork.Payment.Find(x => x.ApplicationTypeId.Equals(apptype.Id));
+
+            if (payment.Count() > 0)
             {
-                coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Plant");
-                return new ApiResponse
-                {
-                    Message = "Applications fetched successfully",
-                    StatusCode = HttpStatusCode.OK,
-                    Success = true,
-                    Data = coqs.OrderByDescending(c => c.DateCreated).Select(x => new
-                    {
-                        x.Id,
-                        AppId = x.AppId,
-                        CompanyEmail = x.Application?.User.Email,
-                        ImportName = x.Application?.User.Company.Name,
-                        VesselName = x.Application?.VesselName,
-                        x.Reference,
-                        x.Status,
-                        DepotName = x.Plant?.Name,
-                        DepotId = x.PlantId,
-                        DateOfVesselArrival = x.DateOfVesselArrival.ToShortDateString(),
-                        DateOfVesselUllage = x.DateOfVesselUllage.ToShortDateString(),
-                        DateOfSTAfterDischarge = x.DateOfSTAfterDischarge.ToShortDateString(),
-                        DateOfVesselArrivalISO = x.DateOfVesselArrival.ToString("MM/dd/yyyy"),
-                        DateOfVesselUllageISO = x.DateOfVesselUllage.ToString("MM/dd/yyyy"),
-                        DateOfSTAfterDischargeISO = x.DateOfSTAfterDischarge.ToString("MM/dd/yyyy"),
-                        MT_VAC = x.MT_VAC,
-                        MT_AIR = x.MT_AIR,
-                        GOV = x.GOV,
-                        GSV = x.GSV,
-                        DepotPrice = x.DepotPrice,
-                        CreatedBy = x.CreatedBy,
-                        SubmittedDate = x.SubmittedDate,
-                        ApplicationType = "COQ"
-                    }).ToList(),
-                };
-            }
-            else if(await _userManager.IsInRoleAsync(user, "FAD"))
-            {
-                //checking if coq is completed
-                var coq = await _unitOfWork.CoQ.Find(x => x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)));
+                var pendingCoqs = coq.ToList().Where(c => payment.ToList().Any(p => !p.COQId.Equals(c.Id)));
 
-                //checking if the apptype is debit note 
-                ApplicationType? apptype = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));
-
-                //checking if the debitnote is existing on the paymentTable
-                var payment = await _unitOfWork.Payment.Find(x => x.ApplicationTypeId.Equals(apptype.Id));
-
-                if(payment.Count() > 0)
-                {
-                    //checking for a coq that is not tied to a debit note here
-                    var pendingCoqs = coq.ToList().Where(c => payment.ToList().Any(p => !p.COQId.Equals(c.Id)));
-
-                    if (coq != null)
-                    {
-
-                        return new ApiResponse
-                        {
-                            Message = "Successful",
-                            StatusCode = HttpStatusCode.OK,
-                            Success = true,
-                            Data = pendingCoqs.Select(c => new
-                            {
-                                c.Reference,
-                                c.Application?.User.Company.Name,
-                                DepotName = c.Plant?.Name,
-                                DepotPrice = c.DepotPrice,
-                                c.GSV,
-                                DebitNote = (c.GSV * c.DepotPrice * 0.01),
-
-                            }).ToList(),
-
-                        };
-
-                    }
-                }
-                else
-                {
+                if (coq != null)
                     return new ApiResponse
                     {
                         Message = "Successful",
                         StatusCode = HttpStatusCode.OK,
                         Success = true,
-                        Data = coq.Select(c => new
+                        Data = pendingCoqs.Select(c => new
                         {
+                            c.Id,
                             c.Reference,
                             c.Application?.User.Company.Name,
                             DepotName = c.Plant?.Name,
-                            DepotPrice = c.DepotPrice,
-                            c.GSV,
-                            DebitNote = (c.GSV * c.DepotPrice * 0.01),
-
+                            c.DepotPrice,
+                            Volume = c.GSV == 0 ? c.MT_VAC : c.GSV,
+                            DebitNote = c.GSV == 0 ? c.MT_VAC * c.DepotPrice * 0.01 : c.GSV * c.DepotPrice * 0.01,
                         }).ToList(),
-
                     };
-
-                }
-
             }
+
             return new ApiResponse
             {
-                StatusCode = HttpStatusCode.InternalServerError,
-                Success = false
-            };
+                Message = "Successful",
+                StatusCode = HttpStatusCode.OK,
+                Success = true,
+                Data = coq.Select(c => new
+                {
+                    c.Reference,
+                    c.Application?.User.Company.Name,
+                    DepotName = c.Plant?.Name,
+                    DepotPrice = c.DepotPrice,
+                    c.GSV,
+                    DebitNote = (c.GSV * c.DepotPrice * 0.01),
 
+                }).ToList(),
+
+            };
+        }
+
+            private async Task<ApiResponse> GetMyDeskFO(ApplicationUser? user)
+            {
+            var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Plant");
+            // if (await _userManager.IsInRoleAsync(user, "FAD"))
+            //     coqs = await _unitOfWork.CoQ.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)));
+            if (await _userManager.IsInRoleAsync(user, "Company"))
+                coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Plant");
+            return new ApiResponse
+            {
+                Message = "Applications fetched successfully",
+                StatusCode = HttpStatusCode.OK,
+                Success = true,
+                Data = coqs.OrderByDescending(c => c.DateCreated).Select(x => new
+                {
+                    x.Id,
+                    AppId = x.AppId,
+                    CompanyEmail = x.Application?.User.Email,
+                    ImportName = x.Application?.User.Company.Name,
+                    VesselName = x.Application?.VesselName,
+                    x.Reference,
+                    x.Status,
+                    DepotName = x.Plant?.Name,
+                    DepotId = x.PlantId,
+                    DateOfVesselArrival = x.DateOfVesselArrival.ToShortDateString(),
+                    DateOfVesselUllage = x.DateOfVesselUllage.ToShortDateString(),
+                    DateOfSTAfterDischarge = x.DateOfSTAfterDischarge.ToShortDateString(),
+                    DateOfVesselArrivalISO = x.DateOfVesselArrival.ToString("MM/dd/yyyy"),
+                    DateOfVesselUllageISO = x.DateOfVesselUllage.ToString("MM/dd/yyyy"),
+                    DateOfSTAfterDischargeISO = x.DateOfSTAfterDischarge.ToString("MM/dd/yyyy"),
+                    MT_VAC = x.MT_VAC,
+                    MT_AIR = x.MT_AIR,
+                    GOV = x.GOV,
+                    GSV = x.GSV,
+                    DepotPrice = x.DepotPrice,
+                    CreatedBy = x.CreatedBy,
+                    SubmittedDate = x.SubmittedDate,
+                    ApplicationType = "COQ"
+                }).ToList(),
+            };
         }
 
         public async Task<ApiResponse> ViewApplication(int id)
@@ -1544,21 +1540,6 @@ namespace Bunkering.Access.Services
             }
         }
 
-        public async Task<IEnumerable<NavalLetterDto>> GetClearedVessels()
-        {
-            var apps = (await _unitOfWork.Application.Find(c => c.HasCleared)).ToList();
-            var data = new List<NavalLetterDto>();
-            foreach (var app in apps)
-            {
-                var appDepot = (await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.AppId == app.Id, "Depot"));
-                var product = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.ProductId));
-                data.Add(new NavalLetterDto(app.MarketerName, product.Name, appDepot.Volume,
-                    app.VesselName, app.MotherVessel, app.Jetty, app.ETA, app.LoadingPort, appDepot.Depot.Name
-                ));
-            }
-            return data;
-        }
-
         public async Task<ApiResponse> IMONumberVerification(string imoNumber)
         {
             var verifyIMO = await _unitOfWork.Facility.FirstOrDefaultAsync(x => x.IMONumber.Equals(imoNumber));
@@ -1761,5 +1742,4 @@ namespace Bunkering.Access.Services
         }
 
     }
-
 }
