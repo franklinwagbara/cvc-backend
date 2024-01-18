@@ -14,12 +14,14 @@ stages:
   jobs:
   - job: Job
     pool:
+      name: Azure Pipelines
       vmImage: 'windows-2022'
-    steps:
-    - task: UseDotNet@2
-      displayName: 'Use .NET Core 6'
+    steps:   
+    - task: DotNetCoreCLI@2
+      displayName: Restore
       inputs:
-        version: 6.0.x
+        command: restore
+        projects: '**/*.csproj'
     - task: DotNetCoreCLI@2
       displayName: Build
       inputs:
