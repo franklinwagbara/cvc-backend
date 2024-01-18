@@ -10,16 +10,6 @@
 );
 
 
-
-
-
-
-
-
-
-
-
-
 GO
 CREATE NONCLUSTERED INDEX [IX_Tanks_FacilityId]
     ON [dbo].[Tanks]([FacilityId] ASC);

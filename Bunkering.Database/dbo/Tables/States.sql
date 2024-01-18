@@ -8,16 +8,6 @@
 );
 
 
-
-
-
-
-
-
-
-
-
-
 GO
 CREATE NONCLUSTERED INDEX [IX_States_CountryId]
     ON [dbo].[States]([CountryId] ASC);

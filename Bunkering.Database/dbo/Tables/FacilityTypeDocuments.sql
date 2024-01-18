@@ -1,4 +1,4 @@
-CREATE TABLE [dbo].[FacilityTypeDocuments] (
+﻿CREATE TABLE [dbo].[FacilityTypeDocuments] (
     [Id]                INT            IDENTITY (1, 1) NOT NULL,
     [DocumentTypeId]    INT            NOT NULL,
     [VesselTypeId]      INT            NOT NULL,
@@ -10,24 +10,6 @@ CREATE TABLE [dbo].[FacilityTypeDocuments] (
     CONSTRAINT [FK_FacilityTypeDocuments_ApplicationTypes_ApplicationTypeId] FOREIGN KEY ([ApplicationTypeId]) REFERENCES [dbo].[ApplicationTypes] ([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_FacilityTypeDocuments_VesselTypes_VesselTypeId] FOREIGN KEY ([VesselTypeId]) REFERENCES [dbo].[VesselTypes] ([Id]) ON DELETE CASCADE
 );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 GO

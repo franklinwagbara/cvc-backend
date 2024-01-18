@@ -6,5 +6,3 @@
     CONSTRAINT [PK_ApplicationSurveyors] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 
-
-

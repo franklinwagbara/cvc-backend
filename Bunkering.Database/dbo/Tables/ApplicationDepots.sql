@@ -11,15 +11,9 @@
 );
 
 
-
-
-
-
-
-
 GO
-CREATE NONCLUSTERED INDEX [IX_ApplicationDepots_ProductId]
-    ON [dbo].[ApplicationDepots]([ProductId] ASC);
+CREATE NONCLUSTERED INDEX [IX_ApplicationDepots_AppId]
+    ON [dbo].[ApplicationDepots]([AppId] ASC);
 
 
 GO
@@ -28,6 +22,6 @@ CREATE NONCLUSTERED INDEX [IX_ApplicationDepots_DepotId]
 
 
 GO
-CREATE NONCLUSTERED INDEX [IX_ApplicationDepots_AppId]
-    ON [dbo].[ApplicationDepots]([AppId] ASC);
+CREATE NONCLUSTERED INDEX [IX_ApplicationDepots_ProductId]
+    ON [dbo].[ApplicationDepots]([ProductId] ASC);
 

@@ -10,25 +10,3 @@
     CONSTRAINT [PK_AppFees] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-GO
-
-
-
-GO
-
-

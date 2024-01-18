@@ -27,42 +27,6 @@
 );
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 GO
 CREATE NONCLUSTERED INDEX [IX_Payments_ApplicationId]
     ON [dbo].[Payments]([ApplicationId] ASC);
