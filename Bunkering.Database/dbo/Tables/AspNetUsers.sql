@@ -35,26 +35,6 @@
 );
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 GO
 CREATE NONCLUSTERED INDEX [EmailIndex]
     ON [dbo].[AspNetUsers]([NormalizedEmail] ASC);
@@ -66,8 +46,8 @@ CREATE NONCLUSTERED INDEX [IX_AspNetUsers_CompanyId]
 
 
 GO
-CREATE UNIQUE NONCLUSTERED INDEX [UserNameIndex]
-    ON [dbo].[AspNetUsers]([NormalizedUserName] ASC) WHERE ([NormalizedUserName] IS NOT NULL);
+CREATE NONCLUSTERED INDEX [IX_AspNetUsers_LocationId]
+    ON [dbo].[AspNetUsers]([LocationId] ASC);
 
 
 GO
@@ -76,6 +56,6 @@ CREATE NONCLUSTERED INDEX [IX_AspNetUsers_OfficeId]
 
 
 GO
-CREATE NONCLUSTERED INDEX [IX_AspNetUsers_LocationId]
-    ON [dbo].[AspNetUsers]([LocationId] ASC);
+CREATE UNIQUE NONCLUSTERED INDEX [UserNameIndex]
+    ON [dbo].[AspNetUsers]([NormalizedUserName] ASC) WHERE ([NormalizedUserName] IS NOT NULL);
 

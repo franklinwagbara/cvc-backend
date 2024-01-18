@@ -13,18 +13,6 @@
 );
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 GO
 CREATE NONCLUSTERED INDEX [IX_Inspections_ApplicationId]
     ON [dbo].[Inspections]([ApplicationId] ASC);

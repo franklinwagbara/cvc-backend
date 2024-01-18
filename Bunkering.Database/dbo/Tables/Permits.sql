@@ -12,16 +12,6 @@
 );
 
 
-
-
-
-
-
-
-
-
-
-
 GO
 CREATE NONCLUSTERED INDEX [IX_Permits_ApplicationId]
     ON [dbo].[Permits]([ApplicationId] ASC);

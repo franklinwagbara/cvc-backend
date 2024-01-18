@@ -13,14 +13,6 @@
 );
 
 
-
-
-
-
-
-
-
-
 GO
 CREATE NONCLUSTERED INDEX [IX_AuditLogs_UserId]
     ON [dbo].[AuditLogs]([UserId] ASC);

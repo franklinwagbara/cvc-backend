@@ -6,11 +6,3 @@
     CONSTRAINT [PK_Products] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 
-
-
-
-
-
-
-
-
