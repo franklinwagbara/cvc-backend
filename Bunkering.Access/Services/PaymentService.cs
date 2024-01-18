@@ -30,7 +30,7 @@ namespace Bunkering.Access.Services
         private readonly ApplicationContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        private readonly UserManager<ApplicationUser> _userManager;
+       
 
         public PaymentService(
             IUnitOfWork unitOfWork,
@@ -157,7 +157,7 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> GenerateDebitNote(int id)
         {
-            var user = await _userManager.FindByEmailAsync(User);
+            //var user = await _userManager.FindByEmailAsync(User);
             if (id > 0)
             {
                 var baseUrl = $"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}";
