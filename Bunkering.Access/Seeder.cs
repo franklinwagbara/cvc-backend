@@ -263,7 +263,7 @@ namespace Bunkering.Access
 			if (!_context.Products.Any())
 			{
 				foreach (var f in products)
-					_context.Products.Add(new Product { Name = f, ProuctType = "Non-Gas" });
+					_context.Products.Add(new Product { Name = f, ProductType = "Non-Gas" });
 
 				_context.SaveChanges();
 			}
