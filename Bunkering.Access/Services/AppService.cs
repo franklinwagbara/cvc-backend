@@ -1084,16 +1084,18 @@ namespace Bunkering.Access.Services
             }
             else if(await _userManager.IsInRoleAsync(user, "FAD"))
             {
-                //checked 
+                //checking if coq is completed
                 var coq = await _unitOfWork.CoQ.Find(x => x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)));
-                ApplicationType? apptype = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));
-                //&& !x.Application.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));
 
+                //checking if the apptype is debit note 
+                ApplicationType? apptype = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));
+
+                //checking if the debitnote is existing on the paymentTable
                 var payment = await _unitOfWork.Payment.Find(x => x.ApplicationTypeId.Equals(apptype.Id));
 
                 if(payment.Count() > 0)
                 {
-
+                    //checking for a coq that is not tied to a debit note here
                     var pendingCoqs = coq.ToList().Where(c => payment.ToList().Any(p => !p.COQId.Equals(c.Id)));
 
                     if (coq != null)
