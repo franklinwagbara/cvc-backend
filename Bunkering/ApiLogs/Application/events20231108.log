@@ -1,0 +1,16 @@
+2023-11-08T12:38:55.5130644+01:00 [ERR] () Nullable object must have a value.
+
+   at System.Nullable`1.get_Value()
+   at Bunkering.Access.Services.AppService.CreateFacility(ApplictionViewModel model, ApplicationUser user)
+2023-11-08T12:41:01.1171403+01:00 [ERR] () Nullable object must have a value.
+
+   at System.Nullable`1.get_Value()
+   at Bunkering.Access.Services.AppService.CreateFacility(ApplictionViewModel model, ApplicationUser user)
+2023-11-08T12:42:27.1532702+01:00 [ERR] () Nullable object must have a value.
+
+   at System.Nullable`1.get_Value()
+   at Bunkering.Access.Services.AppService.CreateFacility(ApplictionViewModel model, ApplicationUser user)
+2023-11-08T12:45:44.6188608+01:00 [ERR] () Nullable object must have a value.
+
+   at System.Nullable`1.get_Value()
+   at Bunkering.Access.Services.AppService.CreateFacility(ApplictionViewModel model, ApplicationUser user)
