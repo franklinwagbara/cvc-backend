@@ -2,6 +2,7 @@
 @{
     Layout = null;
     int count = 1;
+    var total = Model.WholesalePrice * Model.Volume;
 }
 <html lang="en">
 <head>
@@ -55,20 +56,20 @@
                         <td>@count.ToString("###")</td>
                         <td></td>
                         <td>@Model.DepotName</td>
-                        <td>@Model.Volume</td>
-                        <td>@Model.WholesalePrice</td>
-                        <td>@Model.Price</td>
-                        <td>@Model.Levy</td>
+                        <td>@Model.Volume.ToString("N2")</td>
+                        <td>@Model.WholesalePrice.ToString("N2")</td>
+                        <td>@total.ToString("N2")</td>
+                        <td>@Model.Levy.ToString("N2")</td>
                     </tr>
                 </tbody>
             </table>
-            <h3>Total Payable: ₦@Model.Levy</h3>
+            <h3>Total Payable: ₦@Model.Levy.ToString("N2")</h3>
         </p>
         <div class="row">
             <div class="col-6 border-right">
-                @{ var halfLevy = 0.5m * Model.Levy;}
+                @{ var halfLevy = (double)0.5m * Model.Levy;}
 
-               <p><strong>0.5% Due to NMDPRA = ₦@halfLevy</strong></p>
+                <p><strong>0.5% Due to NMDPRA = ₦@halfLevy.ToString("N2")</strong></p>
                <p><strong>In Words:</strong><br />@Humanizer.NumberToWordsExtension.ToWords((int)halfLevy) Naira only</p>
                <br />
                <p>
@@ -78,7 +79,7 @@
             </div>
             <div class="col-6">
 
-               <p><strong>0.5% Due to MDGIF = ₦@halfLevy</strong></p>
+                <p><strong>0.5% Due to MDGIF = ₦@halfLevy.ToString("N2")</strong></p>
                <p><strong>In Words:</strong><br />@Humanizer.NumberToWordsExtension.ToWords((int)halfLevy) Naira only</p>
                <br />
                <p>
@@ -90,7 +91,7 @@
         <hr />
         <p>
             Vessel Discharged on 0910812023
-            Payable before 30/08/2023 (21 Days After Discharge)
+            Payable before @Model.PayableBefore.ToString("dd/MM/yyyy") (21 Days After Discharge)
             For further inquiry, contact:
             08033362122 ogheneruemu.macaulay@nmdpra.gw.ng
             obinna.nwankwo@nmdpra.gov.ng
