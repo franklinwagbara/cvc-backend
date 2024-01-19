@@ -1,9 +1,15 @@
-﻿using Bunkering.Access.IContracts;
+﻿using Azure.Core;
+using Bunkering.Access.DAL;
+using Bunkering.Access.IContracts;
 using Bunkering.Core.Data;
 using Bunkering.Core.Utils;
+using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Microsoft.VisualBasic.FileIO;
+using System.Diagnostics.Metrics;
 using System.Net;
 
 namespace Bunkering.Access
@@ -15,21 +21,22 @@ namespace Bunkering.Access
 		private readonly RoleManager<ApplicationRole> _roleManager;
 		private readonly IServiceProvider _serviceProvider;
 		private readonly IElps _elps;
+		private AppSetting _appsetting;
 
 		public Seeder(
 			ApplicationContext db,
 			IServiceProvider serviceProvider,
 			UserManager<ApplicationUser> userManager,
 			RoleManager<ApplicationRole> roleManager,
-			IElps elps)
+			IElps elps,
+			IOptions<AppSetting> appSetting)
 		{
 			_db = db;
 			_serviceProvider = serviceProvider;
 			_userMnager = userManager;
 			_roleManager = roleManager;
 			_elps = elps;
-
-
+			_appsetting = appSetting.Value;
 		}
 
 		public async Task CreateRoles()
@@ -84,118 +91,84 @@ namespace Bunkering.Access
 		public async Task CreateStates()
 		{
 			var _context = _serviceProvider.GetRequiredService<ApplicationContext>();
-			var country = await _context.Countries.ToListAsync();
+			var countries = await _context.Countries.ToListAsync();
 
 			var client = new HttpClient();
-			if (!country.Any())
+			if (countries.Any())
 			{
-				var request = new HttpRequestMessage
+				var nigeria = countries.FirstOrDefault(c => c.Name.ToLower().Equals("nigeria"));
+				var apihash = $"{_appsetting.AppEmail}{_appsetting.AppId}".GenerateSha512();
+
+                var request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri($"https://celpsnmdpra-dev.azurewebsites.net/api/Address/states/156/{_appsetting.AppEmail}/{apihash}")
+                };
+
+                var req = client.SendAsync(request).Result;
+                if (req.IsSuccessStatusCode)
 				{
-					Method = HttpMethod.Get,
-					RequestUri = new Uri("https://countriesnow.space/api/v0.1/countries/states")
-				};
-				using (var response = await client.SendAsync(request))
-				{
-					if (response.StatusCode.Equals(HttpStatusCode.OK))
+					var content = await req.Content.ReadAsStringAsync();
+					var nigs = _context.States.Where(x => x.CountryId.Equals(nigeria.Id));
+
+                    if (!_context.States.Any(x => x.CountryId.Equals(nigeria.Id)))
 					{
-						var states = new List<State>();
-						var countryObj = new List<Country>();
-						var content = await response.Content.ReadAsStringAsync();
-						var obj = content.Parse<Dictionary<string, object>>();
-						var countrylist = obj.GetValue("data");
-						var countries = countrylist.Stringify().Parse<List<Dictionary<string, object>>>();
-
-						countries.ForEach(c =>
+						var dic = content.Parse<List<Dictionary<string, string>>>();
+						foreach(var state in dic)
 						{
-							var cl = new Country { Code = (string)c.GetValue("iso3"), Name = (string)c.GetValue("name") };
-							_context.Countries.Add(cl);
-							_context.SaveChanges();
-							countryObj.Add(cl);
-
-							var statelist = c.GetValue("states").Stringify().Parse<List<Dictionary<string, string>>>();
-							statelist.ForEach(s =>
+							_context.States.Add(new State
 							{
-								var code = s.GetValue("state_code");
-								states.Add(new State
-								{
-									CountryId = cl.Id,
-									Name = s.GetValue("name"),
-									Code = !string.IsNullOrEmpty(code) ? code : ""
-								});
+								CountryId = nigeria.Id,
+								Name = state.GetValue("name"),
+								Code = string.Empty
 							});
-						});
-
-						if (states.Count > 0)
-						{
-							_context.States.AddRange(states.OrderBy(x => x.Name));
-							_context.SaveChanges();
 						}
-
-						states.Where(y => y.CountryId.Equals(countryObj.FirstOrDefault(j => j.Name.ToLower().Equals("nigeria")).Id)).ToList().ForEach(x =>
-						{
-							var req = client.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"https://api.facts.ng/v1/states/{x.Name.ToLower()}")).Result;
-							if (req.IsSuccessStatusCode)
-							{
-								var lgaOutput = req.Content.ReadAsStringAsync().Result;
-								var lgaDic = lgaOutput.Parse<Dictionary<string, object>>();
-								var lgalist = lgaDic.GetValue("lgas").Stringify().Parse<List<string>>();
-								var lgaObj = new List<LGA>();
-
-								lgalist.ForEach(l =>
-								{
-									lgaObj.Add(new LGA
-									{
-										Code = "",
-										Name = l,
-										StateId = x.Id
-									});
-								});
-								_context.LGAs.AddRange(lgaObj);
-								_context.SaveChanges();
-
-							}
-						});
+						_context.SaveChanges();
 					}
 				}
-			}
-			else
-			{
-				var n = country.FirstOrDefault(x => x.Name.ToLower().Equals("nigeria"));
-				if (n != null)
-				{
-					var st = await _context.States.Where(x => x.CountryId.Equals(n.Id)).ToListAsync();
-					var stateIds = st.Select(x => x.Id);
-					var lg = _context.LGAs.Where(l => stateIds.Contains(l.StateId)).ToList();
-					if (st.Any() && lg.Count == 0)
-					{
-						st.ForEach(x =>
-						{
-							var name = x.Name.Contains(" State") ? x.Name.Split(" State")[0] : x.Name;
-							var req = client.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"https://api.facts.ng/v1/states/{name.ToLower()}")).Result;
-							if (req.IsSuccessStatusCode)
-							{
-								var lgaOutput = req.Content.ReadAsStringAsync().Result;
-								var lgaDic = lgaOutput.Parse<Dictionary<string, object>>();
-								var lgalist = lgaDic.GetValue("lgas").Stringify().Parse<List<string>>();
-								var lgaObj = new List<LGA>();
+                countries.ForEach(c =>
+                {
+                    
+                });
+            }
+            else
+            {
+                var n = countries.FirstOrDefault(x => x.Name.ToLower().Equals("nigeria"));
+                if (n != null)
+                {
+                    var st = await _context.States.Where(x => x.CountryId.Equals(n.Id)).ToListAsync();
+                    var stateIds = st.Select(x => x.Id);
+                    var lg = _context.LGAs.Where(l => stateIds.Contains(l.StateId)).ToList();
+                    if (st.Any() && lg.Count == 0)
+                    {
+                        st.ForEach(x =>
+                        {
+                            var name = x.Name.Contains(" State") ? x.Name.Split(" State")[0] : x.Name;
+                            var req = client.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"https://api.facts.ng/v1/states/{name.ToLower()}")).Result;
+                            if (req.IsSuccessStatusCode)
+                            {
+                                var lgaOutput = req.Content.ReadAsStringAsync().Result;
+                                var lgaDic = lgaOutput.Parse<Dictionary<string, object>>();
+                                var lgalist = lgaDic.GetValue("lgas").Stringify().Parse<List<string>>();
+                                var lgaObj = new List<LGA>();
 
-								lgalist.ForEach(l =>
-								{
-									lgaObj.Add(new LGA
-									{
-										Code = "",
-										Name = l,
-										StateId = x.Id
-									});
-								});
-								_context.LGAs.AddRange(lgaObj);
-								_context.SaveChanges();
+                                lgalist.ForEach(l =>
+                                {
+                                    lgaObj.Add(new LGA
+                                    {
+                                        Code = "",
+                                        Name = l,
+                                        StateId = x.Id
+                                    });
+                                });
+                                _context.LGAs.AddRange(lgaObj);
+                                _context.SaveChanges();
 
-							}
-						});
-					}
-				}
-			}
+                            }
+                        });
+                    }
+                }
+            }
 		}
 
 		public async Task CreateDefaultFcailityTypes()
