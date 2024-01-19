@@ -1106,7 +1106,7 @@ namespace Bunkering.Access.Services
             };
         }
 
-            private async Task<ApiResponse> GetMyDeskFO(ApplicationUser? user)
+        private async Task<ApiResponse> GetMyDeskFO(ApplicationUser? user)
             {
             var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Plant");
             // if (await _userManager.IsInRoleAsync(user, "FAD"))
