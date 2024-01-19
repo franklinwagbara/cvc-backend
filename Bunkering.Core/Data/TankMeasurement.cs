@@ -34,6 +34,8 @@ namespace Bunkering.Core.Data
         public double VapourPressure { get; set; } = 0;
         public double MolecularWeight { get; set; } = 0;
         public double VapourFactor { get; set; } = 0;
+        public double LiquidTemperature { get; set; }
+
         public double LiquidDensityAir => LiquidDensityVac * 0.0011;
         public double CorrectedLiquidLevel => ObservedSounding + TapeCorrection;
         public double CorrectedLiquidVolumeM3 => ObservedLiquidVolume * ShrinkageFactorLiquid;

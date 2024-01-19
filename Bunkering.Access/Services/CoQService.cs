@@ -118,7 +118,8 @@ namespace Bunkering.Access.Services
                 {
                     Data = foundCOQ,
                     Message = "Successful",
-                    StatusCode = System.Net.HttpStatusCode.OK
+                    StatusCode = System.Net.HttpStatusCode.OK,
+                    Success = true
                 };
             }
             catch (Exception e)
