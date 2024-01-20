@@ -40,7 +40,8 @@ namespace Bunkering.Controllers.API
         [Route("create-vessel-discharge-clearance")]
         [HttpPost]
 
-        public async Task<IActionResult> CreateVesselDischargeClearance(VesselDischargeCleareanceViewModel model) => Response(await _vesselDischargeClearanceService.CreateVesselDischargeClearance(model));
+        public async Task<IActionResult> CreateVesselDischargeClearance(VesselDischargeCleareanceViewModel model) 
+            => Response(await _vesselDischargeClearanceService.CreateVesselDischargeClearance(model));
 
 
 

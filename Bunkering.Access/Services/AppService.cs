@@ -510,9 +510,9 @@ namespace Bunkering.Access.Services
                             ApplicationId = id,
                             OrderId = app.Reference,
                             BankCode = _setting.NMDPRAAccount,
-                            Description = $"Payment for CVC & COQ({app.Facility.Name}) |" +
+                            Description = $"Payment for CVC & COQ ({app.Facility.Name}) |" +
                             $" NoA Fee: ₦ {fee.NOAFee:#,#.##} |" +
-                            $" Depots: {appDepots.Count} |" +
+                            $" Depots: {appDepots.Select(x => x.Name)} |" +
                             $" CoQ Fee (per Depot): ₦ {fee.COQFee:#,#.##} |" +
                             $" Total CoQ Fee: ₦ {(fee.COQFee * appDepots.Count):#,#.##} |" +
                             $" Total Amount: ₦ {total:#,#.##}",
@@ -1457,19 +1457,19 @@ namespace Bunkering.Access.Services
             }
 
             var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application.Facility");
-            //var apps = appDepots.OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application).ToList();
+            var apps = appDepots.OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application).ToList();
 
-            var depList = new List<int>();
-            foreach (var item in appDepots)
-            {
-                depList.Add(item.AppId);
-            }
-            List<ViewApplicationsByFieldOfficerDTO> appsDto = new List<ViewApplicationsByFieldOfficerDTO>();
-            foreach (var app in depList)
-            {
-                var apps = GetApplications(app);
-                appsDto.Add(apps);
-            }
+            //var depList = new List<int>();
+            //foreach (var item in appDepots)
+            //{
+            //    depList.Add(item.AppId);
+            //}
+            //var appsDto = new List<ViewApplicationsByFieldOfficerDTO>();
+            //foreach (var app in depList)
+            //{
+            //    var apps = GetApplications(app);
+            //    appsDto.Add(apps);
+            //}
 
 
             _response = new ApiResponse
@@ -1477,7 +1477,7 @@ namespace Bunkering.Access.Services
                 Message = "Applications fetched successfully",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                Data = appsDto
+                Data = apps
             };
 
             return _response;
