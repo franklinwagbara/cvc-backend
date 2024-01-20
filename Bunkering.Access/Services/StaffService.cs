@@ -306,6 +306,7 @@ namespace Bunkering.Access.Services
 					user.FirstName = model.FirstName;
 					user.LastName = model.LastName;
 					user.IsActive = model.IsActive;
+					user.Directorate = model.Directorate;
 
                     if (model.SignatureFile?.Length > 0)
                     {
