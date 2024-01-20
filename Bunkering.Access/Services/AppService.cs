@@ -1430,6 +1430,27 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
+        public async Task<ApiResponse> AllApplicationsByJetty(int jettyId)
+        {
+            var appDepot = await _unitOfWork.Jetty.Find(x => x.Id.Equals(jettyId));
+            var applications = await _unitOfWork.Application.Find(x => appDepot.Any(a => a.Name == x.Jetty && x.Status == Enum.GetName(AppStatus.Completed)) == true);
+            if (applications != null)
+            {
+                var filteredapps = applications.Where(x => x.IsDeleted == false);
+                _response = new ApiResponse
+                {
+                    Message = "Applications fetched successfully",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true,
+                    Data = applications.OrderByDescending(c => c.CreatedDate).ToList()
+                };
+            }
+
+
+
+            return _response;
+        }
+
         public async Task<ApiResponse> AllApplicationsInDepotByUserID()
         {
             var user = await _userManager.FindByEmailAsync(User);
@@ -1459,18 +1480,45 @@ namespace Bunkering.Access.Services
             var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application.Facility");
             var apps = appDepots.OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application).ToList();
 
-            //var depList = new List<int>();
-            //foreach (var item in appDepots)
-            //{
-            //    depList.Add(item.AppId);
-            //}
-            //var appsDto = new List<ViewApplicationsByFieldOfficerDTO>();
-            //foreach (var app in depList)
-            //{
-            //    var apps = GetApplications(app);
-            //    appsDto.Add(apps);
-            //}
+            _response = new ApiResponse
+            {
+                Message = "Applications fetched successfully",
+                StatusCode = HttpStatusCode.OK,
+                Success = true,
+                Data = apps
+            };
 
+            return _response;
+        }
+
+        public async Task<ApiResponse> AllApplicationsInJettyByUserID()
+        {
+            var user = await _userManager.FindByEmailAsync(User);
+
+            if (user is null)
+            {
+                _response = new ApiResponse
+                {
+                    Message = "No User was found",
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Success = false
+                };
+                return _response;
+            }
+            var jettys = (await _unitOfWork.JettyOfficer.Find(c => c.OfficerID == Guid.Parse(user.Id))).Select(c => c.Jetty.Name).ToList();
+            if (!jettys.Any())
+            {
+                _response = new ApiResponse
+                {
+                    Message = "User not assigned to a Jetty",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = false
+                };
+                return _response;
+            }
+
+            var appDepots = await _unitOfWork.Application.Find(c => jettys.Contains(c.Jetty), "Application.Facility");
+            var apps = appDepots.OrderByDescending(x => x.CreatedDate);
 
             _response = new ApiResponse
             {
