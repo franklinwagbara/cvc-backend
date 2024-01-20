@@ -66,7 +66,15 @@ namespace Bunkering.Core.ViewModels
         public List<TankAfterReading> TankAfterReadings { get; set; }
 
         public List<SubmitDocumentDto> SubmitDocuments { get; set; }
+    }
 
+    public class GasTankReadingsPerCoQ
+    {
+        public int TankId { get; set; }
+        public int Id { get; set; }
+        public int CoQId { get; set; }
+        public string? TankName { get; set; }
 
+        public List<CreateCoQGasTankDTO>? TankMeasurement { get; set; }
     }
 }

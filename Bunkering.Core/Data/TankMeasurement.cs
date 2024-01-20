@@ -34,7 +34,7 @@ namespace Bunkering.Core.Data
         public double VapourPressure { get; set; } = 0;
         public double MolecularWeight { get; set; } = 0;
         public double VapourFactor { get; set; } = 0;
-        public double LiquidTemperature { get; set; }
+        //public double LiquidTemperature { get; set; }
 
         public double LiquidDensityAir => LiquidDensityVac * 0.0011;
         public double CorrectedLiquidLevel => ObservedSounding + TapeCorrection;
@@ -45,8 +45,8 @@ namespace Bunkering.Core.Data
         public double VapourVolume => TankVolume - ObservedLiquidVolume;
         public double CorrectedVapourVolume => VapourVolume * ShrinkageFactorVapour;
         public double VapourWeightVAC => CorrectedVapourVolume * VapourFactor;
-        public double VapourWeightAir => (LiquidDensityAir / LiquidDensityVac) * VapourWeightVAC;
+        public double? VapourWeightAir => (LiquidDensityAir / LiquidDensityVac) * VapourWeightVAC;
         public double TotalGasWeightVAC => LiquidWeightVAC + VapourWeightVAC;
-        public double TotalGasWeightAir => LiquidWeightAir + VapourWeightAir;
+        public double? TotalGasWeightAir => LiquidWeightAir + VapourWeightAir;
     }
 }

@@ -510,9 +510,9 @@ namespace Bunkering.Access.Services
                             ApplicationId = id,
                             OrderId = app.Reference,
                             BankCode = _setting.NMDPRAAccount,
-                            Description = $"Payment for CVC & COQ({app.Facility.Name}) |" +
+                            Description = $"Payment for CVC & COQ ({app.Facility.Name}) |" +
                             $" NoA Fee: ₦ {fee.NOAFee:#,#.##} |" +
-                            $" Depots: {appDepots.Count} |" +
+                            $" Depots: {appDepots.Select(x => x.Name)} |" +
                             $" CoQ Fee (per Depot): ₦ {fee.COQFee:#,#.##} |" +
                             $" Total CoQ Fee: ₦ {(fee.COQFee * appDepots.Count):#,#.##} |" +
                             $" Total Amount: ₦ {total:#,#.##}",
