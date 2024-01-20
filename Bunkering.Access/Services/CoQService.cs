@@ -1305,7 +1305,8 @@ namespace Bunkering.Access.Services
                                                         VapourFactor = m.VapourFactor,
                                                         VapourPressure = m.VapourPressure,
                                                         VapourTemperature = m.VapourTemperature,
-                                                        TankVolume = m.TankVolume
+                                                        TankVolume = m.TankVolume,
+                                                        MeasurementType = m.MeasurementType
                                                     }).ToList()
                                                 }).ToListAsync();
                             break;
