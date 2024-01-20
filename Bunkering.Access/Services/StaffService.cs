@@ -213,6 +213,7 @@ namespace Bunkering.Access.Services
 						LocationId = model.LocationId,
 						OfficeId = model.OfficeId,
 						CreatedBy = user.Email,
+						Directorate =model.Directorate,
 						CreatedOn = DateTime.UtcNow.AddHours(1),
 					};
 					if (model.SignatureFile is not null)
