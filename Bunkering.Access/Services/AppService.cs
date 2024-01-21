@@ -512,7 +512,7 @@ namespace Bunkering.Access.Services
                             BankCode = _setting.NMDPRAAccount,
                             Description = $"Payment for CVC & COQ ({app.Facility.Name}) |" +
                             $" NoA Fee: ₦ {fee.NOAFee:#,#.##} |" +
-                            $" Depots: {appDepots.Select(x => x.Name)} |" +
+                            $" Depots: {string.Join(", ",appDepots.Select(x => x.Name).ToList())} |" +
                             $" CoQ Fee (per Depot): ₦ {fee.COQFee:#,#.##} |" +
                             $" Total CoQ Fee: ₦ {(fee.COQFee * appDepots.Count):#,#.##} |" +
                             $" Total Amount: ₦ {total:#,#.##}",
@@ -534,7 +534,7 @@ namespace Bunkering.Access.Services
                         {
                             payment.Amount = total;
                             payment.OrderId = app.Reference;
-                            payment.Description = $"Payment for CVC & COQ License ({app.Facility.Name})";
+                            payment.Description = $"Payment for CVC & COQ ({app.Facility.Name})";
                             payment.Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending);
                             payment.TransactionDate = DateTime.UtcNow.AddHours(1);
 
