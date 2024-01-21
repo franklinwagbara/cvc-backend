@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace Bunkering.Access.DAL
 {
-    public class PlantOfficerRepository : Repository<PlantFieldOfficer>, IPantOfficer
+    public class PlantOfficerRepository : Repository<PlantFieldOfficer>, IPlantOfficer
     {
         public PlantOfficerRepository(ApplicationContext context): base(context) { }
         
     }
 
-    public interface IPantOfficer : IRepository<PlantFieldOfficer> { }
+    public interface IPlantOfficer : IRepository<PlantFieldOfficer> { }
     
 }

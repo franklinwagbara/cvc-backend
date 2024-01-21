@@ -727,7 +727,7 @@
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
         </member>
-        <member name="M:Bunkering.Controllers.API.DepotOfficerController.GetAllFees">
+        <member name="M:Bunkering.Controllers.API.DepotOfficerController.GetAllDepotOfficerMapping">
             <summary>
             This endpoint is used to fetch  all the Fees summary
             </summary>

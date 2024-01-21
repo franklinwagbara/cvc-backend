@@ -16,6 +16,7 @@ namespace Bunkering.Core.ViewModels
         public string Surveyor { get; set; }
         public string QRCode { get; set; }
         public string Signature { get; set; }
+        public DateTime DateIssued { get; set; }
         public List<DepotDTO> Destinations { get; set; }
         
     }

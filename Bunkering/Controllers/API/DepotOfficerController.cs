@@ -36,7 +36,7 @@ namespace Bunkering.Controllers.API
         [AllowAnonymous]
         [Route("get-all-mappings")]
         [HttpGet]
-        public async Task<IActionResult> GetAllFees() => Response(await _depotOfficerService.GetAllDepotOfficerMapping());
+        public async Task<IActionResult> GetAllDepotOfficerMapping() => Response(await _depotOfficerService.GetAllDepotOfficerMapping());
 
         [Route("add-mapping")]
         [HttpPost]

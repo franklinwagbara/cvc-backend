@@ -25,7 +25,8 @@ namespace Bunkering.Core.Data
 		public bool IsDeleted { get; set; }
 		public int? LocationId { get; set; }
 		public int? OfficeId { get; set; }
-		public ICollection<ApplicationUserRole> UserRoles { get; set; }
+        public string? Directorate { get; set; }
+        public ICollection<ApplicationUserRole> UserRoles { get; set; }
 
 		[ForeignKey(nameof(LocationId))]
 		public Location? Location { get; set; }

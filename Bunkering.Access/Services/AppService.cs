@@ -77,7 +77,16 @@ namespace Bunkering.Access.Services
                     Name = model.VesselName,
                     CompanyId = user.CompanyId.Value,
                     VesselTypeId = model.VesselTypeId,
+                    //Capacity = model.Capacity,
+                    //DeadWeight = model.DeadWeight,
+                    //Operator = model.Operator,
+                    //FacilitySources = _mapper.Map<List<FacilitySource>>(model.FacilitySources),
+                    //Tanks = _mapper.Map<List<Tank>>(model.TankList),
+                    //CallSIgn = model.CallSIgn,
+                    //Flag = model.Flag,
                     IMONumber = model.IMONumber,
+                    //PlaceOfBuild = model.PlaceOfBuild,
+                    //YearOfBuild = model.YearOfBuild,
                 };
                 var lga = await _unitOfWork.LGA.FirstOrDefaultAsync(x => x.State.Name.ToLower().Contains("lagos"), "State");
 
@@ -138,18 +147,6 @@ namespace Bunkering.Access.Services
                         Success = false
                     };
                 }
-
-                var surveyor = await _unitOfWork.NominatedSurveyor.GetNextAsync();
-                if (surveyor is null)
-                {
-                    return new ApiResponse
-                    {
-                        StatusCode = HttpStatusCode.NotFound,
-                        Message = "Surveyors not configured, please contact support",
-                        Success = false
-                    };
-                }
-
                 var facility = await CreateFacility(model, user);
                 if (facility != null)
                 {
@@ -165,9 +162,11 @@ namespace Bunkering.Access.Services
                         VesselName = model.VesselName,
                         LoadingPort = model.LoadingPort,
                         MarketerName = model.MarketerName,
+                        //IMONumber = model.IMONumber,
                         MotherVessel = model.MotherVessel,
                         Jetty = model.Jetty,
                         ETA = model.ETA,
+
                     };
 
                     var newApp = await _unitOfWork.Application.Add(app);
@@ -189,6 +188,15 @@ namespace Bunkering.Access.Services
                     else
                         throw new Exception("Depot List must be provided!");
 
+                    //surveyor.NominatedVolume += volume;
+                    //var appSurveyor = new ApplicationSurveyor()
+                    //{
+                    //    ApplicationId = newApp.Id,
+                    //    NominatedSurveyorId = surveyor.Id,
+                    //    Volume = volume
+                    //};
+                    //await _unitOfWork.ApplicationSurveyor.Add(appSurveyor);
+                    //await _unitOfWork.SaveChangesAsync(user.Id);
                     return new ApiResponse
                     {
                         Message = "Application initiated successfully",
@@ -196,14 +204,47 @@ namespace Bunkering.Access.Services
                         Data = new { appId = app.Id },
                         Success = true
                     };
+
+                    //save app tanks
+                    // var tank = await AppTanks(model.TankList, facility.Id);
+
+                    // if (tank != null)
+                    // {
+                    //     await _unitOfWork.Application.Add(app);
+                    //     await _unitOfWork.SaveChangesAsync(app.UserId);
+
+                    //     _response = new ApiResponse
+                    //     {
+                    //         Message = "Application initiated successfully",
+                    //         StatusCode = HttpStatusCode.OK,
+                    //         Data = new { appId = app.Id },
+                    //         Success = true
+                    //     };
+
+                    // }
+                    // else
+                    // {
+                    //     _response = new ApiResponse
+                    //     {
+                    //         Message = "unable to apply",
+                    //         StatusCode = HttpStatusCode.NotFound,
+                    //         Success = false
+                    //     };
+
+                    // }
+
+
+                    //await _flow.AppWorkFlow(app.Id, Enum.GetName(typeof(AppActions), AppActions.Initiate), "Application Created");
                 }
                 else
+                {
                     return new ApiResponse
                     {
                         Message = "An error occured. Pls try again.",
                         StatusCode = HttpStatusCode.BadRequest,
                         Success = false
                     };
+                }
             }
             catch (Exception ex)
             {
@@ -248,7 +289,23 @@ namespace Bunkering.Access.Services
             return tankList;
 
         }
-       
+        // private Task<List<Depot>> AppDepots(List<Depot> depot, int appId)
+        // {
+
+        //     var depotList = new List<ApplicationDepot>();
+        //     depot.ForEach(x =>
+        //     {
+        //         depotList.Add(new ApplicationDepot
+        //         {
+        //             AppId = appId,
+        //             DepotId = x.Id
+        //         });
+        //     });
+
+        //      return depotList;
+
+        // }
+
         public async Task<ApiResponse> GetDepotsByAppId(int id)
         {
             if (id > 0)
@@ -269,7 +326,6 @@ namespace Bunkering.Access.Services
                 StatusCode = HttpStatusCode.BadRequest
             };
         }
-
         public async Task<ApiResponse> GetTanksByAppId(int id)
         {
             List<TankViewModel> tankList = new List<TankViewModel>();
@@ -431,9 +487,9 @@ namespace Bunkering.Access.Services
                             ApplicationId = id,
                             OrderId = app.Reference,
                             BankCode = _setting.NMDPRAAccount,
-                            Description = $"Payment for CVC & COQ License ({app.Facility.Name}) |" +
+                            Description = $"Payment for CVC & COQ ({app.Facility.Name}) |" +
                             $" NoA Fee: ₦ {fee.NOAFee:#,#.##} |" +
-                            $" Depots: {appDepots.Count} |" +
+                            $" Depots: {appDepots.Select(x => x.Name)} |" +
                             $" CoQ Fee (per Depot): ₦ {fee.COQFee:#,#.##} |" +
                             $" Total CoQ Fee: ₦ {(fee.COQFee * appDepots.Count):#,#.##} |" +
                             $" Total Amount: ₦ {total:#,#.##}",
@@ -481,7 +537,8 @@ namespace Bunkering.Access.Services
                             ServiceCharge = fee.SerciveCharge,
                             Total = total,
                             payment.RRR,
-                            PaymentStatus = payment.Status
+                            PaymentStatus = payment.Status,
+                            payment.Description
                         }
                     };
                 }
@@ -1027,7 +1084,7 @@ namespace Bunkering.Access.Services
             };
         }
 
-        private async Task<ApiResponse> GetMyDeskFO(ApplicationUser? user)
+            private async Task<ApiResponse> GetMyDeskFO(ApplicationUser? user)
             {
             var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Plant");
             // if (await _userManager.IsInRoleAsync(user, "FAD"))
@@ -1075,8 +1132,8 @@ namespace Bunkering.Access.Services
             {
                 try
                 {
-                    var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id), "User.Company,Appointment,ApplicationType,Payments,Facility.VesselType,WorkFlow,Histories,Facility.Tanks.Product,Facility.FacilitySources.LGA.State,");
-
+                    var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id), "User.Company,Appointment,ApplicationType,Payments,Facility.VesselType,WorkFlow,Histories,Facility.Tanks.Product,Facility.FacilitySources.LGA.State");
+                    var appDepot = await _unitOfWork.ApplicationDepot.GetDepotsAsync(id);
                     if (app != null)
                     {
                         var users = _userManager.Users.Include(c => c.Company).Include(ur => ur.UserRoles).ThenInclude(r => r.Role).ToList();
@@ -1119,6 +1176,7 @@ namespace Bunkering.Access.Services
                         var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Utils.NOA));
 
                         var appDocs = await _unitOfWork.SubmittedDocument.Find(x => x.ApplicationId == app.Id && x.ApplicationTypeId == appType.Id);
+                        
 
                         var paymentStatus = "Payment pending";
                         if (app.Payments.FirstOrDefault()?.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted)) is true)
@@ -1164,6 +1222,7 @@ namespace Bunkering.Access.Services
                                 app.MotherVessel,
                                 app.Jetty,
                                 app.LoadingPort,
+                                ApplicationDepots = appDepot,
                                 NominatedSurveyor = (await _unitOfWork.NominatedSurveyor.Find(c => c.Id == surveyorId)).FirstOrDefault(),
                                 Vessel = new
                                 {
@@ -1219,7 +1278,7 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
-        public async Task<ApiResponse> Process(int id, string act, string comment)
+        public async Task<ApiResponse> Process(int id, string act, string comment = null)
         {
 
             if (id > 0)
@@ -1350,6 +1409,27 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
+        public async Task<ApiResponse> AllApplicationsByJetty(int jettyId)
+        {
+            var appDepot = await _unitOfWork.Jetty.Find(x => x.Id.Equals(jettyId));
+            var applications = await _unitOfWork.Application.Find(x => appDepot.Any(a => a.Name == x.Jetty && x.Status == Enum.GetName(AppStatus.Completed)) == true);
+            if (applications != null)
+            {
+                var filteredapps = applications.Where(x => x.IsDeleted == false);
+                _response = new ApiResponse
+                {
+                    Message = "Applications fetched successfully",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true,
+                    Data = applications.OrderByDescending(c => c.CreatedDate).ToList()
+                };
+            }
+
+
+
+            return _response;
+        }
+
         public async Task<ApiResponse> AllApplicationsInDepotByUserID()
         {
             var user = await _userManager.FindByEmailAsync(User);
@@ -1377,27 +1457,54 @@ namespace Bunkering.Access.Services
             }
 
             var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application.Facility");
-            //var apps = appDepots.OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application).ToList();
-
-            var depList = new List<int>();
-            foreach (var item in appDepots)
-            {
-                depList.Add(item.AppId);
-            }
-            List<ViewApplicationsByFieldOfficerDTO> appsDto = new List<ViewApplicationsByFieldOfficerDTO>();
-            foreach (var app in depList)
-            {
-                var apps = GetApplications(app);
-                appsDto.Add(apps);
-            }
-
+            var apps = appDepots.OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application).ToList();
 
             _response = new ApiResponse
             {
                 Message = "Applications fetched successfully",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                Data = appsDto
+                Data = apps
+            };
+
+            return _response;
+        }
+
+        public async Task<ApiResponse> AllApplicationsInJettyByUserID()
+        {
+            var user = await _userManager.FindByEmailAsync(User);
+
+            if (user is null)
+            {
+                _response = new ApiResponse
+                {
+                    Message = "No User was found",
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Success = false
+                };
+                return _response;
+            }
+            var jettys = (await _unitOfWork.JettyOfficer.Find(c => c.OfficerID == user.Id,"Jetty")).Select(c => c.Jetty.Name).ToList();
+            if (!jettys.Any())
+            {
+                _response = new ApiResponse
+                {
+                    Message = "User not assigned to a Jetty",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = false
+                };
+                return _response;
+            }
+
+            var appDepots = await _unitOfWork.Application.Find(c => jettys.Contains(c.Jetty), "Facility");
+            var apps = appDepots.OrderByDescending(x => x.CreatedDate);
+
+            _response = new ApiResponse
+            {
+                Message = "Applications fetched successfully",
+                StatusCode = HttpStatusCode.OK,
+                Success = true,
+                Data = apps
             };
 
             return _response;
@@ -1612,7 +1719,7 @@ namespace Bunkering.Access.Services
             var apps = _unitOfWork.ApplicationDepot.Query()
                         .Include(x => x.Application)
                         .Include(x => x.Depot)
-                        .FirstOrDefault(x => x.AppId == Id);
+                        .FirstOrDefault(x => x.AppId == Id );
             var vessel = _unitOfWork.Facility.Query().FirstOrDefault(x => x.Id == apps.Application.FacilityId);
 
             var app = new ViewApplicationsByFieldOfficerDTO
@@ -1654,7 +1761,8 @@ namespace Bunkering.Access.Services
                 VesselTypeId = vessel.VesselTypeId,
                 YearOfBuild = vessel.YearOfBuild,
                 DischargeId = apps.DischargeId,
-                HasCleared = apps.Application.HasCleared
+                HasCleared = apps.Application.HasCleared,
+                DepotId = apps.DepotId
             };
 
             return app;

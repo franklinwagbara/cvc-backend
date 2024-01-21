@@ -10,7 +10,7 @@ namespace Bunkering.Core.Data
         public Plant Depot { get; set; }
         public int AppId { get; set; }
         [ForeignKey(nameof(AppId))]
-        public Application Application { get; set; }
+        public virtual Application Application { get; set; }
         public decimal Volume { get; set; }
         public int ProductId { get; set; }
         [ForeignKey(nameof(ProductId))]

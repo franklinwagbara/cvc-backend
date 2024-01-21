@@ -272,6 +272,9 @@ namespace Bunkering.Core.Migrations
                     b.Property<int>("ApplicationId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("NominatedSurveyorId")
                         .HasColumnType("int");
 
@@ -321,6 +324,9 @@ namespace Bunkering.Core.Migrations
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Directorate")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ElpsId")
                         .HasColumnType("int");
@@ -1100,6 +1106,33 @@ namespace Bunkering.Core.Migrations
                     b.ToTable("Jetties");
                 });
 
+            modelBuilder.Entity("Bunkering.Core.Data.JettyFieldOfficer", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("JettyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OfficerID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("JettyId");
+
+                    b.HasIndex("OfficerID");
+
+                    b.ToTable("JettyFieldOfficers");
+                });
+
             modelBuilder.Entity("Bunkering.Core.Data.LGA", b =>
                 {
                     b.Property<int>("Id")
@@ -1263,14 +1296,12 @@ namespace Bunkering.Core.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Account")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("Amount")
                         .HasColumnType("float");
 
                     b.Property<string>("AppReceiptId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("ApplicationId")
@@ -1279,11 +1310,10 @@ namespace Bunkering.Core.Migrations
                     b.Property<int?>("ApplicationTypeId")
                         .HasColumnType("int");
 
-                    b.Property<double>("Arrears")
+                    b.Property<double?>("Arrears")
                         .HasColumnType("float");
 
                     b.Property<string>("BankCode")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("COQId")
@@ -1299,17 +1329,17 @@ namespace Bunkering.Core.Migrations
                     b.Property<DateTime>("LastRetryDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<double>("LateRenewalPenalty")
+                    b.Property<double?>("LateRenewalPenalty")
                         .HasColumnType("float");
 
-                    b.Property<double>("NonRenewalPenalty")
+                    b.Property<double?>("NonRenewalPenalty")
                         .HasColumnType("float");
 
                     b.Property<string>("OrderId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("PaymentDate")
+                    b.Property<DateTime?>("PaymentDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PaymentType")
@@ -1317,10 +1347,9 @@ namespace Bunkering.Core.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RRR")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RetryCount")
+                    b.Property<int?>("RetryCount")
                         .HasColumnType("int");
 
                     b.Property<double>("ServiceCharge")
@@ -1334,18 +1363,14 @@ namespace Bunkering.Core.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("TransactionId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TxnMessage")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationId");
-
-                    b.HasIndex("ExtraPaymentId");
 
                     b.ToTable("Payments");
                 });
@@ -1745,8 +1770,9 @@ namespace Bunkering.Core.Migrations
                     b.Property<int>("DepotId")
                         .HasColumnType("int");
 
-                    b.Property<int>("DischargeId")
-                        .HasColumnType("int");
+                    b.Property<string>("DischargeId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("FinalBoilingPoint")
                         .HasColumnType("float");
@@ -2315,7 +2341,7 @@ namespace Bunkering.Core.Migrations
             modelBuilder.Entity("Bunkering.Core.Data.ApplicationDepot", b =>
                 {
                     b.HasOne("Bunkering.Core.Data.Application", "Application")
-                        .WithMany()
+                        .WithMany("ApplicationDepots")
                         .HasForeignKey("AppId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2521,6 +2547,25 @@ namespace Bunkering.Core.Migrations
                     b.Navigation("Application");
                 });
 
+            modelBuilder.Entity("Bunkering.Core.Data.JettyFieldOfficer", b =>
+                {
+                    b.HasOne("Bunkering.Core.Data.Jetty", "Jetty")
+                        .WithMany()
+                        .HasForeignKey("JettyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Bunkering.Core.Data.ApplicationUser", "Officer")
+                        .WithMany()
+                        .HasForeignKey("OfficerID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Jetty");
+
+                    b.Navigation("Officer");
+                });
+
             modelBuilder.Entity("Bunkering.Core.Data.LGA", b =>
                 {
                     b.HasOne("Bunkering.Core.Data.State", "State")
@@ -2544,12 +2589,6 @@ namespace Bunkering.Core.Migrations
                     b.HasOne("Bunkering.Core.Data.Application", null)
                         .WithMany("Payments")
                         .HasForeignKey("ApplicationId");
-
-                    b.HasOne("Bunkering.Core.Data.ExtraPayment", "ExtraPayment")
-                        .WithMany()
-                        .HasForeignKey("ExtraPaymentId");
-
-                    b.Navigation("ExtraPayment");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.Permit", b =>
@@ -2667,6 +2706,8 @@ namespace Bunkering.Core.Migrations
 
             modelBuilder.Entity("Bunkering.Core.Data.Application", b =>
                 {
+                    b.Navigation("ApplicationDepots");
+
                     b.Navigation("Appointment");
 
                     b.Navigation("Histories");

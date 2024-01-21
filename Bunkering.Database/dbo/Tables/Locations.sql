@@ -4,3 +4,5 @@
     CONSTRAINT [PK_Locations] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 
+
+
