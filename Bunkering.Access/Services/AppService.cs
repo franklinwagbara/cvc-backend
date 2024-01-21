@@ -148,16 +148,16 @@ namespace Bunkering.Access.Services
                     };
                 }
 
-                var surveyor = await _unitOfWork.NominatedSurveyor.GetNextAsync();
-                if (surveyor is null)
-                {
-                    return new ApiResponse
-                    {
-                        StatusCode = HttpStatusCode.NotFound,
-                        Message = "Surveyors not configured, please contact support",
-                        Success = false
-                    };
-                }
+                //var surveyor = await _unitOfWork.NominatedSurveyor.GetNextAsync();
+                //if (surveyor is null)
+                //{
+                //    return new ApiResponse
+                //    {
+                //        StatusCode = HttpStatusCode.NotFound,
+                //        Message = "Surveyors not configured, please contact support",
+                //        Success = false
+                //    };
+                //}
 
                 //var user = _userManager.Users.Include(c => c.Company).FirstOrDefault(x => x.Email.ToLower().Equals(User.Identity.Name));
                 //if ((await _unitOfWork.Application.Find(x => x.Facility.VesselTypeId.Equals(model.VesselTypeId) && x.UserId.Equals(user.Id))).Any())
@@ -211,15 +211,15 @@ namespace Bunkering.Access.Services
                     else
                         throw new Exception("Depot List must be provided!");
 
-                    surveyor.NominatedVolume += volume;
-                    var appSurveyor = new ApplicationSurveyor()
-                    {
-                        ApplicationId = newApp.Id,
-                        NominatedSurveyorId = surveyor.Id,
-                        Volume = volume
-                    };
-                    await _unitOfWork.ApplicationSurveyor.Add(appSurveyor);
-                    await _unitOfWork.SaveChangesAsync(user.Id);
+                    //surveyor.NominatedVolume += volume;
+                    //var appSurveyor = new ApplicationSurveyor()
+                    //{
+                    //    ApplicationId = newApp.Id,
+                    //    NominatedSurveyorId = surveyor.Id,
+                    //    Volume = volume
+                    //};
+                    //await _unitOfWork.ApplicationSurveyor.Add(appSurveyor);
+                    //await _unitOfWork.SaveChangesAsync(user.Id);
                     return new ApiResponse
                     {
                         Message = "Application initiated successfully",

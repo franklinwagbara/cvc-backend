@@ -14,6 +14,7 @@ using Bunkering.Core.ViewModels;
 using Bunkering.Access.DAL;
 using AutoMapper.Internal;
 using System.Net;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Bunkering.Access.Services
 {
@@ -122,7 +123,22 @@ namespace Bunkering.Access.Services
                                 //await _unitOfWork.Application.Update(app);
                                 var nextSUrveyor = await _unitOfWork.NominatedSurveyor.GetNextAsync();
                                 if (nextSUrveyor != null)
+                                {
                                     app.SurveyorId = nextSUrveyor.Id;
+                                    var appDepot = await _unitOfWork.ApplicationDepot.Find(x => x.AppId == app.Id);
+                                    var volume = appDepot.Sum(x => x.Volume);
+
+                                    nextSUrveyor.NominatedVolume += volume;
+                                    var appSurveyor = new ApplicationSurveyor()
+                                    {
+                                        ApplicationId = app.Id,
+                                        NominatedSurveyorId = nextSUrveyor.Id,
+                                        Volume = volume
+                                    };
+                                    await _unitOfWork.ApplicationSurveyor.Add(appSurveyor);
+                                    
+                                }
+                                   
                                 await _unitOfWork.SaveChangesAsync(currentUser.Id);
 
                                 var permit = await GeneratePermit(appid, currentUser.Id);
