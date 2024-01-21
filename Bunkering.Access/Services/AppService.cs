@@ -1505,7 +1505,7 @@ namespace Bunkering.Access.Services
                 };
                 return _response;
             }
-            var jettys = (await _unitOfWork.JettyOfficer.Find(c => c.OfficerID == Guid.Parse(user.Id))).Select(c => c.Jetty.Name).ToList();
+            var jettys = (await _unitOfWork.JettyOfficer.Find(c => c.OfficerID == user.Id,"Jetty")).Select(c => c.Jetty.Name).ToList();
             if (!jettys.Any())
             {
                 _response = new ApiResponse
@@ -1517,7 +1517,7 @@ namespace Bunkering.Access.Services
                 return _response;
             }
 
-            var appDepots = await _unitOfWork.Application.Find(c => jettys.Contains(c.Jetty), "Application.Facility");
+            var appDepots = await _unitOfWork.Application.Find(c => jettys.Contains(c.Jetty), "Facility");
             var apps = appDepots.OrderByDescending(x => x.CreatedDate);
 
             _response = new ApiResponse

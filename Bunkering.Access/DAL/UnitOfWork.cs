@@ -101,7 +101,7 @@ namespace Bunkering.Access.DAL
             PlantOfficer = PlantOfficer ?? new PlantOfficerRepository(_context);
             Plant = Plant ?? new PlantRepository(_context);
             PlantTank = PlantTank ?? new PlantTankRepository(_context);
-            
+            JettyOfficer = JettyOfficer ?? new JettyFieldOfficerRepostitory(_context);
         }
 
         public int Save() => _context.SaveChanges();

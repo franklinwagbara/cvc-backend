@@ -343,7 +343,7 @@ namespace Bunkering.Controllers.API
         [ProducesResponseType(typeof(ApiResponse), 404)]
         [ProducesResponseType(typeof(ApiResponse), 405)]
         [ProducesResponseType(typeof(ApiResponse), 500)]
-        [Route("view-application-By-Depot")]
+        [Route("view-application-By-Jetty")]
         [HttpGet]
         public async Task<IActionResult> ViewApplicationByJettyID(int id) => Response(await _appService.AllApplicationsByJetty(id));
 

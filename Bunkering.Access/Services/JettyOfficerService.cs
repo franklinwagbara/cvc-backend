@@ -32,14 +32,14 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> GetAllJettyOfficerMapping()
         {
-            var mappings = await _unitOfWork.JettyOfficer.GetAll("Jetty");
-            var staffs = await _userManager.Users.Where(x => x.UserRoles.Any(u => u.Role.Name == RoleConstants.COMPANY) != true).ToListAsync();
+            var mappings = (await _unitOfWork.JettyOfficer.GetAll("Jetty,Officer")).ToList();
+            //var staffs = await _userManager.Users.Where(x => x.IsDeleted != true).ToListAsync();
             var filteredMappings = mappings.Where(x => x.IsDeleted == false).Select(d => new JettyFieldOfficerViewModel
             {
                 JettyID = d.ID,
                 UserID = d.OfficerID,
-                JettyName = d.Jetty.Name,
-                OfficerName = staffs.Where(x => x.Id == d.OfficerID.ToString()).Select(u => u?.FirstName + ", " + u?.LastName).FirstOrDefault()
+                JettyName = d.Jetty?.Name,
+                OfficerName = _userManager.Users.Where(x => x.Id == d.OfficerID).Select(n =>  n.FirstName + ' ' + n.LastName).FirstOrDefault(),
             }).ToList();
 
             return new ApiResponse
