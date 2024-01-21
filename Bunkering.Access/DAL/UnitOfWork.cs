@@ -8,7 +8,8 @@ namespace Bunkering.Access.DAL
         private ApplicationContext _context;
         public IApplication Application { get; private set; }
         public IAppFee AppFee { get; private set; }
-        public IPantOfficer PlantOfficer { get; private set; }
+        public IPlantOfficer PlantOfficer { get; private set; }
+        public IJettyOfficer JettyOfficer { get; private set; }
         public IApplicationType ApplicationType { get; set; }
         public IApplicationHistory ApplicationHistory { get; private set; }
         public IAppointment Appointment { get; private set; }
@@ -100,7 +101,7 @@ namespace Bunkering.Access.DAL
             PlantOfficer = PlantOfficer ?? new PlantOfficerRepository(_context);
             Plant = Plant ?? new PlantRepository(_context);
             PlantTank = PlantTank ?? new PlantTankRepository(_context);
-            
+            JettyOfficer = JettyOfficer ?? new JettyFieldOfficerRepostitory(_context);
         }
 
         public int Save() => _context.SaveChanges();

@@ -147,6 +147,7 @@ namespace Bunkering.Access.Services
 					DateCreated = x.CreatedOn,
 					x.IsActive,
 					x.Signature,
+					x.Directorate,
 					AppCount = apps != null && apps.Count() != 0? apps.Count(y => y.UserId.Equals(x.Id)): 0,
 
 				})
@@ -213,6 +214,7 @@ namespace Bunkering.Access.Services
 						LocationId = model.LocationId,
 						OfficeId = model.OfficeId,
 						CreatedBy = user.Email,
+						Directorate =model.Directorate,
 						CreatedOn = DateTime.UtcNow.AddHours(1),
 					};
 					if (model.SignatureFile is not null)
@@ -305,6 +307,7 @@ namespace Bunkering.Access.Services
 					user.FirstName = model.FirstName;
 					user.LastName = model.LastName;
 					user.IsActive = model.IsActive;
+					user.Directorate = model.Directorate;
 
                     if (model.SignatureFile?.Length > 0)
                     {

@@ -1,7 +1,10 @@
 ﻿using Bunkering.Access.Services;
+using Bunkering.Core.Utils;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.OpenApi.Extensions;
 
 namespace Bunkering.Controllers.API
 {
@@ -194,9 +197,24 @@ namespace Bunkering.Controllers.API
 
         public async Task<IActionResult> DeleteNominatedSurveyor(int id) => Response(await _nominatedSurveyorService.DeleteSurveyor(id));
 
+        [Route("getdirectorate")]
+        [HttpGet]
+        public async Task<IActionResult> GetDirectorate()
+        {
+            Array values = Enum.GetValues(typeof(DirectorateEnum));
+            List<SelectListItem> items = new List<SelectListItem>();
 
+            foreach (var i in values)
+            {
+                items.Add(new SelectListItem
+                {
+                    Text = i.ToString(),
+                    Value = i.ToString()
+                });
+            }
 
-
+            return Ok(items);
+        }
 
     }
 }

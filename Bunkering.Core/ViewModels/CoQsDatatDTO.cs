@@ -19,14 +19,14 @@ namespace Bunkering.Core.ViewModels
         public DateTime? DateOfVesselArrival { get; set; }
         public DateTime? DateOfVesselUllage { get; set; }
         public DateTime? DateOfSTAfterDischarge { get; set; }
-        public int? QuauntityReflectedOnBill { get; set; }
-        public int? ArrivalShipFigure { get; set; }
-        public int? DischargeShipFigure { get; set; }
-        public int? MT_VAC { get; set; }
-        public int? MT_AIR { get; set; }
-        public int? GOV { get; set; }
-        public int? GSV { get; set; }
-        public int? DepotPrice { get; set; }
+        public double? QuauntityReflectedOnBill { get; set; }
+        public double? ArrivalShipFigure { get; set; }
+        public double? DischargeShipFigure { get; set; }
+        public double? MT_VAC { get; set; }
+        public double? MT_AIR { get; set; }
+        public double? GOV { get; set; }
+        public double? GSV { get; set; }
+        public double? DepotPrice { get; set; }
         public DateTime? DateCreated { get; set; }
         public DateTime? DateModified { get; set; }
         public DateTime? SubmittedDate { get; set; }

@@ -19,7 +19,8 @@ namespace Bunkering.Core.ViewModels
 		public int OfficeId { get; set; }
 		public string? Phone { get; set; }
 		public bool IsActive { get; set; }
-		public IFormFile? SignatureFile { get; set; }
+        public string? Directorate { get; set; }
+        public IFormFile? SignatureFile { get; set; }
 		public string? Signature { get; set; }
 	}
 }

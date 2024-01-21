@@ -30,14 +30,57 @@ namespace Bunkering.Access.Services
             {
                 var create = await _unitOfWork.VesselDischargeClearance
                     .FirstOrDefaultAsync(x => x.AppId == model.AppId);
+
+                if (create != null) {
+
+                    _response = new ApiResponse
+                    {
+                        Message = "Vessel Discharge Clearance Already Exist",
+                        StatusCode = HttpStatusCode.Conflict,
+                        Success = false
+                    };
+
+                    return _response;
+                }
+
                 var app = await _unitOfWork.Application
                     .FirstOrDefaultAsync(x => x.Id == model.AppId);
+
+                if (app == null)
+                {
+                    _response = new ApiResponse
+                    {
+                        Message = "NOA dosen't exist",
+                        StatusCode = HttpStatusCode.Conflict,
+                        Success = false
+                    };
+
+                    return _response;
+                }
+
+               
+                var appDepot = await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.AppId == model.Id && x.DepotId == x.DepotId);
+
+                if (appDepot == null)
+                {
+                    _response = new ApiResponse
+                    {
+                        Message = "This Depot dosen't exist on this NOA ",
+                        StatusCode = HttpStatusCode.Conflict,
+                        Success = false
+                    };
+
+                    return _response;
+                }
+
+
+
                 if (create == null)
                 {
                     var vesselDischargeClearance = new VesselDischargeClearance
                     {
                         AppId = model.AppId,
-                        DischargeId = model.DischargeId,
+                        DischargeId = appDepot.DischargeId,
                         VesselName = model.VesselName,
                         VesselPort = model.VesselPort,
                         Product = model.Product,
@@ -68,17 +111,7 @@ namespace Bunkering.Access.Services
                     };
 
                 }
-                else
-                {
-                    _response = new ApiResponse
-                    {
-                        Message = "Vessel Discharge Clearance Already Exist",
-                        StatusCode = HttpStatusCode.Conflict,
-                        Success = false
-                    };
-
-                    return _response;
-                }
+               
 
             }
             catch(Exception ex)

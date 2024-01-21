@@ -138,7 +138,8 @@ namespace Bunkering.Controllers.API
 						}).ToList(),
 						Jetty = license.Application.Jetty,
 						Surveyor = nominatedSurveyor is not null ? nominatedSurveyor.Name : "N/A",
-						Signature = user?.Signature ?? string.Empty
+						Signature = user?.Signature ?? string.Empty,
+						DateIssued = license.IssuedDate
                     },
 					PageHeight = 327,
 					PageMargins = new Rotativa.AspNetCore.Options.Margins(10, 10, 10, 10),					
