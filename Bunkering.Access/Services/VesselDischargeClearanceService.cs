@@ -92,6 +92,9 @@ namespace Bunkering.Access.Services
                         Oxygenate = model.Oxygenate,
                         Others = model.Others,
                         Comment = model.Comment,
+                        DepotId = model.DepotId,
+                        IsAllowed   = model.IsAllowed,
+                        FinalBoilingPoint = model.FinalBoilingPoint,
                     };
                     
                     await _unitOfWork.VesselDischargeClearance.Add(vesselDischargeClearance);
