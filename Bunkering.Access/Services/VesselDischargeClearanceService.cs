@@ -59,7 +59,7 @@ namespace Bunkering.Access.Services
                 }
 
                
-                var appDepot = await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.AppId == model.Id && x.DepotId == x.DepotId);
+                var appDepot = await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.AppId == model.AppId && x.DepotId == x.DepotId);
 
                 if (appDepot == null)
                 {
