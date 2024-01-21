@@ -19,9 +19,41 @@
 );
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+GO
+
+
+
+GO
+
+
+
 GO
 CREATE NONCLUSTERED INDEX [IX_Facilities_CompanyId]
     ON [dbo].[Facilities]([CompanyId] ASC);
+
+
+GO
+
 
 
 GO

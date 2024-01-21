@@ -14,11 +14,21 @@
 );
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 GO
 CREATE NONCLUSTERED INDEX [IX_COQCertificates_COQId]
     ON [dbo].[COQCertificates]([COQId] ASC);
-
-
 GO
 CREATE NONCLUSTERED INDEX [IX_COQCertificates_ProductId]
     ON [dbo].[COQCertificates]([ProductId] ASC);

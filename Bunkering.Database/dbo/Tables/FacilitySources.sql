@@ -12,12 +12,20 @@
 );
 
 
-GO
-CREATE NONCLUSTERED INDEX [IX_FacilitySources_FacilityId]
-    ON [dbo].[FacilitySources]([FacilityId] ASC);
+
+
+
+
+
+
 
 
 GO
 CREATE NONCLUSTERED INDEX [IX_FacilitySources_LgaId]
     ON [dbo].[FacilitySources]([LgaId] ASC);
+
+
+GO
+CREATE NONCLUSTERED INDEX [IX_FacilitySources_FacilityId]
+    ON [dbo].[FacilitySources]([FacilityId] ASC);
 

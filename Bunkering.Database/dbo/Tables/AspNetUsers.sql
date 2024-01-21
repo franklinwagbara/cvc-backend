@@ -28,11 +28,34 @@
     [LockoutEnabled]       BIT                NOT NULL,
     [AccessFailedCount]    INT                NOT NULL,
     [Signature]            NVARCHAR (MAX)     NULL,
+    [Directorate]          NVARCHAR (MAX)     NULL,
     CONSTRAINT [PK_AspNetUsers] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_AspNetUsers_Companies_CompanyId] FOREIGN KEY ([CompanyId]) REFERENCES [dbo].[Companies] ([Id]),
     CONSTRAINT [FK_AspNetUsers_Locations_LocationId] FOREIGN KEY ([LocationId]) REFERENCES [dbo].[Locations] ([Id]),
     CONSTRAINT [FK_AspNetUsers_Offices_OfficeId] FOREIGN KEY ([OfficeId]) REFERENCES [dbo].[Offices] ([Id])
 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 GO
@@ -46,8 +69,8 @@ CREATE NONCLUSTERED INDEX [IX_AspNetUsers_CompanyId]
 
 
 GO
-CREATE NONCLUSTERED INDEX [IX_AspNetUsers_LocationId]
-    ON [dbo].[AspNetUsers]([LocationId] ASC);
+CREATE UNIQUE NONCLUSTERED INDEX [UserNameIndex]
+    ON [dbo].[AspNetUsers]([NormalizedUserName] ASC) WHERE ([NormalizedUserName] IS NOT NULL);
 
 
 GO
@@ -56,6 +79,6 @@ CREATE NONCLUSTERED INDEX [IX_AspNetUsers_OfficeId]
 
 
 GO
-CREATE UNIQUE NONCLUSTERED INDEX [UserNameIndex]
-    ON [dbo].[AspNetUsers]([NormalizedUserName] ASC) WHERE ([NormalizedUserName] IS NOT NULL);
+CREATE NONCLUSTERED INDEX [IX_AspNetUsers_LocationId]
+    ON [dbo].[AspNetUsers]([LocationId] ASC);
 

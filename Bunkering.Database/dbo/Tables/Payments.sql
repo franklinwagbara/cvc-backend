@@ -27,12 +27,49 @@
 );
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 GO
 CREATE NONCLUSTERED INDEX [IX_Payments_ApplicationId]
     ON [dbo].[Payments]([ApplicationId] ASC);
 
 
 GO
-CREATE NONCLUSTERED INDEX [IX_Payments_ExtraPaymentId]
-    ON [dbo].[Payments]([ExtraPaymentId] ASC);
+
 

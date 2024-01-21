@@ -329,7 +329,7 @@ namespace Bunkering.Controllers.API
         [ProducesResponseType(typeof(ApiResponse), 500)]
         [Route("process")]
         [HttpPost]
-        public async Task<IActionResult> Process(int id, string act, string comment) => Response(await _appService.Process(id, act, comment));
+        public async Task<IActionResult> Process(int id, string act, string comment = null) => Response(await _appService.Process(id, act, comment));
 
         [ProducesResponseType(typeof(ApiResponse), 200)]
         [ProducesResponseType(typeof(ApiResponse), 404)]
@@ -338,6 +338,14 @@ namespace Bunkering.Controllers.API
         [Route("view-application-By-Depot")]
         [HttpGet]
         public async Task<IActionResult> ViewApplicationByDepotID(int id) => Response(await _appService.AllApplicationsByDepot(id));
+        
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("view-application-By-Jetty")]
+        [HttpGet]
+        public async Task<IActionResult> ViewApplicationByJettyID(int id) => Response(await _appService.AllApplicationsByJetty(id));
 
         [ProducesResponseType(typeof(ApiResponse), 200)]
         [ProducesResponseType(typeof(ApiResponse), 404)]
@@ -346,6 +354,14 @@ namespace Bunkering.Controllers.API
         [Route("view-application-By-Depot-Officer")]
         [HttpGet]
         public async Task<IActionResult> ViewApplicationByDepotOfficer() => Response(await _appService.AllApplicationsInDepotByUserID());
+       
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("view-application-By-Jetty-Officer")]
+        [HttpGet]
+        public async Task<IActionResult> ViewApplicationByJettyOfficer() => Response(await _appService.AllApplicationsInJettyByUserID());
 
         /// <summary>
         /// This endpoint is used to fetch details of an NOA Vessel

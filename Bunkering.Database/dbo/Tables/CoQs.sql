@@ -30,6 +30,22 @@
 );
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+GO
+
+
+
 GO
 CREATE NONCLUSTERED INDEX [IX_CoQs_AppId]
     ON [dbo].[CoQs]([AppId] ASC);

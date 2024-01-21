@@ -20,6 +20,20 @@
 );
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 GO
 CREATE NONCLUSTERED INDEX [IX_Appointments_ApplicationId]
     ON [dbo].[Appointments]([ApplicationId] ASC);

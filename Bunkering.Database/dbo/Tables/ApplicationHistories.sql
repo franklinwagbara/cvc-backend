@@ -13,6 +13,14 @@
 );
 
 
+
+
+
+
+
+
+
+
 GO
 CREATE NONCLUSTERED INDEX [IX_ApplicationHistories_ApplicationId]
     ON [dbo].[ApplicationHistories]([ApplicationId] ASC);

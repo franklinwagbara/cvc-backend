@@ -8,6 +8,14 @@
 );
 
 
+
+
+
+
+
+
+
+
 GO
 CREATE NONCLUSTERED INDEX [IX_AspNetUserClaims_UserId]
     ON [dbo].[AspNetUserClaims]([UserId] ASC);

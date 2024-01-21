@@ -12,215 +12,90 @@
 </head>
 <body>
     <div style="font-size: 1.5em !important;">
-        
+        <div class="text-center">
+            <div>
+                <img src="~/assets/nmdpraLogo.png" alt="Logo" style="height: 250px; display: block; margin: 0 auto;" />
+            </div>
+            <div style="text-align: center;font-size: 2.5em; color: forestgreen;">
+                <b>
+                    NIGERIAN MIDSTREAM AND DOWNSTREAM PETROLEUM REGULATORY AUTHORITY
+                </b>
+            </div>
+            <div style="text-align: center; margin-top: -1em;">
+                <h5>Plot 1012 Cadastral Zone A00, Sani Abacha Way, Central Business District, Abuja, FCT, Nigeria.</h5>
+            </div>
+        </div>
         <div style="width: 100%; text-align: center; position: absolute; top: 50%; margin-top: -400px;">
             <img src="~/assets/coat-of-arm.jpg" style="width: 920px; opacity: 0.1; margin-left: -5em;;" />
         </div>
+        <br /> <br />
+        <br /> <br />
         <p>
-            <table style="width: 100%; font-size: 1em !important; padding: 5px;">
-                <tr>
-                    <td>
-                        <img src="~/assets/nmdpraLogo.png" alt="Logo" style="height: 150px; display: block; margin: 0 auto;" />
-                    </td>
-                    <td colspan="2">
-                        <b>
-                            Nigerian Midstream and Downstream Petroleum Regulatory Authority
-                        </b>
-                        <br />
-                        <br />
-                        <small>
-                            Plot 1012 Cadastral Zone A00, Sani Abacha
-                            Way, Central Business District, Abuja, FCT,
-                            Nigeria.
-                        </small>
-                    </td>
-
-                </tr>
-                <tr>
-                    <td colspan="7" style="padding-top: 1em;"></td>
-                </tr>
-                <tr style="border-bottom: 1px solid;">
-                    <td colspan="2">
-                        <b>
-                            Debit Note Date
-                        </b>                        
-                    </td>
-                    <td>
-                        @Model.PayableBefore.ToString("dd.MM.yy")
-                    </td>
-                    <td style="font-size: x-large; color: red; text-align:right" colspan="4">
-                        <b>
-                            e - DEBIT NOTE
-                        </b>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        <b>
-                            The Managing Director,
-                        </b>
-                    </td>
-                    <td colspan="4" style="text-align: right;">
-                        Debit Note Number
-                    </td>
-                    <td>@Model.DebitNoteNumber</td>
-                </tr>
-                <tr>
-                    <td>
-                        @Model.DepotName
-                    </td>
-                    <td colspan="5" style="text-align: right;">
-                        Location
-                    </td>
-                    <td>
-                        @Model.Location
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="7" style="padding-top: 3em;"></td>
-                </tr>
-                <tr style="border-bottom: 1px solid;">
-                    <td>S/N</td>
-                    <td>Purpose for Payment</td>
-                    <td>Depot</td>
-                    <td>Volume</td>
-                    <td>Wholesale Price</td>
-                    <td>Total</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td colspan="7" style="padding-top: 1em;"></td>
-                </tr>
-                <tr>
-                    <td style="width: 3px;">001</td>
-                    <td>Wholesale 1% Price of @Model.Product Sold in Nigeria</td>
-                    <td>@Model.DepotName</td>
-                    <td>@Model.Volume.ToString("N2")</td>
-                    <td>@Model.WholesalePrice.ToString("N2")</td>
-                    <td>@total.ToString("N2")</td>
-                    <td>@Model.Levy.ToString("N2")</td>
-                </tr>
-                <tr style="border-bottom: 1px solid;">
-                    <td style="padding-top: 3em;">
-
-                    </td>
-                    <td colspan="6" style="padding-top: 3em;">
-                        <b>
-                            Mother Vessel: Daughter Vessel: Supplier:
-                        </b>
-                    </td>
-                </tr>
-                <tr style="border-bottom: 1px solid;">
-                    <td colspan="6" style="text-align: right;">
-                        <b>
-                            Total Payable:
-                        </b>
-                    </td>
-                    <td>
-                        <b>
-                            @Model.Levy.ToString("N2")
-                        </b>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="3" style="padding-top: 3em;">
-                        <div class="col-6 border-right">
-                            @{
-                                var halfLevy = (double)0.5m * Model.Levy;
-                            }
-
-                            <p><strong>0.5% Due to NMDPRA = ₦@halfLevy.ToString("N2")</strong></p>
-                            <p><strong>In Words:</strong><br />@Humanizer.NumberToWordsExtension.ToWords((int)halfLevy) Naira only</p>
-                            <br />
-                            <p>
-                                <span style="color: red; font-weight: bold;">Payable To:</span>
-                                <br />
-                                <span style="font-weight: bold;">
-                                    Nigeria Midstream and Downstream Petroleum Regulatory Authority
-                                </span>
-                                <br />
-                                <span>Account Number: 0020196361023</span>
-                                <br />
-                                <span>Bank: </span><span style="font-weight: bold;"> Central Bank of Nigeria</span>
-                                <span>NUBAN Account Number: </span><span style="font-weight: bold;">3000054379</span>
-                            </p>
-                        </div>
-                    </td>
-                    <td></td>
-                    <td colspan="3" style="padding-top: 3em;">
-                        <div class="col-6">
-                            <p><strong>0.5% Due to NMDPRA = ₦@halfLevy.ToString("N2")</strong></p>
-                            <p><strong>In Words:</strong><br />@Humanizer.NumberToWordsExtension.ToWords((int)halfLevy) Naira only</p>
-                            <br />
-                            <p>
-                                <span style="color: red; font-weight: bold;">Payable To:</span>
-                                <br />
-                                <span style="font-weight: bold;">
-                                    Midstream and Downstream Gas Infrastructure
-                                    Fund
-                                </span>
-                                <br />
-                                <span style="font-weight: bold;">
-                                    General Reserve TSA
-                                </span>
-                                <br />
-                                <span>Account Number: 0020295465029</span>
-                                <br />
-                                <span>Bank: </span><span style="font-weight: bold;"> Central Bank of Nigeria</span>
-                                <br />
-                                <span>NUBAN Account Number: </span><span style="font-weight: bold;">3000125268</span>
-                            </p>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="3" style="border-bottom: 1px solid; padding-top: 10em;">
-                        
-                    </td>
-                    <td></td>
-                    <td colspan="3" style="border-bottom: 1px solid;">
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="3" style="text-align:center;">
-                        Director
-                    </td>
-                    <td></td>
-                    <td colspan="3" style="text-align:center;">
-                        Senior Manager
-                    </td>
-                </tr>
-                <tr>
-                    <td style=" padding-top: 3em;"></td>
-                </tr>
-                <tr>
-                    <td colspan="7" style="border-top: 1px solid;">Debit Note on @Model.PayableBefore.ToString("dd/MM/yyyy")</td>
-                </tr>
-                <tr>
-                    <td style="color: red; padding-top: -2em;" colspan="2">
-                        10% Penalty applies after 21 days
-                    </td>
-                    <td colspan="1"></td>
-                    <td>
-                        <b>
-                            Debit Note Generated by
-                        </b>
-
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        For further inquiry, contact:
-                    </td>
-                    <td colspan="2"></td>
-                    <td colspan="2">
-                        <b>Olamide.faleke</b>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="7">finance@nmdpra.gov.ng</td>
-                </tr>
+            <strong>Vessel Discharge Date: @Model.VesselDischargeDate</strong>
+        </p>
+        <p>
+            The Managing director,<br />@Model.Marketer
+        </p>
+        <br /> <br />
+        <br /> <br />
+        <p>
+            <table style="width: 100%; font-size: 1em !important; border: 1px solid gray; padding: 5px;">
+                <thead>
+                    <tr>
+                        <th>S/N</th>
+                        <th>Purpose for Payment</th>
+                        <th>Depot</th>
+                        <th>Volume</th>
+                        <th>Wholesale Price</th>
+                        <th>Total</th>
+                        <th>1% Levy</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>@count.ToString("###")</td>
+                        <td></td>
+                        <td>@Model.DepotName</td>
+                        <td>@Model.Volume.ToString("N2")</td>
+                        <td>@Model.WholesalePrice.ToString("N2")</td>
+                        <td>@total.ToString("N2")</td>
+                        <td>@Model.Levy.ToString("N2")</td>
+                    </tr>
+                </tbody>
             </table>
+            <h3>Total Payable: ₦@Model.Levy.ToString("N2")</h3>
+        </p>
+        <div class="row">
+            <div class="col-6 border-right">
+                @{ var halfLevy = (double)0.5m * Model.Levy;}
+
+                <p><strong>0.5% Due to NMDPRA = ₦@halfLevy.ToString("N2")</strong></p>
+               <p><strong>In Words:</strong><br />@Humanizer.NumberToWordsExtension.ToWords((int)halfLevy) Naira only</p>
+               <br />
+               <p>
+                    Payable To:
+                    Nigeria Midstream and Downstream Petroleum Regulatory Authority
+               </p>
+            </div>
+            <div class="col-6">
+
+                <p><strong>0.5% Due to MDGIF = ₦@halfLevy.ToString("N2")</strong></p>
+               <p><strong>In Words:</strong><br />@Humanizer.NumberToWordsExtension.ToWords((int)halfLevy) Naira only</p>
+               <br />
+               <p>
+                    Payable To:
+                    Midstream and Downstream Gas Infrastructure Fund
+               </p>
+            </div>
+        </div>
+        <hr />
+        <p>
+            Vessel Discharged on 0910812023
+            Payable before @Model.PayableBefore.ToString("dd/MM/yyyy") (21 Days After Discharge)
+            For further inquiry, contact:
+            08033362122 ogheneruemu.macaulay@nmdpra.gw.ng
+            obinna.nwankwo@nmdpra.gov.ng
+            09054664633
         </p>
     </div>
 </body>
@@ -255,7 +130,7 @@
         font-family: Candara;
         border: 5px solid;
         padding: 3em;
-       /*  justify-content: center; */
+        justify-content: center;
         position: relative;
     }
 
@@ -265,8 +140,9 @@
         } */
 
     td, th {
-        /* text-align: center; */
+        text-align: center;
         width: 160px;
         padding: 3px;
+        border: 1px dotted #999;
     }
 </style>

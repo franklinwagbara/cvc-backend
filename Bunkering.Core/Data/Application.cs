@@ -42,6 +42,7 @@ namespace Bunkering.Core.Data
         public ApplicationType ApplicationType { get; set; }
         [ForeignKey("FlowId")]
         public WorkFlow WorkFlow { get; set; }
+        public virtual ICollection<ApplicationDepot> ApplicationDepots { get; set; }
         public virtual ICollection<Appointment> Appointment { get; set; }
         public virtual ICollection<Payment> Payments { get; set; }
         //public virtual ICollection<SubmittedDocument> SubmittedDocuments { get; set; }

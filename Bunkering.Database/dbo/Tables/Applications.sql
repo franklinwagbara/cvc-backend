@@ -31,9 +31,36 @@
 );
 
 
-GO
-CREATE NONCLUSTERED INDEX [IX_Applications_ApplicationTypeId]
-    ON [dbo].[Applications]([ApplicationTypeId] ASC);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 GO
@@ -42,11 +69,16 @@ CREATE NONCLUSTERED INDEX [IX_Applications_FacilityId]
 
 
 GO
-CREATE NONCLUSTERED INDEX [IX_Applications_FlowId]
-    ON [dbo].[Applications]([FlowId] ASC);
+CREATE NONCLUSTERED INDEX [IX_Applications_UserId]
+    ON [dbo].[Applications]([UserId] ASC);
 
 
 GO
-CREATE NONCLUSTERED INDEX [IX_Applications_UserId]
-    ON [dbo].[Applications]([UserId] ASC);
+CREATE NONCLUSTERED INDEX [IX_Applications_ApplicationTypeId]
+    ON [dbo].[Applications]([ApplicationTypeId] ASC);
+
+
+GO
+CREATE NONCLUSTERED INDEX [IX_Applications_FlowId]
+    ON [dbo].[Applications]([FlowId] ASC);
 

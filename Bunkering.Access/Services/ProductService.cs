@@ -33,7 +33,7 @@ namespace Bunkering.Access.Services
             try
             {
                 var allProducts = await _unitOfWork.Product.GetAll();
-                var allProduct = allProducts.Where(x => x.IsDeleted == null);
+                var allProduct = allProducts.Where(x => x.IsDeleted == false).ToList();
                 return new ApiResponse
                 {
                     Data = allProducts,
@@ -82,8 +82,8 @@ namespace Bunkering.Access.Services
                 _response = new ApiResponse
                 {
                     Message = "Product already exist",
-                    StatusCode = HttpStatusCode.OK,
-                    Success = true
+                    StatusCode = HttpStatusCode.Conflict,
+                    Success = false
                 };
                 return _response;
             }

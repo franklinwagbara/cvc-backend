@@ -8,6 +8,14 @@
 );
 
 
+
+
+
+
+
+
+
+
 GO
 CREATE NONCLUSTERED INDEX [IX_LGAs_StateId]
     ON [dbo].[LGAs]([StateId] ASC);

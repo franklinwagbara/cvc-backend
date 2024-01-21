@@ -8,7 +8,8 @@ namespace Bunkering.Access.IContracts
         IApplication Application { get; }
         IApplicationDepot ApplicationDepot { get; }
         IAppFee AppFee { get; }
-        IPantOfficer PlantOfficer { get; }
+        IPlantOfficer PlantOfficer { get; }
+        IJettyOfficer JettyOfficer { get; }
         IApplicationType ApplicationType { get; }
         IApplicationHistory ApplicationHistory { get; }
         IAppointment Appointment { get; }
