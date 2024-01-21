@@ -1155,8 +1155,8 @@ namespace Bunkering.Access.Services
             {
                 try
                 {
-                    var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id), "User.Company,Appointment,ApplicationType,Payments,Facility.VesselType,WorkFlow,Histories,Facility.Tanks.Product,Facility.FacilitySources.LGA.State,");
-
+                    var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id), "User.Company,Appointment,ApplicationType,Payments,Facility.VesselType,WorkFlow,Histories,Facility.Tanks.Product,Facility.FacilitySources.LGA.State");
+                    var appDepot = await _unitOfWork.ApplicationDepot.GetDepotsAsync(id);
                     if (app != null)
                     {
                         var users = _userManager.Users.Include(c => c.Company).Include(ur => ur.UserRoles).ThenInclude(r => r.Role).ToList();
@@ -1199,6 +1199,7 @@ namespace Bunkering.Access.Services
                         var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Utils.NOA));
 
                         var appDocs = await _unitOfWork.SubmittedDocument.Find(x => x.ApplicationId == app.Id && x.ApplicationTypeId == appType.Id);
+                        
 
                         var paymentStatus = "Payment pending";
                         if (app.Payments.FirstOrDefault()?.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted)) is true)
@@ -1244,6 +1245,7 @@ namespace Bunkering.Access.Services
                                 app.MotherVessel,
                                 app.Jetty,
                                 app.LoadingPort,
+                                ApplicationDepots = appDepot,
                                 NominatedSurveyor = (await _unitOfWork.NominatedSurveyor.Find(c => c.Id == surveyorId)).FirstOrDefault(),
                                 Vessel = new
                                 {
@@ -1740,7 +1742,7 @@ namespace Bunkering.Access.Services
             var apps = _unitOfWork.ApplicationDepot.Query()
                         .Include(x => x.Application)
                         .Include(x => x.Depot)
-                        .FirstOrDefault(x => x.AppId == Id);
+                        .FirstOrDefault(x => x.AppId == Id );
             var vessel = _unitOfWork.Facility.Query().FirstOrDefault(x => x.Id == apps.Application.FacilityId);
 
             var app = new ViewApplicationsByFieldOfficerDTO
