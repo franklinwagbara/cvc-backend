@@ -80,6 +80,7 @@ namespace Bunkering.Access.Services
                         .ThenInclude(r => r.Role)
                         .Include(lo => lo.Location)
                         .FirstOrDefault(x => x.Id.Equals(currUserId));
+
                     var currentuserRoles = currentUser.UserRoles
                         .Where(x => !x.Role.Name.Equals("Staff")).FirstOrDefault().Role.Id;
 
@@ -235,7 +236,7 @@ namespace Bunkering.Access.Services
                     && currentuser.UserRoles.FirstOrDefault().Role.Name.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim())
             && currentuser.LocationId == x.FromLocationId && x.VesselTypeId == VesselTypeId);
 
-        public async Task<bool> SaveHistory(string action, int appid, WorkFlow flow, ApplicationUser user, ApplicationUser nextUser, string comment)
+        public async Task<bool> SaveHistory(string action, int appid, WorkFlow flow, ApplicationUser user, ApplicationUser nextUser, string comment = null)
         {
             await _unitOfWork.ApplicationHistory.Add(new ApplicationHistory
             {

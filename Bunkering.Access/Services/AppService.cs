@@ -1299,7 +1299,7 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
-        public async Task<ApiResponse> Process(int id, string act, string comment)
+        public async Task<ApiResponse> Process(int id, string act, string comment = null)
         {
 
             if (id > 0)
