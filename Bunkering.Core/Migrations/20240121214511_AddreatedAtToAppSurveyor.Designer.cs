@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bunkering.Core.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20240121184714_jettymapping")]
-    partial class jettymapping
+    [Migration("20240121214511_AddreatedAtToAppSurveyor")]
+    partial class AddreatedAtToAppSurveyor
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -274,6 +274,9 @@ namespace Bunkering.Core.Migrations
 
                     b.Property<int>("ApplicationId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("NominatedSurveyorId")
                         .HasColumnType("int");
@@ -1104,6 +1107,33 @@ namespace Bunkering.Core.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Jetties");
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.JettyFieldOfficer", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("JettyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OfficerID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("JettyId");
+
+                    b.HasIndex("OfficerID");
+
+                    b.ToTable("JettyFieldOfficers");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.LGA", b =>
@@ -2314,7 +2344,7 @@ namespace Bunkering.Core.Migrations
             modelBuilder.Entity("Bunkering.Core.Data.ApplicationDepot", b =>
                 {
                     b.HasOne("Bunkering.Core.Data.Application", "Application")
-                        .WithMany()
+                        .WithMany("ApplicationDepots")
                         .HasForeignKey("AppId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2520,6 +2550,25 @@ namespace Bunkering.Core.Migrations
                     b.Navigation("Application");
                 });
 
+            modelBuilder.Entity("Bunkering.Core.Data.JettyFieldOfficer", b =>
+                {
+                    b.HasOne("Bunkering.Core.Data.Jetty", "Jetty")
+                        .WithMany()
+                        .HasForeignKey("JettyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Bunkering.Core.Data.ApplicationUser", "Officer")
+                        .WithMany()
+                        .HasForeignKey("OfficerID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Jetty");
+
+                    b.Navigation("Officer");
+                });
+
             modelBuilder.Entity("Bunkering.Core.Data.LGA", b =>
                 {
                     b.HasOne("Bunkering.Core.Data.State", "State")
@@ -2660,6 +2709,8 @@ namespace Bunkering.Core.Migrations
 
             modelBuilder.Entity("Bunkering.Core.Data.Application", b =>
                 {
+                    b.Navigation("ApplicationDepots");
+
                     b.Navigation("Appointment");
 
                     b.Navigation("Histories");

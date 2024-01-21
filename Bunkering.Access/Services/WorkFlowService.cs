@@ -133,7 +133,8 @@ namespace Bunkering.Access.Services
                                     {
                                         ApplicationId = app.Id,
                                         NominatedSurveyorId = nextSUrveyor.Id,
-                                        Volume = volume
+                                        Volume = volume,
+                                        CreatedAt = DateTime.UtcNow,
                                     };
                                     await _unitOfWork.ApplicationSurveyor.Add(appSurveyor);
                                     
