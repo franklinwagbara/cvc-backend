@@ -5,12 +5,12 @@
     public decimal Volume { get; }
     public string VesselName { get; }
     public string? MotherVessel { get; }
-    public string? Jetty { get; }
+    public int Jetty { get; }
     public DateTime? ETA { get; }
     public string LoadingPort { get; }
     public string Destination { get; }
 
-    public NavalLetterDto(string marketerName, string productName, decimal volume, string vesselName, string? motherVessel, string? jetty, DateTime? eTA, string loadingPort, string destination)
+    public NavalLetterDto(string marketerName, string productName, decimal volume, string vesselName, string? motherVessel, int jetty, DateTime? eTA, string loadingPort, string destination)
     {
         MarketerName = marketerName;
         ProductName = productName;

@@ -19,7 +19,7 @@
     [MarketerName]      NVARCHAR (MAX) NOT NULL,
     [ETA]               DATETIME2 (7)  NULL,
     [MotherVessel]      NVARCHAR (MAX) NULL,
-    [Jetty]             NVARCHAR (MAX) NULL,
+    [Jetty]             INT            DEFAULT ((0)) NOT NULL,
     [SurveyorId]        INT            DEFAULT ((0)) NULL,
     [DeskMovementDate]  DATETIME2 (7)  NULL,
     [HasCleared]        BIT            DEFAULT (CONVERT([bit],(0))) NOT NULL,
@@ -29,6 +29,8 @@
     CONSTRAINT [FK_Applications_Facilities_FacilityId] FOREIGN KEY ([FacilityId]) REFERENCES [dbo].[Facilities] ([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_Applications_WorkFlows_FlowId] FOREIGN KEY ([FlowId]) REFERENCES [dbo].[WorkFlows] ([Id])
 );
+
+
 
 
 

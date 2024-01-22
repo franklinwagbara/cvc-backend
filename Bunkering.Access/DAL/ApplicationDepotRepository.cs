@@ -19,6 +19,7 @@ namespace Bunkering.Access.DAL
                 Name = x.Depot.Name,
                 StateName = x.Depot.State,
                 ProductName = x.Product.Name,
+                Volume = x.Volume
             }).ToListAsync();
         }
     }

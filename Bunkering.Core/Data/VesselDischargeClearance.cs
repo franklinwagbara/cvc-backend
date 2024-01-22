@@ -11,7 +11,7 @@ namespace Bunkering.Core.Data
         public int Id { get; set; }
         public int AppId { get; set; }
         public int DepotId { get; set; }
-        public string DischargeId { get; set; }
+        public string? DischargeId { get; set; }
         public string VesselName { get; set; }
         public string VesselPort { get; set; }
         public string Product {  get; set; }
