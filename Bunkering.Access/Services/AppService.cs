@@ -147,6 +147,29 @@ namespace Bunkering.Access.Services
                         Success = false
                     };
                 }
+
+                //var surveyor = await _unitOfWork.NominatedSurveyor.GetNextAsync();
+                //if (surveyor is null)
+                //{
+                //    return new ApiResponse
+                //    {
+                //        StatusCode = HttpStatusCode.NotFound,
+                //        Message = "Surveyors not configured, please contact support",
+                //        Success = false
+                //    };
+                //}
+
+                //var user = _userManager.Users.Include(c => c.Company).FirstOrDefault(x => x.Email.ToLower().Equals(User.Identity.Name));
+                //if ((await _unitOfWork.Application.Find(x => x.Facility.VesselTypeId.Equals(model.VesselTypeId) && x.UserId.Equals(user.Id))).Any())
+                //    _response = new ApiResponse
+                //    {
+                //        Message = "There is an existing application for this facility, you are not allowed to use license the same vessel twice",
+                //        StatusCode = HttpStatusCode.Found,
+                //        Success = false
+                //    };
+                //else
+                //{
+
                 var facility = await CreateFacility(model, user);
                 if (facility != null)
                 {
@@ -489,7 +512,7 @@ namespace Bunkering.Access.Services
                             BankCode = _setting.NMDPRAAccount,
                             Description = $"Payment for CVC & COQ ({app.Facility.Name}) |" +
                             $" NoA Fee: ₦ {fee.NOAFee:#,#.##} |" +
-                            $" Depots: {appDepots.Select(x => x.Name)} |" +
+                            $" Depots: {string.Join(", ",appDepots.Select(x => x.Name).ToList())} |" +
                             $" CoQ Fee (per Depot): ₦ {fee.COQFee:#,#.##} |" +
                             $" Total CoQ Fee: ₦ {(fee.COQFee * appDepots.Count):#,#.##} |" +
                             $" Total Amount: ₦ {total:#,#.##}",
@@ -511,7 +534,7 @@ namespace Bunkering.Access.Services
                         {
                             payment.Amount = total;
                             payment.OrderId = app.Reference;
-                            payment.Description = $"Payment for CVC & COQ License ({app.Facility.Name})";
+                            payment.Description = $"Payment for CVC & COQ ({app.Facility.Name})";
                             payment.Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending);
                             payment.TransactionDate = DateTime.UtcNow.AddHours(1);
 
@@ -1412,7 +1435,7 @@ namespace Bunkering.Access.Services
         public async Task<ApiResponse> AllApplicationsByJetty(int jettyId)
         {
             var appDepot = await _unitOfWork.Jetty.Find(x => x.Id.Equals(jettyId));
-            var applications = await _unitOfWork.Application.Find(x => appDepot.Any(a => a.Name == x.Jetty && x.Status == Enum.GetName(AppStatus.Completed)) == true);
+            var applications = await _unitOfWork.Application.Find(x => appDepot.Any(a => a.Id == x.Jetty && x.Status == Enum.GetName(AppStatus.Completed)) == true);
             if (applications != null)
             {
                 var filteredapps = applications.Where(x => x.IsDeleted == false);
@@ -1484,7 +1507,7 @@ namespace Bunkering.Access.Services
                 };
                 return _response;
             }
-            var jettys = (await _unitOfWork.JettyOfficer.Find(c => c.OfficerID == user.Id,"Jetty")).Select(c => c.Jetty.Name).ToList();
+            var jettys = (await _unitOfWork.JettyOfficer.Find(c => c.OfficerID == user.Id,"Jetty")).Select(c => c.JettyId).ToList();
             if (!jettys.Any())
             {
                 _response = new ApiResponse
@@ -1722,6 +1745,8 @@ namespace Bunkering.Access.Services
                         .FirstOrDefault(x => x.AppId == Id );
             var vessel = _unitOfWork.Facility.Query().FirstOrDefault(x => x.Id == apps.Application.FacilityId);
 
+            var jetty = _unitOfWork.Jetty.Query().FirstOrDefault(x => x.Id == apps.Application.Jetty)?.Name;
+
             var app = new ViewApplicationsByFieldOfficerDTO
             {
                 ApplicationTypeId = apps?.Application.ApplicationTypeId ?? 0,
@@ -1732,7 +1757,7 @@ namespace Bunkering.Access.Services
                 ETA = apps.Application.ETA,
                 FacilityId = apps.Application.FacilityId,
                 FADApproved = apps.Application.FADApproved,
-                Jetty = apps.Application.Jetty,
+                Jetty = jetty,
                 LoadingPort = apps.Application.LoadingPort,
                 FADStaffId = apps.Application.FADStaffId,
                 FlowId = apps.Application.FlowId,

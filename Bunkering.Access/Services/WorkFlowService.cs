@@ -627,7 +627,9 @@ namespace Bunkering.Access.Services
             var appDepots = await _context.ApplicationDepots.Where(a => a.AppId == id).Include(x => x.Product).ToListAsync();
             foreach (var appDepot in appDepots)
             {
-                appDepot.DischargeId = GenerateDischargeID(appDepot.Product.Name);
+                //appDepot.DischargeId = GenerateDischargeID(appDepot.Product.Name);
+                var num = appDepot.Id.ToString("D6");
+                appDepot.DischargeId = $"{appDepot.Product.Name}/{num}";
             }
 
             _context.ApplicationDepots.UpdateRange(appDepots);

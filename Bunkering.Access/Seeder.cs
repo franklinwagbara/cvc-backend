@@ -259,11 +259,11 @@ namespace Bunkering.Access
 		public async Task CreateProducts()
 		{
 			var _context = _serviceProvider.GetRequiredService<ApplicationContext>();
-			var products = new[] { "Fuel Oils", "AGO", "Lubricating Oils" };
+			var products = new[] { "Fuel Oils", "AGO", "LNG", "Lubricationg Oils" };
 			if (!_context.Products.Any())
 			{
 				foreach (var f in products)
-					_context.Products.Add(new Product { Name = f, ProductType = "NonGas" });
+					_context.Products.Add(new Product { Name = f });
 
 				_context.SaveChanges();
 			}

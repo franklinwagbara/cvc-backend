@@ -1,4 +1,5 @@
 ﻿using Bunkering.Access;
+using Bunkering.Access.DAL;
 using Bunkering.Access.IContracts;
 using Bunkering.Core.Data;
 using Bunkering.Core.ViewModels;
@@ -120,6 +121,14 @@ namespace Bunkering.Controllers.API
 					.Application.Histories?
 					.OrderByDescending(a => a.Date)
 					.LastOrDefault()?.TargetedTo ?? string.Empty);
+
+				string jetty = null;
+
+                if (license.Application?.Jetty > 0)
+				{
+                    jetty = _unitOfWork.Jetty.Query().FirstOrDefault(x => x.Id == license.Application.Jetty)?.Name;
+                }
+              
                 var viewAsPdf = new ViewAsPdf 
 				{
 					Model = new CertificareDTO
@@ -136,7 +145,7 @@ namespace Bunkering.Controllers.API
 							Volume = y.Volume,
 							DischargeId = y.DischargeId,
 						}).ToList(),
-						Jetty = license.Application.Jetty,
+						Jetty = jetty,
 						Surveyor = nominatedSurveyor is not null ? nominatedSurveyor.Name : "N/A",
 						Signature = user?.Signature ?? string.Empty,
 						DateIssued = license.IssuedDate
