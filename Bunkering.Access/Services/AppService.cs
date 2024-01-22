@@ -1435,7 +1435,7 @@ namespace Bunkering.Access.Services
         public async Task<ApiResponse> AllApplicationsByJetty(int jettyId)
         {
             var appDepot = await _unitOfWork.Jetty.Find(x => x.Id.Equals(jettyId));
-            var applications = await _unitOfWork.Application.Find(x => appDepot.Any(a => a.Name == x.Jetty && x.Status == Enum.GetName(AppStatus.Completed)) == true);
+            var applications = await _unitOfWork.Application.Find(x => appDepot.Any(a => a.Id == x.Jetty && x.Status == Enum.GetName(AppStatus.Completed)) == true);
             if (applications != null)
             {
                 var filteredapps = applications.Where(x => x.IsDeleted == false);
@@ -1507,7 +1507,7 @@ namespace Bunkering.Access.Services
                 };
                 return _response;
             }
-            var jettys = (await _unitOfWork.JettyOfficer.Find(c => c.OfficerID == user.Id,"Jetty")).Select(c => c.Jetty.Name).ToList();
+            var jettys = (await _unitOfWork.JettyOfficer.Find(c => c.OfficerID == user.Id,"Jetty")).Select(c => c.JettyId).ToList();
             if (!jettys.Any())
             {
                 _response = new ApiResponse
@@ -1745,6 +1745,8 @@ namespace Bunkering.Access.Services
                         .FirstOrDefault(x => x.AppId == Id );
             var vessel = _unitOfWork.Facility.Query().FirstOrDefault(x => x.Id == apps.Application.FacilityId);
 
+            var jetty = _unitOfWork.Jetty.Query().FirstOrDefault(x => x.Id == apps.Application.Jetty)?.Name;
+
             var app = new ViewApplicationsByFieldOfficerDTO
             {
                 ApplicationTypeId = apps?.Application.ApplicationTypeId ?? 0,
@@ -1755,7 +1757,7 @@ namespace Bunkering.Access.Services
                 ETA = apps.Application.ETA,
                 FacilityId = apps.Application.FacilityId,
                 FADApproved = apps.Application.FADApproved,
-                Jetty = apps.Application.Jetty,
+                Jetty = jetty,
                 LoadingPort = apps.Application.LoadingPort,
                 FADStaffId = apps.Application.FADStaffId,
                 FlowId = apps.Application.FlowId,

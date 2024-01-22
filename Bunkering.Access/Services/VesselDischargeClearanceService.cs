@@ -59,19 +59,19 @@ namespace Bunkering.Access.Services
                 }
 
                
-                var appDepot = await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.AppId == model.AppId && x.DepotId == x.DepotId);
+                //var appDepot = await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.AppId == model.AppId && x.DepotId == x.DepotId);
 
-                if (appDepot == null)
-                {
-                    _response = new ApiResponse
-                    {
-                        Message = "This Depot dosen't exist on this NOA ",
-                        StatusCode = HttpStatusCode.Conflict,
-                        Success = false
-                    };
+                //if (appDepot == null)
+                //{
+                //    _response = new ApiResponse
+                //    {
+                //        Message = "This Depot dosen't exist on this NOA ",
+                //        StatusCode = HttpStatusCode.Conflict,
+                //        Success = false
+                //    };
 
-                    return _response;
-                }
+                //    return _response;
+                //}
 
 
 
@@ -80,7 +80,7 @@ namespace Bunkering.Access.Services
                     var vesselDischargeClearance = new VesselDischargeClearance
                     {
                         AppId = model.AppId,
-                        DischargeId = appDepot.DischargeId,
+                        //DischargeId = appDepot.DischargeId,
                         VesselName = model.VesselName,
                         VesselPort = model.VesselPort,
                         Product = model.Product,
@@ -92,7 +92,7 @@ namespace Bunkering.Access.Services
                         Oxygenate = model.Oxygenate,
                         Others = model.Others,
                         Comment = model.Comment,
-                        DepotId = model.DepotId,
+                        //DepotId = model.DepotId,
                         IsAllowed   = model.IsAllowed,
                         FinalBoilingPoint = model.FinalBoilingPoint,
                     };
