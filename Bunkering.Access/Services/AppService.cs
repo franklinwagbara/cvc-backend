@@ -77,16 +77,7 @@ namespace Bunkering.Access.Services
                     Name = model.VesselName,
                     CompanyId = user.CompanyId.Value,
                     VesselTypeId = model.VesselTypeId,
-                    //Capacity = model.Capacity,
-                    //DeadWeight = model.DeadWeight,
-                    //Operator = model.Operator,
-                    //FacilitySources = _mapper.Map<List<FacilitySource>>(model.FacilitySources),
-                    //Tanks = _mapper.Map<List<Tank>>(model.TankList),
-                    //CallSIgn = model.CallSIgn,
-                    //Flag = model.Flag,
-                    IMONumber = model.IMONumber,
-                    //PlaceOfBuild = model.PlaceOfBuild,
-                    //YearOfBuild = model.YearOfBuild,
+                    IMONumber = model.IMONumber
                 };
                 var lga = await _unitOfWork.LGA.FirstOrDefaultAsync(x => x.State.Name.ToLower().Contains("lagos"), "State");
 
@@ -148,28 +139,6 @@ namespace Bunkering.Access.Services
                     };
                 }
 
-                //var surveyor = await _unitOfWork.NominatedSurveyor.GetNextAsync();
-                //if (surveyor is null)
-                //{
-                //    return new ApiResponse
-                //    {
-                //        StatusCode = HttpStatusCode.NotFound,
-                //        Message = "Surveyors not configured, please contact support",
-                //        Success = false
-                //    };
-                //}
-
-                //var user = _userManager.Users.Include(c => c.Company).FirstOrDefault(x => x.Email.ToLower().Equals(User.Identity.Name));
-                //if ((await _unitOfWork.Application.Find(x => x.Facility.VesselTypeId.Equals(model.VesselTypeId) && x.UserId.Equals(user.Id))).Any())
-                //    _response = new ApiResponse
-                //    {
-                //        Message = "There is an existing application for this facility, you are not allowed to use license the same vessel twice",
-                //        StatusCode = HttpStatusCode.Found,
-                //        Success = false
-                //    };
-                //else
-                //{
-
                 var facility = await CreateFacility(model, user);
                 if (facility != null)
                 {
@@ -185,7 +154,6 @@ namespace Bunkering.Access.Services
                         VesselName = model.VesselName,
                         LoadingPort = model.LoadingPort,
                         MarketerName = model.MarketerName,
-                        //IMONumber = model.IMONumber,
                         MotherVessel = model.MotherVessel,
                         Jetty = model.Jetty,
                         ETA = model.ETA,
@@ -211,15 +179,6 @@ namespace Bunkering.Access.Services
                     else
                         throw new Exception("Depot List must be provided!");
 
-                    //surveyor.NominatedVolume += volume;
-                    //var appSurveyor = new ApplicationSurveyor()
-                    //{
-                    //    ApplicationId = newApp.Id,
-                    //    NominatedSurveyorId = surveyor.Id,
-                    //    Volume = volume
-                    //};
-                    //await _unitOfWork.ApplicationSurveyor.Add(appSurveyor);
-                    //await _unitOfWork.SaveChangesAsync(user.Id);
                     return new ApiResponse
                     {
                         Message = "Application initiated successfully",
@@ -227,37 +186,6 @@ namespace Bunkering.Access.Services
                         Data = new { appId = app.Id },
                         Success = true
                     };
-
-                    //save app tanks
-                    // var tank = await AppTanks(model.TankList, facility.Id);
-
-                    // if (tank != null)
-                    // {
-                    //     await _unitOfWork.Application.Add(app);
-                    //     await _unitOfWork.SaveChangesAsync(app.UserId);
-
-                    //     _response = new ApiResponse
-                    //     {
-                    //         Message = "Application initiated successfully",
-                    //         StatusCode = HttpStatusCode.OK,
-                    //         Data = new { appId = app.Id },
-                    //         Success = true
-                    //     };
-
-                    // }
-                    // else
-                    // {
-                    //     _response = new ApiResponse
-                    //     {
-                    //         Message = "unable to apply",
-                    //         StatusCode = HttpStatusCode.NotFound,
-                    //         Success = false
-                    //     };
-
-                    // }
-
-
-                    //await _flow.AppWorkFlow(app.Id, Enum.GetName(typeof(AppActions), AppActions.Initiate), "Application Created");
                 }
                 else
                 {
