@@ -18,6 +18,7 @@ using System.Security.Cryptography.X509Certificates;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Bunkering.Access.Query;
 using System.ComponentModel.Design;
+using System.Collections.Generic;
 
 namespace Bunkering.Access.Services
 {
@@ -72,35 +73,38 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var facility = new Facility
+                var facility = await _unitOfWork.Facility.FirstOrDefaultAsync(f => f.IMONumber.ToLower().Equals(model.IMONumber.ToLower()));
+                if(facility == null)
                 {
-                    Name = model.VesselName,
-                    CompanyId = user.CompanyId.Value,
-                    VesselTypeId = model.VesselTypeId,
-                    IMONumber = model.IMONumber
-                };
-                var lga = await _unitOfWork.LGA.FirstOrDefaultAsync(x => x.State.Name.ToLower().Contains("lagos"), "State");
+                    facility = new Facility
+                    {
+                        Name = model.VesselName,
+                        CompanyId = user.CompanyId.Value,
+                        VesselTypeId = model.VesselTypeId,
+                        IMONumber = model.IMONumber
+                    };
+                    var lga = await _unitOfWork.LGA.FirstOrDefaultAsync(x => x.State.Name.ToLower().Contains("lagos"), "State");
 
-                var facElps = _elps.CreateElpsFacility(new
-                {
-                    Name = model.VesselName,
-                    StreetAddress = $"{model.VesselName} - {user.ElpsId}",
-                    CompanyId = user.ElpsId,
-                    DateAdded = DateTime.UtcNow.AddHours(1),
-                    City = lga.Name,
-                    lga.StateId,
-                    LGAId = lga.Id,
-                    FacilityType = "CVC Facility",
-                    FacilityDocuments = (string)null,
-                    Id = (string)null
-                })?.Parse<Dictionary<string, object>>();
+                    var facElps = _elps.CreateElpsFacility(new
+                    {
+                        Name = model.VesselName,
+                        StreetAddress = $"{model.VesselName} - {user.ElpsId}",
+                        CompanyId = user.ElpsId,
+                        DateAdded = DateTime.UtcNow.AddHours(1),
+                        City = lga.Name,
+                        lga.StateId,
+                        LGAId = lga.Id,
+                        FacilityType = "CVC Facility",
+                        FacilityDocuments = (string)null,
+                        Id = (string)null
+                    })?.Parse<Dictionary<string, object>>();
 
-                if (facElps?.Count > 0)
-                    facility.ElpsId = int.Parse($"{facElps.GetValue("id")}");
+                    if (facElps?.Count > 0)
+                        facility.ElpsId = int.Parse($"{facElps.GetValue("id")}");
 
-                await _unitOfWork.Facility.Add(facility);
-                await _unitOfWork.SaveChangesAsync(user.Id);
-
+                    await _unitOfWork.Facility.Add(facility);
+                    await _unitOfWork.SaveChangesAsync(user.Id);
+                }
                 return facility;
             }
             catch (Exception ex)
@@ -164,16 +168,22 @@ namespace Bunkering.Access.Services
                     var volume = model.DepotList.Sum(c => c.Volume);
                     await _unitOfWork.SaveChangesAsync(app.UserId);
                     //var depot = await AppDepots(model.DepotList, app.Id);
+                    var depotList = new List<ApplicationDepot>();
                     if (model.DepotList.Any() && newApp != null)
                     {
-                        var depotList = new List<AppDepotViewModel>();
-
                         model.DepotList.ForEach(d =>
                         {
-                            d.AppId = newApp.Id;
-                            depotList.Add(d);
+                            depotList.Add(new ApplicationDepot
+                            {
+                                AppId = app.Id,
+                                DepotId = d.DepotId,
+                                DischargeId = "",
+                                ProductId = d.ProductId,
+                                Volume = d.Volume
+                            });
                         });
-                        var s = await _unitOfWork.ApplicationDepot.AddRange(_mapper.Map<List<ApplicationDepot>>(depotList));
+                        //var depotList = _mapper.Map<List<ApplicationDepot>>(model.DepotList);
+                        await _unitOfWork.ApplicationDepot.AddRange(depotList);
                         await _unitOfWork.SaveChangesAsync(user.Id);
                     }
                     else
@@ -410,7 +420,7 @@ namespace Bunkering.Access.Services
                         Success = false
                     };
                     var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id), "ApplicationType,Facility.VesselType,Payments");
-                    var appDepots = (await _unitOfWork.ApplicationDepot.Find(x => x.AppId.Equals(id))).Select(c => c.Depot).ToList();
+                    var appDepots = (await _unitOfWork.ApplicationDepot.Find(x => x.AppId.Equals(id), "Depot")).Select(c => c.Depot).ToList();
                     if (app is null) return new ApiResponse()
                     {
                         StatusCode = HttpStatusCode.NotFound,
