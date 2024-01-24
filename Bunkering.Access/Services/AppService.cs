@@ -1152,6 +1152,7 @@ namespace Bunkering.Access.Services
                         var rrr = app.Payments.FirstOrDefault()?.RRR;
                         var surveyorId = (await _unitOfWork.ApplicationSurveyor
                             .FirstOrDefaultAsync(x => x.ApplicationId == id))?.NominatedSurveyorId;
+                        var jetty = await _unitOfWork.Jetty.FirstOrDefaultAsync(x => x.Id.Equals(app.Jetty));
                         _response = new ApiResponse
                         {
                             Message = "Application detail found",
@@ -1181,7 +1182,7 @@ namespace Bunkering.Access.Services
                                 Documents = appDocs,
                                 app.MarketerName,
                                 app.MotherVessel,
-                                app.Jetty,
+                                Jetty = jetty?.Name,
                                 app.LoadingPort,
                                 ApplicationDepots = appDepot,
                                 NominatedSurveyor = (await _unitOfWork.NominatedSurveyor.Find(c => c.Id == surveyorId)).FirstOrDefault(),
@@ -1420,7 +1421,7 @@ namespace Bunkering.Access.Services
             var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application.Facility");
             var apps = appDepots.OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application).ToList();
 
-            _response = new ApiResponse
+                _response = new ApiResponse
             {
                 Message = "Applications fetched successfully",
                 StatusCode = HttpStatusCode.OK,
@@ -1606,7 +1607,6 @@ namespace Bunkering.Access.Services
             return _response;
 
         }
-
 
         public async Task<ApiResponse> GetAllVessels()
         {

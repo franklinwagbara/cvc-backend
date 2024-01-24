@@ -709,6 +709,17 @@ namespace Bunkering.Access.Services
             {
                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id == payment.COQId, "Plant");
                 var capacity = coq.MT_VAC == 0 ? coq.GSV : coq.MT_VAC;
+                var product = new Product();
+
+                if (coq.ProductId != null)
+                    product = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(coq.ProductId));
+                else
+                {
+                    var app = await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.Id.Equals(coq.AppId), "Product");
+                    if (app != null)
+                        product = app.Product;
+                }
+
                 var result = new DebitNoteDTO(
                 coq.DateOfSTAfterDischarge,
                 payment.TransactionDate.AddDays(21),
@@ -717,7 +728,10 @@ namespace Bunkering.Access.Services
                 coq.DepotPrice,
                 payment.Amount,
                 capacity,
-                coq.DepotPrice);
+                coq.DepotPrice,
+                coq.Plant.State,
+                $"NMDPRA/{coq.Plant.State.Substring(0, 2).ToUpper()}/{payment.Id}",
+                "", "", "", product?.Name);
                 return new ApiResponse
                 {
                     Message = $"Debit note fetched successfully",
