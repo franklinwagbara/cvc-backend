@@ -1479,8 +1479,15 @@ namespace Bunkering.Access.Services
                 return _response;
             }
 
-            var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application.Facility");
-            var apps = appDepots.OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application).ToList();
+            var appDepots = (await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application.Facility")).ToList();
+            var apps = new List<ViewApplicationsByFieldOfficerDTO>();
+            foreach (var item in appDepots)
+            {
+                var _app = GetApplications(item.AppId);
+                
+                apps.Add(_app);
+            }
+           // var apps = appDepots.OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application).ToList();
 
             _response = new ApiResponse
             {
@@ -1738,12 +1745,14 @@ namespace Bunkering.Access.Services
         private ViewApplicationsByFieldOfficerDTO GetApplications(int Id)
         {
             var result = new ViewApplicationsByFieldOfficerDTO();
-
             var apps = _unitOfWork.ApplicationDepot.Query()
                         .Include(x => x.Application)
                         .Include(x => x.Depot)
                         .FirstOrDefault(x => x.AppId == Id );
+            var companyDetails = _userManager.FindByIdAsync(apps.Application.UserId).Result;
+            
             var vessel = _unitOfWork.Facility.Query().FirstOrDefault(x => x.Id == apps.Application.FacilityId);
+            var vType = _unitOfWork.VesselType.Query().FirstOrDefault(x => x.Id == vessel.VesselTypeId);
 
             var jetty = _unitOfWork.Jetty.Query().FirstOrDefault(x => x.Id == apps.Application.Jetty)?.Name;
 
@@ -1757,7 +1766,7 @@ namespace Bunkering.Access.Services
                 ETA = apps.Application.ETA,
                 FacilityId = apps.Application.FacilityId,
                 FADApproved = apps.Application.FADApproved,
-                Jetty = jetty,
+                Jetty = jetty ?? string.Empty,
                 LoadingPort = apps.Application.LoadingPort,
                 FADStaffId = apps.Application.FADStaffId,
                 FlowId = apps.Application.FlowId,
@@ -1771,8 +1780,10 @@ namespace Bunkering.Access.Services
                 SubmittedDate = apps.Application.SubmittedDate,
                 SurveyorId = apps.Application.SurveyorId,
                 UserId = apps.Application.UserId,
-                CompanyId = vessel.CompanyId,
+                CompanyId = companyDetails?.CompanyId ?? 0,
+                CompanyName = companyDetails?.Company?.Name ?? string.Empty,
                 IMONumber = vessel.IMONumber,
+                VesselType = vessel?.VesselType.Name,
                 IsLicensed = vessel.IsLicensed,
                 Id = vessel.Id,
                 CallSIgn = vessel.CallSIgn,
