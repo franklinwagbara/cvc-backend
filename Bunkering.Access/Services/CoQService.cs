@@ -1377,9 +1377,9 @@ namespace Bunkering.Access.Services
                     QuauntityReflectedOnBill = coq.QuauntityReflectedOnBill
 
                 };
-                if (coq.AppId != null || coq.Reference != null)
+                if (coq.AppId != null )
                 {
-                    var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(coq.AppId) || x.Reference == coq.Reference, "Facility");
+                    var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(coq.AppId), "Facility");
                     var jetty = _unitOfWork.Jetty.Query().FirstOrDefault(x => x.Id == app.Jetty)?.Name;
                     if (app != null)
                     {
