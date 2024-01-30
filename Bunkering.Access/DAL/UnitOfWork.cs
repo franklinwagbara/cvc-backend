@@ -10,6 +10,8 @@ namespace Bunkering.Access.DAL
         public IAppFee AppFee { get; private set; }
         public IPlantOfficer PlantOfficer { get; private set; }
         public IJettyOfficer JettyOfficer { get; private set; }
+        public IDippingMethod DippingMethod { get; private set; }
+        public IMeterType MeterType { get; private set; }
         public IApplicationType ApplicationType { get; set; }
         public IApplicationHistory ApplicationHistory { get; private set; }
         public IAppointment Appointment { get; private set; }
