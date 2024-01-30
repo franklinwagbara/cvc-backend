@@ -43,6 +43,13 @@ namespace Bunkering.Core.Utils
         RejectInspection
     }
 
+    public enum NameType
+    {
+        CVC,
+        ProcessingPlant,
+        Both
+    }
+
     public enum PlantType
     {
         Depot = 2,

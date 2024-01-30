@@ -27,6 +27,7 @@ namespace Bunkering.Access.IContracts
         INominatedSurveyor NominatedSurveyor { get; }
         IApplicationSurveyor ApplicationSurveyor { get; }
         IOffice Office { get; }
+        IOperatingFacility OperatingFacility { get; }
         IPayment Payment { get; }
         IPermit Permit { get; }
         IProduct Product { get; }

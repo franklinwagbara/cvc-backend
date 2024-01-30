@@ -52,6 +52,11 @@ namespace Bunkering.Core.ViewModels
         public decimal? Capacity { get; set; }
         public string? Operator { get; set; }
         public string? DischargeId { get; set; }
+
+        public string? CompanyName { get; set; }
+        public string? CompanyEmail { get; set; }
+        public string? VesselType { get; set; }
+        public string? JettyName { get; set; }
     }
 
     //public class Facility
