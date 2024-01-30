@@ -18,6 +18,7 @@ using System.Security.Cryptography.X509Certificates;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Bunkering.Access.Query;
 using System.ComponentModel.Design;
+using System.Collections.Generic;
 
 namespace Bunkering.Access.Services
 {
@@ -72,44 +73,38 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var facility = new Facility
+                var facility = await _unitOfWork.Facility.FirstOrDefaultAsync(f => f.IMONumber.ToLower().Equals(model.IMONumber.ToLower()));
+                if(facility == null)
                 {
-                    Name = model.VesselName,
-                    CompanyId = user.CompanyId.Value,
-                    VesselTypeId = model.VesselTypeId,
-                    //Capacity = model.Capacity,
-                    //DeadWeight = model.DeadWeight,
-                    //Operator = model.Operator,
-                    //FacilitySources = _mapper.Map<List<FacilitySource>>(model.FacilitySources),
-                    //Tanks = _mapper.Map<List<Tank>>(model.TankList),
-                    //CallSIgn = model.CallSIgn,
-                    //Flag = model.Flag,
-                    IMONumber = model.IMONumber,
-                    //PlaceOfBuild = model.PlaceOfBuild,
-                    //YearOfBuild = model.YearOfBuild,
-                };
-                var lga = await _unitOfWork.LGA.FirstOrDefaultAsync(x => x.State.Name.ToLower().Contains("lagos"), "State");
+                    facility = new Facility
+                    {
+                        Name = model.VesselName,
+                        CompanyId = user.CompanyId.Value,
+                        VesselTypeId = model.VesselTypeId,
+                        IMONumber = model.IMONumber
+                    };
+                    var lga = await _unitOfWork.LGA.FirstOrDefaultAsync(x => x.State.Name.ToLower().Contains("lagos"), "State");
 
-                var facElps = _elps.CreateElpsFacility(new
-                {
-                    Name = model.VesselName,
-                    StreetAddress = $"{model.VesselName} - {user.ElpsId}",
-                    CompanyId = user.ElpsId,
-                    DateAdded = DateTime.UtcNow.AddHours(1),
-                    City = lga.Name,
-                    lga.StateId,
-                    LGAId = lga.Id,
-                    FacilityType = "CVC Facility",
-                    FacilityDocuments = (string)null,
-                    Id = (string)null
-                })?.Parse<Dictionary<string, object>>();
+                    var facElps = _elps.CreateElpsFacility(new
+                    {
+                        Name = model.VesselName,
+                        StreetAddress = $"{model.VesselName} - {user.ElpsId}",
+                        CompanyId = user.ElpsId,
+                        DateAdded = DateTime.UtcNow.AddHours(1),
+                        City = lga.Name,
+                        lga.StateId,
+                        LGAId = lga.Id,
+                        FacilityType = "CVC Facility",
+                        FacilityDocuments = (string)null,
+                        Id = (string)null
+                    })?.Parse<Dictionary<string, object>>();
 
-                if (facElps?.Count > 0)
-                    facility.ElpsId = int.Parse($"{facElps.GetValue("id")}");
+                    if (facElps?.Count > 0)
+                        facility.ElpsId = int.Parse($"{facElps.GetValue("id")}");
 
-                await _unitOfWork.Facility.Add(facility);
-                await _unitOfWork.SaveChangesAsync(user.Id);
-
+                    await _unitOfWork.Facility.Add(facility);
+                    await _unitOfWork.SaveChangesAsync(user.Id);
+                }
                 return facility;
             }
             catch (Exception ex)
@@ -196,16 +191,24 @@ namespace Bunkering.Access.Services
                     var volume = model.DepotList.Sum(c => c.Volume);
                     await _unitOfWork.SaveChangesAsync(app.UserId);
                     //var depot = await AppDepots(model.DepotList, app.Id);
+                    var depotList = new List<ApplicationDepot>();
                     if (model.DepotList.Any() && newApp != null)
                     {
                         var depotList = new List<AppDepotViewModel>();
 
                         model.DepotList.ForEach(d =>
                         {
-                            d.AppId = newApp.Id;
-                            depotList.Add(d);
+                            depotList.Add(new ApplicationDepot
+                            {
+                                AppId = app.Id,
+                                DepotId = d.DepotId,
+                                DischargeId = "",
+                                ProductId = d.ProductId,
+                                Volume = d.Volume
+                            });
                         });
-                        var s = await _unitOfWork.ApplicationDepot.AddRange(_mapper.Map<List<ApplicationDepot>>(depotList));
+                        //var depotList = _mapper.Map<List<ApplicationDepot>>(model.DepotList);
+                        await _unitOfWork.ApplicationDepot.AddRange(depotList);
                         await _unitOfWork.SaveChangesAsync(user.Id);
                     }
                     else
@@ -482,7 +485,7 @@ namespace Bunkering.Access.Services
                         Success = false
                     };
                     var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id), "ApplicationType,Facility.VesselType,Payments");
-                    var appDepots = (await _unitOfWork.ApplicationDepot.Find(x => x.AppId.Equals(id))).Select(c => c.Depot).ToList();
+                    var appDepots = (await _unitOfWork.ApplicationDepot.Find(x => x.AppId.Equals(id), "Depot")).Select(c => c.Depot).ToList();
                     if (app is null) return new ApiResponse()
                     {
                         StatusCode = HttpStatusCode.NotFound,
@@ -1214,6 +1217,7 @@ namespace Bunkering.Access.Services
                         var rrr = app.Payments.FirstOrDefault()?.RRR;
                         var surveyorId = (await _unitOfWork.ApplicationSurveyor
                             .FirstOrDefaultAsync(x => x.ApplicationId == id))?.NominatedSurveyorId;
+                        var jetty = await _unitOfWork.Jetty.FirstOrDefaultAsync(x => x.Id.Equals(app.Jetty));
                         _response = new ApiResponse
                         {
                             Message = "Application detail found",
@@ -1243,7 +1247,7 @@ namespace Bunkering.Access.Services
                                 Documents = appDocs,
                                 app.MarketerName,
                                 app.MotherVessel,
-                                app.Jetty,
+                                Jetty = jetty?.Name,
                                 app.LoadingPort,
                                 ApplicationDepots = appDepot,
                                 NominatedSurveyor = (await _unitOfWork.NominatedSurveyor.Find(c => c.Id == surveyorId)).FirstOrDefault(),
@@ -1479,17 +1483,10 @@ namespace Bunkering.Access.Services
                 return _response;
             }
 
-            var appDepots = (await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application.Facility")).ToList();
-            var apps = new List<ViewApplicationsByFieldOfficerDTO>();
-            foreach (var item in appDepots)
-            {
-                var _app = GetApplications(item.AppId);
-                
-                apps.Add(_app);
-            }
-           // var apps = appDepots.OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application).ToList();
+            var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application.Facility");
+            var apps = appDepots.OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application).ToList();
 
-            _response = new ApiResponse
+                _response = new ApiResponse
             {
                 Message = "Applications fetched successfully",
                 StatusCode = HttpStatusCode.OK,
@@ -1745,6 +1742,7 @@ namespace Bunkering.Access.Services
         private ViewApplicationsByFieldOfficerDTO GetApplications(int Id)
         {
             var result = new ViewApplicationsByFieldOfficerDTO();
+
             var apps = _unitOfWork.ApplicationDepot.Query()
                         .Include(x => x.Application)
                         .Include(x => x.Depot)
@@ -1766,7 +1764,7 @@ namespace Bunkering.Access.Services
                 ETA = apps.Application.ETA,
                 FacilityId = apps.Application.FacilityId,
                 FADApproved = apps.Application.FADApproved,
-                Jetty = jetty ?? string.Empty,
+                Jetty = jetty,
                 LoadingPort = apps.Application.LoadingPort,
                 FADStaffId = apps.Application.FADStaffId,
                 FlowId = apps.Application.FlowId,
@@ -1780,8 +1778,7 @@ namespace Bunkering.Access.Services
                 SubmittedDate = apps.Application.SubmittedDate,
                 SurveyorId = apps.Application.SurveyorId,
                 UserId = apps.Application.UserId,
-                CompanyId = companyDetails?.CompanyId ?? 0,
-                CompanyName = companyDetails?.Company?.Name ?? string.Empty,
+                CompanyId = vessel.CompanyId,
                 IMONumber = vessel.IMONumber,
                 VesselType = vessel?.VesselType.Name,
                 IsLicensed = vessel.IsLicensed,

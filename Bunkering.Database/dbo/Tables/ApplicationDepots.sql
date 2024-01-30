@@ -7,7 +7,7 @@
     [DischargeId] NVARCHAR (MAX)  NULL,
     CONSTRAINT [PK_ApplicationDepots] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_ApplicationDepots_Applications_AppId] FOREIGN KEY ([AppId]) REFERENCES [dbo].[Applications] ([Id]),
-    CONSTRAINT [FK_ApplicationDepots_Applications_ProductId] FOREIGN KEY ([ProductId]) REFERENCES [dbo].[Applications] ([Id])
+    CONSTRAINT [FK_ApplicationDepots_Applications_ProductId] FOREIGN KEY ([ProductId]) REFERENCES [dbo].[Products] ([Id])
 );
 
 

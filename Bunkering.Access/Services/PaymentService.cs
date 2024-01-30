@@ -80,7 +80,7 @@ namespace Bunkering.Access.Services
                                 if (fee != null)
                                 {
                                     int numOfDepots = 1;
-                                    var appDepots = _unitOfWork.ApplicationDepot.GetAll().Result.Where(x => x.AppId == app.Id);
+                                    var appDepots = _unitOfWork.ApplicationDepot.GetAll("Depot").Result.Where(x => x.AppId == app.Id);
                                     if (appDepots != null)
                                     {
                                         numOfDepots = appDepots.Count();

@@ -22,7 +22,7 @@ namespace Bunkering.Access.Services
 		private readonly UserManager<ApplicationUser> _user;
 		private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IUnitOfWork _unitOfWork;
-        ApiResponse _response;
+		ApiResponse _response;
 		private readonly IElps _elps;
 		private readonly string User;
 		private readonly IConfiguration _configuration;
@@ -181,7 +181,7 @@ namespace Bunkering.Access.Services
 					.FirstOrDefaultAsync(x => x.Id.Equals(id));
 
 				var operationFacility = await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.CompanyId == user.CompanyId);
-                if (user != null)
+				if (user != null)
 				{
 					_response = new ApiResponse
 					{

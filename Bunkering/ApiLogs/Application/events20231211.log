@@ -1,0 +1,3 @@
+2023-12-11T00:22:41.0581259+01:00 [ERR] () Object reference not set to an instance of an object.
+
+   at Bunkering.Access.Services.AppService.CreateFacility(ApplictionViewModel model, ApplicationUser user) in C:\Users\suppo\Documents\Visual Studio 2022\Projects\cvc\CVCBackEnd\Bunkering.Access\Services\AppService.cs:line 82
