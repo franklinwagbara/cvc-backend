@@ -9,7 +9,7 @@ namespace Bunkering.Core.ViewModels
 {
     public class OpearatingFacilityViewModel
     {
-        public int Id { get; set; }
+  
         public int CompanyId { get; set; }
         public NameType Name { get; set; }
     }

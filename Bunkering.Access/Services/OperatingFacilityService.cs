@@ -1,5 +1,6 @@
 ﻿using Bunkering.Access.IContracts;
 using Bunkering.Core.Data;
+using Bunkering.Core.Exceptions;
 using Bunkering.Core.Utils;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
@@ -30,21 +31,10 @@ namespace Bunkering.Access.Services
 
             try
             {
-                var opFacilityCheck = await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.Id == model.Id);
+                var opFacilityCheck = await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.CompanyId == model.CompanyId);
+                
                 if (opFacilityCheck != null)
-                {
-                    _response = new ApiResponse
-                    {
-                        Data = model,
-                        Message = "Operating Plant Already Exists",
-                        StatusCode = HttpStatusCode.Conflict,
-                        Success = false,
-                    };
-
-                    return _response;
-
-                }
-
+                    throw new ConflictException("Operating facility already exists!");
 
                 var opFacility = new OperatingFacility
                 {
@@ -55,9 +45,9 @@ namespace Bunkering.Access.Services
 
                 await _unitOfWork.OperatingFacility.Add(opFacility);
                 await _unitOfWork.SaveChangesAsync("");
-                model.Id = opFacility.Id;
+     
 
-                _response = new ApiResponse
+                return new ApiResponse
                 {
                     Data = model,
                     Message = "Operating Plant Created",
@@ -67,41 +57,45 @@ namespace Bunkering.Access.Services
             }
             catch (Exception ex)
             {
-                _response = new ApiResponse { Message = ex.Message };
+                if(ex is ConflictException)
+                    return new ApiResponse { Message = ex.Message, StatusCode = HttpStatusCode.Conflict };
+                else return new ApiResponse { Message = ex.Message };
             }
-            return _response;
-
         }
         public async Task<ApiResponse> EditOperatingFacility(OpearatingFacilityViewModel model)
         {
-
-            var editOpFacility = await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.Id == model.Id);
-            if (editOpFacility != null)
+            try
             {
-                editOpFacility.CompanyId = model.CompanyId;
-                editOpFacility.Name = Enum.GetName(typeof(NameType), model.Name);
+                var editOpFacility = await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.CompanyId == model.CompanyId);
+                if (editOpFacility == null)
+                    throw new NotFoundException("Operating facility not found");
+                
+                
+                    editOpFacility.CompanyId = model.CompanyId;
+                    editOpFacility.Name = Enum.GetName(typeof(NameType), model.Name);
 
-                await _unitOfWork.OperatingFacility.Update(editOpFacility);
-                _unitOfWork.Save();
+                    await _unitOfWork.OperatingFacility.Update(editOpFacility);
+                    _unitOfWork.Save();
 
-                _response = new ApiResponse
-                {
-                    Message = "Updated Successfully",
-                    StatusCode = HttpStatusCode.OK,
-                    Success = true,
-                };
+                    return new ApiResponse
+                    {
+                        Message = "Updated Successfully",
+                        StatusCode = HttpStatusCode.OK,
+                        Success = true,
+                    };
 
+                
             }
-            else
+            catch (Exception ex)
             {
-                _response = new ApiResponse
-                {
-                    Message = "Operating Facility Not Found",
-                    StatusCode = HttpStatusCode.NotFound,
-                    Success = false,
-                };
+                if (ex is NotFoundException)
+                    return new ApiResponse { Message = ex.Message, StatusCode = HttpStatusCode.NotFound };
+                else return new ApiResponse { Message = ex.Message };
             }
-            return _response;
+
+
+
+
         }
         public async Task<ApiResponse> AllOperatingFacilities()
         {
