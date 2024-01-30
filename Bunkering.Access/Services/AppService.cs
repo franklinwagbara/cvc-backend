@@ -194,8 +194,6 @@ namespace Bunkering.Access.Services
                     var depotList = new List<ApplicationDepot>();
                     if (model.DepotList.Any() && newApp != null)
                     {
-                        var depotList = new List<AppDepotViewModel>();
-
                         model.DepotList.ForEach(d =>
                         {
                             depotList.Add(new ApplicationDepot
