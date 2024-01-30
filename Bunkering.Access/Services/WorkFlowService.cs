@@ -14,6 +14,7 @@ using Bunkering.Core.ViewModels;
 using Bunkering.Access.DAL;
 using AutoMapper.Internal;
 using System.Net;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Bunkering.Access.Services
 {
@@ -80,6 +81,7 @@ namespace Bunkering.Access.Services
                         .ThenInclude(r => r.Role)
                         .Include(lo => lo.Location)
                         .FirstOrDefault(x => x.Id.Equals(currUserId));
+
                     var currentuserRoles = currentUser.UserRoles
                         .Where(x => !x.Role.Name.Equals("Staff")).FirstOrDefault().Role.Id;
 
@@ -121,7 +123,23 @@ namespace Bunkering.Access.Services
                                 //await _unitOfWork.Application.Update(app);
                                 var nextSUrveyor = await _unitOfWork.NominatedSurveyor.GetNextAsync();
                                 if (nextSUrveyor != null)
+                                {
                                     app.SurveyorId = nextSUrveyor.Id;
+                                    var appDepot = await _unitOfWork.ApplicationDepot.Find(x => x.AppId == app.Id);
+                                    var volume = appDepot.Sum(x => x.Volume);
+
+                                    nextSUrveyor.NominatedVolume += volume;
+                                    var appSurveyor = new ApplicationSurveyor()
+                                    {
+                                        ApplicationId = app.Id,
+                                        NominatedSurveyorId = nextSUrveyor.Id,
+                                        Volume = volume,
+                                        CreatedAt = DateTime.UtcNow,
+                                    };
+                                    await _unitOfWork.ApplicationSurveyor.Add(appSurveyor);
+                                    
+                                }
+                                   
                                 await _unitOfWork.SaveChangesAsync(currentUser.Id);
 
                                 var permit = await GeneratePermit(appid, currentUser.Id);
@@ -235,7 +253,7 @@ namespace Bunkering.Access.Services
                     && currentuser.UserRoles.FirstOrDefault().Role.Name.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim())
             && currentuser.LocationId == x.FromLocationId && x.VesselTypeId == VesselTypeId);
 
-        public async Task<bool> SaveHistory(string action, int appid, WorkFlow flow, ApplicationUser user, ApplicationUser nextUser, string comment)
+        public async Task<bool> SaveHistory(string action, int appid, WorkFlow flow, ApplicationUser user, ApplicationUser nextUser, string comment = null)
         {
             await _unitOfWork.ApplicationHistory.Add(new ApplicationHistory
             {
@@ -609,7 +627,9 @@ namespace Bunkering.Access.Services
             var appDepots = await _context.ApplicationDepots.Where(a => a.AppId == id).Include(x => x.Product).ToListAsync();
             foreach (var appDepot in appDepots)
             {
-                appDepot.DischargeId = GenerateDischargeID(appDepot.Product.Name);
+                //appDepot.DischargeId = GenerateDischargeID(appDepot.Product.Name);
+                var num = appDepot.Id.ToString("D6");
+                appDepot.DischargeId = $"{appDepot.Product.Name}/{num}";
             }
 
             _context.ApplicationDepots.UpdateRange(appDepots);

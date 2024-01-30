@@ -329,7 +329,7 @@ namespace Bunkering.Controllers.API
         [ProducesResponseType(typeof(ApiResponse), 500)]
         [Route("process")]
         [HttpPost]
-        public async Task<IActionResult> Process(int id, string act, string comment) => Response(await _appService.Process(id, act, comment));
+        public async Task<IActionResult> Process(int id, string act, string comment = null) => Response(await _appService.Process(id, act, comment));
 
         [ProducesResponseType(typeof(ApiResponse), 200)]
         [ProducesResponseType(typeof(ApiResponse), 404)]

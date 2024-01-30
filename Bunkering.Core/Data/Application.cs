@@ -29,7 +29,7 @@ namespace Bunkering.Core.Data
         public int? SurveyorId { get; set; }
         public string VesselName { get; set; }
         public string? MotherVessel { get; set; }
-        public string? Jetty { get; set; }
+        public int Jetty { get; set; }
        // public string IMONumber { get; set; }
         public string LoadingPort { get; set; }
         public string MarketerName { get; set; }
@@ -42,7 +42,7 @@ namespace Bunkering.Core.Data
         public ApplicationType ApplicationType { get; set; }
         [ForeignKey("FlowId")]
         public WorkFlow WorkFlow { get; set; }
-        public virtual ICollection<ApplicationDepot> ApplicationDepots { get; set; }
+        //public virtual ICollection<ApplicationDepot> ApplicationDepots { get; set; }
         public virtual ICollection<Appointment> Appointment { get; set; }
         public virtual ICollection<Payment> Payments { get; set; }
         //public virtual ICollection<SubmittedDocument> SubmittedDocuments { get; set; }

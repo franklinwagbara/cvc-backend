@@ -4,6 +4,7 @@ using Bunkering.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bunkering.Core.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20240121214511_AddreatedAtToAppSurveyor")]
+    partial class AddreatedAtToAppSurveyor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -101,8 +104,8 @@ namespace Bunkering.Core.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int>("Jetty")
-                        .HasColumnType("int");
+                    b.Property<string>("Jetty")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LoadingPort")
                         .IsRequired()
@@ -1771,6 +1774,7 @@ namespace Bunkering.Core.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("DischargeId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("FinalBoilingPoint")
@@ -2340,7 +2344,7 @@ namespace Bunkering.Core.Migrations
             modelBuilder.Entity("Bunkering.Core.Data.ApplicationDepot", b =>
                 {
                     b.HasOne("Bunkering.Core.Data.Application", "Application")
-                        .WithMany()
+                        .WithMany("ApplicationDepots")
                         .HasForeignKey("AppId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2705,6 +2709,8 @@ namespace Bunkering.Core.Migrations
 
             modelBuilder.Entity("Bunkering.Core.Data.Application", b =>
                 {
+                    b.Navigation("ApplicationDepots");
+
                     b.Navigation("Appointment");
 
                     b.Navigation("Histories");

@@ -1377,15 +1377,16 @@ namespace Bunkering.Access.Services
                     QuauntityReflectedOnBill = coq.QuauntityReflectedOnBill
 
                 };
-                if (coq.AppId != null || coq.Reference != null)
+                if (coq.AppId != null )
                 {
-                    var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(coq.AppId) || x.Reference == coq.Reference, "Facility");
+                    var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(coq.AppId), "Facility");
+                    var jetty = _unitOfWork.Jetty.Query().FirstOrDefault(x => x.Id == app.Jetty)?.Name;
                     if (app != null)
                     {
                         coqData.Reference = app.Reference;
                         coqData.MarketerName = app?.MarketerName ?? string.Empty;
                         coqData.MotherVessel = app.MotherVessel;
-                        coqData.Jetty = app.Jetty;
+                        coqData.Jetty = jetty;
                         coqData.LoadingPort = app.LoadingPort;
                         coqData.Vessel.Name = app.Facility.Name;
                         coqData.Vessel.VesselType = app.Facility?.VesselType?.Name ?? string.Empty;
@@ -1695,7 +1696,7 @@ namespace Bunkering.Access.Services
                 string productType = string.Empty;
                 string productName = string.Empty;
 
-
+                string jetty = null;
                 if (cqs.AppId is null)
                 {
                     var prdct = _context.Products.FirstOrDefault(x => x.Id == cqs.ProductId);
@@ -1707,18 +1708,21 @@ namespace Bunkering.Access.Services
                     var prd = _context.ApplicationDepots.Include(p => p.Product).FirstOrDefault(x => x.AppId == cqs.AppId);
                     productName = prd.Product?.Name ?? string.Empty;
                     productType = prd.Product?.ProductType ?? string.Empty;
+
+                    jetty = _unitOfWork.Jetty.Query().FirstOrDefault(x => x.Id == cqs.Application.Jetty)?.Name; //get jetty here
                 }
                 var fieldofficer = _userManager.FindByIdAsync(cqs.CreatedBy).Result;
                 //var coqHistory = _unitOfWork.COQHistory.Find(x => x.TargetRole)
 
                 if (productType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.Gas)))
                 {
+                    
                     var dat = new COQGASCertificateDTO
                     {
                         CompanyName = cqs.Plant.Company,
                         DateOfVesselArrival = cqs.DateOfVesselArrival,
                         DateOfVessselUllage = cqs.DateOfVesselUllage,
-                        Jetty = cqs.Application?.Jetty ?? string.Empty,
+                        Jetty = jetty,
                         MotherVessel = cqs.Application?.MotherVessel ?? string.Empty,
                         ReceivingTerminal = cqs.Plant.Name,
                         VesselName = cqs.Application?.VesselName ?? string.Empty,
@@ -1746,7 +1750,7 @@ namespace Bunkering.Access.Services
                         CompanyName = cqs.Plant.Company,
                         DateOfVesselArrival = cqs.DateOfVesselArrival,
                         DateOfVessselUllage = cqs.DateOfVesselUllage,
-                        Jetty = cqs.Application?.Jetty ?? string.Empty,
+                        Jetty = jetty,
                         MotherVessel = cqs.Application?.MotherVessel ?? string.Empty,
                         ReceivingTerminal = cqs.Plant.Name,
                         VesselName = cqs.Application?.VesselName ?? string.Empty,
@@ -1926,12 +1930,17 @@ namespace Bunkering.Access.Services
                 var coQTanks = _context.COQTanks.Include(t => t.TankMeasurement)
                     .Where(c => c.CoQId == coqId).ToList();
 
+                string jetty = null;
+                if(cqs.Application?.Jetty > 0)
+                {
+                    jetty = _unitOfWork.Jetty.Query().FirstOrDefault(x => x.Id == cqs.Application.Jetty)?.Name;
+                }
                 var dat = new COQGasCertficateDTO
                 {
                     CompanyName = cqs.Plant.Company,
                     DateOfVesselArrival = cqs.DateOfVesselArrival,
                     ShoreDate = cqs.DateOfVesselUllage,
-                    Jetty = cqs.Application?.Jetty ?? string.Empty,
+                    Jetty = jetty,
                     Consignee = cqs.NameConsignee,
                     Product = tnks.FirstOrDefault().Product,
                     ReceivingTerminal = cqs.Plant.Name,

@@ -68,7 +68,7 @@ namespace Bunkering.Access.Services
             try
             {
                 var userExists = await _userManager.Users.AnyAsync(c => c.Id == newJettyOfficer.UserID.ToString());
-                var jettyExists = await _unitOfWork.Plant.FirstOrDefaultAsync(c => c.Id == newJettyOfficer.JettyID) is not null;
+                var jettyExists = await _unitOfWork.Jetty.FirstOrDefaultAsync(c => c.Id == newJettyOfficer.JettyID) is not null;
 
 
                 if (!jettyExists)

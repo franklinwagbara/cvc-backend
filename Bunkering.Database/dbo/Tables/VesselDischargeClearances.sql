@@ -2,7 +2,7 @@
     [Id]                INT            IDENTITY (1, 1) NOT NULL,
     [AppId]             INT            NOT NULL,
     [DepotId]           INT            NOT NULL,
-    [DischargeId]       NVARCHAR (MAX) NOT NULL,
+    [DischargeId]       NVARCHAR (MAX) NULL,
     [VesselName]        NVARCHAR (MAX) NOT NULL,
     [VesselPort]        NVARCHAR (MAX) NOT NULL,
     [Product]           NVARCHAR (MAX) NOT NULL,
@@ -18,6 +18,8 @@
     [IsAllowed]         BIT            NOT NULL,
     CONSTRAINT [PK_VesselDischargeClearances] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
 
 

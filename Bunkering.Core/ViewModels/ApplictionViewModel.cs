@@ -13,7 +13,7 @@ namespace Bunkering.Core.ViewModels
 
         public string MarketerName { get; set; }
         public int DeportStateId { get; set; }
-        public string? Jetty { get; set; }
+        public int Jetty { get; set; }
         public string? MotherVessel { get; set; }
         
 
