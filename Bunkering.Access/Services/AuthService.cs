@@ -12,6 +12,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Bunkering.Access.DAL;
 
 namespace Bunkering.Access.Services
 {
@@ -20,7 +21,8 @@ namespace Bunkering.Access.Services
 		private readonly IHttpContextAccessor _httpContextAccessor;
 		private readonly UserManager<ApplicationUser> _user;
 		private readonly SignInManager<ApplicationUser> _signInManager;
-		ApiResponse _response;
+        private readonly IUnitOfWork _unitOfWork;
+        ApiResponse _response;
 		private readonly IElps _elps;
 		private readonly string User;
 		private readonly IConfiguration _configuration;
@@ -32,7 +34,8 @@ namespace Bunkering.Access.Services
 			SignInManager<ApplicationUser> signInManager,
 			IElps elps,
 			IConfiguration configuration,
-			IOptions<AppSetting> appSetting)
+			IOptions<AppSetting> appSetting,
+			IUnitOfWork unitOfWork)
 		{
 			_httpContextAccessor = httpContextAccessor;
 			_user = user;
@@ -41,6 +44,7 @@ namespace Bunkering.Access.Services
 			User = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
 			_configuration = configuration;
 			_appSetting = appSetting.Value;
+			_unitOfWork = unitOfWork;
 		}
 
 		public async Task<ApiResponse> UserAuth(LoginViewModel model)
@@ -175,7 +179,9 @@ namespace Bunkering.Access.Services
 					.Include(c => c.Location)
 					.Include(ur => ur.UserRoles).ThenInclude(r => r.Role)
 					.FirstOrDefaultAsync(x => x.Id.Equals(id));
-				if (user != null)
+
+				var operationFacility = await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.CompanyId == user.CompanyId);
+                if (user != null)
 				{
 					_response = new ApiResponse
 					{
@@ -197,7 +203,8 @@ namespace Bunkering.Access.Services
 							Location = user.Location?.Name,
 							Office = user.Office?.Name,
 							Directorate = user.Directorate,
-							Token = GenerateToken(user, user.UserRoles.FirstOrDefault(x => x.Role?.Name?.Equals("Staff") is false)?.Role?.Name)
+							operationFacility = operationFacility.Name,
+							Token = GenerateToken(user, user.UserRoles.FirstOrDefault(x => x.Role?.Name?.Equals("Staff") is false)?.Role?.Name, operationFacility)
 						},
 					};
 				}
@@ -210,7 +217,7 @@ namespace Bunkering.Access.Services
 			return _response;
 		}
 
-		private string GenerateToken(ApplicationUser user, string? role)
+		private string GenerateToken(ApplicationUser user, string? role, OperatingFacility operatingFacility)
 		{
 			var tokenHandler = new JwtSecurityTokenHandler();
 			var tokenKey = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]);
@@ -226,6 +233,7 @@ namespace Bunkering.Access.Services
 			if (user.Company != null)
 			{
 				claims.Add(new Claim("company", user.Company.Name));
+				claims.Add(new Claim("operation facility", operatingFacility.Name ));
 			}
 			if (role != null)
 			{

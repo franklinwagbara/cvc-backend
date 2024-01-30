@@ -1,7 +1,11 @@
-﻿using Bunkering.Access.DAL;
+﻿using AutoMapper;
+using Bunkering.Access.DAL;
+using Bunkering.Access.IContracts;
 using Bunkering.Access.Services;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bunkering.Controllers.API
@@ -12,10 +16,13 @@ namespace Bunkering.Controllers.API
     public class OperatingFacilityController : ResponseController
     {
         private readonly OperatingFacilityService _operatingFacility;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IHttpContextAccessor _contextAccessor;
+        ApiResponse _response;
 
-        public OperatingFacilityController(OperatingFacilityService operatingFacility)
+        public OperatingFacilityController(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
         {
-            _operatingFacility = operatingFacility;
+            _operatingFacility = new OperatingFacilityService (unitOfWork, contextAccessor);
         }
 
 

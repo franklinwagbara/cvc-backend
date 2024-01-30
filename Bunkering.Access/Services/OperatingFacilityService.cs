@@ -18,11 +18,11 @@ namespace Bunkering.Access.Services
         private readonly IHttpContextAccessor _contextAccessor;
         ApiResponse _response;
 
-        public OperatingFacilityService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, ApiResponse response)
+        public OperatingFacilityService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
-            _response = new ApiResponse();
+
         }
 
         public async Task<ApiResponse> CreateOperatingFacility(OpearatingFacilityViewModel model)
@@ -49,7 +49,7 @@ namespace Bunkering.Access.Services
                 var opFacility = new OperatingFacility
                 {
                     CompanyId = model.CompanyId,
-                    Name = Enum.GetName(typeof(NameType), 0),
+                    Name = Enum.GetName(typeof(NameType), model.Name),
                 };
 
 
@@ -78,7 +78,8 @@ namespace Bunkering.Access.Services
             var editOpFacility = await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.Id == model.Id);
             if (editOpFacility != null)
             {
-                editOpFacility.Name = Enum.GetName(typeof(NameType), 0);
+                editOpFacility.CompanyId = model.CompanyId;
+                editOpFacility.Name = Enum.GetName(typeof(NameType), model.Name);
 
                 await _unitOfWork.OperatingFacility.Update(editOpFacility);
                 _unitOfWork.Save();
