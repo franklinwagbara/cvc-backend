@@ -17,6 +17,10 @@
 
 
 
+
+
+
+
 GO
 CREATE NONCLUSTERED INDEX [IX_ApplicationDepots_ProductId]
     ON [dbo].[ApplicationDepots]([ProductId] ASC);

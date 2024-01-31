@@ -8,8 +8,12 @@ namespace Bunkering.Access.DAL
         private ApplicationContext _context;
         public IApplication Application { get; private set; }
         public IAppFee AppFee { get; private set; }
+        public ITransferRecord TransferRecord { get; set; }
+        public ITransferDetail TransferDetail { get; set; }
         public IPlantOfficer PlantOfficer { get; private set; }
         public IJettyOfficer JettyOfficer { get; private set; }
+        public IDippingMethod DippingMethod { get; private set; }
+        public IMeterType MeterType { get; private set; }
         public IApplicationType ApplicationType { get; set; }
         public IApplicationHistory ApplicationHistory { get; private set; }
         public IAppointment Appointment { get; private set; }
@@ -104,6 +108,10 @@ namespace Bunkering.Access.DAL
             Plant = Plant ?? new PlantRepository(_context);
             PlantTank = PlantTank ?? new PlantTankRepository(_context);
             JettyOfficer = JettyOfficer ?? new JettyFieldOfficerRepostitory(_context);
+            DippingMethod = DippingMethod ?? new DippingMethodRepository(_context);
+            MeterType = MeterType ?? new MeterTypeRepository(_context);
+            TransferDetail = TransferDetail ?? new TransferDetailRepository(_context);
+            TransferRecord = TransferRecord ?? new TransferRecordRepository(_context);
         }
 
         public int Save() => _context.SaveChanges();

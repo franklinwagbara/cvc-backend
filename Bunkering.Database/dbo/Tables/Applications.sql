@@ -65,6 +65,10 @@
 
 
 
+
+
+
+
 GO
 CREATE NONCLUSTERED INDEX [IX_Applications_FacilityId]
     ON [dbo].[Applications]([FacilityId] ASC);
