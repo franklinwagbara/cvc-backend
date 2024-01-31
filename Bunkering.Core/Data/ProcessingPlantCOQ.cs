@@ -13,7 +13,7 @@ namespace Bunkering.Core.Data
         public int ProcessingPlantCOQId { get; set; }
         public int PlantId { get; set; } //plant here refers to processing Facility Id
         public int ProductId { get; set; }
-        public int MeasurementSystem {  get; set; }
+        public string MeasurementSystem {  get; set; }
         public int? MeterTypeId { get; set; }
         public int? DipMethodId { get; set; }
         public DateTime? StartTime { get; set; }
@@ -23,9 +23,29 @@ namespace Bunkering.Core.Data
         public string? Terminal { get; set; }
         public string? Destination { get; set;}
         public string? ShipmentNo { get; set; }
-        public decimal? ShoreFigure { get; set; }
-        public decimal? ShipFigure { get; set;}
+        public double? ShoreFigure { get; set; }
+        public double? ShipFigure { get; set;}
 
+        public double? PrevMCubeAt15Degree { get;set; }
+        public double? PrevUsBarrelsAt15Degree { get; set; }
+        public double? PrevMTVac { get; set; }
+        public double? PrevMTAir { get; set; }
+        public double? PrevWTAir { get; set; }
+        public double? PrevLongTonsAir { get; set; }
+
+        public double? LeftMCubeAt15Degree { get; set; }
+        public double? LeftUsBarrelsAt15Degree { get; set; }
+        public double? LeftMTVac { get; set; }
+        public double? LeftMTAir { get; set; }
+        public double? LeftLongTonsAir { get; set; }
+
+        public double? TotalMCubeAt15Degree { get; set; }
+        public double? TotalUsBarrelsAt15Degree { get; set; }
+        public double? TotalMTVac { get; set; }
+        public double? TotalMTAir { get; set; }
+        public double? TotalLongTonsAir { get; set; }
+
+       
 
 
     }

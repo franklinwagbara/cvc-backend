@@ -53,6 +53,9 @@ namespace Bunkering.Core.Data
         public DbSet<vDebitNote> VDebitNotes { get; set; }
         public DbSet<CoQ> CoQs { get; set; }
         public DbSet<PlantFieldOfficer> PlantFieldOfficers { get; set; }
+        public DbSet<ProcessingPlantCOQ> ProcessingPlantCOQS { get; set; }
+        public DbSet<ProcessingPlantCOQTank> ProcessingPlantCOQTanks { get; set; }
+        public DbSet<ProcessingPlantCOQTankReading> ProcessingPlantCOQTankReadings { get; set; }
         public DbSet<JettyFieldOfficer> JettyFieldOfficers { get; set; }
         public DbSet<COQHistory> COQHistories { get; set; }
         public DbSet<COQCertificate> COQCertificates { get; set; }

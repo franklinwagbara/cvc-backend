@@ -133,6 +133,10 @@
     <Build Include="dbo\Views\vPayment_1.sql" />
     <Build Include="dbo\Views\vDeitNotes.sql" />
     <Build Include="dbo\Tables\TransferDetail.sql" />
+    <Build Include="dbo\Tables\SourceRecipientVessel.sql" />
+    <Build Include="dbo\Tables\ProcessingPlantCOQTanks.sql" />
+    <Build Include="dbo\Tables\ProcessingPlantCOQTankReadings.sql" />
+    <Build Include="dbo\Tables\ProcessingPlantCOQS.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Snapshots\Bunkering.Database_20230810_10-01-52.dacpac" />
