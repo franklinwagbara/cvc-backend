@@ -8,7 +8,10 @@
     [TargetRole]      NVARCHAR (MAX) NOT NULL,
     [Date]            DATETIME2 (7)  NOT NULL,
     [Comment]         NVARCHAR (MAX) NULL,
-    CONSTRAINT [PK_COQHistories] PRIMARY KEY CLUSTERED ([Id] ASC)
+    CONSTRAINT [PK_COQHistories] PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [FK_COQHistories_CoQs_COQId] FOREIGN KEY ([COQId]) REFERENCES [dbo].[CoQs] ([Id]) ON DELETE CASCADE
 );
+
+
 
 

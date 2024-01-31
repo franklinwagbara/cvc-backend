@@ -31,30 +31,30 @@ namespace Bunkering.Access.Services
             User = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
         }
 
-        public async Task<ApiResponse> AddRecord(TransferRecordDTO transferRecord)
+        public async Task<ApiResponse> AddRecord(DestinationVesselDTO transferRecord)
         {
             try
             {
-                if (transferRecord == null)
+                if (transferRecord is not null)
                 {
                     var tr = new TransferRecord();
                     tr.IMONumber = transferRecord.IMONumber;
                     tr.LoadingPort = transferRecord.LoadingPort;
                     tr.TransferDate = transferRecord.TransferDate;
                     tr.MotherVessel = transferRecord.MotherVessel;
-                    tr.VessellID = transferRecord.VessellID;
+                    tr.VesselName = transferRecord.VesselName;
+                    tr.TotalVolume = transferRecord.TotalVolume;
+                    tr.VesselTypeId = transferRecord.VesselTypeId;
                     tr.TransferDetails = new List<TransferDetail>();
-                    foreach (var item in transferRecord.Details)
+                    foreach (var item in transferRecord.DestinationVessels)
                     {
                         tr.TransferDetails.Add(new TransferDetail()
                         {
                             CreatedDate = DateTime.UtcNow,
                             IMONumber = item.IMONumber,
-                            LoadingPort = item.LoadingPort,
                             ProductId = item.ProductId,
-                            TransferDetailId = item.TransferDetailId,
-                            VessellID = item.VessellID,
-                            VolumeToTransfer = item.VolumeToTransfer
+                            VesselName = item.VesselName,
+                            OfftakeVolume = item.OfftakeVolume
                            
                         });
 

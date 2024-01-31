@@ -6,28 +6,27 @@ using System.Threading.Tasks;
 
 namespace Bunkering.Core.ViewModels
 {
-    public class TransferRecordDTO
+    public class DestinationVesselDTO
     {
-        public int TransferId { get; set; }
-        public int IMONumber { get; set; }
-        public int VessellID { get; set; }
-        public string VessellName { get; set; }
+        public int Id { get; set; }
+        public string IMONumber { get; set; }
+        public string? VesselName { get; set; }
         public string? MotherVessel { get; set; }
         public string? LoadingPort { get; set; }
         public DateTime TransferDate { get; set; }
-        public string Product {  get; set; }
-        public double Quantity { get; set; }
+        public double TotalVolume { get; set; }
+        public int VesselTypeId { get; set; }
 
-        public List<TransferDetailDTO> Details { get; set; }
+
+        public List<DestinationVessel> DestinationVessels { get; set; }
     }
 
-    public class TransferDetailDTO
+    public class DestinationVessel
     {
-        public int TransferDetailId { get; set; }
-        public int IMONumber { get; set; }
-        public int VessellID { get; set; }
-        public string? LoadingPort { get; set; }
+        public int Id { get; set; }
+        public string IMONumber { get; set; }
+        public string VesselName { get; set; }
         public int ProductId { get; set; }
-        public double VolumeToTransfer { get; set; }
+        public double OfftakeVolume { get; set; }
     }
 }

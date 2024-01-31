@@ -126,6 +126,13 @@
     <Build Include="dbo\Tables\PlantFieldOfficers.sql" />
     <Build Include="dbo\Tables\MeterType.sql" />
     <Build Include="dbo\Tables\DippingMethod.sql" />
+    <Build Include="dbo\Tables\VesselDischargeClearances.sql" />
+    <Build Include="dbo\Tables\TransferRecord.sql" />
+    <Build Include="dbo\Tables\JettyFieldOfficers.sql" />
+    <Build Include="dbo\Tables\EmailConfigurations.sql" />
+    <Build Include="dbo\Views\vPayment_1.sql" />
+    <Build Include="dbo\Views\vDeitNotes.sql" />
+    <Build Include="dbo\Tables\TransferDetail.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Snapshots\Bunkering.Database_20230810_10-01-52.dacpac" />

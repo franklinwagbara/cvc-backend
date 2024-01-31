@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bunkering.Controllers.API
-{ 
+{
     //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
@@ -22,10 +22,10 @@ namespace Bunkering.Controllers.API
         [HttpGet]
         public async Task<IActionResult> GetAll() => Response(await _shipToShipService.GetAllTransferRecords());
 
-        
+
         [Route("add-Records")]
-        [HttpGet]
-        public async Task<IActionResult> AddRecord(TransferRecordDTO tr) => Response(await _shipToShipService.AddRecord(tr));
+        [HttpPost]
+        public async Task<IActionResult> AddRecord(DestinationVesselDTO tr) => Response(await _shipToShipService.AddRecord(tr));
 
     }
 }

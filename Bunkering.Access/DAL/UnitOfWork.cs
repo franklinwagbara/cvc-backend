@@ -106,6 +106,10 @@ namespace Bunkering.Access.DAL
             Plant = Plant ?? new PlantRepository(_context);
             PlantTank = PlantTank ?? new PlantTankRepository(_context);
             JettyOfficer = JettyOfficer ?? new JettyFieldOfficerRepostitory(_context);
+            DippingMethod = DippingMethod ?? new DippingMethodRepository(_context);
+            MeterType = MeterType ?? new MeterTypeRepository(_context);
+            TransferDetail = TransferDetail ?? new TransferDetailRepository(_context);
+            TransferRecord = TransferRecord ?? new TransferRecordRepository(_context);
         }
 
         public int Save() => _context.SaveChanges();
