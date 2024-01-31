@@ -8,6 +8,8 @@ namespace Bunkering.Access.DAL
         private ApplicationContext _context;
         public IApplication Application { get; private set; }
         public IAppFee AppFee { get; private set; }
+        public ITransferRecord TransferRecord { get; set; }
+        public ITransferDetail TransferDetail { get; set; }
         public IPlantOfficer PlantOfficer { get; private set; }
         public IJettyOfficer JettyOfficer { get; private set; }
         public IDippingMethod DippingMethod { get; private set; }

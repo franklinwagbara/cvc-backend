@@ -64,6 +64,8 @@ namespace Bunkering.Core.Data
         public DbSet<VesselDischargeClearance> VesselDischargeClearances {  get; set; }
         public DbSet<MeterType> MeterType {  get; set; }
         public DbSet<DippingMethod> DippingMethod {  get; set; }
+        public DbSet<TransferDetail> TransferDetail {  get; set; }
+        public DbSet<TransferRecord> TransferRecord {  get; set; }
 
         //public virtual DbContextOptionsBuilder EnableDetailedErrors(bool detailedErrorsEnabled = true) => detailedErrorsEnabled;
         //public virtual DbContextOptionsBuilder EnableDetailedErrors(bool detailedErrorEnabled) => DbContextOptionsBuilder;
