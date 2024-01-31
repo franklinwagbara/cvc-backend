@@ -28,6 +28,7 @@ namespace Bunkering.Core.Data
         public string? Directorate { get; set; }
         public ICollection<ApplicationUserRole> UserRoles { get; set; }
 
+
 		[ForeignKey(nameof(LocationId))]
 		public Location? Location { get; set; }
 		[ForeignKey(nameof(OfficeId))]

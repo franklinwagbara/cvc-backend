@@ -67,6 +67,7 @@ namespace Bunkering.Core.Data
         public DbSet<TransferDetail> TransferDetail {  get; set; }
         public DbSet<TransferRecord> TransferRecord {  get; set; }
         public DbSet<SourceRecipientVessel> SourceRecipientVessel {  get; set; }
+        public DbSet<OperatingFacility> OperatingFacility { get; set; }
 
         //public virtual DbContextOptionsBuilder EnableDetailedErrors(bool detailedErrorsEnabled = true) => detailedErrorsEnabled;
         //public virtual DbContextOptionsBuilder EnableDetailedErrors(bool detailedErrorEnabled) => DbContextOptionsBuilder;

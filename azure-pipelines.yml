@@ -1,7 +1,7 @@
 trigger:
   branches:
     include:
-    - main
+    - master
 variables:
 - name: solution
   value: '**/*.sln'
@@ -14,18 +14,25 @@ stages:
   jobs:
   - job: Job
     pool:
-      vmImage: 'windows-latest'
-    steps:
-    - task: NuGetToolInstaller@1
+      name: Azure Pipelines
+      vmImage: 'windows-2022'
+    steps:   
+    - task: UseDotNet@2
+      displayName: 'Use .NET Core 7'
+      inputs:
+        version: 7.0.x
+    - task: DotNetCoreCLI@2
+      displayName: Restore
+      inputs:
+        command: restore
+        projects: '**/*.csproj'
+    - task: DotNetCoreCLI@2
+      displayName: Build
+      inputs:
+        projects: '**/*.csproj'
     - task: NuGetCommand@2
       inputs:
         restoreSolution: '$(solution)'
-    - task: VSBuild@1
-      inputs:
-        solution: '$(solution)'
-        msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
-        platform: '$(buildPlatform)'
-        configuration: '$(buildConfiguration)'
     - task: MSBuild@1
       inputs:
         solution: 'Bunkering.Database/Bunkering.Database.sqlproj'
@@ -34,5 +41,13 @@ stages:
         SourceFolder: '$(agent.builddirectory)'
         Contents: '**'
         TargetFolder: '$(build.artifactstagingdirectory)'
+    - task: DotNetCoreCLI@2
+      displayName: Publish
+      inputs:
+        command: publish
+        publishWebProjects: false
+        projects: '**/*.csproj'
+        arguments: '--configuration release --output $(build.artifactstagingdirectory) /property:PublishWithAspNetCoreTargetManifest=false'
+        zipAfterPublish: true
     - task: PublishPipelineArtifact@1
 

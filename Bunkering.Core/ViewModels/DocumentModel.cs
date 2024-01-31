@@ -16,8 +16,8 @@ namespace Bunkering.Core.ViewModels
         public string source { get; set; }
         public string document_type_id { get; set; }
         public string documentTypeName { get; set; }
-        public string date_modified { get; set; }
-        public string date_added { get; set; }
+        public DateTime date_modified { get; set; }
+        public DateTime date_added { get; set; }
         public string status { get; set; }
         public string archived { get; set; }
         public string document_Name { get; set; }

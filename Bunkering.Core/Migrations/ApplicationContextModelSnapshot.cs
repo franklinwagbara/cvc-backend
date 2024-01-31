@@ -758,6 +758,9 @@ namespace Bunkering.Core.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("OperatingFacilityId")
+                        .HasColumnType("int");
+
                     b.Property<string>("RcNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -1285,6 +1288,26 @@ namespace Bunkering.Core.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Offices");
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.OperatingFacility", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OperatingFacility");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.Payment", b =>
