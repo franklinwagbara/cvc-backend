@@ -15,6 +15,8 @@ namespace Bunkering.Core.Data
     public class CompanyModel
     {
         public string user_Id { get; set; }
+        public string email { get; set; }
+        public int OperatingFacilityId { get; set; }
         public string name { get; set; }
         public string business_Type { get; set; }
         public string registered_Address_Id { get; set; }
@@ -113,4 +115,6 @@ namespace Bunkering.Core.Data
         public string DocumentTypeName { get; set; }
         public int? Elps_Id { get; set; }
     }
+
+   
 }
