@@ -9,6 +9,7 @@ namespace Bunkering.Access.IContracts
         IApplicationDepot ApplicationDepot { get; }
         IAppFee AppFee { get; }
         ITransferRecord TransferRecord { get; }
+        ISourceRecipientVessel SourceRecipientVessel { get; }
         ITransferDetail TransferDetail { get; }
         IPlantOfficer PlantOfficer { get; }
         IMeterType MeterType { get; }
