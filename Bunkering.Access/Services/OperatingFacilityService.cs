@@ -31,14 +31,26 @@ namespace Bunkering.Access.Services
 
             try
             {
-                var opFacilityCheck = await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.CompanyId == model.CompanyId);
+                var opFacilityCheck = await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.CompanyEmail == model.CompanyEmail);
                 
                 if (opFacilityCheck != null)
-                    throw new ConflictException("Operating facility already exists!");
+                {
+                    opFacilityCheck.Name = model.Name;
+                    await _unitOfWork.OperatingFacility.Update(opFacilityCheck);
+                    await _unitOfWork.SaveChangesAsync("");
+
+                    return new ApiResponse
+                    {
+                        Data = opFacilityCheck,
+                        Message = "Operating Facility was Created",
+                        StatusCode = HttpStatusCode.OK,
+                        Success = true,
+                    };
+                }
 
                 var opFacility = new OperatingFacility
                 {
-                    CompanyId = model.CompanyId,
+                    CompanyEmail = model.CompanyEmail,
                     Name = Enum.GetName(typeof(NameType), model.Name),
                 };
 
@@ -66,12 +78,12 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var editOpFacility = await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.CompanyId == model.CompanyId);
+                var editOpFacility = await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.CompanyEmail == model.CompanyEmail);
                 if (editOpFacility == null)
                     throw new NotFoundException("Operating facility not found");
                 
                 
-                    editOpFacility.CompanyId = model.CompanyId;
+                    editOpFacility.CompanyEmail = model.CompanyEmail;
                     editOpFacility.Name = Enum.GetName(typeof(NameType), model.Name);
 
                     await _unitOfWork.OperatingFacility.Update(editOpFacility);
@@ -109,6 +121,30 @@ namespace Bunkering.Access.Services
                 Success = true,
             };
             return _response;
+        }
+
+        public async Task<ApiResponse> GetOperationFacility(string Email)
+        {
+            try
+            {
+                var res = await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.CompanyEmail== Email);
+                return new ApiResponse
+                {
+                    Data = res,
+                    Message = "Success",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true,
+                };
+            }
+            catch (Exception e)
+            {
+                return new ApiResponse
+                {
+                    Message = e.Message,
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Success = false,
+                };
+            }
         }
     }
 }

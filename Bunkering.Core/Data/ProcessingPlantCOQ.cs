@@ -44,9 +44,5 @@ namespace Bunkering.Core.Data
         public double? TotalMTVac { get; set; }
         public double? TotalMTAir { get; set; }
         public double? TotalLongTonsAir { get; set; }
-
-       
-
-
     }
 }
