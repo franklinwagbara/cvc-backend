@@ -1,5 +1,6 @@
 ﻿using Bunkering.Access.Services;
 using Bunkering.Core.Data;
+using Bunkering.Core.Dtos;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -91,6 +92,13 @@ namespace Bunkering.Controllers.API
 		public async Task<IActionResult> UpdateProfile(CompanyInformation model, string oldemail) => Response(await _companySrevice.UpdateProfile(model, oldemail));
 
 
+        [Route("profile-update")]
+        [HttpPost]
+        public async Task<IActionResult> ProfileUpdateByCompany(CompanyModel model, string oldemail) => Response(await _companySrevice.ProfileUpdateByCompany(model));
+
+        [Route("address-update")]
+        [HttpPost]
+        public async Task<IActionResult> AddressUpdateByCompany(CompanyAddressUpsertDto model) => Response(await _companySrevice.AddressUpdateByCompany(model));
 
 
 

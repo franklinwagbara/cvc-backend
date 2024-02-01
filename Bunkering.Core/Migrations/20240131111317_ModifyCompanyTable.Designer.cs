@@ -4,6 +4,7 @@ using Bunkering.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bunkering.Core.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20240131111317_ModifyCompanyTable")]
+    partial class ModifyCompanyTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -836,32 +839,6 @@ namespace Bunkering.Core.Migrations
                     b.ToTable("Depots");
                 });
 
-            modelBuilder.Entity("Bunkering.Core.Data.DippingMethod", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DippingMethod");
-                });
-
             modelBuilder.Entity("Bunkering.Core.Data.EmailConfiguration", b =>
                 {
                     b.Property<int>("Id")
@@ -1264,32 +1241,6 @@ namespace Bunkering.Core.Migrations
                     b.ToTable("Messages");
                 });
 
-            modelBuilder.Entity("Bunkering.Core.Data.MeterType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("MeterType");
-                });
-
             modelBuilder.Entity("Bunkering.Core.Data.NominatedSurveyor", b =>
                 {
                     b.Property<int>("Id")
@@ -1587,190 +1538,6 @@ namespace Bunkering.Core.Migrations
                     b.ToTable("PlantTanks");
                 });
 
-            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQ", b =>
-                {
-                    b.Property<int>("ProcessingPlantCOQId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProcessingPlantCOQId"));
-
-                    b.Property<string>("Consignee")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ConsignorName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Destination")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("DipMethodId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("EndTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double?>("LeftLongTonsAir")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("LeftMCubeAt15Degree")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("LeftMTAir")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("LeftMTVac")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("LeftUsBarrelsAt15Degree")
-                        .HasColumnType("float");
-
-                    b.Property<string>("MeasurementSystem")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("MeterTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PlantId")
-                        .HasColumnType("int");
-
-                    b.Property<double?>("PrevLongTonsAir")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("PrevMCubeAt15Degree")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("PrevMTAir")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("PrevMTVac")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("PrevUsBarrelsAt15Degree")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("PrevWTAir")
-                        .HasColumnType("float");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<double?>("ShipFigure")
-                        .HasColumnType("float");
-
-                    b.Property<string>("ShipmentNo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double?>("ShoreFigure")
-                        .HasColumnType("float");
-
-                    b.Property<DateTime?>("StartTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Terminal")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double?>("TotalLongTonsAir")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("TotalMCubeAt15Degree")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("TotalMTAir")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("TotalMTVac")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("TotalUsBarrelsAt15Degree")
-                        .HasColumnType("float");
-
-                    b.HasKey("ProcessingPlantCOQId");
-
-                    b.ToTable("ProcessingPlantCOQS");
-                });
-
-            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQTank", b =>
-                {
-                    b.Property<int>("ProcessingPlantCOQTankId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProcessingPlantCOQTankId"));
-
-                    b.Property<int>("ProcessingPlantCOQId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TankId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProcessingPlantCOQTankId");
-
-                    b.ToTable("ProcessingPlantCOQTanks");
-                });
-
-            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQTankReading", b =>
-                {
-                    b.Property<int>("ProcessingPlantCOQTankId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProcessingPlantCOQTankId"));
-
-                    b.Property<double>("BarrelsAtTankTables")
-                        .HasColumnType("float");
-
-                    b.Property<double>("BarrelsToMCube")
-                        .HasColumnType("float");
-
-                    b.Property<double>("Density")
-                        .HasColumnType("float");
-
-                    b.Property<double>("LongTonsAir")
-                        .HasColumnType("float");
-
-                    b.Property<double>("MCubeAt15Degree")
-                        .HasColumnType("float");
-
-                    b.Property<double>("MTAir")
-                        .HasColumnType("float");
-
-                    b.Property<double>("MTVac")
-                        .HasColumnType("float");
-
-                    b.Property<string>("MeasurementType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProcessingPlantCOQTankId1")
-                        .HasColumnType("int");
-
-                    b.Property<double>("ReadingM")
-                        .HasColumnType("float");
-
-                    b.Property<double>("SpecificGravityObs")
-                        .HasColumnType("float");
-
-                    b.Property<double>("Temperature")
-                        .HasColumnType("float");
-
-                    b.Property<double>("UsBarrelsAt15Degree")
-                        .HasColumnType("float");
-
-                    b.Property<double>("VolumeCorrectionFactor")
-                        .HasColumnType("float");
-
-                    b.Property<double>("WTAir")
-                        .HasColumnType("float");
-
-                    b.HasKey("ProcessingPlantCOQTankId");
-
-                    b.HasIndex("ProcessingPlantCOQTankId1");
-
-                    b.ToTable("ProcessingPlantCOQTankReadings");
-                });
-
             modelBuilder.Entity("Bunkering.Core.Data.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -1974,77 +1741,6 @@ namespace Bunkering.Core.Migrations
                     b.HasIndex("COQTankId");
 
                     b.ToTable("TankMeasurements");
-                });
-
-            modelBuilder.Entity("Bunkering.Core.Data.TransferDetail", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("IMONumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("OfftakeVolume")
-                        .HasColumnType("float");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TransferRecordId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("VesselName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TransferRecordId");
-
-                    b.ToTable("TransferDetail");
-                });
-
-            modelBuilder.Entity("Bunkering.Core.Data.TransferRecord", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("IMONumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LoadingPort")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MotherVessel")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("TotalVolume")
-                        .HasColumnType("float");
-
-                    b.Property<DateTime>("TransferDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("VesselName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("VesselTypeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TransferRecord");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.ValidatiionResponse", b =>
@@ -2951,15 +2647,6 @@ namespace Bunkering.Core.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQTankReading", b =>
-                {
-                    b.HasOne("Bunkering.Core.Data.ProcessingPlantCOQTank", null)
-                        .WithMany("ProcessingPlantCOQTankReadings")
-                        .HasForeignKey("ProcessingPlantCOQTankId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Bunkering.Core.Data.State", b =>
                 {
                     b.HasOne("Bunkering.Core.Data.Country", "Country")
@@ -2997,17 +2684,6 @@ namespace Bunkering.Core.Migrations
                         .HasForeignKey("COQTankId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Bunkering.Core.Data.TransferDetail", b =>
-                {
-                    b.HasOne("Bunkering.Core.Data.TransferRecord", "TransferRecord")
-                        .WithMany("TransferDetails")
-                        .HasForeignKey("TransferRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TransferRecord");
                 });
 
             modelBuilder.Entity("Bunkering.Core.ViewModels.TankViewModel", b =>
@@ -3091,19 +2767,9 @@ namespace Bunkering.Core.Migrations
                     b.Navigation("Tanks");
                 });
 
-            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQTank", b =>
-                {
-                    b.Navigation("ProcessingPlantCOQTankReadings");
-                });
-
             modelBuilder.Entity("Bunkering.Core.Data.State", b =>
                 {
                     b.Navigation("LGAs");
-                });
-
-            modelBuilder.Entity("Bunkering.Core.Data.TransferRecord", b =>
-                {
-                    b.Navigation("TransferDetails");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.VesselType", b =>
