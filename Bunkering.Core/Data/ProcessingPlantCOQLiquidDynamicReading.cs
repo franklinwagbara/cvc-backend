@@ -7,28 +7,23 @@ using System.Threading.Tasks;
 
 namespace Bunkering.Core.Data
 {
-    public class ProcessingPlantCOQTankReading
+    public class ProcessingPlantCOQLiquidDynamicReading
     {
         [Key]
-        public int ProcessingPlantCOQTankReadingId { get; set; }
-        public int ProcessingPlantCOQTankId { get; set; }
-        public string MeasurementType { get; set; }
-        public double ReadingM {  get; set; } = 0;
+        public int ProcessingPlantCOQLiquidDynamicReadingId { get; set; }
+        public int ProcessingPlantCOQLiquidDynamicId { get; set; }
+        public int Batch { get; set; }
         public double Temperature { get; set;} = 0;
         public double Density { get; set; } = 0;
-        public double SpecificGravityObs { get; set; } = 0;
-        public double BarrelsAtTankTables { get; set; } = 0;
-        public double VolumeCorrectionFactor { get; set; } = 0;
+        public double MeterFactor { get; set; } = 0;
+        public double Ctl { get; set; } = 0;
+        public double Cpl { get; set; } = 0;
+
         public double WTAir { get; set; } = 0;
-
-        public double BarrelsToMCube 
-        { 
-            get => BarrelsAtTankTables * 0.158987; set { } 
-        }
-
+                
         public double MCubeAt15Degree
         {
-            get => BarrelsToMCube * VolumeCorrectionFactor; set { }
+            get => MeterFactor * Ctl * Cpl; set { }
         }
 
         public double UsBarrelsAt15Degree

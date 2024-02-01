@@ -27,5 +27,12 @@ namespace Bunkering.Controllers.API
             return Ok("Coming Soon");
         }
 
+        [Route("create-liquid-dynamic-coq")]
+        [HttpPost]
+        public async Task<IActionResult> CreateLiquidDynamicCOQ(UpsertPPlantCOQLiquidDynamicDto dto)
+        {
+            return Ok("Coming Soon");
+        }
+
     }
 }
