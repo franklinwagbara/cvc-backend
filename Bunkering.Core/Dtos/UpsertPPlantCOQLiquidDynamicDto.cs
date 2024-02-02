@@ -34,7 +34,7 @@ namespace Bunkering.Core.Dtos
         public int ProductId { get; set; }
         public string MeasurementSystem { get; set; }
         public int? MeterTypeId { get; set; }
-        public int? DipMethodId { get; set; }
+        //public int? DipMethodId { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public string? ConsignorName { get; set; }
