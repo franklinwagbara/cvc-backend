@@ -46,6 +46,7 @@ namespace Bunkering.Access.Services
             services.AddScoped<DippingMethodService>();
             services.AddScoped<MeterTypeService>();
             services.AddScoped<MeterService>();
+            services.AddScoped<BatchService>();
 
 
             services.AddAutoMapper(typeof(MappingProfile));

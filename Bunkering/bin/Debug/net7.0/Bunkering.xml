@@ -505,6 +505,86 @@
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
         </member>
+        <member name="M:Bunkering.Controllers.API.BatchController.AddBatch(Bunkering.Core.ViewModels.BatchViewModel)">
+            <summary>
+            This endpoint is used to  add Batch
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/Batch/AddBatch
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.BatchController.UpdateBatch(Bunkering.Core.ViewModels.BatchViewModel)">
+            <summary>
+            This endpoint is used to update Batch
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/Batch/UpdateBatch
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.BatchController.DeleteBatch(System.Int32)">
+            <summary>
+            This endpoint is used to delete Batch
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            DELETE: api/Batch/DeleteBatch
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.BatchController.AllBatches">
+            <summary>
+            This endpoint is used to fetch all Batch
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/Batch/AllBatch
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.BatchController.BatchById(System.Int32)">
+            <summary>
+            This endpoint is used to fetch  Batches By Id
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/Batch/BatchById
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
         <member name="M:Bunkering.Controllers.API.CompanyController.GetProfile(System.String)">
             <summary>
             This endpoint is used to fetch company's profile 

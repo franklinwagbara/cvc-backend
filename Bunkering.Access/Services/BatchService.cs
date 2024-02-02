@@ -1,7 +1,5 @@
-﻿using Bunkering.Access.DAL;
-using Bunkering.Access.IContracts;
+﻿using Bunkering.Access.IContracts;
 using Bunkering.Core.Data;
-using Bunkering.Core.Exceptions;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -13,48 +11,46 @@ using System.Threading.Tasks;
 
 namespace Bunkering.Access.Services
 {
-    public class MeterService
+    public class BatchService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
         ApiResponse _response;
 
-        public MeterService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
+        public BatchService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
-            
+
         }
 
-        public async Task<ApiResponse> AddMeter(MeterViewModel model)
+        public async Task<ApiResponse> AddBatch(BatchViewModel model)
         {
-            var addMeter = await _unitOfWork.Meter.FirstOrDefaultAsync(x => x.Name == model.Name);
-            if (addMeter != null)
+            var addBatch = await _unitOfWork.Batch.FirstOrDefaultAsync(x => x.BatchId == model.BatchId);
+            if (addBatch != null)
             {
                 _response = new ApiResponse
                 {
-                    Message = "Meter already exist",
+                    Message = "Batch already exist",
                     StatusCode = HttpStatusCode.Found,
                     Success = true
                 };
             }
 
-            var meter = new Meter
+            var batch = new Batch
             {
                 Name = model.Name,
-                PlantId = model.PlantId,
             };
 
-            await _unitOfWork.Meter.Add(meter);
+            await _unitOfWork.Batch.Add(batch);
             await _unitOfWork.SaveChangesAsync("");
 
-            model.Id = meter.Id;
-            model.PlantId = meter.PlantId;
+            model.BatchId = batch.BatchId;
 
             _response = new ApiResponse
             {
                 Data = model,
-                Message = "Meter Created",
+                Message = "Batch Created",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
             };
@@ -62,15 +58,14 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
-        public async Task<ApiResponse> UpdateMeter(MeterViewModel model)
+        public async Task<ApiResponse> UpdateBatch(BatchViewModel model)
         {
-            var updateMeter = await _unitOfWork.Meter.FirstOrDefaultAsync(x => x.Id.Equals(model.Id));
-            if (updateMeter != null)
+            var updateBatch = await _unitOfWork.Batch.FirstOrDefaultAsync(x => x.BatchId.Equals(model.BatchId));
+            if (updateBatch != null)
             {
-                updateMeter.Name = model.Name;
-                updateMeter.PlantId = model.PlantId;
-               
-                await _unitOfWork.Meter.Update(updateMeter);
+                updateBatch.Name = model.Name;
+
+                await _unitOfWork.Batch.Update(updateBatch);
                 _unitOfWork.Save();
 
                 _response = new ApiResponse
@@ -84,7 +79,7 @@ namespace Bunkering.Access.Services
             {
                 _response = new ApiResponse
                 {
-                    Message = "Meter not Found",
+                    Message = "Batch not Found",
                     StatusCode = HttpStatusCode.NotFound,
                     Success = false,
                 };
@@ -93,29 +88,29 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
-        public async Task<ApiResponse> DeleteMeter(int Id)
+        public async Task<ApiResponse> DeleteBatch(int Id)
         {
-            var delMeter = await _unitOfWork.Meter.FirstOrDefaultAsync(x => x.Id.Equals(Id));
-            if (delMeter != null)
+            var delBatch = await _unitOfWork.Batch.FirstOrDefaultAsync(x => x.BatchId.Equals(Id));
+            if (delBatch != null)
             {
                 _response = new ApiResponse
                 {
-                    Message = "Meter has already been deleted",
+                    Message = "Batch has already been deleted",
                     StatusCode = HttpStatusCode.Conflict,
                     Success = false,
                 };
 
             }
 
-            delMeter.DeletedAt = DateTime.Now;
-            await _unitOfWork.Meter.Update(delMeter);
+            delBatch.DeletedAt = DateTime.Now;
+            await _unitOfWork.Batch.Update(delBatch);
             _unitOfWork.Save();
 
 
             _response = new ApiResponse
             {
-                Message = "Meter has been deleted",
-                Data = delMeter,
+                Message = "Batch has been deleted",
+                Data = delBatch,
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
             };
@@ -123,15 +118,15 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
-        public async Task<ApiResponse> AllMeters()
+        public async Task<ApiResponse> AllBatches()
         {
-            var allMeters = await _unitOfWork.Meter.GetAll();
-            allMeters = allMeters.Where(x => x.DeletedAt == null);
+            var allBatch = await _unitOfWork.Batch.GetAll();
+            allBatch = allBatch.Where(x => x.DeletedAt == null).ToList();
 
             _response = new ApiResponse
             {
-                Data = allMeters.ToList(),
-                Message ="Successful",
+                Data = allBatch,
+                Message = "Successful",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
             };
@@ -139,14 +134,14 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
-        public async Task<ApiResponse> MeterById(int id)
+        public async Task<ApiResponse> BatchById(int id)
         {
-            var meterById = await _unitOfWork.Meter.FirstOrDefaultAsync(x =>x.Id.Equals(id));
-            if (meterById != null)
+            var batchById = await _unitOfWork.Batch.FirstOrDefaultAsync(x => x.BatchId.Equals(id));
+            if (batchById != null)
             {
                 return new ApiResponse
                 {
-                    Data = meterById,
+                    Data = batchById,
                     Message = "Successful",
                     StatusCode = HttpStatusCode.OK,
                     Success = true,
@@ -156,7 +151,7 @@ namespace Bunkering.Access.Services
 
             return new ApiResponse
             {
-                Message = "Meter Not Found",
+                Message = "Batch Not Found",
                 StatusCode = HttpStatusCode.NotFound,
                 Success = false,
             };

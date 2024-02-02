@@ -17,6 +17,7 @@ namespace Bunkering.Access.DAL
         public IApplicationType ApplicationType { get; set; }
         public IApplicationHistory ApplicationHistory { get; private set; }
         public IAppointment Appointment { get; private set; }
+        public IBatch Batch { get; private set; }
         public ICountry Country { get; private set; }
         public IDepot Depot { get; private set; }
         public IApplicationDepot ApplicationDepot { get; private set; }
@@ -67,6 +68,7 @@ namespace Bunkering.Access.DAL
             ApplicationHistory = ApplicationHistory != null ? ApplicationHistory : new ApplicationHistoryRepository(_context);
             ApplicationType = ApplicationType != null ? ApplicationType : new ApplicationTypeRepository(_context);
             Appointment = Appointment != null ? Appointment : new AppointmentRepository(_context);
+            Batch = Batch != null ? Batch : new BatchRepository(_context);  
             Country = Country != null ? Country : new CountryRepository(_context);
             Depot = Depot != null ? Depot : new DepotRepository(_context);
             EmailConfiguration = EmailConfiguration != null ? EmailConfiguration : new EmailConfigurationRepository(_context);
