@@ -8,6 +8,7 @@ namespace Bunkering.Access.IContracts
         IApplication Application { get; }
         IApplicationDepot ApplicationDepot { get; }
         IAppFee AppFee { get; }
+        IBatch Batch { get; }
         ITransferRecord TransferRecord { get; }
         ITransferDetail TransferDetail { get; }
         IPlantOfficer PlantOfficer { get; }
@@ -28,6 +29,7 @@ namespace Bunkering.Access.IContracts
         ILGA LGA { get; }
         ILocation Location { get; }
         IMessage Message { get; }
+        IMeter Meter { get; }
         INominatedSurveyor NominatedSurveyor { get; }
         IApplicationSurveyor ApplicationSurveyor { get; }
         IOffice Office { get; }
