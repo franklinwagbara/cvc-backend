@@ -19,6 +19,7 @@ namespace Bunkering.Core.Data
         public DbSet<ApplicationType> ApplicationTypes { get; set; }
         public DbSet<ApplicationDepot> ApplicationDepots { get; set; }
         public DbSet<Audit> AuditLogs { get; set; }
+        public DbSet<Batch> Batches { get; set; }
         public DbSet<Company> Companies { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<Depot> Depots { get; set; }
@@ -55,10 +56,11 @@ namespace Bunkering.Core.Data
         public DbSet<vDebitNote> VDebitNotes { get; set; }
         public DbSet<CoQ> CoQs { get; set; }
         public DbSet<PlantFieldOfficer> PlantFieldOfficers { get; set; }
-        public DbSet<ProcessingPlantCOQ> ProcessingPlantCOQS { get; set; }
+        public DbSet<ProcessingPlantCOQ> ProcessingPlantCOQs { get; set; }
+        public DbSet<ProcessingPlantCOQBatch> ProcessingPlantCOQBatchs { get; set; }
         public DbSet<ProcessingPlantCOQLiquidDynamic> ProcessingPlantCOQLiquidDynamics { get; set; }
         public DbSet<ProcessingPlantCOQLiquidDynamicReading> ProcessingPlantCOQLiquidDynamicReadings { get; set; }
-        public DbSet<ProcessingPlantCOQTank> ProcessingPlantCOQTanks { get; set; }
+        public DbSet<ProcessingPlantCOQBatchTank> ProcessingPlantCOQBatchTanks { get; set; }
         public DbSet<ProcessingPlantCOQTankReading> ProcessingPlantCOQTankReadings { get; set; }
         public DbSet<JettyFieldOfficer> JettyFieldOfficers { get; set; }
         public DbSet<COQHistory> COQHistories { get; set; }
