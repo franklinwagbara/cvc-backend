@@ -12,9 +12,10 @@ namespace Bunkering.Controllers.API
     [ApiController]
     public class ProcessingPlantCOQController : ResponseController
     {
-        
-        public ProcessingPlantCOQController()
+        private readonly ProcessingPlantCoQService _processingPlantCoQService;
+        public ProcessingPlantCOQController(ProcessingPlantCoQService processingPlantCoQService)
         {
+            _processingPlantCoQService = processingPlantCoQService;
         }
 
       
@@ -23,6 +24,14 @@ namespace Bunkering.Controllers.API
         [Route("create-liquid-static-coq")]
         [HttpPost]
         public async Task<IActionResult> CreateLiquidStaticCOQ(UpsertPPlantCOQLiquidStaticDto dto)
+        {
+            var result = _processingPlantCoQService.CreateLiquidStaticCOQ(dto);
+            return Ok(result);
+        }
+
+        [Route("create-liquid-dynamic-coq")]
+        [HttpPost]
+        public async Task<IActionResult> CreateLiquidDynamicCOQ(UpsertPPlantCOQLiquidDynamicDto dto)
         {
             return Ok("Coming Soon");
         }

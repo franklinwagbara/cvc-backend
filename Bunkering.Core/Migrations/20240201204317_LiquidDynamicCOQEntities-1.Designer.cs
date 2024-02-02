@@ -4,6 +4,7 @@ using Bunkering.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bunkering.Core.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20240201204317_LiquidDynamicCOQEntities-1")]
+    partial class LiquidDynamicCOQEntities1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1640,28 +1643,6 @@ namespace Bunkering.Core.Migrations
                     b.Property<string>("ConsignorName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double?>("DeliveredLongTonsAir")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("DeliveredMCubeAt15Degree")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("DeliveredMTAir")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("DeliveredMTVac")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("DeliveredUsBarrelsAt15Degree")
-                        .HasColumnType("float");
-
                     b.Property<string>("Destination")
                         .HasColumnType("nvarchar(max)");
 
@@ -1717,10 +1698,6 @@ namespace Bunkering.Core.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Reference")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<double?>("ShipFigure")
                         .HasColumnType("float");
 
@@ -1732,10 +1709,6 @@ namespace Bunkering.Core.Migrations
 
                     b.Property<DateTime?>("StartTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Terminal")
                         .HasColumnType("nvarchar(max)");
@@ -1843,21 +1816,6 @@ namespace Bunkering.Core.Migrations
 
                     b.Property<int>("ProcessingPlantCOQId")
                         .HasColumnType("int");
-
-                    b.Property<double?>("SumDiffLongTonsAir")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("SumDiffMCubeAt15Degree")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("SumDiffMTAir")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("SumDiffMTVac")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("SumDiffUsBarrelsAt15Degree")
-                        .HasColumnType("float");
 
                     b.Property<int>("TankId")
                         .HasColumnType("int");

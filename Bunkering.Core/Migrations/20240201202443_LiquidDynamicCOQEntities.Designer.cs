@@ -4,6 +4,7 @@ using Bunkering.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bunkering.Core.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20240201202443_LiquidDynamicCOQEntities")]
+    partial class LiquidDynamicCOQEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1264,45 +1267,6 @@ namespace Bunkering.Core.Migrations
                     b.ToTable("Messages");
                 });
 
-            modelBuilder.Entity("Bunkering.Core.Data.Meter", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PlantId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Meters");
-                });
-
-            modelBuilder.Entity("Bunkering.Core.Data.MeterReading", b =>
-                {
-                    b.Property<int>("MeterReadingId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MeterReadingId"));
-
-                    b.Property<double>("MCube")
-                        .HasColumnType("float");
-
-                    b.Property<int>("ProcessingPlantCOQLiquidDynamicReadingId")
-                        .HasColumnType("int");
-
-                    b.HasKey("MeterReadingId");
-
-                    b.ToTable("MeterReadings");
-                });
-
             modelBuilder.Entity("Bunkering.Core.Data.MeterType", b =>
                 {
                     b.Property<int>("Id")
@@ -1640,28 +1604,6 @@ namespace Bunkering.Core.Migrations
                     b.Property<string>("ConsignorName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double?>("DeliveredLongTonsAir")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("DeliveredMCubeAt15Degree")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("DeliveredMTAir")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("DeliveredMTVac")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("DeliveredUsBarrelsAt15Degree")
-                        .HasColumnType("float");
-
                     b.Property<string>("Destination")
                         .HasColumnType("nvarchar(max)");
 
@@ -1717,10 +1659,6 @@ namespace Bunkering.Core.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Reference")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<double?>("ShipFigure")
                         .HasColumnType("float");
 
@@ -1732,10 +1670,6 @@ namespace Bunkering.Core.Migrations
 
                     b.Property<DateTime?>("StartTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Terminal")
                         .HasColumnType("nvarchar(max)");
@@ -1760,79 +1694,6 @@ namespace Bunkering.Core.Migrations
                     b.ToTable("ProcessingPlantCOQS");
                 });
 
-            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamic", b =>
-                {
-                    b.Property<int>("ProcessingPlantCOQLiquidDynamicId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProcessingPlantCOQLiquidDynamicId"));
-
-                    b.Property<int>("MeterId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProcessingPlantCOQId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProcessingPlantCOQLiquidDynamicId");
-
-                    b.ToTable("ProcessingPlantCOQLiquidDynamics");
-                });
-
-            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamicReading", b =>
-                {
-                    b.Property<int>("ProcessingPlantCOQLiquidDynamicReadingId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProcessingPlantCOQLiquidDynamicReadingId"));
-
-                    b.Property<int>("Batch")
-                        .HasColumnType("int");
-
-                    b.Property<double>("Cpl")
-                        .HasColumnType("float");
-
-                    b.Property<double>("Ctl")
-                        .HasColumnType("float");
-
-                    b.Property<double>("Density")
-                        .HasColumnType("float");
-
-                    b.Property<double>("LongTonsAir")
-                        .HasColumnType("float");
-
-                    b.Property<double>("MCubeAt15Degree")
-                        .HasColumnType("float");
-
-                    b.Property<double>("MTAir")
-                        .HasColumnType("float");
-
-                    b.Property<double>("MTVac")
-                        .HasColumnType("float");
-
-                    b.Property<double>("MeterFactor")
-                        .HasColumnType("float");
-
-                    b.Property<int>("ProcessingPlantCOQLiquidDynamicId")
-                        .HasColumnType("int");
-
-                    b.Property<double>("Temperature")
-                        .HasColumnType("float");
-
-                    b.Property<double>("UsBarrelsAt15Degree")
-                        .HasColumnType("float");
-
-                    b.Property<double>("WTAir")
-                        .HasColumnType("float");
-
-                    b.HasKey("ProcessingPlantCOQLiquidDynamicReadingId");
-
-                    b.HasIndex("ProcessingPlantCOQLiquidDynamicId");
-
-                    b.ToTable("ProcessingPlantCOQLiquidDynamicReadings");
-                });
-
             modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQTank", b =>
                 {
                     b.Property<int>("ProcessingPlantCOQTankId")
@@ -1843,21 +1704,6 @@ namespace Bunkering.Core.Migrations
 
                     b.Property<int>("ProcessingPlantCOQId")
                         .HasColumnType("int");
-
-                    b.Property<double?>("SumDiffLongTonsAir")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("SumDiffMCubeAt15Degree")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("SumDiffMTAir")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("SumDiffMTVac")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("SumDiffUsBarrelsAt15Degree")
-                        .HasColumnType("float");
 
                     b.Property<int>("TankId")
                         .HasColumnType("int");
@@ -3108,15 +2954,6 @@ namespace Bunkering.Core.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamicReading", b =>
-                {
-                    b.HasOne("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamic", null)
-                        .WithMany("ProcessingPlantCOQLiquidDynamicReadings")
-                        .HasForeignKey("ProcessingPlantCOQLiquidDynamicId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQTankReading", b =>
                 {
                     b.HasOne("Bunkering.Core.Data.ProcessingPlantCOQTank", null)
@@ -3255,11 +3092,6 @@ namespace Bunkering.Core.Migrations
             modelBuilder.Entity("Bunkering.Core.Data.Plant", b =>
                 {
                     b.Navigation("Tanks");
-                });
-
-            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamic", b =>
-                {
-                    b.Navigation("ProcessingPlantCOQLiquidDynamicReadings");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQTank", b =>
