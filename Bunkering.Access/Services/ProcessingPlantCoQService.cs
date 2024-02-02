@@ -89,7 +89,7 @@ namespace Bunkering.Access.Services
                     DeliveredUsBarrelsAt15Degree = dto.DeliveredUsBarrelsAt15Degree,
                 };
 
-                _context.ProcessingPlantCOQS.Add(coq);
+                _context.ProcessingPlantCOQs.Add(coq);
                 _context.SaveChanges();
                 #endregion
 

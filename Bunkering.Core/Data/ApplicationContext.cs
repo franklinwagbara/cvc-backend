@@ -57,7 +57,7 @@ namespace Bunkering.Core.Data
         public DbSet<CoQ> CoQs { get; set; }
         public DbSet<PlantFieldOfficer> PlantFieldOfficers { get; set; }
         public DbSet<ProcessingPlantCOQ> ProcessingPlantCOQs { get; set; }
-        public DbSet<ProcessingPlantCOQBatch> ProcessingPlantCOQBatchs { get; set; }
+        public DbSet<ProcessingPlantCOQBatch> ProcessingPlantCOQBatches { get; set; }
         public DbSet<ProcessingPlantCOQLiquidDynamic> ProcessingPlantCOQLiquidDynamics { get; set; }
         public DbSet<ProcessingPlantCOQLiquidDynamicReading> ProcessingPlantCOQLiquidDynamicReadings { get; set; }
         public DbSet<ProcessingPlantCOQBatchTank> ProcessingPlantCOQBatchTanks { get; set; }
