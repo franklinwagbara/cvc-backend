@@ -19,7 +19,3 @@
     CONSTRAINT [PK_VesselDischargeClearances] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 
-
-
-
-

@@ -32,6 +32,8 @@ namespace Bunkering.Core.Data
         public DbSet<LGA> LGAs { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<Meter> Meters { get; set; }
+        public DbSet<MeterReading> MeterReadings { get; set; }
         public DbSet<NominatedSurveyor> NominatedSurveyors { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Plant> Plants { get; set; }
@@ -53,6 +55,11 @@ namespace Bunkering.Core.Data
         public DbSet<vDebitNote> VDebitNotes { get; set; }
         public DbSet<CoQ> CoQs { get; set; }
         public DbSet<PlantFieldOfficer> PlantFieldOfficers { get; set; }
+        public DbSet<ProcessingPlantCOQ> ProcessingPlantCOQS { get; set; }
+        public DbSet<ProcessingPlantCOQLiquidDynamic> ProcessingPlantCOQLiquidDynamics { get; set; }
+        public DbSet<ProcessingPlantCOQLiquidDynamicReading> ProcessingPlantCOQLiquidDynamicReadings { get; set; }
+        public DbSet<ProcessingPlantCOQTank> ProcessingPlantCOQTanks { get; set; }
+        public DbSet<ProcessingPlantCOQTankReading> ProcessingPlantCOQTankReadings { get; set; }
         public DbSet<JettyFieldOfficer> JettyFieldOfficers { get; set; }
         public DbSet<COQHistory> COQHistories { get; set; }
         public DbSet<COQCertificate> COQCertificates { get; set; }
@@ -62,6 +69,10 @@ namespace Bunkering.Core.Data
         public DbSet<TankMeasurement> TankMeasurements { get; set; }
         public DbSet<EmailConfiguration> EmailConfigurations { get; set; }
         public DbSet<VesselDischargeClearance> VesselDischargeClearances {  get; set; }
+        public DbSet<MeterType> MeterType {  get; set; }
+        public DbSet<DippingMethod> DippingMethod {  get; set; }
+        public DbSet<TransferDetail> TransferDetail {  get; set; }
+        public DbSet<TransferRecord> TransferRecord {  get; set; }
         public DbSet<OperatingFacility> OperatingFacility { get; set; }
 
         //public virtual DbContextOptionsBuilder EnableDetailedErrors(bool detailedErrorsEnabled = true) => detailedErrorsEnabled;

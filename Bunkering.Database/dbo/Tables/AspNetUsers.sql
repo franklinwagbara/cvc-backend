@@ -58,6 +58,10 @@
 
 
 
+
+
+
+
 GO
 CREATE NONCLUSTERED INDEX [EmailIndex]
     ON [dbo].[AspNetUsers]([NormalizedEmail] ASC);

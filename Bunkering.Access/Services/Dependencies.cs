@@ -42,6 +42,9 @@ namespace Bunkering.Access.Services
             services.AddScoped<ProductService>();
             services.AddScoped<EmailConfigurationService>();
             services.AddScoped<VesselDischargeClearanceService>();
+            services.AddScoped<ShipToShipService>();
+            services.AddScoped<DippingMethodService>();
+            services.AddScoped<MeterTypeService>();
 
 
             services.AddAutoMapper(typeof(MappingProfile));

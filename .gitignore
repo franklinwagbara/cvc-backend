@@ -440,3 +440,6 @@ FodyWeavers.xsd
 *.v2
 *.csproj
 /.vs/Bunkering/DesignTimeBuild/.dtbcache.v2
+*.dll
+*.pdb
+*.exe

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using System.Net;
 using Microsoft.EntityFrameworkCore;
+using Bunkering.Core.Dtos;
 
 namespace Bunkering.Access.Services
 {
@@ -287,5 +288,145 @@ namespace Bunkering.Access.Services
 			user.Company.YearIncorporated = model.Company.year_Incorporated;
 			return user;
 		}
-	}
+
+        public async Task<ApiResponse> ProfileUpdateByCompany(CompanyModel model)
+        {
+            var companyuser = _userManager.Users.Include("Company").FirstOrDefault(x => x.Email == User);
+
+            if (await _userManager.IsInRoleAsync(companyuser, "Company") == false)
+            {
+                _response = new ApiResponse
+                {
+                    Message = "Please you need to login as a company to update company address",
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Success = false
+                };
+
+                return _response;
+            }
+
+            try
+            {
+                model.id = companyuser.ElpsId;
+
+                _elps.UpdateCompanyDetails(model, User, true)?.Stringify()?.Parse<CompanyModel>();
+
+				if (!model.email.Equals(companyuser.Email, StringComparison.OrdinalIgnoreCase))
+				{
+					companyuser.Email = model.email;
+					companyuser.NormalizedEmail = model.email;
+					companyuser.NormalizedUserName = model.email;
+					companyuser.UserName = model.email;
+				}
+
+                companyuser.FirstName = model.contact_FirstName;
+                companyuser.LastName = model.contact_LastName;
+                companyuser.PhoneNumber = model.contact_Phone;
+
+                companyuser.Company.Name = model.name;
+
+                companyuser.Company.RcNumber = model.rC_Number;
+                companyuser.Company.TinNumber = model.tin_Number;
+                companyuser.Company.YearIncorporated = model.year_Incorporated;
+
+				companyuser.Company.OperatingFacilityId = model.OperatingFacilityId;
+
+                await _userManager.UpdateAsync(companyuser);
+                _response = new ApiResponse
+                {
+                    Message = "Company was updated successfully",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true
+                };
+                
+            }
+            catch (Exception ex)
+            {
+                _response = new ApiResponse
+                {
+                    Message = ex.Message,
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Success = false
+                };
+            }
+            return _response;
+        }
+
+
+        public async Task<ApiResponse> AddressUpdateByCompany(CompanyAddressUpsertDto model)
+        {
+            var user = _userManager.Users.Include("Company").FirstOrDefault(x => x.Email == User);
+
+            if (await _userManager.IsInRoleAsync(user, "Company") == false)
+			{
+                _response = new ApiResponse
+                {
+                    Message = "Please you need to login as a company to update company address",
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Success = false
+                };
+
+				return _response;
+            }
+
+            try
+            {
+				RegisteredAddress add = new RegisteredAddress
+				{
+					city = model.city,
+					country_Id = model.country_Id,
+					stateId = model.stateId,
+					address_1 = model.address_1,
+					address_2 = model.address_2,
+					postal_code = model.postal_code,
+					countryName = user.Company.Name,
+                };
+
+                var addList = new List<RegisteredAddress>();
+
+                if (user.Company.AddressId > 0)
+                {
+					add.id = user.Company.AddressId.Value;
+                    addList.Add(add);
+                    var resp = _elps.UpdateCompanyRegAddress(addList);
+                }
+                else
+                {
+                    var req = _elps.AddCompanyRegAddress(addList, user.ElpsId).Stringify().Parse<List<RegisteredAddress>>().FirstOrDefault();
+                    user.Company.AddressId = req.id;
+                }
+
+                user.Company.Address = model.address_1;
+
+                _response = new ApiResponse
+                {
+                    Message = "Company was updated successfully",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true
+                };
+                
+
+                if (!string.IsNullOrEmpty(user.Company.Address) && user.Company.AddressId > 0 && user.Company.OperatingFacilityId > 0)
+                    user.ProfileComplete = true;
+                await _userManager.UpdateAsync(user);
+
+                if (user.ProfileComplete)
+                    _response.Message = "Address update was successful";
+
+                _response.Message = "Profile update was successful";
+              
+            }
+            catch (Exception ex)
+            {
+                _response = new ApiResponse
+                {
+                    Message = ex.Message,
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Success = false
+                };
+            }
+            return _response;
+        }
+
+    }
 }

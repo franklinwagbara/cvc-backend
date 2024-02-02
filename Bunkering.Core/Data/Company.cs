@@ -17,5 +17,6 @@ namespace Bunkering.Core.Data
         public int? CountryId { get; set; }
         public string? RcNumber { get; set; }
         public string? TinNumber { get; set; }
+        public int? OperatingFacilityId { get; set; }
     }
 }

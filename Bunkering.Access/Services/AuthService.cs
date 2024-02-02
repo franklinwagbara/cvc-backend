@@ -13,6 +13,8 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Bunkering.Access.DAL;
+using Newtonsoft.Json.Linq;
+using Bunkering.Core.Utils;
 
 namespace Bunkering.Access.Services
 {
@@ -180,10 +182,17 @@ namespace Bunkering.Access.Services
 					.Include(ur => ur.UserRoles).ThenInclude(r => r.Role)
 					.FirstOrDefaultAsync(x => x.Id.Equals(id));
 
-				var operationFacility = await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.CompanyId == user.CompanyId);
+				//var operationFacility = await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.CompanyId == user.CompanyId);
 				if (user != null)
 				{
-					_response = new ApiResponse
+
+					string plantTypeName = null;
+					if(user.Company != null && user.Company.OperatingFacilityId > 0)
+					{
+						plantTypeName = Enum.GetName(typeof(PlantType), user.Company.OperatingFacilityId);
+                    }
+
+                    _response = new ApiResponse
 					{
 						Message = "User found",
 						StatusCode = HttpStatusCode.OK,
@@ -203,8 +212,9 @@ namespace Bunkering.Access.Services
 							Location = user.Location?.Name,
 							Office = user.Office?.Name,
 							Directorate = user.Directorate,
-							operationFacility = operationFacility.Name,
-							Token = GenerateToken(user, user.UserRoles.FirstOrDefault(x => x.Role?.Name?.Equals("Staff") is false)?.Role?.Name, operationFacility)
+							operationFacility = plantTypeName,
+
+                            Token = GenerateToken(user, user.UserRoles.FirstOrDefault(x => x.Role?.Name?.Equals("Staff") is false)?.Role?.Name, plantTypeName)
 						},
 					};
 				}
@@ -217,7 +227,7 @@ namespace Bunkering.Access.Services
 			return _response;
 		}
 
-		private string GenerateToken(ApplicationUser user, string? role, OperatingFacility operatingFacility)
+		private string GenerateToken(ApplicationUser user, string? role, string operatingFacilityName = null)
 		{
 			var tokenHandler = new JwtSecurityTokenHandler();
 			var tokenKey = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]);
@@ -233,7 +243,11 @@ namespace Bunkering.Access.Services
 			if (user.Company != null)
 			{
 				claims.Add(new Claim("company", user.Company.Name));
-				claims.Add(new Claim("operation facility", operatingFacility.Name ));
+				if(operatingFacilityName != null)
+				{
+                    claims.Add(new Claim("operation facility", operatingFacilityName));
+                }
+				
 			}
 			if (role != null)
 			{
