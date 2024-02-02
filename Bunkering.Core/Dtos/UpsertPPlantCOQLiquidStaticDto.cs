@@ -1,4 +1,5 @@
-﻿using Bunkering.Core.ViewModels;
+﻿using Bunkering.Core.Data;
+using Bunkering.Core.ViewModels;
 
 namespace Bunkering.Core.Dtos
 {
@@ -24,6 +25,13 @@ namespace Bunkering.Core.Dtos
     {
         public int TankId { get; set; }
         public UpsertProcessingPlantCOQTankReadingsDto TankReading { get; set; }
+    }
+
+    public class ProcessingPlantCOQBatchDto
+    {
+        public int BatchId { get; set; }
+        public List<TankBeforeReadingLiquidStatic> TankBeforeReadings { get; set; }
+        public List<TankAfterReadingLiquidStatic> TankAfterReadings { get; set; }
     }
 
     public class UpsertPPlantCOQLiquidStaticDto
@@ -56,8 +64,8 @@ namespace Bunkering.Core.Dtos
         public double? DeliveredMTAir { get; set; }
         public double? DeliveredLongTonsAir { get; set; }
 
-        public List<TankBeforeReadingLiquidStatic> TankBeforeReadings { get; set; }
-        public List<TankAfterReadingLiquidStatic> TankAfterReadings { get; set; }
+        public List<ProcessingPlantCOQBatchDto> COQBatchs { get; set; }
+       
         public List<SubmitDocumentDto> SubmitDocuments { get; set; }
     }
     

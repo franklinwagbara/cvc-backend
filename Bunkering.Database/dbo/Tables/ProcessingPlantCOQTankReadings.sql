@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[ProcessingPlantCOQTankReadings] (
     [ProcessingPlantCOQTankReadingId] INT            IDENTITY (1, 1) NOT NULL,
-    [ProcessingPlantCOQTankId]        INT            NOT NULL,
+    [ProcessingPlantCOQBatchTankId]   INT            NOT NULL,
     [MeasurementType]                 NVARCHAR (MAX) NOT NULL,
     [ReadingM]                        FLOAT (53)     NOT NULL,
     [Temperature]                     FLOAT (53)     NOT NULL,
@@ -17,8 +17,10 @@
     [LongTonsAir]                     FLOAT (53)     NOT NULL,
     [ProcessingPlantCOQTankId1]       INT            NOT NULL,
     CONSTRAINT [PK_ProcessingPlantCOQTankReadings_1] PRIMARY KEY CLUSTERED ([ProcessingPlantCOQTankReadingId] ASC),
-    CONSTRAINT [FK_ProcessingPlantCOQTankReadings_ProcessingPlantCOQTanks_ProcessingPlantCOQTankId1] FOREIGN KEY ([ProcessingPlantCOQTankId1]) REFERENCES [dbo].[ProcessingPlantCOQTanks] ([ProcessingPlantCOQTankId]) ON DELETE CASCADE
+    CONSTRAINT [FK_ProcessingPlantCOQTankReadings_ProcessingPlantCOQTanks_ProcessingPlantCOQTankId1] FOREIGN KEY ([ProcessingPlantCOQTankId1]) REFERENCES [dbo].[ProcessingPlantCOQBatchTanks] ([ProcessingPlantCOQBatchTankId]) ON DELETE CASCADE
 );
+
+
 
 
 
