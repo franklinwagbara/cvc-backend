@@ -64,7 +64,7 @@ namespace Bunkering.Core.Dtos
         public double? DeliveredMTAir { get; set; }
         public double? DeliveredLongTonsAir { get; set; }
 
-        public List<ProcessingPlantCOQBatchDto> COQBatchs { get; set; }
+        public List<ProcessingPlantCOQBatchDto> COQBatches { get; set; }
        
         public List<SubmitDocumentDto> SubmitDocuments { get; set; }
     }
