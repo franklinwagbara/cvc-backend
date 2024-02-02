@@ -279,7 +279,7 @@
             <returns>Returns an application info</returns>
             <remarks>
             
-            Sample Request
+            Sample Request 
             GET: api/application/view-application
             
             </remarks>
@@ -1335,6 +1335,86 @@
             </remarks>
             <param name="model">This is Read message</param>
             <response code="200">Returns a summary of the message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.MeterController.AddMeter(Bunkering.Core.ViewModels.MeterViewModel)">
+            <summary>
+            This endpoint is used to fetch  add Meter
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/Meter/AddMeter
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.MeterController.UpdateMeter(Bunkering.Core.ViewModels.MeterViewModel)">
+            <summary>
+            This endpoint is used to update Meter
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/Meter/UpdateMeter
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.MeterController.DeleteMeter(System.Int32)">
+            <summary>
+            This endpoint is used to delete Meter
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            DELETE: api/Meter/DeleteMeter
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.MeterController.AllMeters">
+            <summary>
+            This endpoint is used to fetch all Meters
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/Meter/AllMeters
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.MeterController.MetersById(System.Int32)">
+            <summary>
+            This endpoint is used to fetch  Meters By Id
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/Meter/MetersById
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
             <response code="404">Returns not found </response>
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>

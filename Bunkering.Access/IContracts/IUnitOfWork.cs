@@ -28,6 +28,7 @@ namespace Bunkering.Access.IContracts
         ILGA LGA { get; }
         ILocation Location { get; }
         IMessage Message { get; }
+        IMeter Meter { get; }
         INominatedSurveyor NominatedSurveyor { get; }
         IApplicationSurveyor ApplicationSurveyor { get; }
         IOffice Office { get; }

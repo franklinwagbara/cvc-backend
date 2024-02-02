@@ -33,6 +33,7 @@ namespace Bunkering.Access.DAL
         public ILGA LGA { get; private set; }
         public ILocation Location { get; private set; }
         public IMessage Message { get; private set; }
+        public IMeter Meter { get; private set; }
         public INominatedSurveyor NominatedSurveyor { get; private set; }
         public IPayment Payment { get; private set; }
         public IPermit Permit { get; private set; }
@@ -79,6 +80,7 @@ namespace Bunkering.Access.DAL
             LGA = LGA != null ? LGA : new LGARepository(_context);
             Location = Location != null ? Location : new LocationRepository(_context);
             Message = Message != null ? Message : new MessageRepository(_context);
+            Meter = Meter != null ? Meter : new MeterRepository(_context);
             NominatedSurveyor = NominatedSurveyor != null ? NominatedSurveyor : new NominatedSurveyorRepository(_context);
             ApplicationSurveyor = ApplicationSurveyor != null ? ApplicationSurveyor : new ApplicationSurveyorRepository(_context);
             Payment = Payment != null ? Payment : new PaymentRepository(_context);
