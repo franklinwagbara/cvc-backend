@@ -4,6 +4,7 @@ using Bunkering.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bunkering.Core.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20240202111152_DeletedAtColumn")]
+    partial class DeletedAtColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -540,26 +543,6 @@ namespace Bunkering.Core.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("AuditLogs");
-                });
-
-            modelBuilder.Entity("Bunkering.Core.Data.Batch", b =>
-                {
-                    b.Property<int>("BatchId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BatchId"));
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("BatchId");
-
-                    b.ToTable("Batches");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.COQCertificate", b =>
@@ -1780,62 +1763,7 @@ namespace Bunkering.Core.Migrations
 
                     b.HasKey("ProcessingPlantCOQId");
 
-                    b.ToTable("ProcessingPlantCOQs");
-                });
-
-            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQBatch", b =>
-                {
-                    b.Property<int>("ProcessingPlantCOQBatchId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProcessingPlantCOQBatchId"));
-
-                    b.Property<int>("BatchId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProcessingPlantCOQId")
-                        .HasColumnType("int");
-
-                    b.Property<double?>("SumDiffLongTonsAir")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("SumDiffMCubeAt15Degree")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("SumDiffMTAir")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("SumDiffMTVac")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("SumDiffUsBarrelsAt15Degree")
-                        .HasColumnType("float");
-
-                    b.HasKey("ProcessingPlantCOQBatchId");
-
-                    b.ToTable("ProcessingPlantCOQBatches");
-                });
-
-            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQBatchTank", b =>
-                {
-                    b.Property<int>("ProcessingPlantCOQBatchTankId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProcessingPlantCOQBatchTankId"));
-
-                    b.Property<int>("ProcessingPlantCOQBatchId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TankId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProcessingPlantCOQBatchTankId");
-
-                    b.HasIndex("ProcessingPlantCOQBatchId");
-
-                    b.ToTable("ProcessingPlantCOQBatchTanks");
+                    b.ToTable("ProcessingPlantCOQS");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamic", b =>
@@ -1911,6 +1839,40 @@ namespace Bunkering.Core.Migrations
                     b.ToTable("ProcessingPlantCOQLiquidDynamicReadings");
                 });
 
+            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQTank", b =>
+                {
+                    b.Property<int>("ProcessingPlantCOQTankId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProcessingPlantCOQTankId"));
+
+                    b.Property<int>("ProcessingPlantCOQId")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("SumDiffLongTonsAir")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("SumDiffMCubeAt15Degree")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("SumDiffMTAir")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("SumDiffMTVac")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("SumDiffUsBarrelsAt15Degree")
+                        .HasColumnType("float");
+
+                    b.Property<int>("TankId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProcessingPlantCOQTankId");
+
+                    b.ToTable("ProcessingPlantCOQTanks");
+                });
+
             modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQTankReading", b =>
                 {
                     b.Property<int>("ProcessingPlantCOQTankReadingId")
@@ -1944,7 +1906,7 @@ namespace Bunkering.Core.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProcessingPlantCOQBatchTankId")
+                    b.Property<int>("ProcessingPlantCOQTankId")
                         .HasColumnType("int");
 
                     b.Property<double>("ReadingM")
@@ -1967,7 +1929,7 @@ namespace Bunkering.Core.Migrations
 
                     b.HasKey("ProcessingPlantCOQTankReadingId");
 
-                    b.HasIndex("ProcessingPlantCOQBatchTankId");
+                    b.HasIndex("ProcessingPlantCOQTankId");
 
                     b.ToTable("ProcessingPlantCOQTankReadings");
                 });
@@ -3152,15 +3114,6 @@ namespace Bunkering.Core.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQBatchTank", b =>
-                {
-                    b.HasOne("Bunkering.Core.Data.ProcessingPlantCOQBatch", null)
-                        .WithMany("ProcessingPlantCOQBatchTanks")
-                        .HasForeignKey("ProcessingPlantCOQBatchId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamicReading", b =>
                 {
                     b.HasOne("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamic", null)
@@ -3172,9 +3125,9 @@ namespace Bunkering.Core.Migrations
 
             modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQTankReading", b =>
                 {
-                    b.HasOne("Bunkering.Core.Data.ProcessingPlantCOQBatchTank", null)
+                    b.HasOne("Bunkering.Core.Data.ProcessingPlantCOQTank", null)
                         .WithMany("ProcessingPlantCOQTankReadings")
-                        .HasForeignKey("ProcessingPlantCOQBatchTankId")
+                        .HasForeignKey("ProcessingPlantCOQTankId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -3310,19 +3263,14 @@ namespace Bunkering.Core.Migrations
                     b.Navigation("Tanks");
                 });
 
-            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQBatch", b =>
-                {
-                    b.Navigation("ProcessingPlantCOQBatchTanks");
-                });
-
-            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQBatchTank", b =>
-                {
-                    b.Navigation("ProcessingPlantCOQTankReadings");
-                });
-
             modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamic", b =>
                 {
                     b.Navigation("ProcessingPlantCOQLiquidDynamicReadings");
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQTank", b =>
+                {
+                    b.Navigation("ProcessingPlantCOQTankReadings");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.State", b =>
