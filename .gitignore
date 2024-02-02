@@ -443,3 +443,6 @@ FodyWeavers.xsd
 *.dll
 *.pdb
 *.exe
+*.dll
+*.pdb
+*.exe
