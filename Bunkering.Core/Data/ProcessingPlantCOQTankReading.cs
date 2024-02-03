@@ -11,7 +11,7 @@ namespace Bunkering.Core.Data
     {
         [Key]
         public int ProcessingPlantCOQTankReadingId { get; set; }
-        public int ProcessingPlantCOQTankId { get; set; }
+        public int ProcessingPlantCOQBatchTankId { get; set; }
         public string MeasurementType { get; set; }
         public double ReadingM {  get; set; } = 0;
         public double Temperature { get; set;} = 0;

@@ -89,84 +89,116 @@ namespace Bunkering.Access.Services
                     DeliveredUsBarrelsAt15Degree = dto.DeliveredUsBarrelsAt15Degree,
                 };
 
-                _context.ProcessingPlantCOQS.Add(coq);
+                _context.ProcessingPlantCOQs.Add(coq);
                 _context.SaveChanges();
                 #endregion
 
-                #region Create COQ Tank
-                var TankReadings = new List<ProcessingPlantCOQTank>();
+                #region Create COQ batch Tank
+                var batches = new List<ProcessingPlantCOQBatch>();
+                var TankReadings = new List<ProcessingPlantCOQBatchTank>();
+                foreach (var batch in dto.COQBatches)
+                {
+                   
 
-                foreach (var before in dto.TankBeforeReadings)
-                {                    
-                    //_context.ProcessingPlantCOQTanks.Add(newCoqTank);
-                    //_context.SaveChanges();
+                    double longTonsAirB = 0; double mCubeAt15DegreeB = 0; double mTAirB = 0; double mTVacB = 0; double usBarrelsAt15DegreeB = 0;
 
-                    var after = dto.TankAfterReadings.FirstOrDefault(x => x.TankId == before.TankId);
+                    double longTonsAirA = 0; double mCubeAt15DegreeA = 0; double mTAirA = 0; double mTVacA = 0; double usBarrelsAt15DegreeA = 0;
 
-                    if (after.TankReading != null && before.TankReading != null)
+                    foreach (var before in batch.TankBeforeReadings)
                     {
-                        var b = before.TankReading;
-                        var a = after.TankReading;
+                        //_context.ProcessingPlantCOQTanks.Add(newCoqTank);
+                        //_context.SaveChanges();
 
-                        
-                        var newBTankM = new ProcessingPlantCOQTankReading
+                        var after = batch.TankAfterReadings.FirstOrDefault(x => x.TankId == before.TankId);
+
+                        if (after.TankReading != null && before.TankReading != null)
                         {
-                            //ProcessingPlantCOQTankId = newCoqTank.ProcessingPlantCOQTankId,
-                            MeasurementType = ReadingType.Before,
-                            ReadingM = b.ReadingM,
-                            Temperature = b.Temperature,
-                            Density = b.Density,
-                            SpecificGravityObs = b.SpecificGravityObs,
-                            VolumeCorrectionFactor = b.VolumeCorrectionFactor,
-                            BarrelsAtTankTables = b.BarrelsAtTankTables,
-                            WTAir = b.WTAir,
-                        };
-                        
+                            var b = before.TankReading;
+                            var a = after.TankReading;
 
-                        var newATankM = new ProcessingPlantCOQTankReading
-                        {
-                            //ProcessingPlantCOQTankId = newCoqTank.ProcessingPlantCOQTankId,
-                            MeasurementType = ReadingType.After,
-                            ReadingM = a.ReadingM,
-                            Temperature = a.Temperature,
-                            Density = a.Density,
-                            SpecificGravityObs = a.SpecificGravityObs,
-                            VolumeCorrectionFactor = a.VolumeCorrectionFactor,
-                            BarrelsAtTankTables = a.BarrelsAtTankTables,
-                            WTAir = a.WTAir,
-                        };
+                            var newBTankM = new ProcessingPlantCOQTankReading
+                            {
+                                //ProcessingPlantCOQTankId = newCoqTank.ProcessingPlantCOQTankId,
+                                MeasurementType = ReadingType.Before,
+                                ReadingM = b.ReadingM,
+                                Temperature = b.Temperature,
+                                Density = b.Density,
+                                SpecificGravityObs = b.SpecificGravityObs,
+                                VolumeCorrectionFactor = b.VolumeCorrectionFactor,
+                                BarrelsAtTankTables = b.BarrelsAtTankTables,
+                                WTAir = b.WTAir,
+                            };
 
-                        var newTankReadings = new List<ProcessingPlantCOQTankReading>
-                        {
-                            newBTankM, newATankM
-                        };
 
-                        var newCoqTank = new ProcessingPlantCOQTank
-                        {
-                            ProcessingPlantCOQId = coq.ProcessingPlantCOQId,
-                            TankId = before.TankId,
-                            SumDiffLongTonsAir = newBTankM.LongTonsAir - newATankM.LongTonsAir,
-                            SumDiffMCubeAt15Degree = newBTankM.MCubeAt15Degree - newATankM.MCubeAt15Degree,
-                            SumDiffMTAir = newBTankM.MTAir - newATankM.MTAir,
-                            SumDiffMTVac = newBTankM.MTVac - newATankM.MTVac,
-                            SumDiffUsBarrelsAt15Degree = newBTankM.UsBarrelsAt15Degree - newATankM.UsBarrelsAt15Degree
-                        };
+                            var newATankM = new ProcessingPlantCOQTankReading
+                            {
+                                //ProcessingPlantCOQTankId = newCoqTank.ProcessingPlantCOQTankId,
+                                MeasurementType = ReadingType.After,
+                                ReadingM = a.ReadingM,
+                                Temperature = a.Temperature,
+                                Density = a.Density,
+                                SpecificGravityObs = a.SpecificGravityObs,
+                                VolumeCorrectionFactor = a.VolumeCorrectionFactor,
+                                BarrelsAtTankTables = a.BarrelsAtTankTables,
+                                WTAir = a.WTAir,
+                            };
 
-                        newCoqTank.ProcessingPlantCOQTankReadings = newTankReadings;
+                            var newTankReadings = new List<ProcessingPlantCOQTankReading>
+                            {
+                                newBTankM, newATankM
+                            };
 
-                        TankReadings.Add(newCoqTank);
+                            var newCoqTank = new ProcessingPlantCOQBatchTank
+                            {
+                                TankId = before.TankId,
+                            };
+
+                            newCoqTank.ProcessingPlantCOQTankReadings = newTankReadings;
+
+                            TankReadings.Add(newCoqTank);
+
+                            //before reading of model calculated fees
+                            longTonsAirB += newBTankM.LongTonsAir;
+                            mCubeAt15DegreeB += newBTankM.MCubeAt15Degree;
+                            mTAirB += newBTankM.MTAir;
+                            mTVacB += newBTankM.MTVac;
+                            usBarrelsAt15DegreeB += newBTankM.UsBarrelsAt15Degree;
+
+                            //after reading of model calculated fees
+                            longTonsAirA += newATankM.LongTonsAir;
+                            mCubeAt15DegreeA += newATankM.MCubeAt15Degree;
+                            mTAirA += newATankM.MTAir;
+                            mTVacA += newATankM.MTVac;
+                            usBarrelsAt15DegreeA += newATankM.UsBarrelsAt15Degree;
+                        }
                     }
+
+                   
+
+                    var newBatch= new ProcessingPlantCOQBatch
+                    {
+                        ProcessingPlantCOQId = coq.ProcessingPlantCOQId,
+                        BatchId = batch.BatchId,
+                        ProcessingPlantCOQBatchTanks = TankReadings,
+                        SumDiffLongTonsAir = longTonsAirB - longTonsAirA,
+                        SumDiffMCubeAt15Degree = mCubeAt15DegreeB - mCubeAt15DegreeA,
+                        SumDiffMTAir = mTAirB - mTAirA,
+                        SumDiffMTVac = mTVacB - mTVacA,
+                        SumDiffUsBarrelsAt15Degree = usBarrelsAt15DegreeB - usBarrelsAt15DegreeA
+                    };
+
+                    batches.Add(newBatch);
                 }
 
-                _context.ProcessingPlantCOQTanks.AddRange(TankReadings);
+                _context.ProcessingPlantCOQBatches.AddRange(batches);
 
-                coq.TotalLongTonsAir = TankReadings.Sum(x => x.SumDiffLongTonsAir) - coq.LeftLongTonsAir;
-                coq.TotalMCubeAt15Degree = TankReadings.Sum(x => x.SumDiffMCubeAt15Degree) - coq.LeftMCubeAt15Degree;
-                coq.TotalMTAir = TankReadings.Sum(x => x.SumDiffMTAir) - coq.LeftMTAir;
-                coq.TotalMTVac = TankReadings.Sum(x => x.SumDiffMTVac) - coq.LeftMTVac;
-                coq.TotalUsBarrelsAt15Degree = TankReadings.Sum(x => x.SumDiffUsBarrelsAt15Degree) - coq.TotalUsBarrelsAt15Degree;
+                coq.TotalLongTonsAir = batches.Sum(x => x.SumDiffLongTonsAir) - coq.LeftLongTonsAir;
+                coq.TotalMCubeAt15Degree = batches.Sum(x => x.SumDiffMCubeAt15Degree) - coq.LeftMCubeAt15Degree;
+                coq.TotalMTAir = batches.Sum(x => x.SumDiffMTAir) - coq.LeftMTAir;
+                coq.TotalMTVac = batches.Sum(x => x.SumDiffMTVac) - coq.LeftMTVac;
+                coq.TotalUsBarrelsAt15Degree = batches.Sum(x => x.SumDiffUsBarrelsAt15Degree) - coq.TotalUsBarrelsAt15Degree;
 
-                _context.ProcessingPlantCOQS.Update(coq);
+                _context.ProcessingPlantCOQs.Update(coq);
                 #endregion
 
                 #region Document Submission
