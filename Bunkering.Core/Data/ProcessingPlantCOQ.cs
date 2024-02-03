@@ -24,11 +24,11 @@ namespace Bunkering.Core.Data
         public string? Terminal { get; set; }
         public string? Destination { get; set;}
         public string? ShipmentNo { get; set; }
-        public double? ShoreFigure { get; set; }
+         public double? PrevUsBarrelsAt15Degree { get; set; }
         public double? ShipFigure { get; set;}
-
-        public double? PrevMCubeAt15Degree { get => PrevUsBarrelsAt15Degree * 6.294; set { } }
-        public double? PrevUsBarrelsAt15Degree { get; set; }
+        public double? ShoreFigure { get => TotalMTVac; set { } }
+        public double? PrevMCubeAt15Degree { get => (PrevUsBarrelsAt15Degree / 6.294); set { } }
+       
         public double? PrevMTVac { get => (PrevMCubeAt15Degree * 769.79)/1000; set { } }
         public double? PrevMTAir { get => PrevMTVac * PrevWTAir; set { } }
         public double? PrevWTAir { get; set; }
