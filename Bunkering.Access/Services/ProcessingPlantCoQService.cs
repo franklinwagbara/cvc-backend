@@ -82,7 +82,6 @@ namespace Bunkering.Access.Services
                     Destination = dto.Destination,
                     ShipFigure = dto.ShipFigure,
                     ShipmentNo = dto.ShipmentNo,
-                    ShoreFigure = dto.ShipFigure,
                     PrevUsBarrelsAt15Degree = dto.PrevUsBarrelsAt15Degree,
                     PrevWTAir = dto.PrevWTAir,
                     DeliveredLongTonsAir = dto.DeliveredLongTonsAir,

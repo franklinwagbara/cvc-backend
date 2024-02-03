@@ -48,7 +48,7 @@ namespace Bunkering.Core.Dtos
         public string? Terminal { get; set; }
         public string? Destination { get; set; }
         public string? ShipmentNo { get; set; }
-        public double? ShoreFigure { get; set; }
+        //public double? ShoreFigure { get; set; }
         public double? ShipFigure { get; set; }
 
         //public double? PrevMCubeAt15Degree { get; set; }
