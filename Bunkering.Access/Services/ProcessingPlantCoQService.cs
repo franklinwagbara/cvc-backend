@@ -25,39 +25,42 @@ namespace Bunkering.Access.Services
     {
         private readonly IHttpContextAccessor _httpCxtAccessor;
         private ApiResponse _apiReponse;
-        private readonly UserManager<ApplicationUser> _userManager;
+        //private readonly UserManager<ApplicationUser> _userManager;
         private string LoginUserEmail = string.Empty;
         private readonly ApplicationContext _context;
-        private readonly MessageService _messageService;
+        //private readonly MessageService _messageService;
 
 
-        public ProcessingPlantCoQService(IHttpContextAccessor httpCxtAccessor, UserManager<ApplicationUser> userManager, 
-           ApplicationContext context, MessageService messageService)
+        public ProcessingPlantCoQService(IHttpContextAccessor httpCxtAccessor, UserManager<ApplicationUser> userManager, ApplicationContext context)
         {
             _httpCxtAccessor = httpCxtAccessor;
             _apiReponse = new ApiResponse();
-            _userManager = userManager;
+            //_userManager = userManager;
             _apiReponse = new ApiResponse();
             LoginUserEmail = _httpCxtAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);            
             _context = context;
-            _messageService = messageService;
+            //_messageService = messageService;
         }
 
 
         public async Task<ApiResponse> CreateLiquidStaticCOQ(UpsertPPlantCOQLiquidStaticDto dto)
         {
-            var user = await _userManager.FindByEmailAsync(LoginUserEmail);
-
-            if(user == null)
-            {
-                _apiReponse.Message = "Unathorise, this action is restricted to only authorise users";
-                _apiReponse.StatusCode = HttpStatusCode.BadRequest;
-                _apiReponse.Success = false;
-
-                return _apiReponse;
-            }
            
-            using var transaction = _context.Database.BeginTransaction();
+               
+                var userId = _httpCxtAccessor.HttpContext.User.FindFirstValue(ClaimTypes.PrimarySid);
+
+                if (userId == null)
+                {
+                    _apiReponse.Message = "Unathorise, this action is restricted to only authorise users";
+                    _apiReponse.StatusCode = HttpStatusCode.BadRequest;
+                    _apiReponse.Success = false;
+
+                    return _apiReponse;
+                }
+
+               
+
+                using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 #region Create Coq  
@@ -67,7 +70,7 @@ namespace Bunkering.Access.Services
                     ProductId = dto.ProductId,
                     Reference = Utils.GenerateCoQRefrenceCode(),
                     MeasurementSystem = dto.MeasurementSystem,
-                    CreatedBy = user.Id,
+                    CreatedBy = userId,
                     Status = Enum.GetName(typeof(AppStatus), AppStatus.Processing),
                     CreatedAt = DateTime.UtcNow.AddHours(1),
                     DipMethodId = dto.DipMethodId,
