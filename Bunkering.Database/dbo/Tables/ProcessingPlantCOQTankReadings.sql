@@ -15,9 +15,7 @@
     [MTVac]                           FLOAT (53)     NOT NULL,
     [MTAir]                           FLOAT (53)     NOT NULL,
     [LongTonsAir]                     FLOAT (53)     NOT NULL,
-    [ProcessingPlantCOQTankId1]       INT            NOT NULL,
-    CONSTRAINT [PK_ProcessingPlantCOQTankReadings_1] PRIMARY KEY CLUSTERED ([ProcessingPlantCOQTankReadingId] ASC),
-    CONSTRAINT [FK_ProcessingPlantCOQTankReadings_ProcessingPlantCOQTanks_ProcessingPlantCOQTankId1] FOREIGN KEY ([ProcessingPlantCOQTankId1]) REFERENCES [dbo].[ProcessingPlantCOQBatchTanks] ([ProcessingPlantCOQBatchTankId]) ON DELETE CASCADE
+    CONSTRAINT [PK_ProcessingPlantCOQTankReadings_1] PRIMARY KEY CLUSTERED ([ProcessingPlantCOQTankReadingId] ASC)
 );
 
 
@@ -25,7 +23,8 @@
 
 
 
+
+
 GO
-CREATE NONCLUSTERED INDEX [IX_ProcessingPlantCOQTankReadings_ProcessingPlantCOQTankId1]
-    ON [dbo].[ProcessingPlantCOQTankReadings]([ProcessingPlantCOQTankId1] ASC);
+
 
