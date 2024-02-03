@@ -289,7 +289,7 @@ namespace Bunkering.Controllers.API
         /// <returns>Returns an application info</returns>
         /// <remarks>
         /// 
-        /// Sample Request
+        /// Sample Request 
         /// GET: api/application/view-application
         /// 
         /// </remarks>

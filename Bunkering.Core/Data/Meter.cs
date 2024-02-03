@@ -12,5 +12,6 @@ namespace Bunkering.Core.Data
 		public int Id { get; set; }
 		public int PlantId { get; set; }
 		public string Name { get; set; }
+		public DateTime? DeletedAt { get; set; }
 	}
 }

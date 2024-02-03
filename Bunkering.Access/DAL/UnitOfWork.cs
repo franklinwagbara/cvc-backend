@@ -17,6 +17,7 @@ namespace Bunkering.Access.DAL
         public IApplicationType ApplicationType { get; set; }
         public IApplicationHistory ApplicationHistory { get; private set; }
         public IAppointment Appointment { get; private set; }
+        public IBatch Batch { get; private set; }
         public ICountry Country { get; private set; }
         public IDepot Depot { get; private set; }
         public IApplicationDepot ApplicationDepot { get; private set; }
@@ -33,6 +34,7 @@ namespace Bunkering.Access.DAL
         public ILGA LGA { get; private set; }
         public ILocation Location { get; private set; }
         public IMessage Message { get; private set; }
+        public IMeter Meter { get; private set; }
         public INominatedSurveyor NominatedSurveyor { get; private set; }
         public IPayment Payment { get; private set; }
         public IPermit Permit { get; private set; }
@@ -66,6 +68,7 @@ namespace Bunkering.Access.DAL
             ApplicationHistory = ApplicationHistory != null ? ApplicationHistory : new ApplicationHistoryRepository(_context);
             ApplicationType = ApplicationType != null ? ApplicationType : new ApplicationTypeRepository(_context);
             Appointment = Appointment != null ? Appointment : new AppointmentRepository(_context);
+            Batch = Batch != null ? Batch : new BatchRepository(_context);  
             Country = Country != null ? Country : new CountryRepository(_context);
             Depot = Depot != null ? Depot : new DepotRepository(_context);
             EmailConfiguration = EmailConfiguration != null ? EmailConfiguration : new EmailConfigurationRepository(_context);
@@ -79,6 +82,7 @@ namespace Bunkering.Access.DAL
             LGA = LGA != null ? LGA : new LGARepository(_context);
             Location = Location != null ? Location : new LocationRepository(_context);
             Message = Message != null ? Message : new MessageRepository(_context);
+            Meter = Meter != null ? Meter : new MeterRepository(_context);
             NominatedSurveyor = NominatedSurveyor != null ? NominatedSurveyor : new NominatedSurveyorRepository(_context);
             ApplicationSurveyor = ApplicationSurveyor != null ? ApplicationSurveyor : new ApplicationSurveyorRepository(_context);
             Payment = Payment != null ? Payment : new PaymentRepository(_context);
