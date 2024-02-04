@@ -244,52 +244,51 @@ namespace Bunkering.Access.Services
                                     Success = true
                                 };
 
+                                var request = await _elps.GenerateDebitNotePaymentReference($"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}", total, coq.Application.User.Company.Name, coq.Application.User.Email, coq.Reference, coq.Plant.Name, coq.Application.User.ElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DebitNote), "");
+                                _logger.LogRequest("Creation of payment split for application with reference:" + coq.Reference + "(" + coq.Application.User.Company.Name + ") by " + User, false, directory);
 
-                                //var request = await _elps.GenerateDebitNotePaymentReference($"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}", total, coq.Application.User.Company.Name, coq.Application.User.Email, coq.Reference, coq.Plant.Name, coq.Application.User.ElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DebitNote), "");
-                                //_logger.LogRequest("Creation of payment split for application with reference:" + coq.Reference + "(" + coq.Application.User.Company.Name + ") by " + User, false, directory);
-
-                                //if (request == null)
-                                //{
-                                //    _logger.LogRequest($"Payment output from Remita:: {request.Stringify()} by {User}", true, directory);
-                                //    _response = new ApiResponse { Message = "An error occured while generating this payment RRR. Please try again or contact support.", StatusCode = HttpStatusCode.InternalServerError };
-                                //}
-                                //else
-                                //{
-                                //if (!string.IsNullOrEmpty(request.RRR))
-                                //    {
+                                if (request == null)
+                                {
+                                    _logger.LogRequest($"Payment output from Remita:: {request.Stringify()} by {User}", true, directory);
+                                    _response = new ApiResponse { Message = "An error occured while generating this payment RRR. Please try again or contact support.", StatusCode = HttpStatusCode.InternalServerError };
+                                }
+                                else
+                                {
+                                    if (!string.IsNullOrEmpty(request.RRR))
+                                    {
 
 
-                                //        #region Send Payment E-Mail To Company
-                                //        string subject = $"Generation of Debit Note For COQ with reference: {coq.Reference}";
+                                        #region Send Payment E-Mail To Company
+                                        string subject = $"Generation of Debit Note For COQ with reference: {coq.Reference}";
 
-                                //        var emailBody = string.Format($"A Payment RRR: {payment.RRR} has been generated for your COQ with reference number: {coq.Reference}" +
-                                //            "<br /><ul>" +
-                                //            "<li>Amount Generated: {0}</li>" +
-                                //            "<li>Remita RRR: {1}</li>" +
-                                //            "<li>Payment Status: {2}</li>" +
-                                //            "<li>Payment Description: {3}</li>" +
-                                //            "<li>Vessel Name: {4}</li>" +
-                                //            "<p>Kindly note that your application will be pending until this payment is completed. </p>",
-                                //            payment.Amount.ToString(), payment.RRR, payment.Status, payment.Description, $"{coq.Plant.Name}");
+                                        var emailBody = string.Format($"A Payment RRR: {payment.RRR} has been generated for your COQ with reference number: {coq.Reference}" +
+                                            "<br /><ul>" +
+                                            "<li>Amount Generated: {0}</li>" +
+                                            "<li>Remita RRR: {1}</li>" +
+                                            "<li>Payment Status: {2}</li>" +
+                                            "<li>Payment Description: {3}</li>" +
+                                            "<li>Vessel Name: {4}</li>" +
+                                            "<p>Kindly note that your application will be pending until this payment is completed. </p>",
+                                            payment.Amount.ToString(), payment.RRR, payment.Status, payment.Description, $"{coq.Plant.Name}");
 
-                                //        #endregion
+                                        #endregion
 
-                                //        string successMsg = $"Debit Note RRR ({payment.RRR}) generated successfully for {coq.Plant.Name}";
-                                //        _response = new ApiResponse
-                                //        {
-                                //            Message = successMsg,
-                                //            Data = new { rrr = payment.RRR },
-                                //            StatusCode = HttpStatusCode.OK,
-                                //            Success = true
-                                //        };
-                                //    }
-                                //    else
-                                //        _response = new ApiResponse
-                                //        {
-                                //            Message = "Unable to generate RRR, pls try again",
-                                //            StatusCode = HttpStatusCode.InternalServerError
-                                //        };
-                                //}
+                                        string successMsg = $"Debit Note RRR ({payment.RRR}) generated successfully for {coq.Plant.Name}";
+                                        _response = new ApiResponse
+                                        {
+                                            Message = successMsg,
+                                            Data = new { rrr = payment.RRR },
+                                            StatusCode = HttpStatusCode.OK,
+                                            Success = true
+                                        };
+                                    }
+                                    else
+                                        _response = new ApiResponse
+                                        {
+                                            Message = "Unable to generate RRR, pls try again",
+                                            StatusCode = HttpStatusCode.InternalServerError
+                                        };
+                                }
                             }
                         }
                     }

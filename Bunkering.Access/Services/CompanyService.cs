@@ -162,7 +162,6 @@ namespace Bunkering.Access.Services
 			var user = _userManager.Users.Include("Company").FirstOrDefault(x => x.Email == User);
 			try
 			{
-
 				if (await _userManager.IsInRoleAsync(user, "Support") || await _userManager.IsInRoleAsync(user, "ICT")
 					|| await _userManager.IsInRoleAsync(user, "SuperAdmin"))
 				{
@@ -311,12 +310,12 @@ namespace Bunkering.Access.Services
 
                 _elps.UpdateCompanyDetails(model, User, true)?.Stringify()?.Parse<CompanyModel>();
 
-				if (!model.email.Equals(companyuser.Email, StringComparison.OrdinalIgnoreCase))
+				if (!model.user_Id.Equals(companyuser.Email, StringComparison.OrdinalIgnoreCase))
 				{
-					companyuser.Email = model.email;
-					companyuser.NormalizedEmail = model.email;
-					companyuser.NormalizedUserName = model.email;
-					companyuser.UserName = model.email;
+					companyuser.Email = model.user_Id;
+					companyuser.NormalizedEmail = model.user_Id;
+					companyuser.NormalizedUserName = model.user_Id;
+					companyuser.UserName = model.user_Id;
 				}
 
                 companyuser.FirstName = model.contact_FirstName;
@@ -329,7 +328,7 @@ namespace Bunkering.Access.Services
                 companyuser.Company.TinNumber = model.tin_Number;
                 companyuser.Company.YearIncorporated = model.year_Incorporated;
 
-				companyuser.Company.OperatingFacilityId = model.OperatingFacilityId;
+				//companyuser.Company.OperatingFacilityId = model.OperatingFacilityId;
 
                 await _userManager.UpdateAsync(companyuser);
                 _response = new ApiResponse
