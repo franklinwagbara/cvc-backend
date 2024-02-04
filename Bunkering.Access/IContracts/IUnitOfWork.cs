@@ -40,6 +40,7 @@ namespace Bunkering.Access.IContracts
         IRole Role { get; }
         IPlant Plant { get; }
         IPlantTank PlantTank { get; }
+        IProcessingPlantCoQ ProcessingPlantCoQ { get; }
         IState State { get; }
         ISubmittedDocument SubmittedDocument { get; }
         ITank Tank { get; }

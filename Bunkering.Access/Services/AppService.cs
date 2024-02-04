@@ -1111,6 +1111,7 @@ namespace Bunkering.Access.Services
             private async Task<ApiResponse> GetMyDeskFO(ApplicationUser? user)
             {
             var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Plant");
+            //var processingPlantCoQs = await _unitOfWork.ProcessingPlantCoQ.Find(x => x.)
             // if (await _userManager.IsInRoleAsync(user, "FAD"))
             //     coqs = await _unitOfWork.CoQ.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)));
             if (await _userManager.IsInRoleAsync(user, "Company"))

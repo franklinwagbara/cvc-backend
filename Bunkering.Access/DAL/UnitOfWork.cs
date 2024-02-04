@@ -59,6 +59,7 @@ namespace Bunkering.Access.DAL
         public IvDebitNote vDebitNote { get; private set; }
         public IApplicationSurveyor ApplicationSurveyor { get; private set; }
         public IVesselDischargeClearance VesselDischargeClearance { get; set; }
+        public IProcessingPlantCoQ ProcessingPlantCoQ { get; set; }
 
         public UnitOfWork(ApplicationContext context)
         {
@@ -116,6 +117,7 @@ namespace Bunkering.Access.DAL
             MeterType = MeterType ?? new MeterTypeRepository(_context);
             TransferDetail = TransferDetail ?? new TransferDetailRepository(_context);
             TransferRecord = TransferRecord ?? new TransferRecordRepository(_context);
+            ProcessingPlantCoQ = ProcessingPlantCoQ ?? new ProcessingPlantCoQRepository(context);
         }
 
         public int Save() => _context.SaveChanges();

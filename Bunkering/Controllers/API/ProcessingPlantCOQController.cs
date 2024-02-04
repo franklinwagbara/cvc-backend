@@ -4,6 +4,7 @@ using Bunkering.Core.Dtos;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace Bunkering.Controllers.API
 {
@@ -18,7 +19,14 @@ namespace Bunkering.Controllers.API
             _processingPlantCoQService = processingPlantCoQService;
         }
 
-      
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Produces("application/json")]
+        [Route("all_coqs")]
+        [HttpGet]
+        public async Task<IActionResult> Index() => Response(await _processingPlantCoQService.GetAllCoQ());
 
 
         [Route("create-liquid-static-coq")]
