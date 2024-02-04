@@ -27,6 +27,7 @@ namespace Bunkering.Core.Data
         public string? ShipmentNo { get; set; }
          public double? PrevUsBarrelsAt15Degree { get; set; }
         public double? ShipFigure { get; set;}
+       
         public double? ShoreFigure { get => TotalMTVac; set { } }
         public double? PrevMCubeAt15Degree { get => (PrevUsBarrelsAt15Degree / 6.294); set { } }
        
@@ -34,12 +35,11 @@ namespace Bunkering.Core.Data
         public double? PrevMTAir { get => PrevMTVac * PrevWTAir; set { } }
         public double? PrevWTAir { get; set; }
         public double? PrevLongTonsAir { get => PrevMTAir * 0.984206; set { } }
-
-        public double? LeftMCubeAt15Degree { get; set; }
         public double? LeftUsBarrelsAt15Degree { get; set; }
-        public double? LeftMTVac { get; set; }
-        public double? LeftMTAir { get; set; }
-        public double? LeftLongTonsAir { get; set; }
+        public double? LeftMCubeAt15Degree { get => LeftUsBarrelsAt15Degree / 6.294; set { } }        
+        public double? LeftMTVac { get => LeftMCubeAt15Degree * 0.76786; set { } }
+        public double? LeftMTAir { get => LeftMTVac * PrevWTAir; set { } }
+        public double? LeftLongTonsAir { get => LeftMTAir * 0.984206; set { } }
 
         public double? TotalMCubeAt15Degree { get; set; }
         public double? TotalUsBarrelsAt15Degree { get; set; }

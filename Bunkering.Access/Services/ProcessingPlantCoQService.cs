@@ -239,11 +239,23 @@ namespace Bunkering.Access.Services
 
                 _context.ProcessingPlantCOQBatches.AddRange(batches);
 
-                coq.TotalLongTonsAir = batches.Sum(x => x.SumDiffLongTonsAir) - coq.LeftLongTonsAir;
-                coq.TotalMCubeAt15Degree = batches.Sum(x => x.SumDiffMCubeAt15Degree) - coq.LeftMCubeAt15Degree;
-                coq.TotalMTAir = batches.Sum(x => x.SumDiffMTAir) - coq.LeftMTAir;
-                coq.TotalMTVac = batches.Sum(x => x.SumDiffMTVac) - coq.LeftMTVac;
-                coq.TotalUsBarrelsAt15Degree = batches.Sum(x => x.SumDiffUsBarrelsAt15Degree) - coq.TotalUsBarrelsAt15Degree;
+                _context.SaveChanges();
+
+                var sumLongTonAir = batches.Sum(x => x.SumDiffLongTonsAir);
+                var xx = batches.FirstOrDefault().SumDiffUsBarrelsAt15Degree;
+                coq.LeftUsBarrelsAt15Degree = coq.PrevUsBarrelsAt15Degree - batches.LastOrDefault().SumDiffUsBarrelsAt15Degree;
+
+                //coq.LeftMCubeAt15Degree  = coq.LeftUsBarrelsAt15Degree / 6.294;
+                //coq.LeftMTVac = coq.LeftMCubeAt15Degree * 0.76786;
+                //coq.LeftMTAir = coq.LeftMTVac * coq.PrevWTAir;
+                //coq.LeftLongTonsAir = coq.LeftMTAir * 0.984206;
+
+                coq.TotalLongTonsAir = batches.FirstOrDefault().SumDiffLongTonsAir + coq.PrevLongTonsAir - coq.LeftLongTonsAir;
+                coq.TotalMCubeAt15Degree = batches.FirstOrDefault().SumDiffMCubeAt15Degree + coq.PrevMCubeAt15Degree - coq.LeftMCubeAt15Degree;
+                coq.TotalMTAir = batches.FirstOrDefault().SumDiffMTAir + coq.PrevMTAir - coq.LeftMTAir;
+                coq.TotalMTVac = batches.FirstOrDefault().SumDiffMTVac + coq.PrevMTVac - coq.LeftMTVac;
+                coq.TotalUsBarrelsAt15Degree = batches.FirstOrDefault().SumDiffUsBarrelsAt15Degree + coq.PrevUsBarrelsAt15Degree - coq.LeftUsBarrelsAt15Degree;
+                coq.ShoreFigure = coq.TotalMTVac;
 
                 _context.ProcessingPlantCOQs.Update(coq);
                 #endregion
