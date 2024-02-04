@@ -136,14 +136,14 @@
     <Build Include="dbo\Tables\SourceRecipientVessel.sql" />
     <Build Include="dbo\Tables\ProcessingPlantCOQTankReadings.sql" />
     <Build Include="dbo\Tables\ProcessingPlantCOQS.sql" />
-    <Build Include="dbo\Tables\ProcessingPlantCOQLiquidDynamics.sql" />
-    <Build Include="dbo\Tables\ProcessingPlantCOQLiquidDynamicReadings.sql" />
     <Build Include="dbo\Tables\Meters.sql" />
-    <Build Include="dbo\Tables\MeterReadings.sql" />
     <Build Include="dbo\Tables\OperatingFacilities.sql" />
     <Build Include="dbo\Tables\ProcessingPlantCOQBatchTanks.sql" />
     <Build Include="dbo\Tables\ProcessingPlantCOQBatches.sql" />
     <Build Include="dbo\Tables\Batches.sql" />
+    <Build Include="dbo\Tables\ProcessingPlantCOQLiquidDynamicMeters.sql" />
+    <Build Include="dbo\Tables\ProcessingPlantCOQLiquidDynamicBatches.sql" />
+    <Build Include="dbo\Tables\LiquidDynamicMeterReadings.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Snapshots\Bunkering.Database_20230810_10-01-52.dacpac" />

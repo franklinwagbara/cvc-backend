@@ -7,11 +7,12 @@ using System.Threading.Tasks;
 
 namespace Bunkering.Core.Data
 {
-    public class MeterReading
+    public class LiquidDynamicMeterReading
     {
         [Key]
-        public int MeterReadingId { get; set; }
-        public int ProcessingPlantCOQLiquidDynamicReadingId { get; set; }
+        public int LiquidDynamicMeterReadingId { get; set; }
+        public int ProcessingPlantCOQLiquidDynamicMeterId { get; set; }
+        public string MeasurementType { get; set; }
         public double MCube { get; set; } = 0;
 
     }
