@@ -1,11 +1,10 @@
 ﻿using Bunkering.Core.ViewModels;
-using System.ComponentModel.DataAnnotations;
 
 namespace Bunkering.Core.Dtos
 {
     public class UpsertProcessingPlantCOQDynamicReadingsDto
     {
-        public int Batch { get; set; }
+        public int MeterId { get; set; }
         public double Temperature { get; set; } = 0;
         public double Density { get; set; } = 0;
         public double MeterFactor { get; set; } = 0;
@@ -13,16 +12,24 @@ namespace Bunkering.Core.Dtos
         public double Cpl { get; set; } = 0;
 
         public double WTAir { get; set; } = 0;
+
+        public MeterBeforReadingDto MeterBeforReadingDto { get; set; }
+        public MeterAfterReadingDto MeterAfterReadingDto { get; set; }
     }
 
     public class BatchReadingDto
     {
-        public int MeterId { get; set; }
-        public UpsertProcessingPlantCOQDynamicReadingsDto MeterReading { get; set; }
-        public List<MeterReadingDto> MeterReadingList { get; set;}
+        public int BatchId { get; set; }
+        public List<UpsertProcessingPlantCOQDynamicReadingsDto> MeterReadings { get; set; }
+        
     }
 
-    public class MeterReadingDto
+    public class MeterAfterReadingDto
+    {
+        public double MCube { get; set; } = 0;
+    }
+
+    public class MeterBeforReadingDto
     {
         public double MCube { get; set; } = 0;
 
@@ -42,23 +49,18 @@ namespace Bunkering.Core.Dtos
         public string? Terminal { get; set; }
         public string? Destination { get; set; }
         public string? ShipmentNo { get; set; }
-        public double? ShoreFigure { get; set; }
         public double? ShipFigure { get; set; }
-
         public double? PrevMCubeAt15Degree { get; set; }
         public double? PrevUsBarrelsAt15Degree { get; set; }
         public double? PrevMTVac { get; set; }
-        public double? PrevMTAir { get; set; }
         public double? PrevWTAir { get; set; }
-        public double? PrevLongTonsAir { get; set; }
-
         public double? LeftMCubeAt15Degree { get; set; }
         public double? LeftUsBarrelsAt15Degree { get; set; }
         public double? LeftMTVac { get; set; }
         public double? LeftMTAir { get; set; }
         public double? LeftLongTonsAir { get; set; }
 
-        public List<BatchReadingDto> BatchReading { get; set; }
+        public List<BatchReadingDto> COQBatches { get; set; }
         public List<SubmitDocumentDto> SubmitDocuments { get; set; }
     }
     

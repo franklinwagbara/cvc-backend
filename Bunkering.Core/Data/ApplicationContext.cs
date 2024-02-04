@@ -34,7 +34,7 @@ namespace Bunkering.Core.Data
         public DbSet<Location> Locations { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Meter> Meters { get; set; }
-        public DbSet<MeterReading> MeterReadings { get; set; }
+        public DbSet<LiquidDynamicMeterReading> LiquidDynamicMeterReadings { get; set; }
         public DbSet<NominatedSurveyor> NominatedSurveyors { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Plant> Plants { get; set; }
@@ -58,8 +58,8 @@ namespace Bunkering.Core.Data
         public DbSet<PlantFieldOfficer> PlantFieldOfficers { get; set; }
         public DbSet<ProcessingPlantCOQ> ProcessingPlantCOQs { get; set; }
         public DbSet<ProcessingPlantCOQBatch> ProcessingPlantCOQBatches { get; set; }
-        public DbSet<ProcessingPlantCOQLiquidDynamic> ProcessingPlantCOQLiquidDynamics { get; set; }
-        public DbSet<ProcessingPlantCOQLiquidDynamicReading> ProcessingPlantCOQLiquidDynamicReadings { get; set; }
+        public DbSet<ProcessingPlantCOQLiquidDynamicBatch> ProcessingPlantCOQLiquidDynamicBatches { get; set; }
+        public DbSet<ProcessingPlantCOQLiquidDynamicMeter> ProcessingPlantCOQLiquidDynamicMeters { get; set; }
         public DbSet<ProcessingPlantCOQBatchTank> ProcessingPlantCOQBatchTanks { get; set; }
         public DbSet<ProcessingPlantCOQTankReading> ProcessingPlantCOQTankReadings { get; set; }
         public DbSet<JettyFieldOfficer> JettyFieldOfficers { get; set; }
