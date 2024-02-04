@@ -47,20 +47,20 @@ namespace Bunkering.Access.Services
         {
            
                
-                var userId = _httpCxtAccessor.HttpContext.User.FindFirstValue(ClaimTypes.PrimarySid);
+            var userId = _httpCxtAccessor.HttpContext.User.FindFirstValue(ClaimTypes.PrimarySid);
 
-                if (userId == null)
-                {
-                    _apiReponse.Message = "Unathorise, this action is restricted to only authorise users";
-                    _apiReponse.StatusCode = HttpStatusCode.BadRequest;
-                    _apiReponse.Success = false;
+            if (userId == null)
+            {
+                _apiReponse.Message = "Unathorise, this action is restricted to only authorise users";
+                _apiReponse.StatusCode = HttpStatusCode.BadRequest;
+                _apiReponse.Success = false;
 
-                    return _apiReponse;
-                }
+                return _apiReponse;
+            }
 
                
 
-                using var transaction = await _context.Database.BeginTransactionAsync();
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 #region Create Coq  

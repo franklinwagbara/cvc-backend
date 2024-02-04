@@ -25,8 +25,8 @@ namespace Bunkering.Controllers.API
         [HttpPost]
         public async Task<IActionResult> CreateLiquidStaticCOQ(UpsertPPlantCOQLiquidStaticDto dto)
         {
-            var result = _processingPlantCoQService.CreateLiquidStaticCOQ(dto);
-            return Ok(result);
+            var result = await _processingPlantCoQService.CreateLiquidStaticCOQ(dto);
+            return Response(result);
         }
 
         [Route("create-liquid-dynamic-coq")]

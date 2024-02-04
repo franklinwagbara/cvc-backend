@@ -370,7 +370,8 @@ namespace Bunkering.Access.Services
                 Name = mapping.Name,
                 PlantType = mapping.PlantType,
                 State = mapping.State,
-                Tanks = mapping.Tanks
+                Tanks = mapping.Tanks,
+                Meters = mapping.Meters
             };
             
             return new ApiResponse
@@ -684,7 +685,8 @@ namespace Bunkering.Access.Services
                             PlantType = x.PlantType,
                             State = x.State,
                             IsDeleted = x.IsDeleted,
-                            Tanks = x.Tanks.Where(u => !u.IsDeleted).ToList()
+                            Tanks = x.Tanks.Where(u => !u.IsDeleted).ToList(),
+                            Meters = x.Meters
                         })
                         .Where(x => x.PlantType == (int)PlantType.ProccessingPlant)
                         .ToList();

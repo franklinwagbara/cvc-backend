@@ -1499,6 +1499,22 @@
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
         </member>
+        <member name="M:Bunkering.Controllers.API.MeterController.MeterByPlantId(System.Int32)">
+            <summary>
+            This endpoint is used to fetch  Meters By PlantId
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/Meter/MetersByPlantId
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
         <member name="M:Bunkering.Controllers.API.OperatingFacilityController.AllOperatingFacilities">
             <summary>
             This endpoint is used to fetch all operating facilities
