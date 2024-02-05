@@ -232,13 +232,15 @@ namespace Bunkering.Access.Services
                     var certificate = await GenerateCOQCertificate(coqId, currentUser.Id, plant.CompanyElpsId.ToString());
 
                     //add CoQId to CoQReference rrcord
-                    var cqqReference = await _unitOfWork.CoQReference.Add(new CoQReference
+                    var coqReference = await _unitOfWork.CoQReference.Add(new CoQReference
                     {
                         DepotCoQId = coqId,
-
                     });
 
-                    var debitnote = await _paymentService.GenerateDebitNote(coq.Id);
+                    await _unitOfWork.CoQReference.Add(coqReference);
+                    await _unitOfWork.SaveChangesAsync(currentUser.Id);
+
+                    var debitnote = await _paymentService.GenerateDebitNote(coqReference.Id);
 
                     if (certificate.Item1)
                         message = $"COQ Application has been approved and certificate {certificate.Item2} has been generated successfully.";

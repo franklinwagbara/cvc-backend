@@ -12,9 +12,9 @@ namespace Bunkering.Core.Data
         public int Id { get; set; }
         public int? DepotCoQId { get; set; }
         public int? PlantCoQId { get; set; }
-        public string CoQType { get; set; }
+        public bool IsDeleted { get; set; }
         [ForeignKey(nameof(DepotCoQId))]
-        public CoQ? CoQ { get; set; }
+        public CoQ? DepotCoQ { get; set; }
         [ForeignKey(nameof(PlantCoQId))]
         public ProcessingPlantCOQ? ProcessingPlantCOQ { get; set; }
     }
