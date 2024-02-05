@@ -211,7 +211,7 @@ namespace Bunkering.Access.Services
 							Status = user.IsActive,
 							Location = user.Location?.Name,
 							Office = user.Office?.Name,
-							Directorate = user.Directorate,
+							user.Directorate,
 							operationFacility = plantTypeName,
 
                             Token = GenerateToken(user, user.UserRoles.FirstOrDefault(x => x.Role?.Name?.Equals("Staff") is false)?.Role?.Name, plantTypeName)
