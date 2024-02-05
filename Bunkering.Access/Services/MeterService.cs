@@ -161,5 +161,28 @@ namespace Bunkering.Access.Services
                 Success = false,
             };
         }
+
+        public async Task<ApiResponse> MeterByPlantId(int plantId)
+        {
+            var result = await _unitOfWork.Meter.FirstOrDefaultAsync(x => x.PlantId.Equals(plantId));
+            if (result != null)
+            {
+                return new ApiResponse
+                {
+                    Data = result,
+                    Message = "Successful",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true,
+                };
+
+            }
+
+            return new ApiResponse
+            {
+                Message = "Meter Not Found",
+                StatusCode = HttpStatusCode.NotFound,
+                Success = false,
+            };
+        }
     }
 }
