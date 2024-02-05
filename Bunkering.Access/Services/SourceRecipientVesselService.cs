@@ -1,6 +1,5 @@
 ﻿using Bunkering.Access.IContracts;
 using Bunkering.Core.Data;
-using Bunkering.Core.Utils;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -15,31 +14,34 @@ using System.Threading.Tasks;
 
 namespace Bunkering.Access.Services
 {
-    public class JettyOfficerService
+    public class SourceRecipientVesselService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
         private ApiResponse _response = new ApiResponse();
         private readonly UserManager<ApplicationUser> _userManager;
+
         private string User;
-        public JettyOfficerService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<ApplicationUser> userManager)
+        public SourceRecipientVesselService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
-            _userManager = userManager;
+            //_response = response;
             User = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
+            _userManager = userManager;
         }
 
-        public async Task<ApiResponse> GetAllJettyOfficerMapping()
+
+        public async Task<ApiResponse> GetAllSourceRecipientMapping()
         {
-            var mappings = (await _unitOfWork.JettyOfficer.GetAll("Jetty,Officer")).ToList();
+            var mappings = (await _unitOfWork.SourceRecipientVessel.GetAll("SourceVessel,DestinationVessel")).ToList();
             //var staffs = await _userManager.Users.Where(x => x.IsDeleted != true).ToListAsync();
-            var filteredMappings = mappings.Where(x => x.IsDeleted == false).Select(d => new JettyFieldOfficerViewModel
+            var filteredMappings = mappings.Where(x => x.IsDeleted == false).Select(d => new SourceDestinationVesselViewModel
             {
-                JettyID = d.ID,
-                UserID = d.OfficerID,
-                JettyName = d.Jetty?.Name,
-                OfficerName = _userManager.Users.Where(x => x.Id == d.OfficerID).Select(n =>  n.FirstName + ' ' + n.LastName).FirstOrDefault(),
+                SourceVesselId = d.SourceVesselId,
+                DestinationVesselId = d.DestinationVesselId,
+                SourceVesselName = d.SourceVessel?.Name,
+                DestinationVesselName = d.DestinationVessel?.Name,
             }).ToList();
 
             return new ApiResponse
@@ -51,9 +53,9 @@ namespace Bunkering.Access.Services
             };
         }
 
-        public async Task<ApiResponse> GetJettyOfficerByID(int id)
+        public async Task<ApiResponse> GetSourceRecipientVesselByID(int id)
         {
-            JettyFieldOfficer? mapping = await _unitOfWork.JettyOfficer.FirstOrDefaultAsync(x => x.ID == id);
+            SourceRecipientVessel? mapping = await _unitOfWork.SourceRecipientVessel.FirstOrDefaultAsync(x => x.Id == id);
             return new ApiResponse
             {
                 Message = "All Mapping found",
@@ -63,30 +65,30 @@ namespace Bunkering.Access.Services
             };
         }
 
-        public async Task<ApiResponse> CreateJettyOfficerMapping(JettyFieldOfficerViewModel newJettyOfficer)
+        public async Task<ApiResponse> CreateSourceRecipientVesselMapping(SourceDestinationVesselViewModel model)
         {
             try
             {
-                var userExists = await _userManager.Users.AnyAsync(c => c.Id == newJettyOfficer.UserID.ToString());
-                var jettyExists = await _unitOfWork.Jetty.FirstOrDefaultAsync(c => c.Id == newJettyOfficer.JettyID) is not null;
+                var SourceVesselExists = await _unitOfWork.Facility.FirstOrDefaultAsync(c => c.Id == model.SourceVesselId) is not null;
+                var DestinationVesselExists = await _unitOfWork.Facility.FirstOrDefaultAsync(c => c.Id == model.DestinationVesselId) is not null;
 
 
-                if (!jettyExists)
+                if (!SourceVesselExists)
                 {
                     _response = new ApiResponse
                     {
-                        Message = "Jetty not found",
+                        Message = "Source Vessel not found",
                         StatusCode = HttpStatusCode.NotFound,
                         Success = false
                     };
 
                 }
 
-                else if (!userExists)
+                else if (!DestinationVesselExists)
                 {
                     _response = new ApiResponse
                     {
-                        Message = "Officer not found",
+                        Message = "Destination Vessel not found",
                         StatusCode = HttpStatusCode.NotFound,
                         Success = false
                     };
@@ -95,22 +97,22 @@ namespace Bunkering.Access.Services
 
                 else
                 {
-                    var existingMap = await _unitOfWork.JettyOfficer.FirstOrDefaultAsync(a => a.OfficerID == newJettyOfficer.UserID && a.JettyId == newJettyOfficer.JettyID);
+                    var existingMap = await _unitOfWork.SourceRecipientVessel.FirstOrDefaultAsync(a => a.SourceVesselId == model.SourceVesselId && a.DestinationVesselId == model.DestinationVesselId);
                     if (existingMap == null)
 
                     {
-                        var map = new JettyFieldOfficer
+                        var map = new SourceRecipientVessel
                         {
-                            JettyId = newJettyOfficer.JettyID,
-                            OfficerID = newJettyOfficer.UserID
+                            SourceVesselId = model.SourceVesselId,
+                            DestinationVesselId = model.DestinationVesselId
 
                         };
-                        await _unitOfWork.JettyOfficer.Add(map);
+                        await _unitOfWork.SourceRecipientVessel.Add(map);
                         await _unitOfWork.SaveChangesAsync("");
 
                         _response = new ApiResponse
                         {
-                            Message = "Jetty Officer mapping was added successfully.",
+                            Message = "Source Recipient mapping was added successfully.",
                             StatusCode = HttpStatusCode.OK,
                             Success = true,
                         };
@@ -120,15 +122,13 @@ namespace Bunkering.Access.Services
                     {
                         _response = new ApiResponse
                         {
-                            Message = "Officer is Already Assigned To This Jetty",
+                            Message = "Recipient is Already Assigned To This Source Vessel",
                             StatusCode = HttpStatusCode.Conflict,
                             Success = false,
                         };
 
                     }
                 }
-
-
             }
             catch (Exception ex)
             {
@@ -143,18 +143,18 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
-        public async Task<ApiResponse> EditJettyOfficerMapping(int id, JettyFieldOfficerViewModel jetty)
+        public async Task<ApiResponse> EditSourceDestinationMapping(int id, SourceDestinationVesselViewModel model)
         {
             try
             {
                 var user = await _userManager.FindByEmailAsync(User);
-                var updatMapping = await _unitOfWork.JettyOfficer.FirstOrDefaultAsync(x => x.ID == id);
+                var updatMapping = await _unitOfWork.SourceRecipientVessel.FirstOrDefaultAsync(x => x.Id == id);
                 try
                 {
                     if (updatMapping != null)
                     {
-                        updatMapping.JettyId = jetty.JettyID;
-                        updatMapping.OfficerID = jetty.UserID;
+                        updatMapping.SourceVesselId = model.SourceVesselId;
+                        updatMapping.DestinationVesselId = model.DestinationVesselId;
                         var success = await _unitOfWork.SaveChangesAsync(user!.Id) > 0;
                         _response = new ApiResponse
                         {
@@ -200,13 +200,13 @@ namespace Bunkering.Access.Services
                         Success = true
                     };
                 }
-                var deactiveMapping = await _unitOfWork.JettyOfficer.FirstOrDefaultAsync(a => a.ID == id);
+                var deactiveMapping = await _unitOfWork.SourceRecipientVessel.FirstOrDefaultAsync(a => a.Id == id);
                 if (deactiveMapping != null)
                 {
                     if (!deactiveMapping.IsDeleted)
                     {
                         deactiveMapping.IsDeleted = true;
-                        await _unitOfWork.JettyOfficer.Update(deactiveMapping);
+                        await _unitOfWork.SourceRecipientVessel.Update(deactiveMapping);
                         await _unitOfWork.SaveChangesAsync(user.Id);
 
                         _response = new ApiResponse

@@ -76,6 +76,8 @@ namespace Bunkering.Core.Data
         public DbSet<DippingMethod> DippingMethod {  get; set; }
         public DbSet<TransferDetail> TransferDetail {  get; set; }
         public DbSet<TransferRecord> TransferRecord {  get; set; }
+        public DbSet<SourceRecipientVessel> SourceRecipientVessel {  get; set; }
+        public DbSet<OperatingFacility> OperatingFacility { get; set; }
         public DbSet<OperatingFacility> OperatingFacilities { get; set; }
         public DbSet<PPCOQHistory> PPCOQHistories { get; set; }
 

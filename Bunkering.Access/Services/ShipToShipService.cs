@@ -33,8 +33,9 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> AddRecord(DestinationVesselDTO transferRecord)
         {
+
             try
-            {
+            {                
                 if (transferRecord is not null)
                 {
                     var tr = new TransferRecord();
@@ -45,6 +46,7 @@ namespace Bunkering.Access.Services
                     tr.VesselName = transferRecord.VesselName;
                     tr.TotalVolume = transferRecord.TotalVolume;
                     tr.VesselTypeId = transferRecord.VesselTypeId;
+                    tr.UserId = User;
                     tr.TransferDetails = new List<TransferDetail>();
                     foreach (var item in transferRecord.DestinationVessels)
                     {
@@ -84,9 +86,11 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
-        public async Task<ApiResponse> GetAllTransferRecords()
+        public async Task<ApiResponse> GetAllTransferRecordsByCompany()
         {
-            var records = await _unitOfWork.TransferRecord.GetAll();
+            var user = await _userManager.FindByEmailAsync(User);
+           
+            var records =  GetAllTransferByEmail(User);
 
             return new ApiResponse
             {
@@ -95,6 +99,59 @@ namespace Bunkering.Access.Services
                 Success = true,
                 Data = records
             };
+        }
+
+        public async Task<ApiResponse> GetAllTransferRecords()
+        {
+            var records = GetAllTransfer();
+
+            return new ApiResponse
+            {
+                Message = "All Fees found",
+                StatusCode = HttpStatusCode.OK,
+                Success = true,
+                Data = records
+            };
+        }
+
+        private List<TransferRecord> GetAllTransferByEmail(string email)
+        {
+
+            var plist = _unitOfWork.TransferRecord.Query().Where(x => x.UserId == email)
+                        .Select(x => new TransferRecord
+                        {
+                            Id = x.Id,
+                            LoadingPort = x.LoadingPort,
+                            IMONumber = x.IMONumber,
+                            MotherVessel = x.MotherVessel,
+                            TotalVolume = x.TotalVolume,
+                            TransferDate = x.TransferDate,
+                            VesselName = x.VesselName,
+                            VesselTypeId = x.VesselTypeId,
+                            TransferDetails = x.TransferDetails.ToList()
+                        })
+                        .ToList();
+            return plist;
+        }
+
+        private List<TransferRecord> GetAllTransfer()
+        {
+
+            var plist = _unitOfWork.TransferRecord.Query()
+                        .Select(x => new TransferRecord
+                        {
+                            Id = x.Id,
+                            LoadingPort = x.LoadingPort,
+                            IMONumber = x.IMONumber,
+                            MotherVessel = x.MotherVessel,
+                            TotalVolume = x.TotalVolume,
+                            TransferDate = x.TransferDate,
+                            VesselName = x.VesselName,
+                            VesselTypeId = x.VesselTypeId,
+                            TransferDetails = x.TransferDetails.ToList()
+                        })
+                        .ToList();
+            return plist;
         }
 
         //public async Task<ApiResponse> GetTransferRecordsByVesselId(int vesselId)
@@ -114,6 +171,6 @@ namespace Bunkering.Access.Services
         //    };
         //}
 
-       
+
     }
 }

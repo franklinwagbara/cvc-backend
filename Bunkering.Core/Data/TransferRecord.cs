@@ -18,6 +18,7 @@ namespace Bunkering.Core.Data
         public string? LoadingPort { get; set; }
         public DateTime TransferDate { get; set; }
         public double TotalVolume { get; set; }
+        public string UserId { get; set; }
 
 
         public ICollection<TransferDetail> TransferDetails { get; set; }
