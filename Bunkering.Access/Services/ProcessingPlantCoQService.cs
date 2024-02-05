@@ -42,7 +42,6 @@ namespace Bunkering.Access.Services
             //_messageService = messageService;
         }
 
-
         public async Task<ApiResponse> CreateLiquidStaticCOQ(UpsertPPlantCOQLiquidStaticDto dto)
         {
            
@@ -306,7 +305,6 @@ namespace Bunkering.Access.Services
             };
         }
 
-
         public async Task<ApiResponse> CreateLiquidDynamicCOQ(UpsertPPlantCOQLiquidDynamicDto dto)
         {
 
@@ -540,7 +538,5 @@ namespace Bunkering.Access.Services
                 StatusCode = HttpStatusCode.OK
             };
         }
-
-
     }
 }
