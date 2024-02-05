@@ -241,14 +241,17 @@ namespace Bunkering.Access.Services
 
                 _context.SaveChanges();
 
-                var sumLongTonAir = batches.Sum(x => x.SumDiffLongTonsAir);
-                var xx = batches.FirstOrDefault().SumDiffUsBarrelsAt15Degree;
+                 coq.PrevMCubeAt15Degree  = (coq.PrevUsBarrelsAt15Degree / 6.294);
+
+                coq.PrevMTVac = (coq.PrevMCubeAt15Degree * 769.79) / 1000;
+                coq.PrevMTAir = coq.PrevMTVac * coq.PrevWTAir;
+                coq.PrevLongTonsAir = coq.PrevMTAir * 0.984206;
                 coq.LeftUsBarrelsAt15Degree = coq.PrevUsBarrelsAt15Degree - batches.LastOrDefault().SumDiffUsBarrelsAt15Degree;
 
-                //coq.LeftMCubeAt15Degree  = coq.LeftUsBarrelsAt15Degree / 6.294;
-                //coq.LeftMTVac = coq.LeftMCubeAt15Degree * 0.76786;
-                //coq.LeftMTAir = coq.LeftMTVac * coq.PrevWTAir;
-                //coq.LeftLongTonsAir = coq.LeftMTAir * 0.984206;
+                coq.LeftMCubeAt15Degree = coq.LeftUsBarrelsAt15Degree / 6.294;
+                coq.LeftMTVac = coq.LeftMCubeAt15Degree * 0.76786;
+                coq.LeftMTAir = coq.LeftMTVac * coq.PrevWTAir;
+                coq.LeftLongTonsAir = coq.LeftMTAir * 0.984206;
 
                 coq.TotalLongTonsAir = batches.FirstOrDefault().SumDiffLongTonsAir + coq.PrevLongTonsAir - coq.LeftLongTonsAir;
                 coq.TotalMCubeAt15Degree = batches.FirstOrDefault().SumDiffMCubeAt15Degree + coq.PrevMCubeAt15Degree - coq.LeftMCubeAt15Degree;
@@ -339,6 +342,240 @@ namespace Bunkering.Access.Services
             }
         }
 
-     
+
+        public async Task<ApiResponse> CreateLiquidDynamicCOQ(UpsertPPlantCOQLiquidDynamicDto dto)
+        {
+
+
+            var userId = _httpCxtAccessor.HttpContext.User.FindFirstValue(ClaimTypes.PrimarySid);
+
+            if (userId == null)
+            {
+                _apiReponse.Message = "Unathorise, this action is restricted to only authorise users";
+                _apiReponse.StatusCode = HttpStatusCode.BadRequest;
+                _apiReponse.Success = false;
+
+                return _apiReponse;
+            }
+
+
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                #region Create Coq  
+                var coq = new ProcessingPlantCOQ
+                {
+                    PlantId = dto.PlantId,
+                    ProductId = dto.ProductId,
+                    Reference = Utils.GenerateCoQRefrenceCode(),
+                    MeasurementSystem = dto.MeasurementSystem,
+                    CreatedBy = userId,
+                    Status = Enum.GetName(typeof(AppStatus), AppStatus.Processing),
+                    CreatedAt = DateTime.UtcNow.AddHours(1),
+                    MeterTypeId = dto.MeterTypeId,
+                    StartTime = dto.StartTime,
+                    EndTime = dto.EndTime,
+                    Consignee = dto.Consignee,
+                    ConsignorName = dto.ConsignorName,
+                    Terminal = dto.Terminal,
+                    Destination = dto.Destination,
+                    ShipFigure = dto.ShipFigure,
+                    ShipmentNo = dto.ShipmentNo,
+                    PrevUsBarrelsAt15Degree = dto.PrevUsBarrelsAt15Degree,
+                    PrevWTAir = dto.PrevWTAir,
+                    PrevMCubeAt15Degree = dto.PrevMCubeAt15Degree,
+                    PrevMTVac = dto.PrevMTVac,
+                    PrevMTAir = dto.PrevMTVac * dto.PrevWTAir,
+                    PrevLongTonsAir = dto.PrevMTVac * dto.PrevWTAir * 0.984206,
+                };
+
+                _context.ProcessingPlantCOQs.Add(coq);
+                _context.SaveChanges();
+                #endregion
+
+                #region Create COQ batch meter
+                var batches = new List<ProcessingPlantCOQLiquidDynamicBatch>();
+                var MeterReadings = new List<ProcessingPlantCOQLiquidDynamicMeter>();
+                foreach (var batch in dto.COQBatches)
+                {
+
+
+                    double longTonsAir = 0; double mCubeAt15Degree = 0; double mTAir = 0; double mTVac = 0; double usBarrelsAt15Degree = 0;
+
+                    foreach (var meter in batch.MeterReadings)
+                    {
+                       
+
+                        if (meter.MeterBeforReadingDto != null && meter.MeterAfterReadingDto != null)
+                        {
+
+                            var newBMeter = new LiquidDynamicMeterReading
+                            {
+                                MeasurementType = ReadingType.Before,
+                                MCube = meter.MeterBeforReadingDto.MCube,
+                            };
+
+
+                            var newAMeter = new LiquidDynamicMeterReading
+                            {
+                                MeasurementType = ReadingType.After,
+                                MCube = meter.MeterAfterReadingDto.MCube,
+                            };
+
+
+                            var newMeterReadings = new List<LiquidDynamicMeterReading>
+                            {
+                                newBMeter, newAMeter
+                            };
+
+                            var newCoqMeter = new ProcessingPlantCOQLiquidDynamicMeter
+                            {
+                                MeterId = meter.MeterId,
+                                Temperature = meter.Temperature,
+                                Density = meter.Density,
+                                MeterFactor = meter.MeterFactor,
+                                Ctl = meter.Ctl,
+                                Cpl = meter.Cpl,
+                                WTAir = meter.WTAir,
+                                LiquidDynamicMeterReadings = newMeterReadings
+
+                            };
+
+                            MeterReadings.Add(newCoqMeter);
+
+                            //reading of model calculated fees
+                            longTonsAir += newCoqMeter.LongTonsAir;
+                            mCubeAt15Degree += newCoqMeter.MCubeAt15Degree;
+                            mTAir += newCoqMeter.MTAir;
+                            mTVac += newCoqMeter.MTVac;
+                            usBarrelsAt15Degree += newCoqMeter.UsBarrelsAt15Degree;
+                        }
+                    }
+
+                    var newBatch = new ProcessingPlantCOQLiquidDynamicBatch
+                    {
+                        ProcessingPlantCOQId = coq.ProcessingPlantCOQId,
+                        BatchId = batch.BatchId,
+                        ProcessingPlantCOQLiquidDynamicMeters = MeterReadings,
+                        SumDiffLongTonsAir = longTonsAir,
+                        SumDiffMCubeAt15Degree = mCubeAt15Degree,
+                        SumDiffMTAir = mTAir,
+                        SumDiffMTVac = mTVac,
+                        SumDiffUsBarrelsAt15Degree = usBarrelsAt15Degree
+                    };
+
+                    batches.Add(newBatch);
+                }
+
+                _context.ProcessingPlantCOQLiquidDynamicBatches.AddRange(batches);
+
+                _context.SaveChanges();
+
+                coq.LeftUsBarrelsAt15Degree = coq.PrevUsBarrelsAt15Degree - batches.LastOrDefault().SumDiffUsBarrelsAt15Degree;
+
+                //coq.LeftMCubeAt15Degree  = coq.LeftUsBarrelsAt15Degree / 6.294;
+                //coq.LeftMTVac = coq.LeftMCubeAt15Degree * 0.76786;
+                //coq.LeftMTAir = coq.LeftMTVac * coq.PrevWTAir;
+                //coq.LeftLongTonsAir = coq.LeftMTAir * 0.984206;
+
+                coq.TotalLongTonsAir = batches.Sum(x => x.SumDiffLongTonsAir) + coq.PrevLongTonsAir - coq.LeftLongTonsAir;
+                coq.TotalMCubeAt15Degree = batches.Sum(x => x.SumDiffMCubeAt15Degree) + coq.PrevMCubeAt15Degree - coq.LeftMCubeAt15Degree;
+                coq.TotalMTAir = batches.Sum(x => x.SumDiffMTAir) + coq.PrevMTAir - coq.LeftMTAir;
+                coq.TotalMTVac = batches.Sum(x => x.SumDiffMTVac) + coq.PrevMTVac - coq.LeftMTVac;
+                coq.TotalUsBarrelsAt15Degree = batches.Sum(x => x.SumDiffUsBarrelsAt15Degree) + coq.PrevUsBarrelsAt15Degree - coq.LeftUsBarrelsAt15Degree;
+                coq.ShoreFigure = coq.TotalMTVac;
+
+                _context.ProcessingPlantCOQs.Update(coq);
+                #endregion
+
+                #region Document Submission
+
+                //SubmitDocumentDto sDoc = model.SubmitDocuments.FirstOrDefault();
+                //var sDocument = _mapper.Map<SubmittedDocument>(sDoc);
+
+                //var sDocumentList = new List<SubmittedDocument>();
+
+                //dto.SubmitDocuments.ForEach(x =>
+                //{
+                //    var newSDoc = new SubmittedDocument
+                //    {
+                //        DocId = x.DocId,
+                //        FileId = x.FileId,
+                //        DocName = x.DocName,
+                //        DocSource = x.DocSource,
+                //        DocType = x.DocType,
+                //        ApplicationId = coq.ProcessingPlantCOQId,
+                //    };
+
+                //    sDocumentList.Add(newSDoc);
+                //});
+
+                //_context.SubmittedDocuments.AddRange(sDocumentList);
+                #endregion
+
+                _context.SaveChanges();
+
+
+
+                //var submit = await _flow.CoqWorkFlow(coq.Id, Enum.GetName(typeof(AppActions), AppActions.Submit), "COQ Submitted", user.Id);
+                //if (submit.Item1)
+                //{
+                //    var message = new Message
+                //    {
+                //        ApplicationId = coq.Id,
+                //        Subject = $"COQ with reference {coq.Reference} Submitted",
+                //        Content = $"COQ with reference {coq.Reference} has been submitted to your desk for further processing",
+                //        UserId = user.Id,
+                //        Date = DateTime.Now.AddHours(1),
+                //    };
+
+                //    _context.Messages.Add(message);
+                //    _context.SaveChanges();
+
+                //    transaction.Commit();
+
+                //    return new ApiResponse
+                //    {
+                //        Message = submit.Item2,
+                //        StatusCode = HttpStatusCode.OK,
+                //        Success = true
+                //    };
+                //}
+                //else
+                //{
+                //    transaction.Rollback();
+                //    return new ApiResponse
+                //    {
+                //        Message = submit.Item2,
+                //        StatusCode = HttpStatusCode.NotAcceptable,
+                //        Success = false
+                //    };
+
+                //}
+
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+
+                return new ApiResponse
+                {
+                    Message = $"An error occur, COQ not created: {ex.Message}",
+                    Success = false,
+                    StatusCode = HttpStatusCode.InternalServerError
+                };
+            }
+
+            transaction.Commit();
+            return new ApiResponse
+            {
+                Message = "COQ created successfully",
+                Success = true,
+                StatusCode = HttpStatusCode.OK
+            };
+        }
+
+
     }
 }
