@@ -158,40 +158,39 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> GenerateDebitNote(int id)
         {
-            var baseUrl = $"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}";
-
-            try
+            if(id > 0)
             {
-                double total = 0;
-                string orderid = string.Empty;
-                string facName = string.Empty;
-                string companyName = string.Empty;
-                string companyEmail = string.Empty;
-                string description = string.Empty;
-                int compElpsId = 0;
-                
-                int? appId = null;
+                var baseUrl = $"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}";
 
-                var user = await _userManager.FindByEmailAsync(User);
-                if (id < 0)
-                    _response = new ApiResponse { Message = "This COQ record does not exist or has been removed from the system, kindly contact support.", StatusCode = HttpStatusCode.NotFound };
-                else
+                try
                 {
-                    var coqRef = await _unitOfWork.CoQReference.FirstOrDefaultAsync(x => x.Id.Equals(id), "DepotCoQ.Application.User.Company, ProcessingPlantCOQ");
-                    var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));
-                    var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.ApplicationTypeId.Equals(appType.Id) && x.COQId.Equals(coqRef.Id));
+                    double total = 0;
+                    string orderid = string.Empty;
+                    string facName = string.Empty;
+                    string companyName = string.Empty;
+                    string companyEmail = string.Empty;
+                    string description = string.Empty;
+                    int compElpsId = 0;
 
-                    if (payment != null)
-                        _response = new ApiResponse { Message = "Debit note already exists", StatusCode = HttpStatusCode.BadRequest };
+                    int? appId = null;
+
+                    var user = await _userManager.FindByEmailAsync(User);
+                    if (id < 0)
+                        _response = new ApiResponse { Message = "This COQ record does not exist or has been removed from the system, kindly contact support.", StatusCode = HttpStatusCode.NotFound };
                     else
                     {
-                        if (payment == null)
+                        var coqRef = await _unitOfWork.CoQReference.FirstOrDefaultAsync(x => x.Id.Equals(id), "DepotCoQ.Application.User.Company, ProcessingPlantCOQ.Plant");
+                        var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));
+                        var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.ApplicationTypeId.Equals(appType.Id) && x.COQId.Equals(coqRef.Id));
+
+                        if (payment != null)
+                            _response = new ApiResponse { Message = "Debit note already exists", StatusCode = HttpStatusCode.BadRequest };
+                        else
                         {
-                            string productType = string.Empty;
                             if (coqRef.PlantCoQId == null)
                             {
                                 var prd = _context.ApplicationDepots.Include(p => p.Product).FirstOrDefault(x => x.AppId == coqRef.DepotCoQ.AppId);
-                                productType = prd.Product?.ProductType ?? string.Empty;
+                                string productType = prd.Product?.ProductType ?? string.Empty;
 
                                 orderid = coqRef.DepotCoQ.Reference;
                                 appId = coqRef.DepotCoQ.AppId;
@@ -313,11 +312,11 @@ namespace Bunkering.Access.Services
                         }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogRequest($"An error {ex.Message} occured while trying to generate extra payment RRR for this application by {User}", true, directory);
-                _response = new ApiResponse { Message = "An error occured while generating this extra payment RRR. Please try again or contact support.", StatusCode = HttpStatusCode.InternalServerError };
+                catch (Exception ex)
+                {
+                    _logger.LogRequest($"An error {ex.Message} occured while trying to generate extra payment RRR for this application by {User}", true, directory);
+                    _response = new ApiResponse { Message = "An error occured while generating this extra payment RRR. Please try again or contact support.", StatusCode = HttpStatusCode.InternalServerError };
+                }
             }
             return _response;
         }
@@ -330,24 +329,60 @@ namespace Bunkering.Access.Services
 
                 try
                 {
-                    var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id.Equals(id) && x.IsDeleted == false, "Application.User.Company,Facility.VesselType");
-                    if (coq == null)
+                    var coqRef = await _unitOfWork.CoQReference.FirstOrDefaultAsync(x => x.Id.Equals(id) && x.IsDeleted == false, "DepotCoQ.Application.User.Company,ProcessingPlantCOQ.Plant");
+                    if (coqRef == null)
                         _response = new ApiResponse { Message = "This COQ record does not exist or has been removed from the system, kindly contact support.", StatusCode = HttpStatusCode.NotFound };
                     else
                     {
                         var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));
-                        var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.ApplicationTypeId.Equals(appType.Id) && x.COQId.Equals(coq.Id) && x.ApplicationId.Equals(coq.AppId));
+                        var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.ApplicationTypeId.Equals(appType.Id) && x.COQId.Equals(coqRef.Id));
 
                         if (payment == null)
                             _response = new ApiResponse { Message = "Debit note does not exist for this Depot", StatusCode = HttpStatusCode.BadRequest };
                         else
                         {
-                            var total = payment.Amount * 0.10;
+                            double total = 0;
                             var reference = Utils.RefrenceCode();
-                            var description = $"Payment for non-payment of Debit note generated for {coq.Plant.Name} after 21 days as regulated";
+                            string orderid = string.Empty;
+                            string facName = string.Empty;
+                            string companyName = string.Empty;
+                            string companyEmail = string.Empty;
+                            int compElpsId = 0;
+                            int? appId = null;
+                            var description = string.Empty;
+                            var productType = string.Empty;
 
-                            var request = await _elps.GenerateDebitNotePaymentReference($"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}", total, coq.Application.User.Company.Name, coq.Application.User.Email, coq.Reference, coq.Plant.Name, coq.Application.User.ElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DemandNotice), description);
-                            _logger.LogRequest($"Creation of Demand notice payment for application with reference: {reference}for ({coq.Application.User.Company.Name}) as specified in the Authority regulations", false, directory);
+                            if (coqRef.PlantCoQId == null)
+                            {
+                                var prd = _context.ApplicationDepots.Include(p => p.Product).FirstOrDefault(x => x.AppId == coqRef.DepotCoQ.AppId);
+                                productType = prd.Product?.ProductType ?? string.Empty;
+
+                                orderid = coqRef.DepotCoQ.Reference;
+                                appId = coqRef.DepotCoQ.AppId;
+                                compElpsId = coqRef.DepotCoQ.Application.User.ElpsId;
+                                facName = coqRef.DepotCoQ.Plant.Name;
+                                companyName = coqRef.DepotCoQ.Application.User.Company.Name;
+                                companyEmail = coqRef.DepotCoQ.Application.User.Email;
+                                description = $"Debit note amount for CoQ with reference {orderid} for {companyName}({facName})";
+
+                                total = productType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.Gas)) ? coqRef.DepotCoQ.MT_VAC * coqRef.DepotCoQ.DepotPrice * 0.01 : coqRef.DepotCoQ.GSV * coqRef.DepotCoQ.DepotPrice * 0.01;
+                            }
+                            else
+                            {
+                                var processingPlant = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id.Equals(coqRef.ProcessingPlantCOQ.PlantId));
+                                orderid = coqRef.ProcessingPlantCOQ.Reference;
+                                compElpsId = (int)processingPlant.ElpsPlantId.Value;
+                                facName = processingPlant.Name;
+                                companyName = processingPlant.Company;
+                                companyEmail = processingPlant.Email;
+                                description = $"Debit note amount for CoQ with reference {orderid} for {companyName}({facName})";
+
+                                total = coqRef.ProcessingPlantCOQ.TotalMTVac.Value * coqRef.ProcessingPlantCOQ.Price * 0.01;
+                            }
+                            description = $"Payment for non-payment of Debit note generated for {coqRef.ProcessingPlantCOQ.Plant.Name} after 21 days as regulated";
+
+                            var request = await _elps.GenerateDebitNotePaymentReference($"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}", total, companyName, companyEmail, orderid, facName, compElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DemandNotice), description);
+                            _logger.LogRequest($"Creation of Demand notice payment for application with reference: {reference}for ({companyName}) as specified in the Authority regulations", false, directory);
 
                             if (request == null)
                             {
@@ -363,25 +398,36 @@ namespace Bunkering.Access.Services
                                     {
                                         Account = "",
                                         Amount = total,
-                                        ApplicationId = coq.AppId,
+                                        ApplicationId = null,
                                         ApplicationTypeId = demandNotice.Id,
-                                        COQId = coq.Id,
+                                        COQId = coqRef.Id,
                                         Description = description,
                                         OrderId = reference,
                                         RRR = request.RRR,
                                         PaymentType = "NGN",
                                         TransactionDate = DateTime.UtcNow.AddHours(1),
-                                        Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending)
+                                        Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending),
+                                        AppReceiptId = string.Empty,
+                                        TxnMessage = string.Empty,
+                                        BankCode = string.Empty,
+                                        LateRenewalPenalty = 0,
+                                        NonRenewalPenalty = 0,
+                                        Arrears = 0,
+                                        LastRetryDate = DateTime.UtcNow.AddHours(1),
+                                        RetryCount = 0,
+                                        ServiceCharge = 0,
+                                        TransactionId = string.Empty,
                                     };
-                                    await _unitOfWork.Payment.Add(payment);
-                                    await _unitOfWork.SaveChangesAsync(coq.Application.UserId);
 
-                                    _logger.LogRequest($"Payment for debit note with RRR: {payment.RRR} saved for {coq.Reference} by {User}", false, directory);
+                                    await _unitOfWork.Payment.Add(payment);
+                                    await _unitOfWork.SaveChangesAsync("system");
+
+                                    _logger.LogRequest($"Payment for debit note with RRR: {payment.RRR} saved for {orderid} by {User}", false, directory);
 
                                     #region Send Payment E-Mail To Company
-                                    string subject = $"Generation Of Payment For Application With Ref:{coq.Reference}";
+                                    string subject = $"Generation Of Payment For Application With Ref:{orderid}";
 
-                                    var emailBody = string.Format($"A Payment RRR: {payment.RRR} has been generated for your COQ request with reference number: {coq.Reference}" +
+                                    var emailBody = string.Format($"A Payment RRR: {payment.RRR} has been generated for your COQ request with reference number: {orderid}" +
                                         "<br /><ul>" +
                                         "<li>Amount Generated: {0}</li>" +
                                         "<li>Remita RRR: {1}</li>" +
@@ -389,11 +435,11 @@ namespace Bunkering.Access.Services
                                         "<li>Payment Description: {3}</li>" +
                                         "<li>Vessel Name: {4}</li>" +
                                         "<p>Kindly note that your application will be pending until this payment is completed. </p>",
-                                        payment.Amount.ToString(), payment.RRR, payment.Status, payment.Description, $"{coq.Plant.Name}");
+                                        payment.Amount.ToString(), payment.RRR, payment.Status, payment.Description, $"{facName}");
 
                                     #endregion
 
-                                    string successMsg = $"Debit Note RRR ({payment.RRR}) generated successfully for {coq.Plant.Name}";
+                                    string successMsg = $"Demand Notice with RRR ({payment.RRR}) generated successfully for {companyName}({facName})";
                                     _response = new ApiResponse
                                     {
                                         Message = successMsg,
