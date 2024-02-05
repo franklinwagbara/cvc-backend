@@ -83,5 +83,23 @@ namespace Bunkering.Controllers.API
         [Route("edit-operating-facility")]
         [HttpPost]
         public async Task<IActionResult> EditOperatingFacility(OpearatingFacilityViewModel model) => Response(await _operatingFacility.EditOperatingFacility(model));
+
+        /// <summary>
+        /// This endpoint is used to fetch operating facility by email
+        /// </summary>
+        /// <returns>Returns a success message or otherwise</returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// GET: api/operatingfacility/get-operating-facility
+        /// 
+        /// </remarks>
+        /// <response code="200">Returns staff list </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [Route("get-operating-facility")]
+        [HttpGet]
+        public async Task<IActionResult> AllOperatingFacilities(string Email) => Response(await _operatingFacility.GetOperationFacility(Email));
     }
 }

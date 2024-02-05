@@ -45,6 +45,7 @@ namespace Bunkering.Access.IContracts
         IRole Role { get; }
         IPlant Plant { get; }
         IPlantTank PlantTank { get; }
+        IProcessingPlantCoQ ProcessingPlantCoQ { get; }
         IState State { get; }
         ISubmittedDocument SubmittedDocument { get; }
         ITank Tank { get; }
@@ -52,6 +53,10 @@ namespace Bunkering.Access.IContracts
         IVesselDischargeClearance VesselDischargeClearance { get; }
         IWorkflow Workflow { get; }
         IVesselType VesselType { get; }
+        ICoQ CoQ { get; }
+        ICOQTank CoQTank { get; }
+        ICOQHistory COQHistory { get; }
+        ICOQCertificate COQCertificate { get; }
         IMeasurementTypeRepository MeasurementType { get; }
         IvFacilityPermit vFacilityPermit { get; }
         IvAppPayment vAppPayment { get; }
