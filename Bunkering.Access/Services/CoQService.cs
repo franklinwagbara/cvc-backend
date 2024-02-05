@@ -1583,7 +1583,6 @@ namespace Bunkering.Access.Services
 
             return _apiReponse;
         }
-
        
         private List<PlantFieldOfficer> GetDepotsListforUSer(string Id)
         {
@@ -1933,7 +1932,6 @@ namespace Bunkering.Access.Services
             dat.MTVAC = tankList.SelectMany(x => x.AfterTankMeasurement).Sum(t => t.CoQCertTankNonGas.MTVAC) - tankList.SelectMany(x => x.BeforeTankMeasurements).Sum(t => t.CoQCertTankNonGas.MTVAC);
             return dat;
         }
-
 
         private COQGasCertficateDTO GetCOQGasCertficate(int coqId)
         {
