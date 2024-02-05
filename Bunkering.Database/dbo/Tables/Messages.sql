@@ -29,6 +29,8 @@
 
 
 
+
+
 GO
 CREATE NONCLUSTERED INDEX [IX_Messages_ApplicationId]
     ON [dbo].[Messages]([ApplicationId] ASC);

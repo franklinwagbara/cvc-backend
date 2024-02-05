@@ -16,6 +16,7 @@ namespace Bunkering.Access.IContracts
         ICOQCertificate COQCertificate { get; }
         ICoQReference CoQReference { get; }
         ITransferRecord TransferRecord { get; }
+        ISourceRecipientVessel SourceRecipientVessel { get; }
         ITransferDetail TransferDetail { get; }
         IPlantOfficer PlantOfficer { get; }
         IMeterType MeterType { get; }
