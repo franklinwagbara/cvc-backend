@@ -8,6 +8,9 @@
     [CompanyElpsId] BIGINT         NULL,
     [PlantType]     INT            NOT NULL,
     [IsDeleted]     BIT            NOT NULL,
+    [IsDefaulter]   BIT            CONSTRAINT [DF_Plants_IsDefaulter] DEFAULT ((0)) NOT NULL,
     CONSTRAINT [PK_Plants] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
