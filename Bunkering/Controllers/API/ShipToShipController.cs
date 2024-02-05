@@ -22,6 +22,11 @@ namespace Bunkering.Controllers.API
         [HttpGet]
         public async Task<IActionResult> GetAll() => Response(await _shipToShipService.GetAllTransferRecords());
 
+        [AllowAnonymous]
+        [Route("get-all-Records-by-company")]
+        [HttpGet]
+        public async Task<IActionResult> GetAllRecordsByCompany() => Response(await _shipToShipService.GetAllTransferRecordsByCompany());
+
 
         [Route("add-Records")]
         [HttpPost]
