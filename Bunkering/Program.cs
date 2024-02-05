@@ -29,7 +29,7 @@ builder.Services.Services();
 builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("AppSetting"));
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("EmailSetting"));
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddHostedService<DemandNoticeJob>();
+//builder.Services.AddHostedService<DemandNoticeJob>();
 builder.Services.Configure<ErrorHandlingOptions>(builder.Configuration.GetSection("ErrorHandling"));
 builder.Services.AddControllers();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
