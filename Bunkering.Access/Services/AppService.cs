@@ -1111,13 +1111,13 @@ namespace Bunkering.Access.Services
             private async Task<ApiResponse> GetMyDeskFO(ApplicationUser? user)
             {
             var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Plant");
-            var processingPlantCoQs = await _unitOfWork.ProcessingPlantCoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Plant, Product");
+            var processingPlantCoQs = await _unitOfWork.ProcessingPlantCoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Plant,Product");
             // if (await _userManager.IsInRoleAsync(user, "FAD"))
             //     coqs = await _unitOfWork.CoQ.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)));
             if (await _userManager.IsInRoleAsync(user, "Company"))
             {
                 coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Plant");
-                processingPlantCoQs = await _unitOfWork.ProcessingPlantCoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Plant, Product");
+                processingPlantCoQs = await _unitOfWork.ProcessingPlantCoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Plant,Product");
             }
 
             return new ApiResponse
@@ -1162,20 +1162,16 @@ namespace Bunkering.Access.Services
                         x.ConsignorName, 
                         x.Consignee,
                         x.ShipmentNo,
-                        
-                        DateOfVesselArrival = x.DateOfVesselArrival.ToShortDateString(),
-                        DateOfVesselUllage = x.DateOfVesselUllage.ToShortDateString(),
-                        DateOfSTAfterDischarge = x.DateOfSTAfterDischarge.ToShortDateString(),
-                        DateOfVesselArrivalISO = x.DateOfVesselArrival.ToString("MM/dd/yyyy"),
-                        DateOfVesselUllageISO = x.DateOfVesselUllage.ToString("MM/dd/yyyy"),
-                        DateOfSTAfterDischargeISO = x.DateOfSTAfterDischarge.ToString("MM/dd/yyyy"),
+                        x.StartTime,
+                        x.EndTime,
                         MT_VAC = x.TotalMTVac,
                         MT_AIR = x.TotalMTAir,
                         //GOV = x.GOV,
                         //GSV = x.GSV,
+                        x.Price,
                         CreatedBy = x.CreatedBy,
                         SubmittedDate = x.SubmittedDate,
-                        ApplicationType = "COQ"
+                        ApplicationType = "Processing Plant COQ"
                     }).ToList(),
                 }
             };
