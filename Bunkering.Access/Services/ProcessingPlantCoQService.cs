@@ -290,14 +290,15 @@ namespace Bunkering.Access.Services
 
                 _context.SaveChanges();
 
-
-
-                var submit = await _flow.CoqWorkFlow(coq.ProcessingPlantCOQId, Enum.GetName(typeof(AppActions), AppActions.Submit), "COQ Submitted", userId);
+                var submit = await _flow.PPCoqWorkFlow(coq.ProcessingPlantCOQId, Enum.GetName(typeof(AppActions), AppActions.Submit), "COQ Submitted", userId);
                 if (submit.Item1)
                 {
                     var message = new Message
                     {
-                        ApplicationId = coq.ProcessingPlantCOQId,
+                        //ApplicationId = coq.ProcessingPlantCOQId,
+                        IsCOQ = false,
+                        IsPPCOQ = true,
+                        ProcessingCOQId = coq.ProcessingPlantCOQId,
                         Subject = $"COQ with reference {coq.Reference} Submitted",
                         Content = $"COQ with reference {coq.Reference} has been submitted to your desk for further processing",
                         UserId = userId,
@@ -491,68 +492,70 @@ namespace Bunkering.Access.Services
 
                 #region Document Submission
 
-                //SubmitDocumentDto sDoc = model.SubmitDocuments.FirstOrDefault();
-                //var sDocument = _mapper.Map<SubmittedDocument>(sDoc);
+                SubmitDocumentDto sDoc = dto.SubmitDocuments.FirstOrDefault() ?? throw new Exception("No documents passed");
+                var sDocument = _mapper.Map<SubmittedDocument>(sDoc);
 
-                //var sDocumentList = new List<SubmittedDocument>();
+                var sDocumentList = new List<SubmittedDocument>();
 
-                //dto.SubmitDocuments.ForEach(x =>
-                //{
-                //    var newSDoc = new SubmittedDocument
-                //    {
-                //        DocId = x.DocId,
-                //        FileId = x.FileId,
-                //        DocName = x.DocName,
-                //        DocSource = x.DocSource,
-                //        DocType = x.DocType,
-                //        ApplicationId = coq.ProcessingPlantCOQId,
-                //    };
+                dto.SubmitDocuments.ForEach(x =>
+                {
+                    var newSDoc = new SubmittedDocument
+                    {
+                        DocId = x.DocId,
+                        FileId = x.FileId,
+                        DocName = x.DocName,
+                        DocSource = x.DocSource,
+                        DocType = x.DocType,
+                        ApplicationId = coq.ProcessingPlantCOQId,
+                    };
 
-                //    sDocumentList.Add(newSDoc);
-                //});
+                    sDocumentList.Add(newSDoc);
+                });
 
-                //_context.SubmittedDocuments.AddRange(sDocumentList);
+                _context.SubmittedDocuments.AddRange(sDocumentList);
                 #endregion
 
                 _context.SaveChanges();
 
 
 
-                //var submit = await _flow.CoqWorkFlow(coq.Id, Enum.GetName(typeof(AppActions), AppActions.Submit), "COQ Submitted", user.Id);
-                //if (submit.Item1)
-                //{
-                //    var message = new Message
-                //    {
-                //        ApplicationId = coq.Id,
-                //        Subject = $"COQ with reference {coq.Reference} Submitted",
-                //        Content = $"COQ with reference {coq.Reference} has been submitted to your desk for further processing",
-                //        UserId = user.Id,
-                //        Date = DateTime.Now.AddHours(1),
-                //    };
+                var submit = await _flow.PPCoqWorkFlow(coq.ProcessingPlantCOQId, Enum.GetName(typeof(AppActions), AppActions.Submit), "COQ Submitted", userId);
+                if (submit.Item1)
+                {
+                    var message = new Message
+                    {
+                        IsCOQ = false,
+                        IsPPCOQ = true,
+                        ProcessingCOQId = coq.ProcessingPlantCOQId,
+                        Subject = $"COQ with reference {coq.Reference} Submitted",
+                        Content = $"COQ with reference {coq.Reference} has been submitted to your desk for further processing",
+                        UserId = userId,
+                        Date = DateTime.Now.AddHours(1),
+                    };
 
-                //    _context.Messages.Add(message);
-                //    _context.SaveChanges();
+                    _context.Messages.Add(message);
+                    _context.SaveChanges();
 
-                //    transaction.Commit();
+                    transaction.Commit();
 
-                //    return new ApiResponse
-                //    {
-                //        Message = submit.Item2,
-                //        StatusCode = HttpStatusCode.OK,
-                //        Success = true
-                //    };
-                //}
-                //else
-                //{
-                //    transaction.Rollback();
-                //    return new ApiResponse
-                //    {
-                //        Message = submit.Item2,
-                //        StatusCode = HttpStatusCode.NotAcceptable,
-                //        Success = false
-                //    };
+                    return new ApiResponse
+                    {
+                        Message = submit.Item2,
+                        StatusCode = HttpStatusCode.OK,
+                        Success = true
+                    };
+                }
+                else
+                {
+                    transaction.Rollback();
+                    return new ApiResponse
+                    {
+                        Message = submit.Item2,
+                        StatusCode = HttpStatusCode.NotAcceptable,
+                        Success = false
+                    };
 
-                //}
+                }
 
             }
             catch (Exception ex)
@@ -566,14 +569,6 @@ namespace Bunkering.Access.Services
                     StatusCode = HttpStatusCode.InternalServerError
                 };
             }
-
-            transaction.Commit();
-            return new ApiResponse
-            {
-                Message = "COQ created successfully",
-                Success = true,
-                StatusCode = HttpStatusCode.OK
-            };
         }
 
 

@@ -6,7 +6,9 @@
         public bool IsRead { get; set; }
         public int? ApplicationId { get; set; }
         public int? COQId { get; set; }
+        public int? ProcessingCOQId { get; set; }
         public bool? IsCOQ { get; set; }
+        public bool? IsPPCOQ { get; set; }
         public string Content { get; set; }
         public DateTime Date { get; set; }
         public string Subject { get; set; }

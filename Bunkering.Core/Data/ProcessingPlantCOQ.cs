@@ -14,6 +14,9 @@ namespace Bunkering.Core.Data
         public int ProcessingPlantCOQId { get; set; }
         public int PlantId { get; set; } //plant here refers to processing Facility Id
         public int ProductId { get; set; }
+        public string? CurrentDeskId { get; set; }
+        public DateTime? SubmittedDate { get; set; }
+        public DateTime? DateModified { get; set; }
         public string Reference { get; set; }
         public string MeasurementSystem {  get; set; }
         public int? MeterTypeId { get; set; }
