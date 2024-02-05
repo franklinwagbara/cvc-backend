@@ -22,6 +22,11 @@ namespace Bunkering.Core.Data
         public DbSet<Batch> Batches { get; set; }
         public DbSet<Company> Companies { get; set; }
         public DbSet<Country> Countries { get; set; }
+        public DbSet<CoQ> CoQs { get; set; }
+        public DbSet<COQHistory> COQHistories { get; set; }
+        public DbSet<COQCertificate> COQCertificates { get; set; }
+        public DbSet<COQTank> COQTanks { get; set; }
+        public DbSet<CoQReference> CoQReferences { get; set; }
         public DbSet<Depot> Depots { get; set; }
         public DbSet<ExtraPayment> ExtraPayments { get; set; }
         public DbSet<Facility> Facilities { get; set; }
@@ -54,7 +59,6 @@ namespace Bunkering.Core.Data
         public DbSet<vFacilityPermit> vFacilityPermit { get; set; }
         public DbSet<vPayment> vPayment { get; set; }
         public DbSet<vDebitNote> VDebitNotes { get; set; }
-        public DbSet<CoQ> CoQs { get; set; }
         public DbSet<PlantFieldOfficer> PlantFieldOfficers { get; set; }
         public DbSet<ProcessingPlantCOQ> ProcessingPlantCOQs { get; set; }
         public DbSet<ProcessingPlantCOQBatch> ProcessingPlantCOQBatches { get; set; }
@@ -63,10 +67,7 @@ namespace Bunkering.Core.Data
         public DbSet<ProcessingPlantCOQBatchTank> ProcessingPlantCOQBatchTanks { get; set; }
         public DbSet<ProcessingPlantCOQTankReading> ProcessingPlantCOQTankReadings { get; set; }
         public DbSet<JettyFieldOfficer> JettyFieldOfficers { get; set; }
-        public DbSet<COQHistory> COQHistories { get; set; }
-        public DbSet<COQCertificate> COQCertificates { get; set; }
         public DbSet<ApplicationSurveyor> ApplicationSurveyors { get; set; }
-        public DbSet<COQTank> COQTanks { get; set; }
         public DbSet<MeasurementType> MeasurementTypes { get; set; }
         public DbSet<TankMeasurement> TankMeasurements { get; set; }
         public DbSet<EmailConfiguration> EmailConfigurations { get; set; }
