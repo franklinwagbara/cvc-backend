@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[ProcessingPlantCOQS] (
+﻿CREATE TABLE [dbo].[ProcessingPlantCOQs] (
     [ProcessingPlantCOQId]         INT            IDENTITY (1, 1) NOT NULL,
     [PlantId]                      INT            NOT NULL,
     [ProductId]                    INT            NOT NULL,
@@ -39,8 +39,14 @@
     [DeliveredUsBarrelsAt15Degree] FLOAT (53)     NULL,
     [Reference]                    NVARCHAR (MAX) DEFAULT (N'') NOT NULL,
     [Status]                       NVARCHAR (MAX) DEFAULT (N'') NOT NULL,
-    CONSTRAINT [PK_ProcessingPlantCOQS] PRIMARY KEY CLUSTERED ([ProcessingPlantCOQId] ASC)
+    [CurrentDeskId]                NVARCHAR (MAX) NULL,
+    [SubmittedDate]                DATETIME2 (7)  NULL,
+    [DateModified]                 DATETIME2 (7)  NULL,
+    [Price]                        FLOAT (53)     DEFAULT ((0.0000000000000000e+000)) NOT NULL,
+    CONSTRAINT [PK_ProcessingPlantCOQs] PRIMARY KEY CLUSTERED ([ProcessingPlantCOQId] ASC)
 );
+
+
 
 
 
