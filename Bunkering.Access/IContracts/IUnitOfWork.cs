@@ -53,10 +53,10 @@ namespace Bunkering.Access.IContracts
         IVesselDischargeClearance VesselDischargeClearance { get; }
         IWorkflow Workflow { get; }
         IVesselType VesselType { get; }
-        ICoQ CoQ { get; }
-        ICOQTank CoQTank { get; }
-        ICOQHistory COQHistory { get; }
-        ICOQCertificate COQCertificate { get; }
+        //ICoQ CoQ { get; }
+        //ICOQTank CoQTank { get; }
+        //ICOQHistory COQHistory { get; }
+        //ICOQCertificate COQCertificate { get; }
         IMeasurementTypeRepository MeasurementType { get; }
         IvFacilityPermit vFacilityPermit { get; }
         IvAppPayment vAppPayment { get; }
