@@ -59,6 +59,7 @@ namespace Bunkering.Core.Dtos
         public double? LeftMTVac { get; set; }
         public double? LeftMTAir { get; set; }
         public double? LeftLongTonsAir { get; set; }
+        public double Price { get; set; } = 0;
 
         public List<BatchReadingDto> COQBatches { get; set; }
         public List<SubmitDocumentDto> SubmitDocuments { get; set; }
