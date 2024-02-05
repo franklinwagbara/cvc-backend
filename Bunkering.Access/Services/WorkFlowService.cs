@@ -231,7 +231,7 @@ namespace Bunkering.Access.Services
                     var plant = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id.Equals(coq.PlantId));
                     var certificate = await GenerateCOQCertificate(coqId, currentUser.Id, plant.CompanyElpsId.ToString());
 
-                    //add CoQId to CoQReference rrcord
+                    //add CoQId to CoQReference rcord
                     var coqReference = await _unitOfWork.CoQReference.Add(new CoQReference
                     {
                         DepotCoQId = coqId,
@@ -255,6 +255,7 @@ namespace Bunkering.Access.Services
                 return (false, e.Message);
             }
         }
+
         public async Task<WorkFlow> GetWorkFlow(string action, ApplicationUser currentuser, int VesselTypeId)
         => action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Submit).ToLower()) || action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Resubmit))
             ? await _unitOfWork.Workflow.FirstOrDefaultAsync(x => x.Action.ToLower().Trim().Equals(action.ToLower().Trim())

@@ -205,7 +205,6 @@ namespace Bunkering.Access.Services
                             }
                             else
                             {
-                                //total = coqRef.ProcessingPlantCOQ.TotalMTVac * coqRef.ProcessingPlantCOQ
                                 var processingPlant = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id.Equals(coqRef.ProcessingPlantCOQ.PlantId));
                                 orderid = coqRef.ProcessingPlantCOQ.Reference;
                                 compElpsId = (int)processingPlant.ElpsPlantId.Value;
@@ -213,6 +212,8 @@ namespace Bunkering.Access.Services
                                 companyName = processingPlant.Company;
                                 companyEmail = processingPlant.Email;
                                 description = $"Debit note amount for CoQ with reference {orderid} for {companyName}({facName})";
+
+                                total = coqRef.ProcessingPlantCOQ.TotalMTVac.Value * coqRef.ProcessingPlantCOQ.Price * 0.01;
                             }
 
                             payment = new Payment
