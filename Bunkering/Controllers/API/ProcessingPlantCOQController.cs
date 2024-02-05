@@ -33,7 +33,8 @@ namespace Bunkering.Controllers.API
         [HttpPost]
         public async Task<IActionResult> CreateLiquidDynamicCOQ(UpsertPPlantCOQLiquidDynamicDto dto)
         {
-            return Ok("Coming Soon");
+            var result = _processingPlantCoQService.CreateLiquidDynamicCOQ(dto);
+            return Ok(result);
         }
 
     }
