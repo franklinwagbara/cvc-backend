@@ -440,3 +440,17 @@ FodyWeavers.xsd
 *.v2
 *.csproj
 /.vs/Bunkering/DesignTimeBuild/.dtbcache.v2
+*.dll
+*.pdb
+*.exe
+*.dll
+*.pdb
+*.exe
+/Bunkering/bin/Debug/net7.0/Bunkering.Access.dll
+/Bunkering/bin/Debug/net7.0/Bunkering.Access.pdb
+/Bunkering/bin/Debug/net7.0/Bunkering.Core.dll
+/Bunkering/bin/Debug/net7.0/Bunkering.Core.pdb
+/Bunkering/bin/Debug/net7.0/Bunkering.dll
+/Bunkering/bin/Debug/net7.0/Bunkering.exe
+/Bunkering/bin/Debug/net7.0/Bunkering.pdb
+/Bunkering/bin/Debug/net7.0/Bunkering.staticwebassets.runtime.json

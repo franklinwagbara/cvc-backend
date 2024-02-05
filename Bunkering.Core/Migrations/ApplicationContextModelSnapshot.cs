@@ -542,6 +542,26 @@ namespace Bunkering.Core.Migrations
                     b.ToTable("AuditLogs");
                 });
 
+            modelBuilder.Entity("Bunkering.Core.Data.Batch", b =>
+                {
+                    b.Property<int>("BatchId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BatchId"));
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("BatchId");
+
+                    b.ToTable("Batches");
+                });
+
             modelBuilder.Entity("Bunkering.Core.Data.COQCertificate", b =>
                 {
                     b.Property<int>("Id")
@@ -834,6 +854,32 @@ namespace Bunkering.Core.Migrations
                     b.HasIndex("StateId");
 
                     b.ToTable("Depots");
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.DippingMethod", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DippingMethod");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.EmailConfiguration", b =>
@@ -1162,6 +1208,31 @@ namespace Bunkering.Core.Migrations
                     b.ToTable("LGAs");
                 });
 
+            modelBuilder.Entity("Bunkering.Core.Data.LiquidDynamicMeterReading", b =>
+                {
+                    b.Property<int>("LiquidDynamicMeterReadingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LiquidDynamicMeterReadingId"));
+
+                    b.Property<double>("MCube")
+                        .HasColumnType("float");
+
+                    b.Property<string>("MeasurementType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProcessingPlantCOQLiquidDynamicMeterId")
+                        .HasColumnType("int");
+
+                    b.HasKey("LiquidDynamicMeterReadingId");
+
+                    b.HasIndex("ProcessingPlantCOQLiquidDynamicMeterId");
+
+                    b.ToTable("LiquidDynamicMeterReadings");
+                });
+
             modelBuilder.Entity("Bunkering.Core.Data.Location", b =>
                 {
                     b.Property<int>("Id")
@@ -1236,6 +1307,55 @@ namespace Bunkering.Core.Migrations
                     b.HasIndex("ApplicationId");
 
                     b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.Meter", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PlantId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Meters");
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.MeterType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MeterType");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.NominatedSurveyor", b =>
@@ -1535,6 +1655,347 @@ namespace Bunkering.Core.Migrations
                     b.ToTable("PlantTanks");
                 });
 
+            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQ", b =>
+                {
+                    b.Property<int>("ProcessingPlantCOQId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProcessingPlantCOQId"));
+
+                    b.Property<string>("Consignee")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ConsignorName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("DeliveredLongTonsAir")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("DeliveredMCubeAt15Degree")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("DeliveredMTAir")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("DeliveredMTVac")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("DeliveredUsBarrelsAt15Degree")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Destination")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("DipMethodId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("EndTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double?>("LeftLongTonsAir")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("LeftMCubeAt15Degree")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("LeftMTAir")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("LeftMTVac")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("LeftUsBarrelsAt15Degree")
+                        .HasColumnType("float");
+
+                    b.Property<string>("MeasurementSystem")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("MeterTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PlantId")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("PrevLongTonsAir")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("PrevMCubeAt15Degree")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("PrevMTAir")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("PrevMTVac")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("PrevUsBarrelsAt15Degree")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("PrevWTAir")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reference")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("ShipFigure")
+                        .HasColumnType("float");
+
+                    b.Property<string>("ShipmentNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("ShoreFigure")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime?>("StartTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Terminal")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("TotalLongTonsAir")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("TotalMCubeAt15Degree")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("TotalMTAir")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("TotalMTVac")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("TotalUsBarrelsAt15Degree")
+                        .HasColumnType("float");
+
+                    b.HasKey("ProcessingPlantCOQId");
+
+                    b.ToTable("ProcessingPlantCOQs");
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQBatch", b =>
+                {
+                    b.Property<int>("ProcessingPlantCOQBatchId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProcessingPlantCOQBatchId"));
+
+                    b.Property<int>("BatchId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProcessingPlantCOQId")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("SumDiffLongTonsAir")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("SumDiffMCubeAt15Degree")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("SumDiffMTAir")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("SumDiffMTVac")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("SumDiffUsBarrelsAt15Degree")
+                        .HasColumnType("float");
+
+                    b.HasKey("ProcessingPlantCOQBatchId");
+
+                    b.ToTable("ProcessingPlantCOQBatches");
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQBatchTank", b =>
+                {
+                    b.Property<int>("ProcessingPlantCOQBatchTankId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProcessingPlantCOQBatchTankId"));
+
+                    b.Property<int>("ProcessingPlantCOQBatchId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TankId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProcessingPlantCOQBatchTankId");
+
+                    b.HasIndex("ProcessingPlantCOQBatchId");
+
+                    b.ToTable("ProcessingPlantCOQBatchTanks");
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamicBatch", b =>
+                {
+                    b.Property<int>("ProcessingPlantCOQLiquidDynamicBatchId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProcessingPlantCOQLiquidDynamicBatchId"));
+
+                    b.Property<int>("BatchId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProcessingPlantCOQId")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("SumDiffLongTonsAir")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("SumDiffMCubeAt15Degree")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("SumDiffMTAir")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("SumDiffMTVac")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("SumDiffUsBarrelsAt15Degree")
+                        .HasColumnType("float");
+
+                    b.HasKey("ProcessingPlantCOQLiquidDynamicBatchId");
+
+                    b.ToTable("ProcessingPlantCOQLiquidDynamicBatches");
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamicMeter", b =>
+                {
+                    b.Property<int>("ProcessingPlantCOQLiquidDynamicMeterId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProcessingPlantCOQLiquidDynamicMeterId"));
+
+                    b.Property<double>("Cpl")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Ctl")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Density")
+                        .HasColumnType("float");
+
+                    b.Property<double>("LongTonsAir")
+                        .HasColumnType("float");
+
+                    b.Property<double>("MCubeAt15Degree")
+                        .HasColumnType("float");
+
+                    b.Property<double>("MTAir")
+                        .HasColumnType("float");
+
+                    b.Property<double>("MTVac")
+                        .HasColumnType("float");
+
+                    b.Property<double>("MeterFactor")
+                        .HasColumnType("float");
+
+                    b.Property<int>("MeterId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProcessingPlantCOQLiquidDynamicBatchId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Temperature")
+                        .HasColumnType("float");
+
+                    b.Property<double>("UsBarrelsAt15Degree")
+                        .HasColumnType("float");
+
+                    b.Property<double>("WTAir")
+                        .HasColumnType("float");
+
+                    b.HasKey("ProcessingPlantCOQLiquidDynamicMeterId");
+
+                    b.HasIndex("ProcessingPlantCOQLiquidDynamicBatchId");
+
+                    b.ToTable("ProcessingPlantCOQLiquidDynamicMeters");
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQTankReading", b =>
+                {
+                    b.Property<int>("ProcessingPlantCOQTankReadingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProcessingPlantCOQTankReadingId"));
+
+                    b.Property<double>("BarrelsAtTankTables")
+                        .HasColumnType("float");
+
+                    b.Property<double>("BarrelsToMCube")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Density")
+                        .HasColumnType("float");
+
+                    b.Property<double>("LongTonsAir")
+                        .HasColumnType("float");
+
+                    b.Property<double>("MCubeAt15Degree")
+                        .HasColumnType("float");
+
+                    b.Property<double>("MTAir")
+                        .HasColumnType("float");
+
+                    b.Property<double>("MTVac")
+                        .HasColumnType("float");
+
+                    b.Property<string>("MeasurementType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProcessingPlantCOQBatchTankId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("ReadingM")
+                        .HasColumnType("float");
+
+                    b.Property<double>("SpecificGravityObs")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Temperature")
+                        .HasColumnType("float");
+
+                    b.Property<double>("UsBarrelsAt15Degree")
+                        .HasColumnType("float");
+
+                    b.Property<double>("VolumeCorrectionFactor")
+                        .HasColumnType("float");
+
+                    b.Property<double>("WTAir")
+                        .HasColumnType("float");
+
+                    b.HasKey("ProcessingPlantCOQTankReadingId");
+
+                    b.HasIndex("ProcessingPlantCOQBatchTankId");
+
+                    b.ToTable("ProcessingPlantCOQTankReadings");
+                });
+
             modelBuilder.Entity("Bunkering.Core.Data.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -1738,6 +2199,77 @@ namespace Bunkering.Core.Migrations
                     b.HasIndex("COQTankId");
 
                     b.ToTable("TankMeasurements");
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.TransferDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("IMONumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("OfftakeVolume")
+                        .HasColumnType("float");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TransferRecordId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("VesselName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TransferRecordId");
+
+                    b.ToTable("TransferDetail");
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.TransferRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("IMONumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LoadingPort")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MotherVessel")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("TotalVolume")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime>("TransferDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("VesselName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("VesselTypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TransferRecord");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.ValidatiionResponse", b =>
@@ -2599,6 +3131,15 @@ namespace Bunkering.Core.Migrations
                     b.Navigation("State");
                 });
 
+            modelBuilder.Entity("Bunkering.Core.Data.LiquidDynamicMeterReading", b =>
+                {
+                    b.HasOne("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamicMeter", null)
+                        .WithMany("LiquidDynamicMeterReadings")
+                        .HasForeignKey("ProcessingPlantCOQLiquidDynamicMeterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Bunkering.Core.Data.Message", b =>
                 {
                     b.HasOne("Bunkering.Core.Data.Application", null)
@@ -2644,6 +3185,33 @@ namespace Bunkering.Core.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQBatchTank", b =>
+                {
+                    b.HasOne("Bunkering.Core.Data.ProcessingPlantCOQBatch", null)
+                        .WithMany("ProcessingPlantCOQBatchTanks")
+                        .HasForeignKey("ProcessingPlantCOQBatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamicMeter", b =>
+                {
+                    b.HasOne("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamicBatch", null)
+                        .WithMany("ProcessingPlantCOQLiquidDynamicMeters")
+                        .HasForeignKey("ProcessingPlantCOQLiquidDynamicBatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQTankReading", b =>
+                {
+                    b.HasOne("Bunkering.Core.Data.ProcessingPlantCOQBatchTank", null)
+                        .WithMany("ProcessingPlantCOQTankReadings")
+                        .HasForeignKey("ProcessingPlantCOQBatchTankId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Bunkering.Core.Data.State", b =>
                 {
                     b.HasOne("Bunkering.Core.Data.Country", "Country")
@@ -2681,6 +3249,17 @@ namespace Bunkering.Core.Migrations
                         .HasForeignKey("COQTankId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.TransferDetail", b =>
+                {
+                    b.HasOne("Bunkering.Core.Data.TransferRecord", "TransferRecord")
+                        .WithMany("TransferDetails")
+                        .HasForeignKey("TransferRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TransferRecord");
                 });
 
             modelBuilder.Entity("Bunkering.Core.ViewModels.TankViewModel", b =>
@@ -2764,9 +3343,34 @@ namespace Bunkering.Core.Migrations
                     b.Navigation("Tanks");
                 });
 
+            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQBatch", b =>
+                {
+                    b.Navigation("ProcessingPlantCOQBatchTanks");
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQBatchTank", b =>
+                {
+                    b.Navigation("ProcessingPlantCOQTankReadings");
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamicBatch", b =>
+                {
+                    b.Navigation("ProcessingPlantCOQLiquidDynamicMeters");
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamicMeter", b =>
+                {
+                    b.Navigation("LiquidDynamicMeterReadings");
+                });
+
             modelBuilder.Entity("Bunkering.Core.Data.State", b =>
                 {
                     b.Navigation("LGAs");
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.TransferRecord", b =>
+                {
+                    b.Navigation("TransferDetails");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.VesselType", b =>

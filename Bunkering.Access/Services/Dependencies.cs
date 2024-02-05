@@ -36,6 +36,7 @@ namespace Bunkering.Access.Services
             services.AddScoped<DepotService>();
             services.AddScoped<NominatedSurveyorService>();
             services.AddScoped<CoQService>();
+            services.AddScoped<ProcessingPlantCoQService>();
             services.AddScoped<ApplicationQueries>();
             services.AddScoped<RoleService>();
             services.AddScoped<PlantService>();
@@ -45,6 +46,8 @@ namespace Bunkering.Access.Services
             services.AddScoped<ShipToShipService>();
             services.AddScoped<DippingMethodService>();
             services.AddScoped<MeterTypeService>();
+            services.AddScoped<MeterService>();
+            services.AddScoped<BatchService>();
             services.AddScoped<SourceRecipientVesselService>();
 
 

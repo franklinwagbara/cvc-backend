@@ -6,3 +6,7 @@
     CONSTRAINT [PK_Meters] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 
+
+
+
+

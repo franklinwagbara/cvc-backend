@@ -230,7 +230,17 @@ namespace Bunkering.Access.Services
                 {
                     var plant = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id.Equals(coq.PlantId));
                     var certificate = await GenerateCOQCertificate(coqId, currentUser.Id, plant.CompanyElpsId.ToString());
-                    //var debitnote = await _paymentService.GenerateDebitNote(coq.Id);
+
+                    //add CoQId to CoQReference rcord
+                    var coqReference = await _unitOfWork.CoQReference.Add(new CoQReference
+                    {
+                        DepotCoQId = coqId,
+                    });
+
+                    await _unitOfWork.CoQReference.Add(coqReference);
+                    await _unitOfWork.SaveChangesAsync(currentUser.Id);
+
+                    var debitnote = await _paymentService.GenerateDebitNote(coqReference.Id);
 
                     if (certificate.Item1)
                         message = $"COQ Application has been approved and certificate {certificate.Item2} has been generated successfully.";
@@ -245,6 +255,85 @@ namespace Bunkering.Access.Services
                 return (false, e.Message);
             }
         }
+
+        public async Task<(bool, string)> PPCoqWorkFlow(int coqId, string action, string comment, string currUserId = null, string delUserId = null)
+        {
+            try
+            {
+                var isProcessingPlant = false;
+                //return (false, $"Application with Id={coq.AppId} was not found.");
+                var coq = await _unitOfWork.ProcessingPlantCoQ.FirstOrDefaultAsync(x => x.ProcessingPlantCOQId.Equals(coqId)) ?? throw new Exception($"Processing COQ with Id={coqId} was not found.");
+
+                var message = string.Empty;
+
+                currUserId = string.IsNullOrEmpty(currUserId) ? coq.CurrentDeskId : currUserId;
+                var currentUser = _userManager.Users
+                        .Include(x => x.Company)
+                        .Include(ol => ol.Office)
+                        .Include(lo => lo.UserRoles)
+                        .ThenInclude(r => r.Role)
+                        .Include(lo => lo.Location)
+                        .FirstOrDefault(x => x.Id.Equals(currUserId)) ?? throw new Exception($"User with Id={currUserId} was not found.");
+
+                var workFlow = (await GetWorkFlow(action, currentUser, 1)) ?? throw new Exception($"Work Flow for this action was not found.");
+                var nextProcessingOfficer = (await GetNextStaffCOQPP(coqId, action, workFlow, currentUser, delUserId)) ?? throw new Exception($"No processing staff for this action was not found.");
+
+                coq.CurrentDeskId = nextProcessingOfficer.Id;
+                coq.Status = workFlow.Status;
+                coq.DateModified = DateTime.UtcNow.AddHours(1);
+
+                if (action.Equals(Enum.GetName(typeof(AppActions), AppActions.Submit)))
+                    coq.SubmittedDate = DateTime.UtcNow.AddHours(1);
+
+                if (action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Approve).ToLower()))
+                    message = "COQ processed successfully and moved to the next processing staff";
+                else if (action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Submit).ToLower()))
+                    message = "COQ submitted successfully";
+                else if (action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Resubmit).ToLower()))
+                    message = "COQ re-submitted successfully";
+                else
+                    message = "COQ has been returned for review";
+
+                await _unitOfWork.ProcessingPlantCoQ.Update(coq);
+                await _unitOfWork.SaveChangesAsync(currentUser.Id);
+                nextProcessingOfficer.LastJobDate = DateTime.UtcNow.AddHours(1);
+                await _userManager.UpdateAsync(nextProcessingOfficer);
+
+                //save action to history
+                await SavePPCOQHistory(action, coqId, workFlow, currentUser, nextProcessingOfficer, comment);
+
+                //Generate permit number on final approval
+                if (workFlow.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)))
+                {
+                    var plant = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id.Equals(coq.PlantId));
+                    var certificate = await GenerateCOQCertificate(coqId, currentUser.Id, plant.CompanyElpsId.ToString());
+                    //var debitnote = await _paymentService.GenerateDebitNote(coq.Id);
+
+                    //add CoQId to CoQReference rcord
+                    var coqReference = await _unitOfWork.CoQReference.Add(new CoQReference
+                    {
+                        PlantCoQId = coqId,
+                    });
+
+                    await _unitOfWork.CoQReference.Add(coqReference);
+                    await _unitOfWork.SaveChangesAsync(currentUser.Id);
+
+                    var debitnote = await _paymentService.GenerateDebitNote(coqReference.Id);
+
+                    if (certificate.Item1)
+                        message = $"COQ Application has been approved and certificate {certificate.Item2} has been generated successfully.";
+                }
+                //send and save notification
+                //await SendCOQNotification(coq, action, nextProcessingOfficer, message);
+                return (true, message);
+
+            }
+            catch (Exception e)
+            {
+                return (false, e.Message);
+            }
+        }
+
         public async Task<WorkFlow> GetWorkFlow(string action, ApplicationUser currentuser, int VesselTypeId)
         => action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Submit).ToLower()) || action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Resubmit))
             ? await _unitOfWork.Workflow.FirstOrDefaultAsync(x => x.Action.ToLower().Trim().Equals(action.ToLower().Trim())
@@ -273,6 +362,23 @@ namespace Bunkering.Access.Services
         public async Task<bool> SaveCOQHistory(string action, int coqId, WorkFlow flow, ApplicationUser user, ApplicationUser nextUser, string comment)
         {
             await _unitOfWork.COQHistory.Add(new COQHistory
+            {
+                Action = action,
+                Date = DateTime.Now.AddHours(1),
+                COQId = coqId,
+                TargetedTo = nextUser.Id,
+                TargetRole = nextUser.UserRoles.Where(x => !x.Role.Id.Equals("Staff")).FirstOrDefault().Role.Id,
+                TriggeredBy = user.Id,
+                TriggeredByRole = user.UserRoles.Where(x => !x.Role.Name.Equals("Staff")).FirstOrDefault().Role.Id,
+                Comment = comment
+            });
+            var res = await _unitOfWork.SaveChangesAsync(user.Id);
+            return res > 0;
+        }
+
+        public async Task<bool> SavePPCOQHistory(string action, int coqId, WorkFlow flow, ApplicationUser user, ApplicationUser nextUser, string comment)
+        {
+            await _unitOfWork.PPCOQHistory.Add(new PPCOQHistory
             {
                 Action = action,
                 Date = DateTime.Now.AddHours(1),
@@ -381,6 +487,77 @@ namespace Bunkering.Access.Services
                 if (action.Equals(Enum.GetName(typeof(AppActions), AppActions.Resubmit)) || action.Equals(Enum.GetName(typeof(AppActions), AppActions.Reject)))
                 {
                     var historylist = await _unitOfWork.COQHistory.Find(x => x.COQId == coqId
+                                        && currentUser.UserRoles.FirstOrDefault().Role.Id.Equals(x.TargetRole)
+                                        && x.TargetedTo.Equals(currentUser.Id)
+                                        && x.TriggeredByRole.Equals(wkflow.TargetRole));
+
+                    var history = historylist.OrderByDescending(x => x.Id).FirstOrDefault();
+                    if (history != null)
+                    {
+                        nextprocessingofficer = _userManager.Users.Include(ur => ur.UserRoles).ThenInclude(r => r.Role).Include(lo => lo.Location).Include(ol => ol.Office)
+                                                    .FirstOrDefault(x => x.Id.Equals(history.TriggeredBy))!;
+                        if (nextprocessingofficer != null && !nextprocessingofficer.IsActive)
+                        {
+                            var users = _userManager.Users
+                                            .Include(x => x.Company).Include(ur => ur.UserRoles).ThenInclude(r => r.Role).Include(lo => lo.Location).Include(ol => ol.Office)
+                                            .Where(x => x.UserRoles.Where(y => y.Role.Id.Equals(wkflow.TargetRole)) != null
+                                            && x.IsActive).ToList();
+                            nextprocessingofficer = users.OrderBy(x => x.LastJobDate).FirstOrDefault();
+                        }
+                    }
+                }
+                if (wkflow != null && nextprocessingofficer == null)
+                {
+                    if (wkflow.TargetRole.Equals(currentUser.UserRoles.FirstOrDefault().Role.Name))
+                        nextprocessingofficer = currentUser;
+                    // else if (wkflow.TargetRole.Equals(app.User.UserRoles.FirstOrDefault().Role.Name))
+                    //     nextprocessingofficer = app.User;
+                    else
+                    {
+                        var users = !action.Equals(Enum.GetName(typeof(AppActions), AppActions.Submit))
+                            ? _userManager.Users.Include(x => x.Company).Include(f => f.Company).Include(ur => ur.UserRoles)
+                                .ThenInclude(r => r.Role)
+                                .Include(lo => lo.Location)
+                                .Include(ol => ol.Office)
+                                .Where(x => x.UserRoles.Any(y => y.Role.Name.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
+                                && x.IsActive && x.OfficeId == currentUser.OfficeId).ToList()
+                            : _userManager.Users.Include(x => x.Company).Include(f => f.Company).Include(ur => ur.UserRoles)
+                                .ThenInclude(r => r.Role)
+                                .Include(lo => lo.Location)
+                                .Include(ol => ol.Office)
+                                .Where(x => x.UserRoles.Any(y => y.Role.Name.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
+                                && x.IsActive).ToList();
+
+                        foreach (var user in users)
+                        {
+                            if (!user.UserRoles.Any(c => c.Role.Name == RoleConstants.COMPANY) && user.LocationId != wkflow.ToLocationId)
+                            {
+                                users.Remove(user);
+                            }
+                        }
+                        nextprocessingofficer = users.OrderBy(x => x.LastJobDate).FirstOrDefault();
+                    }
+                }
+                return nextprocessingofficer;
+            }
+        }
+
+        public async Task<ApplicationUser> GetNextStaffCOQPP(int coqId, string action, WorkFlow wkflow, ApplicationUser currentUser, string delUserId = null)
+        {
+            ApplicationUser nextprocessingofficer = null;
+            if (!string.IsNullOrEmpty(delUserId))
+                return _userManager.Users.Include(x => x.Company)
+                    .Include(ur => ur.UserRoles).ThenInclude(r => r.Role)
+                    .Include(lo => lo.Location).Include(ol => ol.Office)
+                    .FirstOrDefault(x => x.Id.Equals(delUserId) && x.IsActive)!;
+            else
+            {
+                // var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == appid, "User.UserRoles.Role");
+                var coq = await _unitOfWork.ProcessingPlantCoQ.FirstOrDefaultAsync(x => x.ProcessingPlantCOQId.Equals(coqId)) ?? throw new Exception($"Unable to find COQ with ID={coqId}.");
+
+                if (action.Equals(Enum.GetName(typeof(AppActions), AppActions.Resubmit)) || action.Equals(Enum.GetName(typeof(AppActions), AppActions.Reject)))
+                {
+                    var historylist = await _unitOfWork.PPCOQHistory.Find(x => x.COQId == coqId
                                         && currentUser.UserRoles.FirstOrDefault().Role.Id.Equals(x.TargetRole)
                                         && x.TargetedTo.Equals(currentUser.Id)
                                         && x.TriggeredByRole.Equals(wkflow.TargetRole));

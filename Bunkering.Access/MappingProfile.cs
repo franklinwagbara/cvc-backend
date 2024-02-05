@@ -13,6 +13,7 @@ namespace Bunkering.Access
             CreateMap<ApplicationDepot, AppDepotViewModel>().ReverseMap();
             CreateMap<WorkFlow, WorkflowviewModel>().ReverseMap();
             CreateMap<ApplicationRole, RoleViewModel>().ReverseMap();   
+            CreateMap<SubmitDocumentDto, SubmittedDocument>().ReverseMap();   
         }
     }
 }
