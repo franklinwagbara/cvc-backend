@@ -189,7 +189,7 @@ namespace Bunkering.Access.Services
 					string plantTypeName = null;
 					if(user.Company != null && user.Company.OperatingFacilityId > 0)
 					{
-						plantTypeName = Enum.GetName(typeof(PlantType), user.Company.OperatingFacilityId);
+						plantTypeName = (await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.Id == user.Company.OperatingFacilityId)).Name;
                     }
 
                     _response = new ApiResponse

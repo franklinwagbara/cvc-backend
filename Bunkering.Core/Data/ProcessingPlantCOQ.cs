@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,9 @@ namespace Bunkering.Core.Data
         public int ProcessingPlantCOQId { get; set; }
         public int PlantId { get; set; } //plant here refers to processing Facility Id
         public int ProductId { get; set; }
+        public string? CurrentDeskId { get; set; }
+        public DateTime? SubmittedDate { get; set; }
+        public DateTime? DateModified { get; set; }
         public string Reference { get; set; }
         public string MeasurementSystem {  get; set; }
         public int? MeterTypeId { get; set; }
@@ -57,6 +61,9 @@ namespace Bunkering.Core.Data
         public DateTime CreatedAt { get; set; }
         public string Status { get; set; }
 
-
+        [ForeignKey(nameof(PlantId))]
+        public Plant Plant { get; set; }
+        [ForeignKey(nameof(ProductId))]
+        public Product Product { get; set; }
     }
 }
