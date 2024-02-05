@@ -55,6 +55,7 @@ namespace Bunkering.Core.Data
         public double? DeliveredMTVac { get; set; }
         public double? DeliveredMTAir { get; set; }
         public double? DeliveredLongTonsAir { get; set; }
+        public double Price { get; set; } = 0;
 
         public string CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; }

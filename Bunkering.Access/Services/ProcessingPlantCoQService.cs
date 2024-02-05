@@ -134,6 +134,7 @@ namespace Bunkering.Access.Services
                     DeliveredMTAir = dto.DeliveredMTAir,
                     DeliveredMTVac = dto.DeliveredMTVac,
                     DeliveredUsBarrelsAt15Degree = dto.DeliveredUsBarrelsAt15Degree,
+                    Price = dto.Price,
                 };
 
                 _context.ProcessingPlantCOQs.Add(coq);
@@ -389,6 +390,7 @@ namespace Bunkering.Access.Services
                     PrevMTVac = dto.PrevMTVac,
                     PrevMTAir = dto.PrevMTVac * dto.PrevWTAir,
                     PrevLongTonsAir = dto.PrevMTVac * dto.PrevWTAir * 0.984206,
+                    Price = dto.Price,
                 };
 
                 _context.ProcessingPlantCOQs.Add(coq);
