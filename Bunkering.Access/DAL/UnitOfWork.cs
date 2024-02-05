@@ -13,6 +13,7 @@ namespace Bunkering.Access.DAL
         public ITransferDetail TransferDetail { get; set; }
         public IPlantOfficer PlantOfficer { get; private set; }
         public IJettyOfficer JettyOfficer { get; private set; }
+        public ISourceRecipientVessel SourceRecipientVessel { get; private set; }
         public IDippingMethod DippingMethod { get; private set; }
         public IMeterType MeterType { get; private set; }
         public IApplicationType ApplicationType { get; set; }
@@ -120,6 +121,7 @@ namespace Bunkering.Access.DAL
             MeterType = MeterType ?? new MeterTypeRepository(_context);
             TransferDetail = TransferDetail ?? new TransferDetailRepository(_context);
             TransferRecord = TransferRecord ?? new TransferRecordRepository(_context);
+            SourceRecipientVessel = SourceRecipientVessel ?? new SourceRecipientVesselRepostitory(_context);
             ProcessingPlantCoQ = ProcessingPlantCoQ ?? new ProcessingPlantCoQRepository(context);
             PPCOQHistory = PPCOQHistory ?? new PPCOQHistoryRepository(context);
         }
