@@ -34,5 +34,6 @@ namespace Bunkering.Core.Data
 		[ForeignKey(nameof(OfficeId))]
 		public Office? Office { get; set; }
 		public string? Signature { get; set; }
+        public bool IsDefaulter { get; set; }
     }
 }

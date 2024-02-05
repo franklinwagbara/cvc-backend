@@ -9,7 +9,14 @@ namespace Bunkering.Access.IContracts
         IApplicationDepot ApplicationDepot { get; }
         IAppFee AppFee { get; }
         IBatch Batch { get; }
+        ICoQ CoQ { get; }
+        ICOQTank CoQTank { get; }
+        ICOQHistory COQHistory { get; }
+        IPPCOQHistory PPCOQHistory { get; }
+        ICOQCertificate COQCertificate { get; }
+        ICoQReference CoQReference { get; }
         ITransferRecord TransferRecord { get; }
+        ISourceRecipientVessel SourceRecipientVessel { get; }
         ITransferDetail TransferDetail { get; }
         IPlantOfficer PlantOfficer { get; }
         IMeterType MeterType { get; }
@@ -48,11 +55,10 @@ namespace Bunkering.Access.IContracts
         IVesselDischargeClearance VesselDischargeClearance { get; }
         IWorkflow Workflow { get; }
         IVesselType VesselType { get; }
-        ICoQ CoQ { get; }
-        ICOQTank CoQTank { get; }
-        ICOQHistory COQHistory { get; }
-        IPPCOQHistory PPCOQHistory { get; }
-        ICOQCertificate COQCertificate { get; }
+        //ICoQ CoQ { get; }
+        //ICOQTank CoQTank { get; }
+        //ICOQHistory COQHistory { get; }
+        //ICOQCertificate COQCertificate { get; }
         IMeasurementTypeRepository MeasurementType { get; }
         ICOQSubmittedDocument COQSubmittedDocument { get; }
         IPPCOQSubmittedDocument PPCOQSubmittedDocument { get; }

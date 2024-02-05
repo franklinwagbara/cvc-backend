@@ -384,6 +384,8 @@ FodyWeavers.xsd
 /Bunkering/obj/Debug/net7.0/Bunkering.csproj.AssemblyReference.cache
 /Bunkering.Access/bin/Debug/net7.0/Bunkering.Access.dll
 /Bunkering.Access/bin/Debug/net7.0/Bunkering.Access.pdb
+Bunkering/bin/Debug/net7.0/AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+/Bunkering/bin/Debug/net7.0/AutoMapper.Extensions.Microsoft.DependencyInjection.dll
 *.dll
 *.dll
 *.dll
