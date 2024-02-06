@@ -4,6 +4,7 @@ using Bunkering.Access.DAL;
 using Bunkering.Access.IContracts;
 using Bunkering.Core.Data;
 using Bunkering.Core.Dtos;
+using Bunkering.Core.Exceptions;
 using Bunkering.Core.Utils;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
@@ -27,7 +28,7 @@ namespace Bunkering.Access.Services
         private readonly IMapper _mapper;
         private ApiResponse _apiReponse;
         private readonly WorkFlowService _flow;
-        //private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private string LoginUserEmail = string.Empty;
         private readonly ApplicationContext _context;
         private readonly IUnitOfWork _unitOfWork;
@@ -38,7 +39,7 @@ namespace Bunkering.Access.Services
         {
             _httpCxtAccessor = httpCxtAccessor;
             _apiReponse = new ApiResponse();
-            //_userManager = userManager;
+            _userManager = userManager;
             _apiReponse = new ApiResponse();
             LoginUserEmail = _httpCxtAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);            
             _context = context;
@@ -267,26 +268,26 @@ namespace Bunkering.Access.Services
                 #region Document Submission
 
                 SubmitDocumentDto sDoc = dto.SubmitDocuments.FirstOrDefault() ?? throw new Exception("No documents passed");
-                var sDocument = _mapper.Map<SubmittedDocument>(sDoc);
+                var sDocument = _mapper.Map<PPCOQSubmittedDocument>(sDoc);
 
-                var sDocumentList = new List<SubmittedDocument>();
+                var sDocumentList = new List<PPCOQSubmittedDocument>();
 
                 dto.SubmitDocuments.ForEach(x =>
                 {
-                    var newSDoc = new SubmittedDocument
+                    var newSDoc = new PPCOQSubmittedDocument
                     {
                         DocId = x.DocId,
                         FileId = x.FileId,
                         DocName = x.DocName,
                         DocSource = x.DocSource,
                         DocType = x.DocType,
-                        ApplicationId = coq.ProcessingPlantCOQId,
+                        ProcessingPlantCOQId = coq.ProcessingPlantCOQId,
                     };
 
                     sDocumentList.Add(newSDoc);
                 });
 
-                _context.SubmittedDocuments.AddRange(sDocumentList);
+                _context.PPCOQSubmittedDocuments.AddRange(sDocumentList);
                 #endregion
 
                 _context.SaveChanges();
@@ -494,26 +495,26 @@ namespace Bunkering.Access.Services
                 #region Document Submission
 
                 SubmitDocumentDto sDoc = dto.SubmitDocuments.FirstOrDefault() ?? throw new Exception("No documents passed");
-                var sDocument = _mapper.Map<SubmittedDocument>(sDoc);
+                var sDocument = _mapper.Map<PPCOQSubmittedDocument>(sDoc);
 
-                var sDocumentList = new List<SubmittedDocument>();
+                var sDocumentList = new List<PPCOQSubmittedDocument>();
 
                 dto.SubmitDocuments.ForEach(x =>
                 {
-                    var newSDoc = new SubmittedDocument
+                    var newSDoc = new PPCOQSubmittedDocument
                     {
                         DocId = x.DocId,
                         FileId = x.FileId,
                         DocName = x.DocName,
                         DocSource = x.DocSource,
                         DocType = x.DocType,
-                        ApplicationId = coq.ProcessingPlantCOQId,
+                        ProcessingPlantCOQId = coq.ProcessingPlantCOQId,
                     };
 
                     sDocumentList.Add(newSDoc);
                 });
 
-                _context.SubmittedDocuments.AddRange(sDocumentList);
+                _context.PPCOQSubmittedDocuments.AddRange(sDocumentList);
                 #endregion
 
                 _context.SaveChanges();
@@ -568,6 +569,226 @@ namespace Bunkering.Access.Services
                     Message = $"An error occur, COQ not created: {ex.Message}",
                     Success = false,
                     StatusCode = HttpStatusCode.InternalServerError
+                };
+            }
+        }
+
+        public async Task<ApiResponse> GetPPCOQDetailsById(int Id)
+        {
+            try
+            {
+                var coq = await _unitOfWork.ProcessingPlantCoQ
+                    .Find(c => c.ProcessingPlantCOQId == Id, "Plant,Product") 
+                    ?? throw new NotFoundException($"COQ with Id={Id} does not exist");
+
+                return new ApiResponse
+                {
+                    Data = coq,
+                    Message = "Successfull",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true
+                };
+
+                //var gastankList = new List<GasTankReadingsPerCoQ>();
+                //var liqtankList = new List<LiquidTankReadingsPerCoQ>();
+                //var product = new Product();
+
+                //var docs = await _context.PPCOQSubmittedDocuments.FirstOrDefaultAsync(c => c.ProcessingPlantCOQId == coq.ProcessingPlantCOQId);
+
+                //if (coq.ProductId != null)
+                //    product = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(coq.ProductId));
+                //else
+                //{
+                //    var app = await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.Id.Equals(coq.AppId), "Product");
+                //    if (app != null)
+                //        product = app.Product;
+                //}
+                //if (product != null)
+                //{
+                //    switch (product.ProductType.ToLower())
+                //    {
+                //        case "gas":
+                //            //foreach (var item in tanks)
+                //            //{
+                //            //    var reading = _mapper.Map<List<CreateCoQGasTankDTO>>(item.TankMeasurement);
+                //            //    reading.ForEach(x => x.TankName = _context.PlantTanks.FirstOrDefault(x => x.PlantTankId == item.TankId).TankName);
+                //            //    gastankList.Add(reading);
+                //            //}
+                //            gastankList = await _context.COQTanks
+                //                                .Include(c => c.TankMeasurement).Where(c => c.CoQId == coq.Id)
+                //                                .Select(c => new GasTankReadingsPerCoQ
+                //                                {
+                //                                    TankId = c.TankId,
+                //                                    Id = c.Id,
+                //                                    TankName = _context.PlantTanks.FirstOrDefault(x => x.PlantTankId == c.TankId).TankName,
+                //                                    CoQId = c.CoQId,
+                //                                    TankMeasurement = c.TankMeasurement.Select(m => new CreateCoQGasTankDTO
+                //                                    {
+                //                                        LiquidDensityVac = m.LiquidDensityVac,
+                //                                        MolecularWeight = m.MolecularWeight,
+                //                                        ObservedLiquidVolume = m.ObservedLiquidVolume,
+                //                                        ObservedSounding = m.ObservedSounding,
+                //                                        ShrinkageFactorLiquid = m.ShrinkageFactorLiquid,
+                //                                        ShrinkageFactorVapour = m.ShrinkageFactorVapour,
+                //                                        TapeCorrection = m.TapeCorrection,
+                //                                        VapourFactor = m.VapourFactor,
+                //                                        VapourPressure = m.VapourPressure,
+                //                                        VapourTemperature = m.VapourTemperature,
+                //                                        TankVolume = m.TankVolume,
+                //                                        MeasurementType = m.MeasurementType
+                //                                    }).ToList()
+                //                                }).ToListAsync();
+                //            break;
+                //        default:
+
+                //            //foreach (var item in tanks)
+                //            //{
+                //            //    liqtankList.AddRange(item.TankMeasurement.Select(x => new CreateCoQLiquidTankDto
+                //            //    {
+                //            //        Density = x.Density,
+                //            //        DIP = x.DIP,
+                //            //        FloatRoofCorr = x.FloatRoofCorr,
+                //            //        GOV = x.GOV,
+                //            //        TankName = _context.PlantTanks.FirstOrDefault(x => x.PlantTankId == item.TankId).TankName,
+                //            //        MeasurementType = x.MeasurementType,
+                //            //        Tempearture = x.Tempearture,
+                //            //        TOV = x.TOV,
+                //            //        VCF = x.VCF,
+                //            //        WaterDIP = x.WaterDIP,
+                //            //        WaterVolume = x.WaterVolume
+                //            //    }).ToList());
+                //            //    //var reading = _mapper.Map<List<CreateCoQLiquidTankDto>>(item.TankMeasurement);
+                //            //    //reading.ForEach(x => x.TankName = _context.PlantTanks.FirstOrDefault(x => x.PlantTankId == item.TankId).TankName);
+                //            //    //liqtankList.Add(reading);
+                //            //}
+                //            liqtankList = await _context.COQTanks
+                //                                 .Include(c => c.TankMeasurement).Where(c => c.CoQId == coq.Id)
+                //                                 .Select(c => new LiquidTankReadingsPerCoQ
+                //                                 {
+                //                                     TankId = c.TankId,
+                //                                     Id = c.Id,
+                //                                     CoQId = c.CoQId,
+                //                                     TankName = _context.PlantTanks.FirstOrDefault(x => x.PlantTankId == c.TankId).TankName,
+                //                                     TankMeasurement = c.TankMeasurement.Select(m => new CreateCoQLiquidTankDto
+                //                                     {
+                //                                         Density = m.Density,
+                //                                         DIP = m.DIP,
+                //                                         FloatRoofCorr = m.FloatRoofCorr,
+                //                                         GOV = m.GOV,
+                //                                         MeasurementType = m.MeasurementType,
+                //                                         Tempearture = m.Tempearture,
+                //                                         TOV = m.TOV,
+                //                                         VCF = m.VCF,
+                //                                         WaterDIP = m.WaterDIP,
+                //                                         WaterVolume = m.WaterVolume
+                //                                     }).ToList()
+                //                                 })
+                //                                 .ToListAsync();
+                //            break;
+                //    }
+                //}
+                //var dictionary = coq.Stringify().Parse<Dictionary<string, object>>();
+                //var coqData = new CoQsDataDTO()
+                //{
+                //    Vessel = new(),
+                //    DateOfSTAfterDischarge = coq.DateOfSTAfterDischarge,
+                //    DateOfVesselArrival = coq.DateOfVesselArrival,
+                //    DateOfVesselUllage = coq.DateOfVesselUllage,
+                //    ArrivalShipFigure = coq.ArrivalShipFigure,
+                //    DepotPrice = coq.DepotPrice,
+                //    MT_AIR = coq.MT_AIR,
+                //    MT_VAC = coq.MT_VAC,
+                //    GOV = coq.GOV,
+                //    GSV = coq.GSV,
+                //    Status = coq.Status,
+                //    AppId = coq.AppId,
+                //    Reference = coq.Reference,
+                //    QuauntityReflectedOnBill = coq.QuauntityReflectedOnBill
+
+                //};
+                //if (coq.AppId != null || coq.Reference != null)
+                //{
+                //    var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(coq.AppId) || x.Reference == coq.Reference, "Facility");
+                //    var jetty = _unitOfWork.Jetty.Query().FirstOrDefault(x => x.Id == app.Jetty)?.Name;
+                //    if (app != null)
+                //    {
+                //        coqData.Reference = app.Reference;
+                //        coqData.MarketerName = app?.MarketerName ?? string.Empty;
+                //        coqData.MotherVessel = app.MotherVessel;
+                //        coqData.Jetty = jetty;
+                //        coqData.LoadingPort = app.LoadingPort;
+                //        coqData.Vessel.Name = app.Facility.Name;
+                //        coqData.Vessel.VesselType = app.Facility?.VesselType?.Name ?? string.Empty;
+                //        coqData.NominatedSurveyor = (await _unitOfWork.NominatedSurveyor.FirstOrDefaultAsync(c => c.Id == app.SurveyorId)).Name;
+                //        coqData.AppId = app.Id;
+                //        coqData.ApplicationTypeId = app.ApplicationTypeId;
+                //        coqData.ApplicationType = (await _unitOfWork.ApplicationType.FirstOrDefaultAsync(c => c.Id == app.ApplicationTypeId)).Name;
+                //    }
+                //}
+                //coqData.ProductType = product.ProductType;
+                //coqData.CurrentDesk = _userManager.Users.FirstOrDefault(u => u.Id.Equals(coq.CurrentDeskId)).Email;
+                //coqData.Plant = _context.Plants.FirstOrDefault(p => p.Id.Equals(coq.PlantId)).Name;
+
+                //if (product.ProductType != null && product.ProductType.ToLower().Equals("gas"))
+                //    return new()
+                //    {
+                //        Success = true,
+                //        StatusCode = HttpStatusCode.OK,
+                //        Data = new
+                //        {
+                //            coq = coqData,
+                //            tankList = gastankList,
+                //            docs
+                //        }
+                //    };
+                //else
+                //    return new()
+                //    {
+                //        Success = true,
+                //        StatusCode = HttpStatusCode.OK,
+                //        Data = new
+                //        {
+                //            coq = coqData,
+                //            tankList = liqtankList,
+                //            docs
+                //        }
+                //    };
+            }
+            catch (Exception ex)
+            {
+                if (ex is ConflictException) return new ApiResponse { Message = ex.Message, StatusCode = HttpStatusCode.Conflict, Success = false };
+                else if (ex is NotFoundException) return new ApiResponse { Message = ex.Message, StatusCode = HttpStatusCode.NotFound, Success = false };
+                else return new ApiResponse { Message = ex.Message, StatusCode = HttpStatusCode.InternalServerError, Success = false };
+            }
+
+        }
+
+        public async Task<ApiResponse> Process(int id, string act, string comment)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(LoginUserEmail) ?? throw new Exception($"User with the email={LoginUserEmail} was not found.");
+                var coq = await _unitOfWork.ProcessingPlantCoQ.FirstOrDefaultAsync(x => x.ProcessingPlantCOQId.Equals(id)) ?? throw new Exception($"COQ with the ID={id} could not be found.");
+
+                var result = await _flow.PPCoqWorkFlow(id, act, comment);
+
+                if (result.Item1)
+                    return new ApiResponse
+                    {
+                        Data = result.Item1,
+                        Message = "COQ Application has been pushed",
+                        Success = true,
+                        StatusCode = HttpStatusCode.OK
+                    };
+                else throw new Exception("COQ Application could not be pushed.");
+            }
+            catch (Exception e)
+            {
+                return new ApiResponse
+                {
+                    Message = e.Message,
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Success = false
                 };
             }
         }
