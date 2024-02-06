@@ -145,13 +145,9 @@
     <Build Include="dbo\Tables\ProcessingPlantCOQLiquidDynamicBatches.sql" />
     <Build Include="dbo\Tables\LiquidDynamicMeterReadings.sql" />
     <Build Include="dbo\Tables\PPCOQHistories.sql" />
-<<<<<<< HEAD
     <Build Include="dbo\Tables\COQSubmittedDocuments.sql" />
     <Build Include="dbo\Tables\PPCOQSubmittedDocuments.sql" />
-=======
     <Build Include="dbo\Tables\CoQReferences.sql" />
-    <Build Include="dbo\Tables\ProcessingPlantCOQs.sql" />
->>>>>>> 98064cddb8f3aa847d4579bead175bc794a6099d
   </ItemGroup>
   <ItemGroup>
     <None Include="Snapshots\Bunkering.Database_20230810_10-01-52.dacpac" />
