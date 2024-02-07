@@ -25,6 +25,7 @@ namespace Bunkering.Core.Data
         public DbSet<CoQ> CoQs { get; set; }
         public DbSet<COQHistory> COQHistories { get; set; }
         public DbSet<COQCertificate> COQCertificates { get; set; }
+        public DbSet<PPCOQCertificate> PPCOQCertificates { get; set; }
         public DbSet<COQTank> COQTanks { get; set; }
         public DbSet<CoQReference> CoQReferences { get; set; }
         public DbSet<Depot> Depots { get; set; }

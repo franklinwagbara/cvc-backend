@@ -577,13 +577,20 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var coq = await _unitOfWork.ProcessingPlantCoQ
-                    .Find(c => c.ProcessingPlantCOQId == Id, "Plant,Product") 
+                var coq = (await _unitOfWork.ProcessingPlantCoQ
+                    .Find(c => c.ProcessingPlantCOQId == Id, "Plant,Product")).FirstOrDefault()
                     ?? throw new NotFoundException($"COQ with Id={Id} does not exist");
+
+                var currentDesk = await _userManager.Users.FirstOrDefaultAsync(x => x.Id.Equals(coq.CurrentDeskId)) 
+                    ?? throw new NotFoundException($"User could not be found. CurrentDeskID = {coq.CurrentDeskId}");
+
+                var coqDTO = _mapper.Map<ProcessingPlantCOQDTO>(coq);
+                coqDTO.CurrentDeskName = $"{currentDesk.LastName}, {currentDesk.FirstName}";
+                coqDTO.CurrentDeskEmail = currentDesk.Email;
 
                 return new ApiResponse
                 {
-                    Data = coq,
+                    Data = coqDTO,
                     Message = "Successfull",
                     StatusCode = HttpStatusCode.OK,
                     Success = true
