@@ -53,6 +53,7 @@ namespace Bunkering.Access.DAL
         public ICOQHistory COQHistory { get; set; }
         public IPPCOQHistory PPCOQHistory { get; set; }
         public ICOQCertificate COQCertificate { get; set; }
+        public IPPCOQCertificate PPCOQCertificate { get; set; }
         public IMeasurementTypeRepository MeasurementType { get; private set; }
         public IvAppVessel vAppVessel { get; private set; }
         public IvAppPayment vAppPayment { get; private set; }
@@ -128,6 +129,7 @@ namespace Bunkering.Access.DAL
             PPCOQHistory = PPCOQHistory ?? new PPCOQHistoryRepository(context);
             COQSubmittedDocument = COQSubmittedDocument ?? new COQSubmittedDocumentRepository(context);
             PPCOQSubmittedDocument = PPCOQSubmittedDocument ?? new PPCOQSubmittedDocumentRepository(context);
+            PPCOQCertificate = PPCOQCertificate ?? new PPCOQCertificateRepository(context);
         }
 
         public int Save() => _context.SaveChanges();
