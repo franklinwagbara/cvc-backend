@@ -8,10 +8,12 @@ namespace Bunkering.Access.DAL
         private ApplicationContext _context;
         public IApplication Application { get; private set; }
         public IAppFee AppFee { get; private set; }
+        public ICoQReference CoQReference { get; set; }
         public ITransferRecord TransferRecord { get; set; }
         public ITransferDetail TransferDetail { get; set; }
         public IPlantOfficer PlantOfficer { get; private set; }
         public IJettyOfficer JettyOfficer { get; private set; }
+        public ISourceRecipientVessel SourceRecipientVessel { get; private set; }
         public IDippingMethod DippingMethod { get; private set; }
         public IMeterType MeterType { get; private set; }
         public IApplicationType ApplicationType { get; set; }
@@ -49,7 +51,9 @@ namespace Bunkering.Access.DAL
         public ICoQ CoQ { get; set; }
         public ICOQTank CoQTank { get; set; }
         public ICOQHistory COQHistory { get; set; }
+        public IPPCOQHistory PPCOQHistory { get; set; }
         public ICOQCertificate COQCertificate { get; set; }
+        public IPPCOQCertificate PPCOQCertificate { get; set; }
         public IMeasurementTypeRepository MeasurementType { get; private set; }
         public IvAppVessel vAppVessel { get; private set; }
         public IvAppPayment vAppPayment { get; private set; }
@@ -59,6 +63,9 @@ namespace Bunkering.Access.DAL
         public IvDebitNote vDebitNote { get; private set; }
         public IApplicationSurveyor ApplicationSurveyor { get; private set; }
         public IVesselDischargeClearance VesselDischargeClearance { get; set; }
+        public IProcessingPlantCoQ ProcessingPlantCoQ { get; set; }
+        public ICOQSubmittedDocument COQSubmittedDocument { get; set; }
+        public IPPCOQSubmittedDocument PPCOQSubmittedDocument { get; set; }
 
         public UnitOfWork(ApplicationContext context)
         {
@@ -70,6 +77,7 @@ namespace Bunkering.Access.DAL
             Appointment = Appointment != null ? Appointment : new AppointmentRepository(_context);
             Batch = Batch != null ? Batch : new BatchRepository(_context);  
             Country = Country != null ? Country : new CountryRepository(_context);
+            CoQReference = CoQReference != null ? CoQReference : new CoQReferenceRepository(_context);
             Depot = Depot != null ? Depot : new DepotRepository(_context);
             EmailConfiguration = EmailConfiguration != null ? EmailConfiguration : new EmailConfigurationRepository(_context);
             Facility = Facility != null ? Facility : new FacilityRepository(_context);
@@ -100,7 +108,7 @@ namespace Bunkering.Access.DAL
             CoQTank = CoQTank != null ? CoQTank : new COQTankRepository(_context);
             COQHistory = COQHistory != null? COQHistory: new COQHistoryRepository(_context);
             COQCertificate = COQCertificate != null? COQCertificate: new COQCertificateRepository(_context);
-             MeasurementType = MeasurementType != null? MeasurementType : new MeasurementTypeRepository(_context);
+            MeasurementType = MeasurementType != null? MeasurementType : new MeasurementTypeRepository(_context);
             vAppVessel = vAppVessel != null ? vAppVessel : new vAppVesselRepository(_context);
             vFacilityPermit = vFacilityPermit != null ? vFacilityPermit : new vFacilityPermitRepository(_context);
             vAppPayment = vAppPayment != null ? vAppPayment : new vAppPaymentRepository(_context);
@@ -116,6 +124,12 @@ namespace Bunkering.Access.DAL
             MeterType = MeterType ?? new MeterTypeRepository(_context);
             TransferDetail = TransferDetail ?? new TransferDetailRepository(_context);
             TransferRecord = TransferRecord ?? new TransferRecordRepository(_context);
+            SourceRecipientVessel = SourceRecipientVessel ?? new SourceRecipientVesselRepostitory(_context);
+            ProcessingPlantCoQ = ProcessingPlantCoQ ?? new ProcessingPlantCoQRepository(context);
+            PPCOQHistory = PPCOQHistory ?? new PPCOQHistoryRepository(context);
+            COQSubmittedDocument = COQSubmittedDocument ?? new COQSubmittedDocumentRepository(context);
+            PPCOQSubmittedDocument = PPCOQSubmittedDocument ?? new PPCOQSubmittedDocumentRepository(context);
+            PPCOQCertificate = PPCOQCertificate ?? new PPCOQCertificateRepository(context);
         }
 
         public int Save() => _context.SaveChanges();

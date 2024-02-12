@@ -189,7 +189,7 @@ namespace Bunkering.Access.Services
 					string plantTypeName = null;
 					if(user.Company != null && user.Company.OperatingFacilityId > 0)
 					{
-						plantTypeName = Enum.GetName(typeof(PlantType), user.Company.OperatingFacilityId);
+						plantTypeName = (await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.Id == user.Company.OperatingFacilityId)).Name;
                     }
 
                     _response = new ApiResponse
@@ -211,7 +211,7 @@ namespace Bunkering.Access.Services
 							Status = user.IsActive,
 							Location = user.Location?.Name,
 							Office = user.Office?.Name,
-							Directorate = user.Directorate,
+							user.Directorate,
 							operationFacility = plantTypeName,
 
                             Token = GenerateToken(user, user.UserRoles.FirstOrDefault(x => x.Role?.Name?.Equals("Staff") is false)?.Role?.Name, plantTypeName)

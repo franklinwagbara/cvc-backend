@@ -212,7 +212,7 @@ namespace Bunkering.Access.Services
                         _response = new ApiResponse
                         {
                             Data = deactiveMapping,
-                            Message = "Fee has been deleted",
+                            Message = "Mapping has been deleted",
                             StatusCode = HttpStatusCode.OK,
                             Success = true
                         };

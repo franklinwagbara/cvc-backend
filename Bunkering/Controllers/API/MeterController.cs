@@ -150,9 +150,35 @@ namespace Bunkering.Controllers.API
         [ProducesResponseType(typeof(ApiResponse), 405)]
         [ProducesResponseType(typeof(ApiResponse), 500)]
         [Produces("application/json")]
-        [Route("Meters-By-{id}")]
+        [Route("Meters-By-Id")]
         [HttpGet]
 
         public async Task<IActionResult> MetersById(int id) => Response(await _meterService.MeterById(id));
+
+        /// <summary>
+        /// This endpoint is used to fetch  Meters By PlantId
+        /// </summary>
+        /// <returns>Returns a success message or otherwise</returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// GET: api/Meter/MetersByPlantId
+        /// 
+        /// </remarks>
+        /// <response code="200">Returns the fees  </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+
+
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Produces("application/json")]
+        [Route("Meters-By-PlantId")]
+        [HttpGet]
+
+        public async Task<IActionResult> MeterByPlantId(int plantId) => Response(await _meterService.MeterByPlantId(plantId));
     }
 }

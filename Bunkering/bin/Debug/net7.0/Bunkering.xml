@@ -1499,6 +1499,22 @@
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
         </member>
+        <member name="M:Bunkering.Controllers.API.MeterController.MeterByPlantId(System.Int32)">
+            <summary>
+            This endpoint is used to fetch  Meters By PlantId
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/Meter/MetersByPlantId
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
         <member name="M:Bunkering.Controllers.API.OperatingFacilityController.AllOperatingFacilities">
             <summary>
             This endpoint is used to fetch all operating facilities
@@ -1540,6 +1556,22 @@
             
             Sample Request
             POST: api/operatingfacility/edit
+            
+            </remarks>
+            <response code="200">Returns staff list </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.OperatingFacilityController.AllOperatingFacilities(System.String)">
+            <summary>
+            This endpoint is used to fetch operating facility by email
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/operatingfacility/get-operating-facility
             
             </remarks>
             <response code="200">Returns staff list </response>
@@ -1642,6 +1674,23 @@
             
             </remarks>
             <response code="200">Returns the Plants  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.ProcessingPlantCOQController.Process(System.Int32,System.String,System.String)">
+            <summary>
+            This endpoint is used to process a COQ Application
+            </summary>
+            <returns>Returns a message after submission </returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/coq/submit/xxxx
+            
+            </remarks>
+            <param name="id">The coq id used to fetch coq application</param>
+            <response code="200">Returns success message </response>
             <response code="404">Returns not found </response>
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>

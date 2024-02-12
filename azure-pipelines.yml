@@ -17,11 +17,15 @@ stages:
       name: Azure Pipelines
       vmImage: 'windows-2022'
     steps:   
+    - task: UseDotNet@2
+      displayName: 'Use .NET Core 7'
+      inputs:
+        version: 7.0.x
     - task: DotNetCoreCLI@2
       displayName: Restore
       inputs:
         command: restore
-        projects: '$(System.DefaultWorkingDirectory)/Bunkering/Bunkering.sln'
+        projects: '**/*.csproj'
     - task: DotNetCoreCLI@2
       displayName: Build
       inputs:
@@ -44,6 +48,6 @@ stages:
         publishWebProjects: false
         projects: '**/*.csproj'
         arguments: '--configuration release --output $(build.artifactstagingdirectory) /property:PublishWithAspNetCoreTargetManifest=false'
-        zipAfterPublish: false
+        zipAfterPublish: true
     - task: PublishPipelineArtifact@1
 

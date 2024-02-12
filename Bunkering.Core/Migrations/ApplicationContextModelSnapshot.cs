@@ -1208,6 +1208,31 @@ namespace Bunkering.Core.Migrations
                     b.ToTable("LGAs");
                 });
 
+            modelBuilder.Entity("Bunkering.Core.Data.LiquidDynamicMeterReading", b =>
+                {
+                    b.Property<int>("LiquidDynamicMeterReadingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LiquidDynamicMeterReadingId"));
+
+                    b.Property<double>("MCube")
+                        .HasColumnType("float");
+
+                    b.Property<string>("MeasurementType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProcessingPlantCOQLiquidDynamicMeterId")
+                        .HasColumnType("int");
+
+                    b.HasKey("LiquidDynamicMeterReadingId");
+
+                    b.HasIndex("ProcessingPlantCOQLiquidDynamicMeterId");
+
+                    b.ToTable("LiquidDynamicMeterReadings");
+                });
+
             modelBuilder.Entity("Bunkering.Core.Data.Location", b =>
                 {
                     b.Property<int>("Id")
@@ -1292,7 +1317,7 @@ namespace Bunkering.Core.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("DeletedAt")
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
@@ -1305,25 +1330,6 @@ namespace Bunkering.Core.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Meters");
-                });
-
-            modelBuilder.Entity("Bunkering.Core.Data.MeterReading", b =>
-                {
-                    b.Property<int>("MeterReadingId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MeterReadingId"));
-
-                    b.Property<double>("MCube")
-                        .HasColumnType("float");
-
-                    b.Property<int>("ProcessingPlantCOQLiquidDynamicReadingId")
-                        .HasColumnType("int");
-
-                    b.HasKey("MeterReadingId");
-
-                    b.ToTable("MeterReadings");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.MeterType", b =>
@@ -1737,6 +1743,9 @@ namespace Bunkering.Core.Migrations
                     b.Property<double?>("PrevWTAir")
                         .HasColumnType("float");
 
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
@@ -1838,35 +1847,47 @@ namespace Bunkering.Core.Migrations
                     b.ToTable("ProcessingPlantCOQBatchTanks");
                 });
 
-            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamic", b =>
+            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamicBatch", b =>
                 {
-                    b.Property<int>("ProcessingPlantCOQLiquidDynamicId")
+                    b.Property<int>("ProcessingPlantCOQLiquidDynamicBatchId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProcessingPlantCOQLiquidDynamicId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProcessingPlantCOQLiquidDynamicBatchId"));
 
-                    b.Property<int>("MeterId")
+                    b.Property<int>("BatchId")
                         .HasColumnType("int");
 
                     b.Property<int>("ProcessingPlantCOQId")
                         .HasColumnType("int");
 
-                    b.HasKey("ProcessingPlantCOQLiquidDynamicId");
+                    b.Property<double?>("SumDiffLongTonsAir")
+                        .HasColumnType("float");
 
-                    b.ToTable("ProcessingPlantCOQLiquidDynamics");
+                    b.Property<double?>("SumDiffMCubeAt15Degree")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("SumDiffMTAir")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("SumDiffMTVac")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("SumDiffUsBarrelsAt15Degree")
+                        .HasColumnType("float");
+
+                    b.HasKey("ProcessingPlantCOQLiquidDynamicBatchId");
+
+                    b.ToTable("ProcessingPlantCOQLiquidDynamicBatches");
                 });
 
-            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamicReading", b =>
+            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamicMeter", b =>
                 {
-                    b.Property<int>("ProcessingPlantCOQLiquidDynamicReadingId")
+                    b.Property<int>("ProcessingPlantCOQLiquidDynamicMeterId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProcessingPlantCOQLiquidDynamicReadingId"));
-
-                    b.Property<int>("Batch")
-                        .HasColumnType("int");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProcessingPlantCOQLiquidDynamicMeterId"));
 
                     b.Property<double>("Cpl")
                         .HasColumnType("float");
@@ -1892,7 +1913,10 @@ namespace Bunkering.Core.Migrations
                     b.Property<double>("MeterFactor")
                         .HasColumnType("float");
 
-                    b.Property<int>("ProcessingPlantCOQLiquidDynamicId")
+                    b.Property<int>("MeterId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProcessingPlantCOQLiquidDynamicBatchId")
                         .HasColumnType("int");
 
                     b.Property<double>("Temperature")
@@ -1904,11 +1928,11 @@ namespace Bunkering.Core.Migrations
                     b.Property<double>("WTAir")
                         .HasColumnType("float");
 
-                    b.HasKey("ProcessingPlantCOQLiquidDynamicReadingId");
+                    b.HasKey("ProcessingPlantCOQLiquidDynamicMeterId");
 
-                    b.HasIndex("ProcessingPlantCOQLiquidDynamicId");
+                    b.HasIndex("ProcessingPlantCOQLiquidDynamicBatchId");
 
-                    b.ToTable("ProcessingPlantCOQLiquidDynamicReadings");
+                    b.ToTable("ProcessingPlantCOQLiquidDynamicMeters");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQTankReading", b =>
@@ -3107,6 +3131,15 @@ namespace Bunkering.Core.Migrations
                     b.Navigation("State");
                 });
 
+            modelBuilder.Entity("Bunkering.Core.Data.LiquidDynamicMeterReading", b =>
+                {
+                    b.HasOne("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamicMeter", null)
+                        .WithMany("LiquidDynamicMeterReadings")
+                        .HasForeignKey("ProcessingPlantCOQLiquidDynamicMeterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Bunkering.Core.Data.Message", b =>
                 {
                     b.HasOne("Bunkering.Core.Data.Application", null)
@@ -3161,11 +3194,11 @@ namespace Bunkering.Core.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamicReading", b =>
+            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamicMeter", b =>
                 {
-                    b.HasOne("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamic", null)
-                        .WithMany("ProcessingPlantCOQLiquidDynamicReadings")
-                        .HasForeignKey("ProcessingPlantCOQLiquidDynamicId")
+                    b.HasOne("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamicBatch", null)
+                        .WithMany("ProcessingPlantCOQLiquidDynamicMeters")
+                        .HasForeignKey("ProcessingPlantCOQLiquidDynamicBatchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -3320,9 +3353,14 @@ namespace Bunkering.Core.Migrations
                     b.Navigation("ProcessingPlantCOQTankReadings");
                 });
 
-            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamic", b =>
+            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamicBatch", b =>
                 {
-                    b.Navigation("ProcessingPlantCOQLiquidDynamicReadings");
+                    b.Navigation("ProcessingPlantCOQLiquidDynamicMeters");
+                });
+
+            modelBuilder.Entity("Bunkering.Core.Data.ProcessingPlantCOQLiquidDynamicMeter", b =>
+                {
+                    b.Navigation("LiquidDynamicMeterReadings");
                 });
 
             modelBuilder.Entity("Bunkering.Core.Data.State", b =>

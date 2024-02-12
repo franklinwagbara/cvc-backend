@@ -48,7 +48,7 @@ namespace Bunkering.Core.Dtos
         public string? Terminal { get; set; }
         public string? Destination { get; set; }
         public string? ShipmentNo { get; set; }
-        public double? ShoreFigure { get; set; }
+        //public double? ShoreFigure { get; set; }
         public double? ShipFigure { get; set; }
 
         //public double? PrevMCubeAt15Degree { get; set; }
@@ -63,6 +63,7 @@ namespace Bunkering.Core.Dtos
         public double? DeliveredMTVac { get; set; }
         public double? DeliveredMTAir { get; set; }
         public double? DeliveredLongTonsAir { get; set; }
+        public double Price { get; set; } = 0;
 
         public List<ProcessingPlantCOQBatchDto> COQBatches { get; set; }
        

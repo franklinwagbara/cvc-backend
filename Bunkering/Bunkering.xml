@@ -201,7 +201,7 @@
             GET: api/application/add-dcouments/xxxx
             
             </remarks>
-            <param name="id">The application id used to fetch documenst for the application type</param>
+            <param name="id">The application id used to fetch documents for the application type</param>
             <response code="200">Returns an object of fees </response>
             <response code="404">Returns not found </response>
             <response code="401">Unauthorized user </response>
@@ -279,7 +279,7 @@
             <returns>Returns an application info</returns>
             <remarks>
             
-            Sample Request
+            Sample Request 
             GET: api/application/view-application
             
             </remarks>
@@ -303,6 +303,38 @@
             <param name="act">This is the action taken on the aplication </param>
             <param name="comment">This is the message attaced to the processing of the application </param>
             <response code="200">Returns an application info </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.ApplicationController.GetAppVesselInfo(System.Int32,System.Int32)">
+            <summary>
+            This endpoint is used to fetch details of an NOA Vessel
+            </summary>
+            <returns>Returns an application info</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/application/get-app-vessel-info
+            
+            </remarks>
+            <response code="200">Returns an application / vessel info </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.ApplicationController.GetNavalLetter">
+            <summary>
+            This endpoint is used to fetch details of an NOA Vessel
+            </summary>
+            <returns>Returns an application info</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/application/get-app-vessel-info
+            
+            </remarks>
+            <response code="200">Returns an application / vessel info </response>
             <response code="404">Returns not found </response>
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
@@ -473,6 +505,86 @@
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
         </member>
+        <member name="M:Bunkering.Controllers.API.BatchController.AddBatch(Bunkering.Core.ViewModels.BatchViewModel)">
+            <summary>
+            This endpoint is used to  add Batch
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/Batch/AddBatch
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.BatchController.UpdateBatch(Bunkering.Core.ViewModels.BatchViewModel)">
+            <summary>
+            This endpoint is used to update Batch
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/Batch/UpdateBatch
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.BatchController.DeleteBatch(System.Int32)">
+            <summary>
+            This endpoint is used to delete Batch
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            DELETE: api/Batch/DeleteBatch
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.BatchController.AllBatches">
+            <summary>
+            This endpoint is used to fetch all Batch
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/Batch/AllBatch
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.BatchController.BatchById(System.Int32)">
+            <summary>
+            This endpoint is used to fetch  Batches By Id
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/Batch/BatchById
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
         <member name="M:Bunkering.Controllers.API.CompanyController.GetProfile(System.String)">
             <summary>
             This endpoint is used to fetch company's profile 
@@ -627,7 +739,75 @@
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
         </member>
-        <member name="M:Bunkering.Controllers.API.DepotOfficerController.GetAllFees">
+        <member name="M:Bunkering.Controllers.API.CoQController.Submit(System.Int32)">
+            <summary>
+            This endpoint is used to submit a COQ Application
+            </summary>
+            <returns>Returns a message after submission </returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/coq/submit/xxxx
+            
+            </remarks>
+            <param name="id">The coq id used to fetch coq application</param>
+            <response code="200">Returns success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.CoQController.Process(System.Int32,System.String,System.String)">
+            <summary>
+            This endpoint is used to process a COQ Application
+            </summary>
+            <returns>Returns a message after submission </returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/coq/submit/xxxx
+            
+            </remarks>
+            <param name="id">The coq id used to fetch coq application</param>
+            <response code="200">Returns success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.CoQController.CreateCOQForLiquid(Bunkering.Core.ViewModels.CreateCoQLiquidDto)">
+            <summary>
+            This endpoint is used to add coq tanks
+            </summary>
+            <returns>Returns a message after adding </returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/coq/add-coq-tank/xxxx
+            
+            </remarks>
+            <param name="model">model for adding tank to coq</param>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.CoQController.CreateCOQForGas(Bunkering.Core.ViewModels.CreateGasProductCoQDto)">
+            <summary>
+            This endpoint is used to add coq gas tanks
+            </summary>
+            <returns>Returns a message after adding </returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/coq/add-coq-tank/xxxx
+            
+            </remarks>
+            <param name="model">model for adding tank to coq</param>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.DepotOfficerController.GetAllDepotOfficerMapping">
             <summary>
             This endpoint is used to fetch  all the Fees summary
             </summary>
@@ -639,6 +819,70 @@
             
             </remarks>
             <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.EmailConfigurationController.CreateEmailConfiguration(Bunkering.Core.ViewModels.EmailConfigurationViewModel)">
+            <summary>
+            This endpoint is used to create email configuration
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/email/create-email-configuration
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.EmailConfigurationController.UpdateEmailConfiguration(Bunkering.Core.ViewModels.EmailConfigurationViewModel)">
+            <summary>
+            This endpoint is used to update email configuration
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/email/update-email-configuration
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.EmailConfigurationController.DeleteEmailConfiguration(System.Int32)">
+            <summary>
+            This endpoint is to delete email configuration
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/email/delete-email-configuration
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.EmailConfigurationController.AllEmailConfiguration">
+            <summary>
+            This endpoint is used to fetch all email configurations
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/email/all-email-configuration
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
             <response code="404">Returns not found </response>
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
@@ -966,6 +1210,22 @@
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
         </member>
+        <member name="M:Bunkering.Controllers.API.LibraryController.AllDepotByAppId(System.Int32)">
+            <summary>
+            This endpoint is used to get all Depot by noa id
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/location/AllDepot-by-AppId
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
         <member name="M:Bunkering.Controllers.API.LibraryController.AllNominatedSurveyor">
             <summary>
             This endpoint is used to get all Nominated Surveyor
@@ -1155,6 +1415,378 @@
             </remarks>
             <param name="model">This is Read message</param>
             <response code="200">Returns a summary of the message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.MeterController.AddMeter(Bunkering.Core.ViewModels.MeterViewModel)">
+            <summary>
+            This endpoint is used to fetch  add Meter
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/Meter/AddMeter
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.MeterController.UpdateMeter(Bunkering.Core.ViewModels.MeterViewModel)">
+            <summary>
+            This endpoint is used to update Meter
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/Meter/UpdateMeter
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.MeterController.DeleteMeter(System.Int32)">
+            <summary>
+            This endpoint is used to delete Meter
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            DELETE: api/Meter/DeleteMeter
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.MeterController.AllMeters">
+            <summary>
+            This endpoint is used to fetch all Meters
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/Meter/AllMeters
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.MeterController.MetersById(System.Int32)">
+            <summary>
+            This endpoint is used to fetch  Meters By Id
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/Meter/MetersById
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.MeterController.MeterByPlantId(System.Int32)">
+            <summary>
+            This endpoint is used to fetch  Meters By PlantId
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/Meter/MetersByPlantId
+            
+            </remarks>
+            <response code="200">Returns the fees  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.OperatingFacilityController.AllOperatingFacilities">
+            <summary>
+            This endpoint is used to fetch all operating facilities
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/operatingfacility/all-operating-facilities
+            
+            </remarks>
+            <response code="200">Returns staff list </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.OperatingFacilityController.CreateOperatingFacility(Bunkering.Core.ViewModels.OpearatingFacilityViewModel)">
+            <summary>
+            This endpoint is used to fetch create operating facility
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/operatingfacility/create
+            
+            </remarks>
+            <response code="200">Returns staff list </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.OperatingFacilityController.EditOperatingFacility(Bunkering.Core.ViewModels.OpearatingFacilityViewModel)">
+            <summary>
+            This endpoint is used to fetch edit operating facility
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/operatingfacility/edit
+            
+            </remarks>
+            <response code="200">Returns staff list </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.OperatingFacilityController.AllOperatingFacilities(System.String)">
+            <summary>
+            This endpoint is used to fetch operating facility by email
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/operatingfacility/get-operating-facility
+            
+            </remarks>
+            <response code="200">Returns staff list </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.PaymentController.GenerateDebitNote(System.Int32)">
+            <summary>
+            This endpoint is used to generate Debit note RRR for Depot's COQ 
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            post: api/application/generate-debit-note
+            
+            </remarks>
+            <param name="id">refers to the COQ Id generated for a specific Depot</param>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.PaymentController.GenerateDemandNotice(System.Int32)">
+            <summary>
+            This endpoint is used to generate Demand notice RRR for a Depot defaulter
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            post: api/application/generate-demand-notice
+            
+            </remarks>
+            <param name="id">refers to the COQ Id generated for a specific Depot</param>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.PaymentController.UpdatePaymentStatus(System.String)">
+            <summary>
+            This endpoint is used to update the status of any payment
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            post: api/application/update-payment-status
+            
+            </remarks>
+            <param name="orderId">refers to the payment reference used to generate the RRR</param>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.PaymentController.GetDebitNotes(System.Int32)">
+            <summary>
+            This endpoint is used to fetch all Debit notes for a NOA/CVC application
+            </summary>
+            <returns>Returns a list of Debit notes for an application</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/application/get-debit-botes-by-appid
+            
+            </remarks>
+            <response code="200">Returns a list of Debit notes for an application </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.PaymentController.GetPendingPaymentsByAppId(System.Int32)">
+            <summary>
+            This endpoint is used to fetch all pending payments for a NOA/CVC application
+            </summary>
+            <returns>Returns a list of pending payments for an application</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/application/get-pending-payments-by-appid
+            
+            </remarks>
+            <response code="200">Returns a list of pending payments for an application </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.PlantController.GetAllPlants">
+            <summary>
+            This endpoint is used to fetch  all the Plants summary
+            </summary>
+            <returns>Returns a success message or otherwise</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/application/get-all-plants
+            
+            </remarks>
+            <response code="200">Returns the Plants  </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.ProcessingPlantCOQController.Process(System.Int32,System.String,System.String)">
+            <summary>
+            This endpoint is used to process a COQ Application
+            </summary>
+            <returns>Returns a message after submission </returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/coq/submit/xxxx
+            
+            </remarks>
+            <param name="id">The coq id used to fetch coq application</param>
+            <response code="200">Returns success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.ProductController.CreateProduct(Bunkering.Core.ViewModels.ProductViewModel)">
+            <summary>
+            This endpoint is used to create product
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/product/create-products
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.ProductController.EditProduct(Bunkering.Core.ViewModels.ProductViewModel)">
+            <summary>
+            This endpoint is used to edit product
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/product/edit-product
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.ProductController.DeleteProduct(System.Int32)">
+            <summary>
+            This endpoint is used to delete product
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            DELETE: api/product/{id}
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.ProductController.GetProductById(System.Int32)">
+            <summary>
+            This endpoint is used to fetch product by id
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/product/product/{id}
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.ProductController.AllProduct">
+            <summary>
+            This endpoint is used to GET ALL product
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/product/all-product
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.ProductController.GetProductTypes">
+            <summary>
+            This endpoint is used to GET ALL product types
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/product/all-product-types
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
             <response code="404">Returns not found </response>
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
@@ -1435,6 +2067,72 @@
             
             </remarks>
             <response code="200">Returns success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.VesselController.IMONumberVerification(System.String)">
+            <summary>
+            This endpoint is used to fetch verified IMO numbers  
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            post: api/vessel/verifyIMONumbers
+            
+            </remarks>
+            <param name="model">Model for applying for a bunker application</param>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.VesselController.EditIMONoByName(System.String,System.String)">
+            <summary>
+            This endpoint is used to edit IMO name  
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            post: api/vessel/edit-vessel-IMO
+            
+            </remarks>
+            <param name="model">Model for applying for a bunker application</param>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.VesselDischargeClearanceController.CreateVesselDischargeClearance(Bunkering.Core.ViewModels.VesselDischargeCleareanceViewModel)">
+            <summary>
+            This endpoint is used to create vessel discharge clearance 
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/email/create-vessel-discharge-clearance
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.VesselDischargeClearanceController.GetAllVesselDischargeClearance">
+            <summary>
+            This endpoint is used to fetch vessel discharge clearance by id
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/vessel-discharge-clearance/{id}
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
             <response code="404">Returns not found </response>
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
