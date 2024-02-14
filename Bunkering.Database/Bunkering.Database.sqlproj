@@ -90,7 +90,6 @@
     <Build Include="dbo\Tables\ApplicationTypes.sql" />
     <Build Include="dbo\Tables\Appointments.sql" />
     <Build Include="dbo\Tables\Products.sql" />
-    <Build Include="dbo\Tables\ExtraPayments.sql" />
     <Build Include="dbo\Tables\WorkFlows.sql" />
     <Build Include="dbo\Tables\FacilityTypeDocuments.sql" />
     <Build Include="dbo\Tables\VesselTypes.sql" />
@@ -131,7 +130,6 @@
     <Build Include="dbo\Tables\JettyFieldOfficers.sql" />
     <Build Include="dbo\Tables\EmailConfigurations.sql" />
     <Build Include="dbo\Views\vPayment_1.sql" />
-    <Build Include="dbo\Views\vDeitNotes.sql" />
     <Build Include="dbo\Tables\TransferDetail.sql" />
     <Build Include="dbo\Tables\SourceRecipientVessel.sql" />
     <Build Include="dbo\Tables\ProcessingPlantCOQTankReadings.sql" />
@@ -149,6 +147,8 @@
     <Build Include="dbo\Tables\PPCOQSubmittedDocuments.sql" />
     <Build Include="dbo\Tables\CoQReferences.sql" />
     <Build Include="dbo\Tables\PPCOQCertificates.sql" />
+    <Build Include="dbo\Tables\DemandNotices.sql" />
+    <Build Include="dbo\Views\vDebitNotes.sql" />
     <Build Include="dbo\Tables\Terminals.sql" />
     <Build Include="dbo\Tables\ProcessingPlantCOQCondensateTankReadings.sql" />
     <Build Include="dbo\Tables\ProcessingPlantCOQCondensateSBatchTanks.sql" />

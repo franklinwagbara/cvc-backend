@@ -59,12 +59,10 @@ public class NavalReportJob : IHostedService, IDisposable
     public Task StartAsync(CancellationToken cancellationToken)
     {
         // Calculate the time until 8 AM.
-        DateTime now = DateTime.Now;
+        DateTime now = DateTime.UtcNow.AddHours(1);
         DateTime execTime = DateTime.Today.AddHours(23);
         if (now > execTime)
-        {
             execTime = execTime.AddDays(1);
-        }
 
         TimeSpan timeUntilExecution = execTime - now;
 

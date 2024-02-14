@@ -29,9 +29,10 @@ namespace Bunkering.Core.Data
 		public double? LateRenewalPenalty { get; set; }
 		public double? NonRenewalPenalty { get; set; }
 		public string Status { get; set; }
-		//[NotMapped]
+        public ICollection<DemandNotice>? DemandNotices { get; set; }
+        //[NotMapped]
 
-		//[ForeignKey(nameof(ApplicationId))]
-		//public Application Application { get; set; }
-	}
+        //[ForeignKey(nameof(ApplicationId))]
+        //public Application Application { get; set; }
+    }
 }

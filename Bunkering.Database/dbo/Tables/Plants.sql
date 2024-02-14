@@ -9,8 +9,11 @@
     [PlantType]     INT            NOT NULL,
     [IsDeleted]     BIT            NOT NULL,
     [IsDefaulter]   BIT            CONSTRAINT [DF_Plants_IsDefaulter] DEFAULT ((0)) NOT NULL,
+    [IsCleared]     BIT            CONSTRAINT [DF_Plants_IsCleared] DEFAULT ((1)) NOT NULL,
     CONSTRAINT [PK_Plants] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
 
 
