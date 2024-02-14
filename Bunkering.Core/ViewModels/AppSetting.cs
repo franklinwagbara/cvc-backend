@@ -30,5 +30,6 @@ namespace Bunkering.Core.ViewModels
         public string ServiceTypeId { get; set; }
         public string RemitaBase { get; set; }
         public string LoginUrl { get; set; }
+        public string SAPBaseUrl { get; set; }
     }
 }

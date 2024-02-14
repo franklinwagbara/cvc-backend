@@ -240,7 +240,18 @@ namespace Bunkering.Access.Services
                     await _unitOfWork.CoQReference.Add(coqReference);
                     await _unitOfWork.SaveChangesAsync(currentUser.Id);
 
-                    var debitnote = await _paymentService.GenerateDebitNote(coqReference.Id);
+                    //generate debitnote
+                    var debitNote = await _paymentService.GenerateDebitNote(coqReference.Id);
+
+                    //notify SAP of the new debit note
+                    if(debitNote.Success)
+                    {
+                        //var debitNoteSAPPostRequest = new ;
+                        var notifySAP = await Utils.Send(_appSetting.SAPBaseUrl, new HttpRequestMessage
+                        {
+                            
+                        });
+                    }
 
                     if (certificate.Item1)
                         message = $"COQ Application has been approved and certificate {certificate.Item2} has been generated successfully.";
@@ -799,6 +810,7 @@ namespace Bunkering.Access.Services
 
             return $"{product.ToUpper()}/{_token}";
         }
+
         public async Task<bool> PostDischargeId(int id)
         {
             var appDepots = await _context.ApplicationDepots.Where(a => a.AppId == id).Include(x => x.Product).ToListAsync();
