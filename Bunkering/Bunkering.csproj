@@ -5,11 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-<<<<<<< HEAD
     <DocumentationFile>C:\Users\suppo\Documents\Visual Studio 2022\Projects\nmdpra-coq\Bunkering\Bunkering.xml</DocumentationFile>
-=======
-    <DocumentationFile>C:\Users\anyan\Documents\Visual Studio 2022\CVC\CVCBackEnd\Bunkering\Bunkering.xml</DocumentationFile>
->>>>>>> origin/master
+    <DocumentationFile>C:\Users\suppo\Documents\Visual Studio 2022\Projects\nmdpra-coq\Bunkering\Bunkering.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
