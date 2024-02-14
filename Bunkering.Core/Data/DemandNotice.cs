@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Bunkering.Core.Data
 {
-    public class ExtraPayment
+    public class DemandNotice
     {
         public int Id { get; set; }
         public int DebitNoteId { get; set; }
@@ -12,5 +12,6 @@ namespace Bunkering.Core.Data
         public DateTime AddedDate { get; set; }
         public string AddedBy { get; set; }
         public string Description { get; set; }
+        public bool Paid { get; set; }
     }
 }

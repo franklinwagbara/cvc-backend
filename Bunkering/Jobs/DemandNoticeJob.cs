@@ -1,9 +1,15 @@
-﻿using Bunkering.Access.DAL;
+﻿using Azure;
+using Bunkering.Access;
+using Bunkering.Access.DAL;
 using Bunkering.Access.IContracts;
 using Bunkering.Access.Services;
 using Bunkering.Core.Data;
 using Bunkering.Core.Utils;
+using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System.IO;
+using System.Net;
 
 namespace Bunkering.Jobs;
 
@@ -40,30 +46,84 @@ public class DemandNoticeJob : IHostedService, IDisposable
     {
         using (var scope = _serviceScopeFactory.CreateScope())
         {
-            var paymentService = scope.ServiceProvider.GetRequiredService<PaymentService>();
             var userManger = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
             var typeId = unitOfWork.ApplicationType
                 .FirstOrDefaultAsync(x => x.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)))
                 .GetAwaiter().GetResult()?.Id;
-            var notes = unitOfWork.vDebitNote
-                .Find(x => x.Status == Enum
-                .GetName(typeof(AppStatus), AppStatus.PaymentPending)
+            var notes = unitOfWork.vDebitNote.Find(x => x.Status == Enum.GetName(typeof(AppStatus),AppStatus.PaymentPending)
                 && x.ApplicationTypeId == typeId && x.TransactionDate.AddDays(21) > DateTime.UtcNow.AddHours(1))
                 .GetAwaiter().GetResult().ToList();
 
             foreach (var c in notes)
+                GenerateDemandNotice(unitOfWork, c.COQId, userManger).Wait();
+        }
+    }
+
+    private async Task GenerateDemandNotice(IUnitOfWork unitOfWork, int id, UserManager<ApplicationUser> userManager)
+    {
+        try
+        {
+            var coqRef = unitOfWork.CoQReference.FirstOrDefaultAsync(x => x.Id.Equals(id) && x.IsDeleted == false, "DepotCoQ.Application.User.Company,ProcessingPlantCOQ.Plant").Result;
+
+            var plant = coqRef.PlantCoQId == null ? coqRef.DepotCoQ.Plant : coqRef.ProcessingPlantCOQ.Plant;
+            var user = userManager.Users.FirstOrDefault(u => u.ElpsId.Equals(plant.CompanyElpsId));
+
+            if (coqRef == null)
+                return;
+            else
             {
-                var app = unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == c.ApplicationId).Result;
-                //var user =  userManger.FindByEmailAsync(c.CompanyEmail).GetAwaiter().GetResult();
-                //if (user is null)
-                //{
-                //    continue;
-                //}
-                //user.IsDefaulter = true;
-                paymentService?.GenerateDemandNotice(c.COQId).Wait();
+                var appType = unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote))).Result;
+                var payment = unitOfWork.Payment.FirstOrDefaultAsync(x => x.ApplicationTypeId.Equals(appType.Id) && x.COQId.Equals(coqRef.Id), "DemandNotices").Result;
+
+                if (payment == null)
+                    return;
+                else
+                {
+                    double amount = 0;
+                    if (payment.DemandNotices is not null && payment.DemandNotices.LastOrDefault().AddedDate.AddDays(21) > DateTime.UtcNow.AddHours(1))
+                        amount = (payment.Amount + payment.DemandNotices.Sum(a => a.Amount)) * 0.10;
+                    else
+                        amount = payment.Amount * 0.10;
+
+                    if(amount > 0)
+                    {
+                        var description = $"Demand notice for non-payment of Debit note generated for {coqRef.ProcessingPlantCOQ.Plant.Name} after 21 days as regulated";
+
+                        unitOfWork.DemandNotice.Add(new DemandNotice
+                        {
+                            Amount = amount,
+                            AddedBy = "system",
+                            AddedDate = DateTime.UtcNow.AddHours(1),
+                            DebitNoteId = coqRef.Id,
+                            Description = description,
+                            Reference = ""
+                        }).Wait();
+
+                        //set company as a defaulter
+                        if (!user.IsDefaulter)
+                        {
+                            user.IsDefaulter = true;
+                            user.IsCleared = false;
+                            userManager.UpdateAsync(user).Wait();
+                        }
+
+                        //set plant or depot as defaulter
+                        if(!plant.IsDefaulter)
+                        {
+                            plant.IsDefaulter = true;
+                            plant.IsCleared = false;
+                            unitOfWork.Plant.Update(plant).Wait();
+                        }
+                        unitOfWork.SaveChangesAsync("system").Wait();
+                    }                    
+                }
             }
-            unitOfWork.SaveChangesAsync("system").Wait();
+        }
+        catch (Exception ex)
+        {
+            //_logger.LogRequest($"An error {ex.Message} occurred while trying to generate extra payment RRR for this application by {User}", true, directory);
+            //_response = new ApiResponse { Message = "An error occurred while generating this extra payment RRR. Please try again or contact support.", StatusCode = HttpStatusCode.InternalServerError };
         }
     }
 

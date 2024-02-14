@@ -313,7 +313,7 @@ namespace Bunkering.Access.Services
                         Depot = plant.Name,
                         Directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.DSSRI),
                         ProductOrServiceType = product.Product.Name,
-                        RevenueDescription = "",
+                        RevenueDescription = debitNote.Description,
                         ShoreVolume = product.Product.ProductType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.Gas)) ? coq.MT_VAC : coq.GSV,
                         RevenueCode = Enum.GetName(typeof(AppTypes), AppTypes.DebitNote),
                         WholeSalePrice = coq.DepotPrice
@@ -349,7 +349,7 @@ namespace Bunkering.Access.Services
                         Depot = plant.Name,
                         Directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.HPPITI),
                         ProductOrServiceType = coq.Product.Name,
-                        RevenueDescription = "",
+                        RevenueDescription = debitNote.Description,
                         ShoreVolume = coq.TotalMTVac.Value,
                         RevenueCode = Enum.GetName(typeof(AppTypes), AppTypes.DebitNote),
                         WholeSalePrice = coq.Price

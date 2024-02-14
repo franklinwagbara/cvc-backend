@@ -29,7 +29,7 @@ namespace Bunkering.Core.Data
         public DbSet<COQTank> COQTanks { get; set; }
         public DbSet<CoQReference> CoQReferences { get; set; }
         public DbSet<Depot> Depots { get; set; }
-        public DbSet<ExtraPayment> ExtraPayments { get; set; }
+        public DbSet<DemandNotice> DemandNotices { get; set; }
         public DbSet<Facility> Facilities { get; set; }
         public DbSet<FacilityType> FacilityTypes { get; set; }
         public DbSet<FacilityTypeDocument> FacilityTypeDocuments { get; set; }

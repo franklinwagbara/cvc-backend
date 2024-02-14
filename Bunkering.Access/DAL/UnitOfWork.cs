@@ -9,6 +9,7 @@ namespace Bunkering.Access.DAL
         public IApplication Application { get; private set; }
         public IAppFee AppFee { get; private set; }
         public ICoQReference CoQReference { get; set; }
+        public IDemandNotice DemandNotice { get; set; }
         public ITransferRecord TransferRecord { get; set; }
         public ITransferDetail TransferDetail { get; set; }
         public IPlantOfficer PlantOfficer { get; private set; }
@@ -78,6 +79,7 @@ namespace Bunkering.Access.DAL
             Batch = Batch != null ? Batch : new BatchRepository(_context);  
             Country = Country != null ? Country : new CountryRepository(_context);
             CoQReference = CoQReference != null ? CoQReference : new CoQReferenceRepository(_context);
+            DemandNotice = DemandNotice != null ? DemandNotice : new DemandNoticeRepository(_context);
             Depot = Depot != null ? Depot : new DepotRepository(_context);
             EmailConfiguration = EmailConfiguration != null ? EmailConfiguration : new EmailConfigurationRepository(_context);
             Facility = Facility != null ? Facility : new FacilityRepository(_context);
