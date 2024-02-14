@@ -14,6 +14,7 @@ namespace Bunkering.Access.IContracts
         ICOQHistory COQHistory { get; }
         IPPCOQHistory PPCOQHistory { get; }
         ICOQCertificate COQCertificate { get; }
+        IDemandNotice DemandNotice { get; }
         IPPCOQCertificate PPCOQCertificate { get; }
         ICoQReference CoQReference { get; }
         ITransferRecord TransferRecord { get; }
