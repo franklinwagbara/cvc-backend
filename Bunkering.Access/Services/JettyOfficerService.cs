@@ -1,5 +1,7 @@
-﻿using Bunkering.Access.IContracts;
+﻿using Bunkering.Access.DAL;
+using Bunkering.Access.IContracts;
 using Bunkering.Core.Data;
+using Bunkering.Core.Migrations;
 using Bunkering.Core.Utils;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
@@ -32,11 +34,12 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> GetAllJettyOfficerMapping()
         {
-            var mappings = (await _unitOfWork.JettyOfficer.GetAll("Jetty,Officer")).ToList();
+            var mappings = (await _unitOfWork.JettyOfficer.GetAll()).ToList();
             //var staffs = await _userManager.Users.Where(x => x.IsDeleted != true).ToListAsync();
             var filteredMappings = mappings.Where(x => x.IsDeleted == false).Select(d => new JettyFieldOfficerViewModel
             {
-                JettyID = d.ID,
+                JettyFieldOfficerID = d.ID,
+                JettyID = d.JettyId,
                 UserID = d.OfficerID,
                 JettyName = d.Jetty?.Name,
                 OfficerName = _userManager.Users.Where(x => x.Id == d.OfficerID).Select(n =>  n.FirstName + ' ' + n.LastName).FirstOrDefault(),
@@ -68,12 +71,13 @@ namespace Bunkering.Access.Services
             try
             {
                 var userExists = await _userManager.Users.AnyAsync(c => c.Id == newJettyOfficer.UserID.ToString());
-                var jettyExists = await _unitOfWork.Jetty.FirstOrDefaultAsync(c => c.Id == newJettyOfficer.JettyID) is not null;
+                var jettyExists = await _unitOfWork.Jetty.FirstOrDefaultAsync(c => c.Id == newJettyOfficer.JettyID);
 
-
-                if (!jettyExists)
+                //CHECK if jetty exist
+                //return false
+                if (jettyExists == null)
                 {
-                    _response = new ApiResponse
+                    return new ApiResponse
                     {
                         Message = "Jetty not found",
                         StatusCode = HttpStatusCode.NotFound,
@@ -81,52 +85,35 @@ namespace Bunkering.Access.Services
                     };
 
                 }
-
-                else if (!userExists)
+                // check if its exisiting on the jettyOfficer table
+                var jettyOfficerExist = await _unitOfWork.JettyOfficer.FirstOrDefaultAsync(j=>j.JettyId.Equals(newJettyOfficer.JettyID));
+                
+                if(jettyOfficerExist != null)
                 {
-                    _response = new ApiResponse
+                    return new ApiResponse
                     {
-                        Message = "Officer not found",
-                        StatusCode = HttpStatusCode.NotFound,
+                        Message = "Jetty already assigned to an officer!",
+                        StatusCode = HttpStatusCode.Conflict,
                         Success = false
                     };
-
                 }
-
-                else
+                var map = new JettyFieldOfficer
                 {
-                    var existingMap = await _unitOfWork.JettyOfficer.FirstOrDefaultAsync(a => a.OfficerID == newJettyOfficer.UserID && a.JettyId == newJettyOfficer.JettyID);
-                    if (existingMap == null)
+                    JettyId = newJettyOfficer.JettyID,
+                    OfficerID = newJettyOfficer.UserID
 
-                    {
-                        var map = new JettyFieldOfficer
-                        {
-                            JettyId = newJettyOfficer.JettyID,
-                            OfficerID = newJettyOfficer.UserID
+                };
+                await _unitOfWork.JettyOfficer.Add(map);
+                await _unitOfWork.SaveChangesAsync("");
 
-                        };
-                        await _unitOfWork.JettyOfficer.Add(map);
-                        await _unitOfWork.SaveChangesAsync("");
+                return new ApiResponse
+                {
+                    Message = "Jetty Officer mapping was added successfully.",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true,
+                };
 
-                        _response = new ApiResponse
-                        {
-                            Message = "Jetty Officer mapping was added successfully.",
-                            StatusCode = HttpStatusCode.OK,
-                            Success = true,
-                        };
-
-                    }
-                    else
-                    {
-                        _response = new ApiResponse
-                        {
-                            Message = "Officer is Already Assigned To This Jetty",
-                            StatusCode = HttpStatusCode.Conflict,
-                            Success = false,
-                        };
-
-                    }
-                }
+              
 
 
             }
@@ -148,7 +135,7 @@ namespace Bunkering.Access.Services
             try
             {
                 var user = await _userManager.FindByEmailAsync(User);
-                var updatMapping = await _unitOfWork.JettyOfficer.FirstOrDefaultAsync(x => x.ID == id);
+                var updatMapping = await _unitOfWork.JettyOfficer.FirstOrDefaultAsync(x => x.ID == jetty.JettyFieldOfficerID);
                 try
                 {
                     if (updatMapping != null)
