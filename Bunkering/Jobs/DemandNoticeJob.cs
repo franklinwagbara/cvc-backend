@@ -64,7 +64,7 @@ public class DemandNoticeJob : IHostedService, IDisposable
     {
         try
         {
-            var coqRef = unitOfWork.CoQReference.FirstOrDefaultAsync(x => x.Id.Equals(id) && x.IsDeleted == false, "DepotCoQ.Application.User.Company,ProcessingPlantCOQ.Plant").Result;
+            var coqRef = unitOfWork.CoQReference.FirstOrDefaultAsync(x => x.Id.Equals(id) && x.IsDeleted == false, "DepotCoQ.Application.User.Company,DepotCoQ.Plant,ProcessingPlantCOQ.Plant").Result;
 
             var plant = coqRef.PlantCoQId == null ? coqRef.DepotCoQ.Plant : coqRef.ProcessingPlantCOQ.Plant;
             var user = userManager.Users.FirstOrDefault(u => u.ElpsId.Equals(plant.CompanyElpsId));
