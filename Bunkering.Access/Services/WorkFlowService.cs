@@ -200,7 +200,7 @@ namespace Bunkering.Access.Services
                         .ThenInclude(r => r.Role)
                         .Include(lo => lo.Location)
                         .FirstOrDefault(x => x.Id.Equals(currUserId)) ?? throw new Exception($"User with Id={currUserId} was not found.");
-                var workFlow = (await GetWorkFlow(action, currentUser, coq.Application?.Facility?.VesselTypeId ?? 1)) ?? throw new Exception($"Work Flow for this action was not found.");
+                var workFlow = (await GetWorkFlow(action, currentUser, coq.Application?.Facility?.VesselTypeId ?? 1, coq.Application.ApplicationTypeId)) ?? throw new Exception($"Work Flow for this action was not found.");
                 var nextProcessingOfficer = (await GetNextStaffCOQ(coqId, action, workFlow, currentUser, delUserId)) ?? throw new Exception($"No processing staff for this action was not found.");
 
                 coq.CurrentDeskId = nextProcessingOfficer.Id;
@@ -243,54 +243,9 @@ namespace Bunkering.Access.Services
 
                     //generate debitnote
                     var debitNote = await _paymentService.GenerateDebitNote(coqReference.Id);
-                    var product = await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(ad => ad.Application.Id.Equals(coq.AppId) && ad.DepotId.Equals(plant.Id), "Product");
 
-                    //notify SAP of the new debit note
-                    if(debitNote.Success)
-                    {
-                        var levy = (Payment)debitNote.Data;
-                        var debitNoteSAPPostRequest = new DebitNoteSAPRequestDTO
-                        {
-                            BankAccount = _appSetting.NMDPRAAccount,
-                            Directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.DSSRI),
-                            CustomerAddress = coq.Application.User.Company.Address,
-                            CustomerCode = $"{coq.Application.User.ElpsId}",
-                            CustomerEmail = coq.Application.User.Email,
-                            CustomerName = coq.Application.User.Company.Name,
-                            DocumentCurrency = "NGN",
-                            Id = coq.Reference,
-                            CustomerState = plant.State,
-                            DebitNoteType = "0.5%",
-                            Location = plant.State,
-                            PaymentAmount = levy.Amount,
-                            PostingDate = DateTime.UtcNow.AddHours(1).Date.ToString("yyyy-MM-dd"),
-                            CustomerPhoneNumber1 = coq.Application.User.PhoneNumber,
-                            Lines = new List<DebitNoteLine>
-                            {
-                                new DebitNoteLine
-                                {
-                                    AppliedFactor = 1,
-                                    MotherVesselName = coq.Application.MotherVessel,
-                                    DaughterVesselName = coq.Application.Facility.Name,
-                                    Depot = plant.Name,
-                                    Directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.DSSRI),
-                                    ProductOrServiceType = product.Product.Name,
-                                    RevenueDescription = "",
-                                    ShoreVolume = product.Product.ProductType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.Gas)) ? coq.MT_VAC : coq.GSV,
-                                    RevenueCode = Enum.GetName(typeof(AppTypes), AppTypes.DebitNote),
-                                    WholeSalePrice = coq.DepotPrice
-                                }
-                            }
-                        };
-
-                        var httpRequest = new HttpRequestMessage(HttpMethod.Post, "/DebitNote/CreateDebitNote")
-                        {
-                            Content = new StringContent(debitNoteSAPPostRequest.Stringify(), Encoding.UTF8, "application/json")
-                        };
-                        httpRequest.Headers.Authorization = new AuthenticationHeaderValue("X-API-Key",
-                            _appSetting.SAPKey);
-                        var notifySAP = await Utils.Send(_appSetting.SAPBaseUrl, httpRequest);
-                    }
+                    //send debit note to SAP
+                    var notifySAP = await SendDebitNoteToSAP((Payment)debitNote.Data, plant, coq);
 
                     if (certificate.Item1)
                         message = $"COQ Application has been approved and certificate {certificate.Item2} has been generated successfully.";
@@ -304,6 +259,64 @@ namespace Bunkering.Access.Services
             {
                 return (false, e.Message);
             }
+        }
+
+        private async Task<bool> SendDebitNoteToSAP(Payment debitNote, Plant plant, CoQ coq)
+        {
+            var product = await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(ad => ad.Application.Id.Equals(coq.AppId) && ad.DepotId.Equals(plant.Id), "Product");
+
+            //notify SAP of the new debit note
+            try
+            {
+                var debitNoteSAPPostRequest = new DebitNoteSAPRequestDTO
+                {
+                    BankAccount = _appSetting.NMDPRAAccount,
+                    Directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.DSSRI),
+                    CustomerAddress = coq.Application.User.Company.Address,
+                    CustomerCode = $"{coq.Application.User.ElpsId}",
+                    CustomerEmail = coq.Application.User.Email,
+                    CustomerName = coq.Application.User.Company.Name,
+                    DocumentCurrency = "NGN",
+                    Id = coq.Reference,
+                    CustomerState = plant.State,
+                    DebitNoteType = "0.5%",
+                    Location = plant.State,
+                    PaymentAmount = debitNote.Amount,
+                    PostingDate = DateTime.UtcNow.AddHours(1).Date.ToString("yyyy-MM-dd"),
+                    CustomerPhoneNumber1 = coq.Application.User.PhoneNumber,
+                    Lines = new List<DebitNoteLine>
+                    {
+                        new DebitNoteLine
+                        {
+                            AppliedFactor = 1,
+                            MotherVesselName = coq.Application.MotherVessel,
+                            DaughterVesselName = coq.Application.Facility.Name,
+                            Depot = plant.Name,
+                            Directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.DSSRI),
+                            ProductOrServiceType = product.Product.Name,
+                            RevenueDescription = "",
+                            ShoreVolume = product.Product.ProductType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.Gas)) ? coq.MT_VAC : coq.GSV,
+                            RevenueCode = Enum.GetName(typeof(AppTypes), AppTypes.DebitNote),
+                            WholeSalePrice = coq.DepotPrice
+                        }
+                    }
+                };
+
+                var httpRequest = new HttpRequestMessage(HttpMethod.Post, "/DebitNote/CreateDebitNote")
+                {
+                    Content = new StringContent(debitNoteSAPPostRequest.Stringify(), Encoding.UTF8, "application/json")
+                };
+                httpRequest.Headers.Authorization = new AuthenticationHeaderValue("X-API-Key",
+                    _appSetting.SAPKey);
+                var notifySAP = await Utils.Send(_appSetting.SAPBaseUrl, httpRequest);
+
+                return true;
+            }
+            catch(Exception ex)
+            {
+
+            }
+            return false;
         }
 
         public async Task<(bool, string)> PPCoqWorkFlow(int coqId, string action, string comment, string currUserId = null, string delUserId = null)
