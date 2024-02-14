@@ -67,6 +67,12 @@ namespace Bunkering.Core.Data
         public DbSet<ProcessingPlantCOQLiquidDynamicMeter> ProcessingPlantCOQLiquidDynamicMeters { get; set; }
         public DbSet<ProcessingPlantCOQBatchTank> ProcessingPlantCOQBatchTanks { get; set; }
         public DbSet<ProcessingPlantCOQTankReading> ProcessingPlantCOQTankReadings { get; set; }
+        public DbSet<ProcessingPlantCOQCondensateSBatch> ProcessingPlantCOQCondensateSBatches { get; set; }
+        public DbSet<ProcessingPlantCOQCondensateSBatchTank> ProcessingPlantCOQCondensateSBatchTanks { get; set; }
+        public DbSet<ProcessingPlantCOQCondensateTankReading> ProcessingPlantCOQCondensateTankReadings { get; set; }
+        public DbSet<ProcessingPlantCOQCondensateDBatch> ProcessingPlantCOQCondensateDBatches { get; set; }
+        public DbSet<ProcessingPlantCOQCondensateDBatchMeter> ProcessingPlantCOQCondensateDBatchMeters { get; set; }
+        public DbSet<CondensateDynamicMeterReading> CondensateDynamicMeterReadings { get; set; }
         public DbSet<JettyFieldOfficer> JettyFieldOfficers { get; set; }
         public DbSet<ApplicationSurveyor> ApplicationSurveyors { get; set; }
         public DbSet<MeasurementType> MeasurementTypes { get; set; }
