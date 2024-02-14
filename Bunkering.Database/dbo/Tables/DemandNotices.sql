@@ -7,6 +7,8 @@
     [Amount]      FLOAT (53)     NOT NULL,
     [Description] NVARCHAR (MAX) NOT NULL,
     [Paid]        BIT            NOT NULL,
-    CONSTRAINT [PK_ExtraPayments] PRIMARY KEY CLUSTERED ([Id] ASC)
+    CONSTRAINT [PK_DemandNotices] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
