@@ -30,11 +30,14 @@
     [Signature]            NVARCHAR (MAX)     NULL,
     [Directorate]          NVARCHAR (MAX)     NULL,
     [IsDefaulter]          BIT                CONSTRAINT [DF_AspNetUsers_IsDefaulter] DEFAULT ((0)) NOT NULL,
+    [IsCleared]            BIT                CONSTRAINT [DF_AspNetUsers_IsCleared] DEFAULT ((1)) NOT NULL,
     CONSTRAINT [PK_AspNetUsers] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_AspNetUsers_Companies_CompanyId] FOREIGN KEY ([CompanyId]) REFERENCES [dbo].[Companies] ([Id]),
     CONSTRAINT [FK_AspNetUsers_Locations_LocationId] FOREIGN KEY ([LocationId]) REFERENCES [dbo].[Locations] ([Id]),
     CONSTRAINT [FK_AspNetUsers_Offices_OfficeId] FOREIGN KEY ([OfficeId]) REFERENCES [dbo].[Offices] ([Id])
 );
+
+
 
 
 
