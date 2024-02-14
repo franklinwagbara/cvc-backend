@@ -47,6 +47,14 @@ namespace Bunkering.Controllers.API
             return Response(result);
         }
 
+        [Route("create-liquid-coq")]
+        [HttpPost]
+        public async Task<IActionResult> CreateLiquidCOQ(LiquidCOQPostDto dto)
+        {
+            var result = await _processingPlantCoQService.CreateLiquidCOQ(dto);
+            return Response(result);
+        }
+
         [ProducesResponseType(typeof(ApiResponse), 200)]
         [ProducesResponseType(typeof(ApiResponse), 404)]
         [ProducesResponseType(typeof(ApiResponse), 405)]

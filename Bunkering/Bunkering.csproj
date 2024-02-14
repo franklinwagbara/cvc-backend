@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <DocumentationFile>C:\Users\BrandOneTech\source\repos\CVC\CVC_COQ\Bunkering\Bunkering.xml</DocumentationFile>
+    <DocumentationFile>C:\BrandOne\CVC_COQ\Bunkering\Bunkering.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
