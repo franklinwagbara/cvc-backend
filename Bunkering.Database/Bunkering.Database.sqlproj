@@ -149,6 +149,13 @@
     <Build Include="dbo\Tables\PPCOQCertificates.sql" />
     <Build Include="dbo\Tables\DemandNotices.sql" />
     <Build Include="dbo\Views\vDebitNotes.sql" />
+    <Build Include="dbo\Tables\Terminals.sql" />
+    <Build Include="dbo\Tables\ProcessingPlantCOQCondensateTankReadings.sql" />
+    <Build Include="dbo\Tables\ProcessingPlantCOQCondensateSBatchTanks.sql" />
+    <Build Include="dbo\Tables\ProcessingPlantCOQCondensateSBatches.sql" />
+    <Build Include="dbo\Tables\ProcessingPlantCOQCondensateDBatchMeters.sql" />
+    <Build Include="dbo\Tables\ProcessingPlantCOQCondensateDBatches.sql" />
+    <Build Include="dbo\Tables\CondensateDynamicMeterReadings.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Snapshots\Bunkering.Database_20230810_10-01-52.dacpac" />

@@ -57,6 +57,24 @@ namespace Bunkering.Core.Data
         public double? DeliveredLongTonsAir { get; set; }
         public double Price { get; set; } = 0;
 
+
+        #region specific to condensate
+        public string? Location { get; set; }
+        public double? ApiGravity { get; set; }
+        public double? AverageSgAt60 { get; set; }
+        public double? AverageBsw { get; set; }
+        public double? TotalGrossUsBarrelsAtTankTemp { get; set; }
+        public double? TotalGrossBarrelsAt60 { get; set; }
+        public double? TotalGrossLongTons { get; set; }
+
+        public double? TotalBswBarrelsAt60 { get; set; }
+        public double? TotalBswLongTons { get; set; }
+
+        public double? TotalNettUsBarrelsAt60 { get; set; }
+        public double? TotalNettLongTons { get; set; }
+        public double? TotalNettMetricTons { get; set; }
+        #endregion
+
         public string CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; }
         public string Status { get; set; }
