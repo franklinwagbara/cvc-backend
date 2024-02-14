@@ -14,6 +14,7 @@ namespace Bunkering.Access.IContracts
         ICOQHistory COQHistory { get; }
         IPPCOQHistory PPCOQHistory { get; }
         ICOQCertificate COQCertificate { get; }
+        IPPCOQCertificate PPCOQCertificate { get; }
         ICoQReference CoQReference { get; }
         ITransferRecord TransferRecord { get; }
         ISourceRecipientVessel SourceRecipientVessel { get; }
@@ -60,6 +61,8 @@ namespace Bunkering.Access.IContracts
         //ICOQHistory COQHistory { get; }
         //ICOQCertificate COQCertificate { get; }
         IMeasurementTypeRepository MeasurementType { get; }
+        ICOQSubmittedDocument COQSubmittedDocument { get; }
+        IPPCOQSubmittedDocument PPCOQSubmittedDocument { get; }
         IvFacilityPermit vFacilityPermit { get; }
         IvAppPayment vAppPayment { get; }
         IvAppVessel vAppVessel { get; }

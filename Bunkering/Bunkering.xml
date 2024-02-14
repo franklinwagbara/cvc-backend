@@ -1678,6 +1678,23 @@
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
         </member>
+        <member name="M:Bunkering.Controllers.API.ProcessingPlantCOQController.Process(System.Int32,System.String,System.String)">
+            <summary>
+            This endpoint is used to process a COQ Application
+            </summary>
+            <returns>Returns a message after submission </returns>
+            <remarks>
+            
+            Sample Request
+            GET: api/coq/submit/xxxx
+            
+            </remarks>
+            <param name="id">The coq id used to fetch coq application</param>
+            <response code="200">Returns success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
         <member name="M:Bunkering.Controllers.API.ProductController.CreateProduct(Bunkering.Core.ViewModels.ProductViewModel)">
             <summary>
             This endpoint is used to create product

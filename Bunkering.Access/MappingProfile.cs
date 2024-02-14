@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Bunkering.Core.Data;
+using Bunkering.Core.Dtos;
 using Bunkering.Core.ViewModels;
 
 namespace Bunkering.Access
@@ -14,6 +15,9 @@ namespace Bunkering.Access
             CreateMap<WorkFlow, WorkflowviewModel>().ReverseMap();
             CreateMap<ApplicationRole, RoleViewModel>().ReverseMap();   
             CreateMap<SubmitDocumentDto, SubmittedDocument>().ReverseMap();   
+            CreateMap<SubmitDocumentDto, COQSubmittedDocument>().ReverseMap();
+            CreateMap<SubmitDocumentDto, PPCOQSubmittedDocument>().ReverseMap();
+            CreateMap<ProcessingPlantCOQDTO, ProcessingPlantCOQ>().ReverseMap();
         }
     }
 }

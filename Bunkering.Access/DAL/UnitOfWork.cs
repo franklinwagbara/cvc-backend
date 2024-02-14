@@ -53,6 +53,7 @@ namespace Bunkering.Access.DAL
         public ICOQHistory COQHistory { get; set; }
         public IPPCOQHistory PPCOQHistory { get; set; }
         public ICOQCertificate COQCertificate { get; set; }
+        public IPPCOQCertificate PPCOQCertificate { get; set; }
         public IMeasurementTypeRepository MeasurementType { get; private set; }
         public IvAppVessel vAppVessel { get; private set; }
         public IvAppPayment vAppPayment { get; private set; }
@@ -63,6 +64,8 @@ namespace Bunkering.Access.DAL
         public IApplicationSurveyor ApplicationSurveyor { get; private set; }
         public IVesselDischargeClearance VesselDischargeClearance { get; set; }
         public IProcessingPlantCoQ ProcessingPlantCoQ { get; set; }
+        public ICOQSubmittedDocument COQSubmittedDocument { get; set; }
+        public IPPCOQSubmittedDocument PPCOQSubmittedDocument { get; set; }
 
         public UnitOfWork(ApplicationContext context)
         {
@@ -124,6 +127,9 @@ namespace Bunkering.Access.DAL
             SourceRecipientVessel = SourceRecipientVessel ?? new SourceRecipientVesselRepostitory(_context);
             ProcessingPlantCoQ = ProcessingPlantCoQ ?? new ProcessingPlantCoQRepository(context);
             PPCOQHistory = PPCOQHistory ?? new PPCOQHistoryRepository(context);
+            COQSubmittedDocument = COQSubmittedDocument ?? new COQSubmittedDocumentRepository(context);
+            PPCOQSubmittedDocument = PPCOQSubmittedDocument ?? new PPCOQSubmittedDocumentRepository(context);
+            PPCOQCertificate = PPCOQCertificate ?? new PPCOQCertificateRepository(context);
         }
 
         public int Save() => _context.SaveChanges();

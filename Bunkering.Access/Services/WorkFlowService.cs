@@ -88,7 +88,7 @@ namespace Bunkering.Access.Services
 
                     if (currentUser != null)
                     {
-                        wkflow = await GetWorkFlow(action, currentUser, app.Facility.VesselTypeId);
+                        wkflow = await GetWorkFlow(action, currentUser, app.Facility.VesselTypeId, app.ApplicationTypeId);
                         if (wkflow != null) //get next processing staff
                             nextprocessingofficer = await GetNextStaff(appid, action, wkflow, currentUser, delUserId);
 
@@ -325,7 +325,10 @@ namespace Bunkering.Access.Services
                         .Include(lo => lo.Location)
                         .FirstOrDefault(x => x.Id.Equals(currUserId)) ?? throw new Exception($"User with Id={currUserId} was not found.");
 
-                var workFlow = (await GetWorkFlow(action, currentUser, 1)) ?? throw new Exception($"Work Flow for this action was not found.");
+                var applicationType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals("COQ"));
+                var vesselType = await _unitOfWork.VesselType.FirstOrDefaultAsync(x => x.Name.Equals("Vessel"));
+
+                var workFlow = (await GetWorkFlow(action, currentUser, vesselType.Id, applicationType.Id)) ?? throw new Exception($"Work Flow for this action was not found.");
                 var nextProcessingOfficer = (await GetNextStaffCOQPP(coqId, action, workFlow, currentUser, delUserId)) ?? throw new Exception($"No processing staff for this action was not found.");
 
                 coq.CurrentDeskId = nextProcessingOfficer.Id;
@@ -384,13 +387,15 @@ namespace Bunkering.Access.Services
             }
         }
 
-        public async Task<WorkFlow> GetWorkFlow(string action, ApplicationUser currentuser, int VesselTypeId)
+        public async Task<WorkFlow> GetWorkFlow(string action, ApplicationUser currentuser, int VesselTypeId, int ApplicationTypeId)
         => action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Submit).ToLower()) || action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Resubmit))
             ? await _unitOfWork.Workflow.FirstOrDefaultAsync(x => x.Action.ToLower().Trim().Equals(action.ToLower().Trim())
-                    && currentuser.UserRoles.FirstOrDefault().Role.Name.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim()))
+                    && currentuser.UserRoles.FirstOrDefault().Role.Name.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim())
+                    && x.ApplicationTypeId.Equals(ApplicationTypeId))
             : await _unitOfWork.Workflow.FirstOrDefaultAsync(x => x.Action.ToLower().Trim().Equals(action.ToLower().Trim())
                     && currentuser.UserRoles.FirstOrDefault().Role.Name.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim())
-            && currentuser.LocationId == x.FromLocationId && x.VesselTypeId == VesselTypeId);
+                    && currentuser.LocationId == x.FromLocationId && x.VesselTypeId == VesselTypeId
+                    && x.ApplicationTypeId.Equals(ApplicationTypeId));
 
         public async Task<bool> SaveHistory(string action, int appid, WorkFlow flow, ApplicationUser user, ApplicationUser nextUser, string comment = null)
         {
@@ -772,6 +777,60 @@ namespace Bunkering.Access.Services
             }
             return (false, null);
         }
+
+        //internal async Task<(bool, string)> GeneratePPCOQCertificate(int id, string userid, string CompanyElpsId)
+        //{
+        //    var coq = await _unitOfWork.ProcessingPlantCoQ.FirstOrDefaultAsync(x => x.ProcessingPlantCOQId == id, "Plant,Product");
+        //    if (coq != null)
+        //    {
+        //        var year = DateTime.Now.Year.ToString();
+        //        var pno = $"NMDPRA/HPPITI/COQ/{year.Substring(2)}/{coq.ProcessingPlantCOQId}";
+        //        var qrcode = Utils.GenerateQrCode($"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/License/ValidateQrCode/{id}");
+        //        //license.QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length);
+        //        //save certificate to elps and portal
+        //        var certificate = new PPCOQCertificate
+        //        {
+        //            COQId = id,
+        //            ExpireDate = DateTime.UtcNow.AddHours(1).AddMonths(12),
+        //            IssuedDate = DateTime.Now,
+        //            CertifcateNo = pno,
+        //            Signature = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/wwwroot/assets/fa.png",
+        //            QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length),
+        //            ProductId = coq.ProductId
+        //        };
+
+        //        var req = await Utils.Send(_appSetting.ElpsUrl, new HttpRequestMessage(HttpMethod.Post, $"api/Permits/{CompanyElpsId}/{_appSetting.AppEmail}/{Utils.GenerateSha512($"{_appSetting.AppEmail}{_appSetting.AppId}")}")
+        //        {
+        //            Content = new StringContent(new
+        //            {
+        //                Permit_No = pno,
+        //                OrderId = coq.Reference,
+        //                Company_Id = CompanyElpsId,
+        //                Date_Issued = certificate.IssuedDate.ToString("yyyy-MM-ddTHH:mm:ss.fff"),
+        //                Date_Expire = certificate.ExpireDate.ToString("yyyy-MM-ddTHH:mm:ss.fff"),
+        //                CategoryName = "COQ",
+        //                Is_Renewed = coq.Application?.ApplicationType.Name,
+        //                LicenseId = id,
+        //                Expired = false
+        //            }.Stringify(), Encoding.UTF8, "application/json")
+        //        });
+
+        //        if (req.IsSuccessStatusCode)
+        //        {
+        //            var content = await req.Content.ReadAsStringAsync();
+        //            if (!string.IsNullOrEmpty(content))
+        //            {
+        //                var dic = content.Parse<Dictionary<string, string>>();
+        //                certificate.ElpsId = int.Parse(dic.GetValue("id"));
+        //                await _unitOfWork.COQCertificate.Add(certificate);
+        //                await _unitOfWork.SaveChangesAsync(userid);
+
+        //                return (true, pno);
+        //            }
+        //        }
+        //    }
+        //    return (false, null);
+        //}
 
         public async Task SendNotification(Application app, string action, ApplicationUser user, string comment)
         {

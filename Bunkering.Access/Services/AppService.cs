@@ -999,7 +999,7 @@ namespace Bunkering.Access.Services
                 if (user.Location?.Name == LOCATION.FO && !user.UserRoles.FirstOrDefault().Role.Name.Equals("FAD"))
                     return await GetMyDeskFO(user);
                 else if (user.UserRoles.FirstOrDefault().Role.Name.Equals("FAD"))
-                    return await GetMyDeskFAD();
+                    return await GetMyDeskFAD(user);
                 else
                     return await GetMyDeskOthers(user);
             }
@@ -1057,10 +1057,12 @@ namespace Bunkering.Access.Services
             };
         }
 
-        private async Task<ApiResponse> GetMyDeskFAD()
+        private async Task<ApiResponse> GetMyDeskFAD(ApplicationUser? user)
         {
             //checked 
             var coq = await _unitOfWork.CoQ.Find(x => x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)));
+            var processingPlantCoQs = await _unitOfWork.ProcessingPlantCoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Plant,Product");
+
             ApplicationType? apptype = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));
             //&& !x.Application.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));
 
@@ -1076,16 +1078,40 @@ namespace Bunkering.Access.Services
                         Message = "Successful",
                         StatusCode = HttpStatusCode.OK,
                         Success = true,
-                        Data = pendingCoqs.Select(c => new
+                        Data = new
                         {
-                            c.Id,
-                            c.Reference,
-                            c.Application?.User.Company.Name,
-                            DepotName = c.Plant?.Name,
-                            c.DepotPrice,
-                            Volume = c.GSV == 0 ? c.MT_VAC : c.GSV,
-                            DebitNote = c.GSV == 0 ? c.MT_VAC * c.DepotPrice * 0.01 : c.GSV * c.DepotPrice * 0.01,
-                        }).ToList(),
+                            CoQ = pendingCoqs.Select(c => new
+                            {
+                                c.Id,
+                                c.Reference,
+                                c.Application?.User.Company.Name,
+                                DepotName = c.Plant?.Name,
+                                c.DepotPrice,
+                                Volume = c.GSV == 0 ? c.MT_VAC : c.GSV,
+                                DebitNote = c.GSV == 0 ? c.MT_VAC * c.DepotPrice * 0.01 : c.GSV * c.DepotPrice * 0.01,
+                            }).ToList(),
+
+                            ProcessingPlantCOQ = processingPlantCoQs.OrderByDescending(c => c.CreatedAt).Select(x => new
+                            {
+                                x.ProcessingPlantCOQId,
+                                PlantName = x.Plant.Name,
+                                x.Reference,
+                                x.Status,
+                                x.ConsignorName,
+                                x.Consignee,
+                                x.ShipmentNo,
+                                x.StartTime,
+                                x.EndTime,
+                                MT_VAC = x.TotalMTVac,
+                                MT_AIR = x.TotalMTAir,
+                                //GOV = x.GOV,
+                                //GSV = x.GSV,
+                                x.Price,
+                                CreatedBy = x.CreatedBy,
+                                SubmittedDate = x.SubmittedDate,
+                                ApplicationType = "Processing Plant COQ"
+                            }).ToList(),
+                        }
                     };
             }
 
@@ -1094,72 +1120,25 @@ namespace Bunkering.Access.Services
                 Message = "Successful",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                Data = coq.Select(c => new
-                {
-                    c.Reference,
-                    c.Application?.User.Company.Name,
-                    DepotName = c.Plant?.Name,
-                    DepotPrice = c.DepotPrice,
-                    c.GSV,
-                    DebitNote = (c.GSV * c.DepotPrice * 0.01),
-
-                }).ToList(),
-
-            };
-        }
-
-            private async Task<ApiResponse> GetMyDeskFO(ApplicationUser? user)
-            {
-            var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Plant");
-            var processingPlantCoQs = await _unitOfWork.ProcessingPlantCoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Plant,Product");
-            // if (await _userManager.IsInRoleAsync(user, "FAD"))
-            //     coqs = await _unitOfWork.CoQ.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)));
-            if (await _userManager.IsInRoleAsync(user, "Company"))
-            {
-                coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Plant");
-                processingPlantCoQs = await _unitOfWork.ProcessingPlantCoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Plant,Product");
-            }
-
-            return new ApiResponse
-            {
-                Message = "Applications fetched successfully",
-                StatusCode = HttpStatusCode.OK,
-                Success = true,
                 Data = new
                 {
-                    CoQ = coqs.OrderByDescending(c => c.DateCreated).Select(x => new
-                        {
-                            x.Id,
-                            AppId = x.AppId,
-                            CompanyEmail = x.Application?.User.Email,
-                            ImportName = x.Application?.User.Company.Name,
-                            VesselName = x.Application?.VesselName,
-                            x.Reference,
-                            x.Status,
-                            DepotName = x.Plant?.Name,
-                            DepotId = x.PlantId,
-                            DateOfVesselArrival = x.DateOfVesselArrival.ToShortDateString(),
-                            DateOfVesselUllage = x.DateOfVesselUllage.ToShortDateString(),
-                            DateOfSTAfterDischarge = x.DateOfSTAfterDischarge.ToShortDateString(),
-                            DateOfVesselArrivalISO = x.DateOfVesselArrival.ToString("MM/dd/yyyy"),
-                            DateOfVesselUllageISO = x.DateOfVesselUllage.ToString("MM/dd/yyyy"),
-                            DateOfSTAfterDischargeISO = x.DateOfSTAfterDischarge.ToString("MM/dd/yyyy"),
-                            MT_VAC = x.MT_VAC,
-                            MT_AIR = x.MT_AIR,
-                            GOV = x.GOV,
-                            GSV = x.GSV,
-                            DepotPrice = x.DepotPrice,
-                            CreatedBy = x.CreatedBy,
-                            SubmittedDate = x.SubmittedDate,
-                            ApplicationType = "COQ"
-                        }).ToList(),
+                    CoQ = coq.Select(c => new
+                    {
+                        c.Reference,
+                        c.Application?.User.Company.Name,
+                        DepotName = c.Plant?.Name,
+                        DepotPrice = c.DepotPrice,
+                        c.GSV,
+                        DebitNote = (c.GSV * c.DepotPrice * 0.01),
+
+                    }).ToList(),
                     ProcessingPlantCOQ = processingPlantCoQs.OrderByDescending(c => c.CreatedAt).Select(x => new
                     {
                         x.ProcessingPlantCOQId,
                         PlantName = x.Plant.Name,
                         x.Reference,
                         x.Status,
-                        x.ConsignorName, 
+                        x.ConsignorName,
                         x.Consignee,
                         x.ShipmentNo,
                         x.StartTime,
@@ -1174,8 +1153,78 @@ namespace Bunkering.Access.Services
                         ApplicationType = "Processing Plant COQ"
                     }).ToList(),
                 }
+
             };
         }
+
+            private async Task<ApiResponse> GetMyDeskFO(ApplicationUser? user)
+            {
+                var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Plant");
+                var processingPlantCoQs = await _unitOfWork.ProcessingPlantCoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Plant,Product");
+                // if (await _userManager.IsInRoleAsync(user, "FAD"))
+                //     coqs = await _unitOfWork.CoQ.Find(x => x.FADStaffId.Equals(user.Id) && !x.FADApproved && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Processing)));
+                if (await _userManager.IsInRoleAsync(user, "Company"))
+                {
+                    coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Plant");
+                    processingPlantCoQs = await _unitOfWork.ProcessingPlantCoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Plant,Product");
+                }
+
+                return new ApiResponse
+                {
+                    Message = "Applications fetched successfully",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true,
+                    Data = new
+                    {
+                        CoQ = coqs.OrderByDescending(c => c.DateCreated).Select(x => new
+                            {
+                                x.Id,
+                                AppId = x.AppId,
+                                CompanyEmail = x.Application?.User.Email,
+                                ImportName = x.Application?.User.Company.Name,
+                                VesselName = x.Application?.VesselName,
+                                x.Reference,
+                                x.Status,
+                                DepotName = x.Plant?.Name,
+                                DepotId = x.PlantId,
+                                DateOfVesselArrival = x.DateOfVesselArrival.ToShortDateString(),
+                                DateOfVesselUllage = x.DateOfVesselUllage.ToShortDateString(),
+                                DateOfSTAfterDischarge = x.DateOfSTAfterDischarge.ToShortDateString(),
+                                DateOfVesselArrivalISO = x.DateOfVesselArrival.ToString("MM/dd/yyyy"),
+                                DateOfVesselUllageISO = x.DateOfVesselUllage.ToString("MM/dd/yyyy"),
+                                DateOfSTAfterDischargeISO = x.DateOfSTAfterDischarge.ToString("MM/dd/yyyy"),
+                                MT_VAC = x.MT_VAC,
+                                MT_AIR = x.MT_AIR,
+                                GOV = x.GOV,
+                                GSV = x.GSV,
+                                DepotPrice = x.DepotPrice,
+                                CreatedBy = x.CreatedBy,
+                                SubmittedDate = x.SubmittedDate,
+                                ApplicationType = "COQ"
+                            }).ToList(),
+                        ProcessingPlantCOQ = processingPlantCoQs.OrderByDescending(c => c.CreatedAt).Select(x => new
+                        {
+                            x.ProcessingPlantCOQId,
+                            PlantName = x.Plant.Name,
+                            x.Reference,
+                            x.Status,
+                            x.ConsignorName, 
+                            x.Consignee,
+                            x.ShipmentNo,
+                            x.StartTime,
+                            x.EndTime,
+                            MT_VAC = x.TotalMTVac,
+                            MT_AIR = x.TotalMTAir,
+                            //GOV = x.GOV,
+                            //GSV = x.GSV,
+                            x.Price,
+                            CreatedBy = x.CreatedBy,
+                            SubmittedDate = x.SubmittedDate,
+                            ApplicationType = "Processing Plant COQ"
+                        }).ToList(),
+                    }
+                };
+            }
 
         public async Task<ApiResponse> ViewApplication(int id)
         {
