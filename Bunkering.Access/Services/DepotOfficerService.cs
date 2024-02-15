@@ -32,7 +32,8 @@ namespace Bunkering.Access.Services
             var staffs = await _userManager.Users.Where(x => x.UserRoles.Any(u => u.Role.Name == RoleConstants.COMPANY) != true).ToListAsync();
             var filteredMappings = mappings.Where(x => x.IsDeleted == false).Select(d => new DepotFieldOfficerViewModel
             {
-                DepotID = d.ID,
+                PlantFieldOfficerID = d.ID,
+                DepotID = d.PlantID,
                 UserID = d.OfficerID,
                 DepotName = d.Plant.Name,
                 OfficerName = staffs.Where(x => x.Id == d.OfficerID.ToString()).Select(u => u?.FirstName + ", " + u?.LastName ).FirstOrDefault()
@@ -89,41 +90,35 @@ namespace Bunkering.Access.Services
                     
                 }
 
-                else
+
+                var depotOfficerExist = await _unitOfWork.PlantOfficer.FirstOrDefaultAsync(j => j.PlantID.Equals(newDepotOfficer.DepotID));
+
+
+                if (depotOfficerExist != null)
                 {
-                    var existingMap = await _unitOfWork.PlantOfficer.FirstOrDefaultAsync(a => a.OfficerID == newDepotOfficer.UserID && a.PlantID == newDepotOfficer.DepotID);
-                    if (existingMap == null)
-
+                    return new ApiResponse
                     {
-                        var map = new PlantFieldOfficer
-                        {
-                            PlantID = newDepotOfficer.DepotID,
-                            OfficerID = newDepotOfficer.UserID
-
-                        };
-                        await _unitOfWork.PlantOfficer.Add(map);
-                        await _unitOfWork.SaveChangesAsync("");
-
-                        _response = new ApiResponse
-                        {
-                            Message = "Facility Officer mapping was added successfully.",
-                            StatusCode = HttpStatusCode.OK,
-                            Success = true,
-                        };
-
-                    }
-                    else
-                    {
-                        _response = new ApiResponse
-                        {
-                            Message = "Officer is Already Assigned To This Depot",
-                            StatusCode = HttpStatusCode.Conflict,
-                            Success = false,
-                        };
-
-                    }
+                        Message = "Depot already assigned to an officer!",
+                        StatusCode = HttpStatusCode.Conflict,
+                        Success = false
+                    };
                 }
-                
+                var map = new PlantFieldOfficer
+                {
+                    PlantID = newDepotOfficer.DepotID,
+                    OfficerID = newDepotOfficer.UserID
+
+                };
+                await _unitOfWork.PlantOfficer.Add(map);
+                await _unitOfWork.SaveChangesAsync("");
+
+                return new ApiResponse
+                {
+                    Message = "Depot Officer mapping was added successfully.",
+                    StatusCode = HttpStatusCode.OK,
+                    Success = true,
+                };
+
 
             }
             catch (Exception ex)
@@ -144,7 +139,7 @@ namespace Bunkering.Access.Services
             try
             {
                 var user = await _userManager.FindByEmailAsync(User);
-                var updatMapping = await _unitOfWork.PlantOfficer.FirstOrDefaultAsync(x => x.ID == id);
+                var updatMapping = await _unitOfWork.PlantOfficer.FirstOrDefaultAsync(x => x.ID == depot.PlantFieldOfficerID);
                 try
                 {
                     if (updatMapping != null)
