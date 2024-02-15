@@ -53,7 +53,7 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var coqs = await _unitOfWork.ProcessingPlantCoQ.GetAll();
+                var coqs = await _unitOfWork.ProcessingPlantCoQ.GetAll("Plant,Product");
 
                 return new ApiResponse
                 {
@@ -62,10 +62,8 @@ namespace Bunkering.Access.Services
                     Success = true,
                     Data = coqs.Select(c => new
                     {
-                        //PlantName = c.Plant?.Name,
-                        //ProductName = c.Product?.Name,
-                        PlantId = c.PlantId,
-                        ProductId = c.ProductId,
+                        PlantName = c.Plant?.Name,
+                        ProductName = c.Product?.Name,
                         Reference = c.Reference,
                         MeasurementSystem = c.MeasurementSystem,
                         StartTime = c.StartTime,
