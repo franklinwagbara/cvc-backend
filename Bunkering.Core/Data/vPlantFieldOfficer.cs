@@ -8,7 +8,7 @@ namespace Bunkering.Core.Data
 {
     public class vPlantFieldOfficer
     {
-        public int PlantFieldOfficerID { get; set; }
+        public int ID { get; set; }
         public int PlantID { get; set; }
         public string OfficerID { get; set; }
         public string DepotName { get; set; }
