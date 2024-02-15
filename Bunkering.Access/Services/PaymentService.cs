@@ -58,8 +58,6 @@ namespace Bunkering.Access.Services
             {
                 var baseUrl = $"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}";
                 //var IsExtraPayment = _appSettings.IsExtraPayment;
-                var RemitaPayment_URL = $"{baseUrl}/api/payment/Remita";
-                var ResponsePayment_URL = $"{baseUrl}/api/payment/RemitaResponse";
                 //var FailedPayment_URL = baseUrl + _appSettings.FailedExtraPayment;
 
                 try
@@ -88,7 +86,7 @@ namespace Bunkering.Access.Services
                                     }
                                     var total = fee.ApplicationFee + fee.ProcessingFee + (fee.COQFee * numOfDepots) + fee.SerciveCharge + fee.NOAFee;
 
-                                    var request = await _elps.GeneratePaymentReference($"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}", app, fee, numOfDepots);
+                                    var request = await _elps.GeneratePaymentReference($"{baseUrl}", app, fee, numOfDepots);
                                     _logger.LogRequest("Creation of payment split for application with reference:" + app.Reference + "(" + app.User.Company.Name + ") by " + User, false, directory);
 
                                     if (request == null)
@@ -152,6 +150,19 @@ namespace Bunkering.Access.Services
                     _logger.LogRequest($"An error {ex.Message} occured while trying to generate extra payment RRR for this application by {User}", true, directory);
                     _response = new ApiResponse { Message = "An error occured while generating this extra payment RRR. Please try again or contact support.", StatusCode = HttpStatusCode.InternalServerError };
                 }
+            }
+            return _response;
+        }
+
+        public async Task<ApiResponse> CreateDebitNoteRRR(int id)
+        {
+            try
+            {
+
+            }
+            catch(Exception ex) 
+            { 
+                
             }
             return _response;
         }
@@ -252,15 +263,14 @@ namespace Bunkering.Access.Services
                                 Success = true,
                                 Data = payment
                             };
-                            //var emailBody = string.Format($"Debit Note has been generated for your COQ with reference number: {coq.Reference}" +
-                            //    "<br /><ul>" +
-                            //    "<li>Amount Generated: {0}</li>" +
-                            //    //"<li>Remita RRR: {1}</li>" +
-                            //    "<li>Payment Status: {1}</li>" +
-                            //    "<li>Payment Description: {2}</li>" +
-                            //    "<li>Vessel Name: {3}</li>" +
-                            //    "<p>Kindly visit the <a hhref=''>portal to generate RRR for payment. </p>",
-                            //    payment.Amount.ToString(), payment.Status, payment.Description, $"{coqRef.CoQ.Plant.Name}");
+                            var emailBody = string.Format($"Debit Note has been generated for your COQ with reference number: {orderid}" +
+                                "<br /><ul>" +
+                                "<li>Amount Generated: {0}</li>" +
+                                "<li>Payment Status: {1}</li>" +
+                                "<li>Payment Description: {2}</li>" +
+                                "<li>Vessel Name: {3}</li>" +
+                                "<p>Kindly visit the <a hhref=''>portal to generate RRR for payment. </p>",
+                                payment.Amount.ToString(), payment.Status, payment.Description, $"{facName}");
 
                             #endregion
 
