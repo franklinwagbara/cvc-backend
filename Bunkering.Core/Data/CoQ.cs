@@ -32,6 +32,9 @@ namespace Bunkering.Core.Data
         public string? CurrentDeskId { get; set; }
         public bool? FADApproved { get; set; }
         public string? NameConsignee { get; set; }
+        public double GrandTotalWeightKg { get => MT_VAC * 1000; set { } }
+
+        public double ShoreFigureMTAirGas { get => MT_AIR; set { } }
 
         [ForeignKey("AppId")]
         public Application? Application { get; set; }

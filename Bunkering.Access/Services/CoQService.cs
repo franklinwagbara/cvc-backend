@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Data;
+using System.Diagnostics;
 using System.Dynamic;
 using System.Net;
 using System.Net.Http.Headers;
@@ -896,6 +897,18 @@ namespace Bunkering.Access.Services
 
                 _context.COQTanks.AddRange(coqTankList);
                 #endregion
+
+
+                var totalBeforeWeightAir = coqTankList.SelectMany(x => x.TankMeasurement).Where(x => x.MeasurementType == ReadingType.Before).Sum(t => t.TotalGasWeightAir);
+                var totalAfterWeightAir = coqTankList.SelectMany(x => x.TankMeasurement).Where(x => x.MeasurementType == ReadingType.After).Sum(t => t.TotalGasWeightAir);
+
+                var totalBeforeWeightVac = coqTankList.SelectMany(x => x.TankMeasurement).Where(x => x.MeasurementType == ReadingType.Before).Sum(t => t.TotalGasWeightVAC);
+                var totalAfterWeightVac = coqTankList.SelectMany(x => x.TankMeasurement).Where(x => x.MeasurementType == ReadingType.After).Sum(t => t.TotalGasWeightVAC);
+
+                coq.MT_VAC = totalAfterWeightVac - totalBeforeWeightVac;
+                coq.MT_AIR = (double)(totalAfterWeightAir - totalBeforeWeightAir);
+
+                _context.CoQs.Update(coq);
 
                 #region Document Submission
 

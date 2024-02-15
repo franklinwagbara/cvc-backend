@@ -85,6 +85,17 @@ namespace Bunkering.Access.Services
                     };
 
                 }
+                else if (!userExists)
+                {
+                    _response = new ApiResponse
+                    {
+                        Message = "Officer not found",
+                        StatusCode = HttpStatusCode.NotFound,
+                        Success = false
+                    };
+
+                }
+
                 // check if its exisiting on the jettyOfficer table
                 var jettyOfficerExist = await _unitOfWork.JettyOfficer.FirstOrDefaultAsync(j=>j.JettyId.Equals(newJettyOfficer.JettyID));
                 
@@ -103,6 +114,7 @@ namespace Bunkering.Access.Services
                     OfficerID = newJettyOfficer.UserID
 
                 };
+
                 await _unitOfWork.JettyOfficer.Add(map);
                 await _unitOfWork.SaveChangesAsync("");
 
