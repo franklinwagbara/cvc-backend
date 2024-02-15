@@ -48,8 +48,8 @@ namespace Bunkering.Access.Services
 
 				processes.ForEach(r =>
 				{
-					var trole = roles.FirstOrDefault(x => x.Name.ToLower().Equals(r.TriggeredByRole.ToLower()));
-					var rrole = roles.FirstOrDefault(x => x.Name.ToLower().Equals(r.TargetRole.ToLower()));
+					var trole = roles.FirstOrDefault(x => x.Id.ToLower().Equals(r.TriggeredByRole.ToLower()));
+					var rrole = roles.FirstOrDefault(x => x.Id.ToLower().Equals(r.TargetRole.ToLower()));
 					var flow = _mapper.Map<WorkflowviewModel>(r);
 
 					flow.FromLocation = location.FirstOrDefault(l => l.Id.Equals(r.FromLocationId))?.Name;
