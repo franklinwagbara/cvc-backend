@@ -444,7 +444,7 @@ namespace Bunkering.Access.Services
         }
 
         public async Task<WorkFlow> GetWorkFlow(string action, ApplicationUser currentuser, int VesselTypeId, int ApplicationTypeId)
-        => action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Submit).ToLower()) || action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Resubmit))
+        => action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Submit).ToLower()) || action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Resubmit).ToLower())
             ? await _unitOfWork.Workflow.FirstOrDefaultAsync(x => x.Action.ToLower().Trim().Equals(action.ToLower().Trim())
                     && currentuser.UserRoles.FirstOrDefault().Role.Name.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim())
                     && x.ApplicationTypeId.Equals(ApplicationTypeId))
@@ -536,7 +536,7 @@ namespace Bunkering.Access.Services
                     if (history != null)
                     {
                         nextprocessingofficer = _userManager.Users.Include(ur => ur.UserRoles).ThenInclude(r => r.Role).Include(lo => lo.Location).Include(ol => ol.Office)
-                                                    .FirstOrDefault(x => x.Id.Equals(history.TriggeredBy));
+                                                    .FirstOrDefault(x => x.Id.Equals(history.TriggeredBy) && x.UserRoles.FirstOrDefault().Role.Id.Equals(wkflow.TargetRole));
                         if (nextprocessingofficer != null && !nextprocessingofficer.IsActive)
                         {
                             var users = _userManager.Users
