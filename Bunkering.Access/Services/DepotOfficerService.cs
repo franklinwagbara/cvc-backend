@@ -28,15 +28,15 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> GetAllDepotOfficerMapping()
         {
-            var mappings = await _unitOfWork.PlantOfficer.GetAll("Plant");
-            var staffs = await _userManager.Users.Where(x => x.UserRoles.Any(u => u.Role.Name == RoleConstants.COMPANY) != true).ToListAsync();
-            var filteredMappings = mappings.Where(x => x.IsDeleted == false).Select(d => new DepotFieldOfficerViewModel
+            var mappings = await _unitOfWork.PlantOfficer.Find(x => x.IsDeleted == false, "Plant,Officer");
+            //var staffs = await _userManager.Users.Where(x => x.UserRoles.Any(u => u.Role.Name == RoleConstants.COMPANY) != true).ToListAsync();
+            var filteredMappings = mappings.Select(d => new DepotFieldOfficerViewModel
             {
                 PlantFieldOfficerID = d.ID,
                 DepotID = d.PlantID,
-                UserID = d.OfficerID,
+                UserID = Guid.Parse(d.OfficerID),
                 DepotName = d.Plant.Name,
-                OfficerName = staffs.Where(x => x.Id == d.OfficerID.ToString()).Select(u => u?.FirstName + ", " + u?.LastName ).FirstOrDefault()
+                OfficerName = $"{d.Officer.FirstName} {d.Officer.LastName}"
             }).ToList(); 
 
             return new ApiResponse
@@ -106,7 +106,7 @@ namespace Bunkering.Access.Services
                 var map = new PlantFieldOfficer
                 {
                     PlantID = newDepotOfficer.DepotID,
-                    OfficerID = newDepotOfficer.UserID
+                    OfficerID = $"{newDepotOfficer.UserID}"
 
                 };
                 await _unitOfWork.PlantOfficer.Add(map);
@@ -145,7 +145,7 @@ namespace Bunkering.Access.Services
                     if (updatMapping != null)
                     {
                         updatMapping.PlantID = depot.DepotID;
-                        updatMapping.OfficerID = depot.UserID;
+                        updatMapping.OfficerID = $"{depot.UserID}";
                         var success = await _unitOfWork.SaveChangesAsync(user!.Id) > 0;
                         _response = new ApiResponse
                         {
