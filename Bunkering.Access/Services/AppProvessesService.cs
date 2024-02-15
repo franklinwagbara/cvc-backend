@@ -90,8 +90,8 @@ namespace Bunkering.Access.Services
 			var user = await _userManager.FindByEmailAsync(User);
 
 			var wk = _mapper.Map<WorkFlow>(model);
-			wk.TriggeredByRole = (await _role.Roles.FirstOrDefaultAsync(x => x.Id == model.TriggeredByRoleId))?.Name;
-			wk.TargetRole = (await _role.Roles.FirstOrDefaultAsync(x => x.Id == model.TargetRoleId))?.Name;
+			//wk.TriggeredByRole = (await _role.Roles.FirstOrDefaultAsync(x => x.Id == model.TriggeredByRoleId))?.Name;
+			//wk.TargetRole = (await _role.Roles.FirstOrDefaultAsync(x => x.Id == model.TargetRoleId))?.Name;
 
 			await _unitOfWork.Workflow.Add(wk);
 			await _unitOfWork.SaveChangesAsync(user.Id);
@@ -114,9 +114,9 @@ namespace Bunkering.Access.Services
 				{
 					flow.Rate = model.Rate;
 					flow.Status = model.Status;
-					flow.TargetRole = (await _role.Roles.FirstOrDefaultAsync(x => x.Id == model.TargetRoleId)).Name;
+					flow.TargetRole = model.TargetRoleId;
 					flow.Action = model.Action;
-					flow.TriggeredByRole = (await _role.Roles.FirstOrDefaultAsync(x => x.Id == model.TriggeredByRoleId)).Name;
+					flow.TriggeredByRole = model.TriggeredByRoleId;
 					flow.VesselTypeId = (int)model.VesselTypeId;
 					flow.FromLocationId = model.FromLocationId;
 					flow.ToLocationId = model.ToLocationId;
