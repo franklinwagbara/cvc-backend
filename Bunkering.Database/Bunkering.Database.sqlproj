@@ -156,6 +156,7 @@
     <Build Include="dbo\Tables\ProcessingPlantCOQCondensateDBatchMeters.sql" />
     <Build Include="dbo\Tables\ProcessingPlantCOQCondensateDBatches.sql" />
     <Build Include="dbo\Tables\CondensateDynamicMeterReadings.sql" />
+    <Build Include="dbo\Views\vPlantFieldOfficers.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Snapshots\Bunkering.Database_20230810_10-01-52.dacpac" />

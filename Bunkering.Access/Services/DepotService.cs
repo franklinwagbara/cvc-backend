@@ -164,8 +164,8 @@ namespace Bunkering.Access.Services
             try
             {
                 var user = _contextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.PrimarySid)?.Value;
-                var coq = await _unitOfWork.CoQ.Query(c =>  c.AppId == AppId).Select(c => c.Id).ToListAsync();
-                var depotOffices = (await _unitOfWork.PlantOfficer.Find(c => c.OfficerID.ToString() == user && c.IsDeleted != true)).ToList();
+                var coq = (await _unitOfWork.CoQ.Find(c =>  c.AppId == AppId)).Select(c => c.Id).ToList();
+                var depotOffices = (await _unitOfWork.PlantOfficer.Find(c => c.OfficerID.Equals(user) && !c.IsDeleted)).ToList();
 
                 if(!depotOffices.Any() )
                 {
