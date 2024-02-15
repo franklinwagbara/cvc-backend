@@ -1083,6 +1083,14 @@ namespace Bunkering.Access.Services
                 _context.COQTanks.AddRange(coqTankList);
                 #endregion
 
+                coq.GSV = coqTankList.SelectMany(x => x.TankMeasurement).Where(x => x.MeasurementType == ReadingType.After).Sum(t => t.GSV) - coqTankList.SelectMany(x => x.TankMeasurement).Where(x => x.MeasurementType == ReadingType.Before).Sum(t => t.GSV);
+
+                coq.GOV = coqTankList.SelectMany(x => x.TankMeasurement).Where(x => x.MeasurementType == ReadingType.After).Sum(t => t.GOV) - coqTankList.SelectMany(x => x.TankMeasurement).Where(x => x.MeasurementType == ReadingType.Before).Sum(t => t.GOV);
+
+                coq.MT_VAC = coqTankList.SelectMany(x => x.TankMeasurement).Where(x => x.MeasurementType == ReadingType.After).Sum(t => t.MTVAC) - coqTankList.SelectMany(x => x.TankMeasurement).Where(x => x.MeasurementType == ReadingType.Before).Sum(t => t.MTVAC);
+
+                _context.CoQs.Update(coq);
+
                 #region Document Submission
 
                 //SubmitDocumentDto sDoc = model.SubmitDocuments.FirstOrDefault();
