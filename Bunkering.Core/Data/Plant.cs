@@ -19,7 +19,8 @@ namespace Bunkering.Core.Data
         public bool IsDeleted { get; set; }
         public ICollection<PlantTank> Tanks { get; set; }
         public ICollection<Meter> Meters { get; set; }
-
+        public bool IsDefaulter { get; set; }
+        public bool IsCleared { get; set; }
 
     }
 }
