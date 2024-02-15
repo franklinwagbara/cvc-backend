@@ -36,17 +36,17 @@ namespace Bunkering.Core.Data
         public double VapourFactor { get; set; } = 0;
         //public double LiquidTemperature { get; set; }
 
-        public double LiquidDensityAir => LiquidDensityVac * 0.0011;
-        public double CorrectedLiquidLevel => ObservedSounding + TapeCorrection;
-        public double CorrectedLiquidVolumeM3 => ObservedLiquidVolume * ShrinkageFactorLiquid;
-        public double GrossStandardVolumeGas => CorrectedLiquidVolumeM3 * VCF;
-        public double LiquidWeightVAC => LiquidDensityVac * GrossStandardVolumeGas;
-        public double LiquidWeightAir => LiquidDensityAir * GrossStandardVolumeGas;
-        public double VapourVolume => TankVolume - ObservedLiquidVolume;
-        public double CorrectedVapourVolume => VapourVolume * ShrinkageFactorVapour;
-        public double VapourWeightVAC => CorrectedVapourVolume * VapourFactor;
-        public double? VapourWeightAir => (LiquidDensityAir / LiquidDensityVac) * VapourWeightVAC;
-        public double TotalGasWeightVAC => LiquidWeightVAC + VapourWeightVAC;
-        public double? TotalGasWeightAir => LiquidWeightAir + VapourWeightAir;
+        public double LiquidDensityAir { get => LiquidDensityVac * 0.0011; set { } }
+        public double CorrectedLiquidLevel { get => ObservedSounding + TapeCorrection; set { } }
+        public double CorrectedLiquidVolumeM3 { get => ObservedLiquidVolume * ShrinkageFactorLiquid; set { } }
+        public double GrossStandardVolumeGas { get => CorrectedLiquidVolumeM3 * VCF; set { } }
+        public double LiquidWeightVAC { get => LiquidDensityVac * GrossStandardVolumeGas; set { } }
+        public double LiquidWeightAir { get => LiquidDensityAir * GrossStandardVolumeGas; set { } }
+        public double VapourVolume { get => TankVolume - ObservedLiquidVolume; set { } }
+        public double CorrectedVapourVolume { get => VapourVolume * ShrinkageFactorVapour; set { } }
+        public double VapourWeightVAC { get => CorrectedVapourVolume * VapourFactor; set { } }
+        public double? VapourWeightAir { get => (LiquidDensityAir / LiquidDensityVac) * VapourWeightVAC; set { } }
+        public double TotalGasWeightVAC { get => LiquidWeightVAC + VapourWeightVAC; set { } }
+        public double? TotalGasWeightAir { get => LiquidWeightAir + VapourWeightAir; set { } }
     }
 }
