@@ -28,15 +28,15 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> GetAllDepotOfficerMapping()
         {
-            var mappings = await _unitOfWork.PlantOfficer.Find(x => x.IsDeleted == false, "Plant,Officer");
+            var mappings = await _unitOfWork.vPlantFieldOfficer.Find(x => x.IsDeleted == false);
             //var staffs = await _userManager.Users.Where(x => x.UserRoles.Any(u => u.Role.Name == RoleConstants.COMPANY) != true).ToListAsync();
             var filteredMappings = mappings.Select(d => new DepotFieldOfficerViewModel
             {
-                PlantFieldOfficerID = d.ID,
+                PlantFieldOfficerID = d.PlantFieldOfficerID,
                 DepotID = d.PlantID,
                 UserID = d.OfficerID,
-                DepotName = d.Plant.Name,
-                OfficerName = $"{d.Officer.FirstName} {d.Officer.LastName}"
+                DepotName = d.DepotName,
+                OfficerName = $"{d.FirstName} {d.LastName}"
             }).ToList(); 
 
             return new ApiResponse

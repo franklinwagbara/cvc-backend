@@ -60,6 +60,7 @@ namespace Bunkering.Core.Data
         public DbSet<vFacilityPermit> vFacilityPermit { get; set; }
         public DbSet<vPayment> vPayment { get; set; }
         public DbSet<vDebitNote> VDebitNotes { get; set; }
+        public DbSet<vPlantFieldOfficer> vPlantFieldOfficers { get; set; }
         public DbSet<PlantFieldOfficer> PlantFieldOfficers { get; set; }
         public DbSet<ProcessingPlantCOQ> ProcessingPlantCOQs { get; set; }
         public DbSet<ProcessingPlantCOQBatch> ProcessingPlantCOQBatches { get; set; }
