@@ -32,7 +32,7 @@ namespace Bunkering.Access.Services
             //var staffs = await _userManager.Users.Where(x => x.UserRoles.Any(u => u.Role.Name == RoleConstants.COMPANY) != true).ToListAsync();
             var filteredMappings = mappings.Select(d => new DepotFieldOfficerViewModel
             {
-                PlantFieldOfficerID = d.PlantFieldOfficerID,
+                PlantFieldOfficerID = d.ID,
                 DepotID = d.PlantID,
                 UserID = d.OfficerID,
                 DepotName = d.DepotName,
