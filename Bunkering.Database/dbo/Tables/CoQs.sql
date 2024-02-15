@@ -24,12 +24,12 @@
     [QuauntityReflectedOnBill] FLOAT (53)     NOT NULL,
     [NameConsignee]            NVARCHAR (MAX) NULL,
     [ProductId]                INT            NULL,
-    [GrandTotalWeightKg]       FLOAT (53)     DEFAULT ((0.0000000000000000e+000)) NOT NULL,
-    [ShoreFigureMTAirGas]      FLOAT (53)     DEFAULT ((0.0000000000000000e+000)) NOT NULL,
     CONSTRAINT [PK_CoQs] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_CoQs_Applications_AppId] FOREIGN KEY ([AppId]) REFERENCES [dbo].[Applications] ([Id]),
     CONSTRAINT [FK_CoQs_Plants_PlantId] FOREIGN KEY ([PlantId]) REFERENCES [dbo].[Plants] ([Id]) ON DELETE CASCADE
 );
+
+
 
 
 

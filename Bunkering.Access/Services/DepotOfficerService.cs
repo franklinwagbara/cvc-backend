@@ -34,7 +34,7 @@ namespace Bunkering.Access.Services
             {
                 PlantFieldOfficerID = d.ID,
                 DepotID = d.PlantID,
-                UserID = Guid.Parse(d.OfficerID),
+                UserID = d.OfficerID,
                 DepotName = d.Plant.Name,
                 OfficerName = $"{d.Officer.FirstName} {d.Officer.LastName}"
             }).ToList(); 
@@ -64,7 +64,7 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var userExists = await _userManager.Users.AnyAsync(c => c.Id == newDepotOfficer.UserID.ToString());
+                var userExists = await _userManager.Users.AnyAsync(c => c.Id == newDepotOfficer.UserID);
                 var depotExists = await _unitOfWork.Plant.FirstOrDefaultAsync(c => c.Id ==  newDepotOfficer.DepotID) is not null;
 
 
@@ -106,8 +106,7 @@ namespace Bunkering.Access.Services
                 var map = new PlantFieldOfficer
                 {
                     PlantID = newDepotOfficer.DepotID,
-                    OfficerID = $"{newDepotOfficer.UserID}"
-
+                    OfficerID = newDepotOfficer.UserID
                 };
                 await _unitOfWork.PlantOfficer.Add(map);
                 await _unitOfWork.SaveChangesAsync("");
@@ -145,7 +144,7 @@ namespace Bunkering.Access.Services
                     if (updatMapping != null)
                     {
                         updatMapping.PlantID = depot.DepotID;
-                        updatMapping.OfficerID = $"{depot.UserID}";
+                        updatMapping.OfficerID = depot.UserID;
                         var success = await _unitOfWork.SaveChangesAsync(user!.Id) > 0;
                         _response = new ApiResponse
                         {
