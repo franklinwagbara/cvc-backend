@@ -1546,7 +1546,7 @@ namespace Bunkering.Access.Services
                 };
                 return _response;
             }
-            var depots = (await _unitOfWork.PlantOfficer.Find(c => c.OfficerID == Guid.Parse(user.Id))).Select(c => c.PlantID).ToList();
+            var depots = (await _unitOfWork.PlantOfficer.Find(c => c.OfficerID.Equals(user.Id))).Select(c => c.PlantID);
             if (!depots.Any())
             {
                 _response = new ApiResponse
@@ -1559,9 +1559,9 @@ namespace Bunkering.Access.Services
             }
 
             var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application.Facility");
-            var apps = appDepots.OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application).ToList();
+            var apps = appDepots.OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application);
 
-                _response = new ApiResponse
+            _response = new ApiResponse
             {
                 Message = "Applications fetched successfully",
                 StatusCode = HttpStatusCode.OK,

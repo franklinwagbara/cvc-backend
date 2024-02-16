@@ -62,6 +62,7 @@ namespace Bunkering.Access.DAL
         public IvFacilityPermit vFacilityPermit { get; private set; }
         public IvPayment vPayment { get; private set; }
         public IvDebitNote vDebitNote { get; private set; }
+        public IvPlantFieldOfficer vPlantFieldOfficer { get; private set; }
         public IApplicationSurveyor ApplicationSurveyor { get; private set; }
         public IVesselDischargeClearance VesselDischargeClearance { get; set; }
         public IProcessingPlantCoQ ProcessingPlantCoQ { get; set; }
@@ -117,6 +118,7 @@ namespace Bunkering.Access.DAL
             vAppUser = vAppUser != null ? vAppUser : new vAppUserRepository(_context);
             vPayment = vPayment != null ? vPayment : new vPaymentRepository(_context);
             vDebitNote = vDebitNote != null ? vDebitNote : new vDebitNoteRepository(_context);
+            vPlantFieldOfficer = vPlantFieldOfficer != null ? vPlantFieldOfficer : new vPlantFieldOfficerRepository(_context);
             ApplicationDepot = ApplicationDepot ?? new ApplicationDepotRepository(_context);
             PlantOfficer = PlantOfficer ?? new PlantOfficerRepository(_context);
             Plant = Plant ?? new PlantRepository(_context);
