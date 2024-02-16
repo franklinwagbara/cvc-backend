@@ -183,7 +183,7 @@ namespace Bunkering.Access.Services
             {
                 var isProcessingPlant = false;
                     //return (false, $"Application with Id={coq.AppId} was not found.");
-                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id.Equals(coqId), "Application.User.Company,Application.Facility.VesselType,Payments") ?? throw new Exception($"COQ with Id={coqId} was not found.");
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id.Equals(coqId), "Application.User.Company,Application.Facility.VesselType") ?? throw new Exception($"COQ with Id={coqId} was not found.");
                 if (coq is not null && coq.AppId is null)
                 {
                     isProcessingPlant = true;
@@ -195,7 +195,8 @@ namespace Bunkering.Access.Services
                 currUserId = string.IsNullOrEmpty(currUserId) ? coq.CurrentDeskId : currUserId;
                 var currentUser = _userManager.Users.Include(x => x.Company).Include(ol => ol.Office).Include(lo => lo.UserRoles).ThenInclude(r => r.Role)
                         .Include(lo => lo.Location).FirstOrDefault(x => x.Id.Equals(currUserId)) ?? throw new Exception($"User with Id={currUserId} was not found.");
-                var workFlow = (await GetWorkFlow(action, currentUser, coq.Application?.Facility?.VesselTypeId ?? 1, coq.Application.ApplicationTypeId)) ?? throw new Exception($"Work Flow for this action was not found.");
+                var apptypes = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(a => a.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.COQ)));
+                var workFlow = (await GetWorkFlow(action, currentUser, coq.Application?.Facility?.VesselTypeId ?? 1, apptypes.Id)) ?? throw new Exception($"Work Flow for this action was not found.");
                 var nextProcessingOfficer = (await GetNextStaffCOQ(coqId, action, workFlow, currentUser, delUserId)) ?? throw new Exception($"No processing staff for this action was not found.");
 
                 coq.CurrentDeskId = nextProcessingOfficer.Id;
