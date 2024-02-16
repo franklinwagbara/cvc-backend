@@ -177,7 +177,7 @@ namespace Bunkering.Access.Services
                     };
                 }
 
-                var appDepots = (await _unitOfWork.ApplicationDepot.Find(x => x.AppId == AppId, "Depot")).ToList() ?? throw new Exception("No Depot was applied for this NOA application.");
+                var appDepots = (await _unitOfWork.ApplicationDepot.Find(x => x.AppId == AppId, "Depot")) ?? throw new Exception("No Depot was applied for this NOA application.");
                 var depots = appDepots.Where(x => depotOffices
                 .Exists(a => a.PlantID == x.DepotId)).Select(x => x.Depot)
                 .ToList() ?? throw new Exception("Could find these depot(s)");
