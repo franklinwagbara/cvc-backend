@@ -1111,8 +1111,6 @@ namespace Bunkering.Access.Services
 
                 _context.SaveChanges();
 
-
-
                 var submit = await _flow.CoqWorkFlow(coq.Id, Enum.GetName(typeof(AppActions), AppActions.Submit), "COQ Submitted", user.Id);
                 if (submit.Item1)
                 {
