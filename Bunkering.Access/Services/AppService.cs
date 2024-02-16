@@ -1559,7 +1559,7 @@ namespace Bunkering.Access.Services
             }
 
             var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application.Facility");
-            var apps = appDepots.OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application);
+            var apps = appDepots.GroupBy(x => x.AppId).Select(x => x.FirstOrDefault()).OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application);
 
             _response = new ApiResponse
             {
