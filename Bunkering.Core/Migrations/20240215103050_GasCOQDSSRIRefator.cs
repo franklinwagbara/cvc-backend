@@ -11,8 +11,8 @@ namespace Bunkering.Core.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "ExtraPayments");
+            //migrationBuilder.DropTable(
+            //    name: "ExtraPayments");
 
             migrationBuilder.AddColumn<double>(
                 name: "CorrectedLiquidLevel",
@@ -110,19 +110,19 @@ namespace Bunkering.Core.Migrations
             //    nullable: false,
             //    defaultValue: false);
 
-            migrationBuilder.AddColumn<double>(
-                name: "GrandTotalWeightKg",
-                table: "CoQs",
-                type: "float",
-                nullable: false,
-                defaultValue: 0.0);
+            //migrationBuilder.AddColumn<double>(
+            //    name: "GrandTotalWeightKg",
+            //    table: "CoQs",
+            //    type: "float",
+            //    nullable: false,
+            //    defaultValue: 0.0);
 
-            migrationBuilder.AddColumn<double>(
-                name: "ShoreFigureMTAirGas",
-                table: "CoQs",
-                type: "float",
-                nullable: false,
-                defaultValue: 0.0);
+            //migrationBuilder.AddColumn<double>(
+            //    name: "ShoreFigureMTAirGas",
+            //    table: "CoQs",
+            //    type: "float",
+            //    nullable: false,
+            //    defaultValue: 0.0);
 
             //migrationBuilder.AddColumn<bool>(
             //    name: "IsCleared",
