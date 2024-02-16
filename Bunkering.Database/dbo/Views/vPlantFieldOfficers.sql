@@ -1,7 +1,7 @@
 ﻿CREATE VIEW dbo.vPlantFieldOfficers
 AS
 SELECT dbo.PlantFieldOfficers.ID, dbo.AspNetUsers.FirstName, dbo.AspNetUsers.LastName, dbo.AspNetUsers.IsActive, dbo.AspNetUsers.IsDeleted, dbo.AspNetUsers.Email, dbo.AspNetUsers.PhoneNumber, dbo.Plants.Name AS DepotName, 
-                  dbo.Plants.Id AS PalntID, dbo.AspNetUsers.Id AS OfficerID
+                  dbo.Plants.Id AS PlantID, dbo.AspNetUsers.Id AS OfficerID
 FROM     dbo.Plants INNER JOIN
                   dbo.PlantFieldOfficers ON dbo.Plants.Id = dbo.PlantFieldOfficers.PlantID INNER JOIN
                   dbo.AspNetUsers ON dbo.PlantFieldOfficers.OfficerID = dbo.AspNetUsers.Id
