@@ -446,10 +446,10 @@ namespace Bunkering.Access.Services
         public async Task<WorkFlow> GetWorkFlow(string action, ApplicationUser currentuser, int VesselTypeId, int ApplicationTypeId)
         => action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Submit).ToLower()) || action.ToLower().Equals(Enum.GetName(typeof(AppActions), AppActions.Resubmit).ToLower())
             ? await _unitOfWork.Workflow.FirstOrDefaultAsync(x => x.Action.ToLower().Trim().Equals(action.ToLower().Trim())
-                    && currentuser.UserRoles.FirstOrDefault().Role.Name.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim())
+                    && currentuser.UserRoles.FirstOrDefault().Role.Id.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim())
                     && x.ApplicationTypeId.Equals(ApplicationTypeId))
             : await _unitOfWork.Workflow.FirstOrDefaultAsync(x => x.Action.ToLower().Trim().Equals(action.ToLower().Trim())
-                    && currentuser.UserRoles.FirstOrDefault().Role.Name.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim())
+                    && currentuser.UserRoles.FirstOrDefault().Role.Id.ToLower().Trim().Equals(x.TriggeredByRole.ToLower().Trim())
                     && currentuser.LocationId == x.FromLocationId && x.VesselTypeId == VesselTypeId
                     && x.ApplicationTypeId.Equals(ApplicationTypeId));
 
@@ -549,9 +549,9 @@ namespace Bunkering.Access.Services
                 }
                 if (wkflow != null && nextprocessingofficer == null)
                 {
-                    if (wkflow.TargetRole.Equals(currentUser.UserRoles.FirstOrDefault().Role.Name))
+                    if (wkflow.TargetRole.Equals(currentUser.UserRoles.FirstOrDefault().Role.Id))
                         nextprocessingofficer = currentUser;
-                    else if (wkflow.TargetRole.Equals(app.User.UserRoles.FirstOrDefault().Role.Name))
+                    else if (wkflow.TargetRole.Equals(app.User.UserRoles.FirstOrDefault().Role.Id))
                         nextprocessingofficer = app.User;
                     else
                     {
@@ -560,22 +560,22 @@ namespace Bunkering.Access.Services
                                 .ThenInclude(r => r.Role)
                                 .Include(lo => lo.Location)
                                 .Include(ol => ol.Office)
-                                .Where(x => x.UserRoles.Any(y => y.Role.Name.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
+                                .Where(x => x.UserRoles.Any(y => y.Role.Id.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
                                 && x.LocationId == wkflow.ToLocationId && x.IsActive && x.OfficeId == currentUser.OfficeId).ToList()
                             : _userManager.Users.Include(x => x.Company).Include(f => f.Company).Include(ur => ur.UserRoles)
                                 .ThenInclude(r => r.Role)
                                 .Include(lo => lo.Location)
                                 .Include(ol => ol.Office)
-                                .Where(x => x.UserRoles.Any(y => y.Role.Name.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
+                                .Where(x => x.UserRoles.Any(y => y.Role.Id.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
                                 && x.LocationId == wkflow.ToLocationId && x.IsActive).ToList();
                         nextprocessingofficer = users.OrderBy(x => x.LastJobDate).FirstOrDefault()!;
-                        foreach (var user in users)
-                        {
-                            if (!user.UserRoles.Any(c => c.Role.Name == RoleConstants.COMPANY) && user.LocationId != wkflow.ToLocationId)
-                            {
-                                users.Remove(user);
-                            }
-                        }
+                        //foreach (var user in users)
+                        //{
+                        //    if (!user.UserRoles.Any(c => c.Role.Name == RoleConstants.COMPANY) && user.LocationId != wkflow.ToLocationId)
+                        //    {
+                        //        users.Remove(user);
+                        //    }
+                        //}
                     }
                 }
                 return nextprocessingofficer!;
@@ -619,7 +619,7 @@ namespace Bunkering.Access.Services
                 }
                 if (wkflow != null && nextprocessingofficer == null)
                 {
-                    if (wkflow.TargetRole.Equals(currentUser.UserRoles.FirstOrDefault().Role.Name))
+                    if (wkflow.TargetRole.Equals(currentUser.UserRoles.FirstOrDefault().Role.Id))
                         nextprocessingofficer = currentUser;
                     // else if (wkflow.TargetRole.Equals(app.User.UserRoles.FirstOrDefault().Role.Name))
                     //     nextprocessingofficer = app.User;
@@ -630,13 +630,13 @@ namespace Bunkering.Access.Services
                                 .ThenInclude(r => r.Role)
                                 .Include(lo => lo.Location)
                                 .Include(ol => ol.Office)
-                                .Where(x => x.UserRoles.Any(y => y.Role.Name.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
+                                .Where(x => x.UserRoles.Any(y => y.Role.Id.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
                                 && x.IsActive && x.OfficeId == currentUser.OfficeId).ToList()
                             : _userManager.Users.Include(x => x.Company).Include(f => f.Company).Include(ur => ur.UserRoles)
                                 .ThenInclude(r => r.Role)
                                 .Include(lo => lo.Location)
                                 .Include(ol => ol.Office)
-                                .Where(x => x.UserRoles.Any(y => y.Role.Name.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
+                                .Where(x => x.UserRoles.Any(y => y.Role.Id.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
                                 && x.IsActive).ToList();
 
                         foreach (var user in users)
@@ -690,7 +690,7 @@ namespace Bunkering.Access.Services
                 }
                 if (wkflow != null && nextprocessingofficer == null)
                 {
-                    if (wkflow.TargetRole.Equals(currentUser.UserRoles.FirstOrDefault().Role.Name))
+                    if (wkflow.TargetRole.Equals(currentUser.UserRoles.FirstOrDefault().Role.Id))
                         nextprocessingofficer = currentUser;
                     // else if (wkflow.TargetRole.Equals(app.User.UserRoles.FirstOrDefault().Role.Name))
                     //     nextprocessingofficer = app.User;
@@ -701,13 +701,13 @@ namespace Bunkering.Access.Services
                                 .ThenInclude(r => r.Role)
                                 .Include(lo => lo.Location)
                                 .Include(ol => ol.Office)
-                                .Where(x => x.UserRoles.Any(y => y.Role.Name.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
+                                .Where(x => x.UserRoles.Any(y => y.Role.Id.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
                                 && x.IsActive && x.OfficeId == currentUser.OfficeId).ToList()
                             : _userManager.Users.Include(x => x.Company).Include(f => f.Company).Include(ur => ur.UserRoles)
                                 .ThenInclude(r => r.Role)
                                 .Include(lo => lo.Location)
                                 .Include(ol => ol.Office)
-                                .Where(x => x.UserRoles.Any(y => y.Role.Name.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
+                                .Where(x => x.UserRoles.Any(y => y.Role.Id.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
                                 && x.IsActive).ToList();
 
                         foreach (var user in users)

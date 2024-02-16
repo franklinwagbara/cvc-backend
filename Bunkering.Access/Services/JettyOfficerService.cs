@@ -34,16 +34,16 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> GetAllJettyOfficerMapping()
         {
-            var mappings = (await _unitOfWork.JettyOfficer.GetAll()).ToList();
+            var mappings = await _unitOfWork.JettyOfficer.Find(x => x.IsDeleted == false, "Officer,Jetty");
             //var staffs = await _userManager.Users.Where(x => x.IsDeleted != true).ToListAsync();
-            var filteredMappings = mappings.Where(x => x.IsDeleted == false).Select(d => new JettyFieldOfficerViewModel
+            var filteredMappings = mappings.Select(d => new JettyFieldOfficerViewModel
             {
                 JettyFieldOfficerID = d.ID,
                 JettyID = d.JettyId,
                 UserID = d.OfficerID,
                 JettyName = d.Jetty?.Name,
-                OfficerName = _userManager.Users.Where(x => x.Id == d.OfficerID).Select(n =>  n.FirstName + ' ' + n.LastName).FirstOrDefault(),
-            }).ToList();
+                OfficerName = $"{ d.Officer.FirstName } { d.Officer.LastName }",
+            });
 
             return new ApiResponse
             {
@@ -124,10 +124,6 @@ namespace Bunkering.Access.Services
                     StatusCode = HttpStatusCode.OK,
                     Success = true,
                 };
-
-              
-
-
             }
             catch (Exception ex)
             {

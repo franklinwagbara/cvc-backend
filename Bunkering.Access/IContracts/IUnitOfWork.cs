@@ -70,6 +70,7 @@ namespace Bunkering.Access.IContracts
         IvAppUser vAppUser { get; }
         IvPayment vPayment { get; }
         IvDebitNote vDebitNote { get; }
+        IvPlantFieldOfficer vPlantFieldOfficer { get; }
         int Save();
         Task<int> SaveChangesAsync(string userId);
     }

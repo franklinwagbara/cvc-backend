@@ -28,15 +28,15 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> GetAllDepotOfficerMapping()
         {
-            var mappings = await _unitOfWork.PlantOfficer.GetAll("Plant");
-            var staffs = await _userManager.Users.Where(x => x.UserRoles.Any(u => u.Role.Name == RoleConstants.COMPANY) != true).ToListAsync();
-            var filteredMappings = mappings.Where(x => x.IsDeleted == false).Select(d => new DepotFieldOfficerViewModel
+            var mappings = await _unitOfWork.vPlantFieldOfficer.Find(x => x.IsDeleted == false);
+            //var staffs = await _userManager.Users.Where(x => x.UserRoles.Any(u => u.Role.Name == RoleConstants.COMPANY) != true).ToListAsync();
+            var filteredMappings = mappings.Select(d => new DepotFieldOfficerViewModel
             {
                 PlantFieldOfficerID = d.ID,
                 DepotID = d.PlantID,
                 UserID = d.OfficerID,
-                DepotName = d.Plant.Name,
-                OfficerName = staffs.Where(x => x.Id == d.OfficerID.ToString()).Select(u => u?.FirstName + ", " + u?.LastName ).FirstOrDefault()
+                DepotName = d.DepotName,
+                OfficerName = $"{d.FirstName} {d.LastName}"
             }).ToList(); 
 
             return new ApiResponse
@@ -64,7 +64,7 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var userExists = await _userManager.Users.AnyAsync(c => c.Id == newDepotOfficer.UserID.ToString());
+                var userExists = await _userManager.Users.AnyAsync(c => c.Id == newDepotOfficer.UserID);
                 var depotExists = await _unitOfWork.Plant.FirstOrDefaultAsync(c => c.Id ==  newDepotOfficer.DepotID) is not null;
 
 
@@ -107,7 +107,6 @@ namespace Bunkering.Access.Services
                 {
                     PlantID = newDepotOfficer.DepotID,
                     OfficerID = newDepotOfficer.UserID
-
                 };
                 await _unitOfWork.PlantOfficer.Add(map);
                 await _unitOfWork.SaveChangesAsync("");
