@@ -1119,8 +1119,6 @@ namespace Bunkering.Access.Services
 
                 _context.SaveChanges();
 
-
-
                 var submit = await _flow.CoqWorkFlow(coq.Id, Enum.GetName(typeof(AppActions), AppActions.Submit), "COQ Submitted", user.Id);
                 if (submit.Item1)
                 {
@@ -1130,7 +1128,7 @@ namespace Bunkering.Access.Services
                         Subject = $"COQ with reference {coq.Reference} Submitted",
                         Content = $"COQ with reference {coq.Reference} has been submitted to your desk for further processing",
                         UserId = user.Id,
-                        Date = DateTime.Now.AddHours(1),
+                        Date = DateTime.UtcNow.AddHours(1),
                     };
 
                     _context.Messages.Add(message);
