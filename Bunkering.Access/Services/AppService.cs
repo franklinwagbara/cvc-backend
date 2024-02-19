@@ -1060,7 +1060,8 @@ namespace Bunkering.Access.Services
         private async Task<ApiResponse> GetMyDeskFAD(ApplicationUser? user)
         {
             //checked 
-            var coq = await _unitOfWork.CoQ.Find(x => x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)));
+            var coq = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id));
+            //var coq = await _unitOfWork.CoQ.Find(x => x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)));
             var processingPlantCoQs = await _unitOfWork.ProcessingPlantCoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Plant,Product");
 
             ApplicationType? apptype = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));

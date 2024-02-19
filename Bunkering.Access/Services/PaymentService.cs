@@ -190,7 +190,7 @@ namespace Bunkering.Access.Services
                         _response = new ApiResponse { Message = "This COQ record does not exist or has been removed from the system, kindly contact support.", StatusCode = HttpStatusCode.NotFound };
                     else
                     {
-                        var coqRef = await _unitOfWork.CoQReference.FirstOrDefaultAsync(x => x.Id.Equals(id), "DepotCoQ.Application.User.Company, ProcessingPlantCOQ.Plant");
+                        var coqRef = await _unitOfWork.CoQReference.FirstOrDefaultAsync(x => x.Id.Equals(id));
                         var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));
                         var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.ApplicationTypeId.Equals(appType.Id) && x.COQId.Equals(coqRef.Id));
 
@@ -200,30 +200,32 @@ namespace Bunkering.Access.Services
                         {
                             if (coqRef.PlantCoQId == null)
                             {
-                                var prd = _context.ApplicationDepots.Include(p => p.Product).FirstOrDefault(x => x.AppId == coqRef.DepotCoQ.AppId);
+                                var depotCoq = await _unitOfWork.CoQ.FirstOrDefaultAsync(d => d.Id.Equals(coqRef.DepotCoQId), "Application.User");
+                                var prd = _context.ApplicationDepots.Include(p => p.Product).FirstOrDefault(x => x.AppId == depotCoq.AppId);
                                 string productType = prd.Product?.ProductType ?? string.Empty;
 
-                                orderid = coqRef.DepotCoQ.Reference;
-                                appId = coqRef.DepotCoQ.AppId;
-                                compElpsId = coqRef.DepotCoQ.Application.User.ElpsId;
-                                facName = coqRef.DepotCoQ.Plant.Name;
-                                companyName = coqRef.DepotCoQ.Application.User.Company.Name;
-                                companyEmail = coqRef.DepotCoQ.Application.User.Email;
+                                orderid = depotCoq.Reference;
+                                appId = depotCoq.AppId;
+                                compElpsId = depotCoq.Application.User.ElpsId;
+                                facName = depotCoq.Plant.Name;
+                                companyName = depotCoq.Application.User.Company.Name;
+                                companyEmail = depotCoq.Application.User.Email;
                                 description = $"Debit note amount for CoQ with reference {orderid} for {companyName}({facName})";
 
-                                total = productType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.Gas)) ? coqRef.DepotCoQ.MT_VAC * coqRef.DepotCoQ.DepotPrice * 0.01 : coqRef.DepotCoQ.GSV * coqRef.DepotCoQ.DepotPrice * 0.01;
+                                total = productType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.Gas)) ? depotCoq.MT_VAC * depotCoq.DepotPrice * 0.01 : depotCoq.GSV * depotCoq.DepotPrice * 0.01;
                             }
                             else
                             {
-                                var processingPlant = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id.Equals(coqRef.ProcessingPlantCOQ.PlantId));
-                                orderid = coqRef.ProcessingPlantCOQ.Reference;
-                                compElpsId = (int)processingPlant.ElpsPlantId.Value;
-                                facName = processingPlant.Name;
-                                companyName = processingPlant.Company;
-                                companyEmail = processingPlant.Email;
+                                var ppCoq = await _unitOfWork.ProcessingPlantCoQ.FirstOrDefaultAsync(p => p.ProcessingPlantCOQId.Equals(coqRef.PlantCoQId), "Plant");
+                                //var processingPlant = await _unitOfWork.Plant.FirstOrDefaultAsync(x => x.Id.Equals(coqRef.ProcessingPlantCOQ.PlantId));
+                                orderid = ppCoq.Reference;
+                                compElpsId = (int)ppCoq.Plant.ElpsPlantId.Value;
+                                facName = ppCoq.Plant.Name;
+                                companyName = ppCoq.Plant.Company;
+                                companyEmail = ppCoq.Plant.Email;
                                 description = $"Debit note amount for CoQ with reference {orderid} for {companyName}({facName})";
 
-                                total = coqRef.ProcessingPlantCOQ.TotalMTVac.Value * coqRef.ProcessingPlantCOQ.Price * 0.01;
+                                total = ppCoq.TotalMTVac.Value * ppCoq.Price * 0.01;
                             }
 
                             payment = new Payment
