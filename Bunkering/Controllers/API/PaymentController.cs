@@ -142,7 +142,7 @@ namespace Bunkering.Controllers.API
         /// <remarks>
         /// 
         /// Sample Request
-        /// GET: api/application/get-debit-botes-by-appid
+        /// GET: api/application/get-debit-notes-by-appid
         /// 
         /// </remarks>
         /// <response code="200">Returns a list of Debit notes for an application </response>
@@ -164,7 +164,7 @@ namespace Bunkering.Controllers.API
         /// <remarks>
         /// 
         /// Sample Request
-        /// GET: api/application/get-pending-payments-by-appid
+        /// GET: api/application/get-pending-payments-by-coqid
         /// 
         /// </remarks>
         /// <response code="200">Returns a list of pending payments for an application </response>
@@ -175,9 +175,9 @@ namespace Bunkering.Controllers.API
         [ProducesResponseType(typeof(ApiResponse), 404)]
         [ProducesResponseType(typeof(ApiResponse), 405)]
         [ProducesResponseType(typeof(ApiResponse), 500)]
-        [Route("get-pending-payments-by-appid")]
+        [Route("get-pending-payments-by-id")]
         [HttpGet]
-        public async Task<IActionResult> GetPendingPaymentsByAppId(int Id) => Response(await _payment.GetPendingPaymentsByAppId(Id));
+        public async Task<IActionResult> GetPendingPaymentsByAppId(int Id) => Response(await _payment.GetPendingPaymentsById(Id));
 
 
         [AllowAnonymous]
