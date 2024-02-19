@@ -308,6 +308,8 @@ namespace Bunkering.Access.Services
 					user.LastName = model.LastName;
 					user.IsActive = model.IsActive;
 					user.Directorate = model.Directorate;
+					user.LocationId = model.LocationId;
+					user.OfficeId = model.OfficeId;
 
                     if (model.SignatureFile?.Length > 0)
                     {
@@ -317,7 +319,6 @@ namespace Bunkering.Access.Services
                             var fileBytes = ms.ToArray();
                             user.Signature = Convert.ToBase64String(fileBytes);
                         }
-
                     }
 
                     await _userManager.UpdateAsync(user);
