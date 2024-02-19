@@ -15,6 +15,7 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
+using System.Transactions;
 
 namespace Bunkering.Access.Services
 {
@@ -201,7 +202,7 @@ namespace Bunkering.Access.Services
                             if (coqRef.PlantCoQId == null)
                             {
                                 var depotCoq = await _unitOfWork.CoQ.FirstOrDefaultAsync(d => d.Id.Equals(coqRef.DepotCoQId), "Application.User");
-                                var prd = _context.ApplicationDepots.Include(p => p.Product).FirstOrDefault(x => x.AppId == depotCoq.AppId);
+                                var prd = _context.ApplicationDepots.Include(p => p.Product).FirstOrDefault(x => x.AppId == depotCoq.AppId && x.DepotId.Equals(depotCoq.PlantId));
                                 string productType = prd.Product?.ProductType ?? string.Empty;
 
                                 orderid = depotCoq.Reference;
@@ -212,7 +213,7 @@ namespace Bunkering.Access.Services
                                 companyEmail = depotCoq.Application.User.Email;
                                 description = $"Debit note amount for CoQ with reference {orderid} for {companyName}({facName})";
 
-                                total = productType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.Gas)) ? depotCoq.MT_VAC * depotCoq.DepotPrice * 0.01 : depotCoq.GSV * depotCoq.DepotPrice * 0.01;
+                                total = productType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.Gas)) ? depotCoq.MT_VAC * depotCoq.DepotPrice * 0.01 : depotCoq.GOV * depotCoq.DepotPrice * 0.01;
                             }
                             else
                             {
@@ -734,13 +735,29 @@ namespace Bunkering.Access.Services
             try
             {
                 var debitnoteId = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));
-                var debitnotes = await _unitOfWork.vDebitNote.Find(x => x.ApplicationId.Equals(id) && x.ApplicationTypeId.Equals(debitnoteId.Id));
+                var debitnotes = await _unitOfWork.Payment.Find(x => x.ApplicationId.Equals(id) && x.ApplicationTypeId.Equals(debitnoteId.Id));
 
                 if (debitnotes == null)
                     throw new Exception("Debit note does not exist for this application!");
 
-                //var depot = await _unitOfWork.Depot.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.Id));  
-                //var product = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(appDepot.ProductId));
+                var coqRefs = await _unitOfWork.CoQReference.Find(c => debitnotes.Any(d => d.COQId.Equals(c.Id)));
+                var dic = new Dictionary<int, string>();
+                var depotCoqs = await _unitOfWork.CoQ.GetAll("Plant");
+                var plantCoqs = await _unitOfWork.ProcessingPlantCoQ.GetAll("Plant");
+
+                foreach(var item in coqRefs)
+                {
+                    if(item.PlantCoQId == null)
+                    {
+                        var depot = depotCoqs.FirstOrDefault(d => d.Id.Equals(item.DepotCoQId));
+                        dic.Add(item.Id, depot.Plant.Name);
+                    }
+                    else
+                    {
+                        var depot = plantCoqs.FirstOrDefault(d => d.ProcessingPlantCOQId.Equals(item.PlantCoQId));
+                        dic.Add(item.Id, depot.Plant.Name);
+                    }
+                }
 
                 return new ApiResponse
                 {
@@ -749,10 +766,9 @@ namespace Bunkering.Access.Services
                         x.Id,
                         x.COQId,
                         x.OrderId,
-                        x.ApptypeName,
-                        x.TransactionDate,
+                        AddedDate = x.TransactionDate.ToString("yyyy-MM-dd hh:mm:ss"),
                         x.Status,
-                        x.DepotName,
+                        DepotName = dic.FirstOrDefault(p => p.Key.Equals(x.COQId)).Value,
                         x.Description,
                         x.PaymentDate,
                         x.RRR,
@@ -776,36 +792,44 @@ namespace Bunkering.Access.Services
             }
         }
 
-        public async Task<ApiResponse> GetPendingPaymentsByAppId(int id)
+        public async Task<ApiResponse> GetPendingPaymentsById(int id)
         {
             try
             {
-                var payments = await _unitOfWork.vDebitNote.Find(x => x.ApplicationId.Equals(id) && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentPending)));
+                var payments = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.Id.Equals(id), "DemandNotices");
 
                 if (payments == null)
                     throw new Exception("No pending payment found for this application!");
 
+                var response = new List<PaymentDTO>
+                {
+                    new PaymentDTO
+                    {
+                        Id = payments.Id,
+                        Amount = payments.Amount,
+                        CraetedDate = payments.TransactionDate.ToString("yyyy-MM-dd hh:mm:ss"),
+                        Description = payments.Description,
+                        PaymentType = Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)
+                    }
+                };
+
+                if (payments.DemandNotices != null && payments.DemandNotices.Count() > 0)
+                    foreach (var d in payments.DemandNotices)
+                        response.Add(new PaymentDTO
+                        {
+                            Id = payments.Id,
+                            Amount = d.Amount,
+                            CraetedDate = d.AddedDate.ToString("yyyy-MM-dd hh:mm:ss"),
+                            Description = d.Description,
+                            PaymentType = Enum.GetName(typeof(AppTypes), AppTypes.DemandNotice)
+                        });
+
                 return new ApiResponse
                 {
-                    Data = payments.Select(x => new
-                    {
-                        x.Id,
-                        x.COQId,
-                        x.OrderId,
-                        x.ApptypeName,
-                        x.TransactionDate,
-                        x.Status,
-                        x.DepotName,
-                        x.Description,
-                        x.PaymentDate,
-                        x.RRR,
-                        x.Amount,
-                        x.ServiceCharge,
-                        x.Arrears
-                    }),
-                    Message = "Successfull",
+                    Data = response,
+                    Message = "Successful",
                     StatusCode = HttpStatusCode.OK,
-                    Success = false
+                    Success = true
                 };
             }
             catch (Exception e)
