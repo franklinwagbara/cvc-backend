@@ -271,9 +271,14 @@ namespace Bunkering.Access.Services
                 {
                     Content = new StringContent(debitNoteSAPPostRequest.Stringify(), Encoding.UTF8, "application/json")
                 };
-                httpRequest.Headers.Authorization = new AuthenticationHeaderValue("X-API-Key",
+                httpRequest.Headers.Add("X-API-Key",
                     _appSetting.SAPKey);
                 var notifySAP = await Utils.Send(_appSetting.SAPBaseUrl, httpRequest);
+
+                if(notifySAP.IsSuccessStatusCode)
+                {
+                    var content = await notifySAP.Content.ReadAsStringAsync();
+                }
 
                 return true;
             }
@@ -290,34 +295,34 @@ namespace Bunkering.Access.Services
 
             return new DebitNoteSAPRequestDTO
             {
-                BankAccount = _appSetting.NMDPRAAccount,
-                Directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.DSSRI),
-                CustomerAddress = coq.Application.User.Company.Address,
-                CustomerCode = $"{coq.Application.User.ElpsId}",
-                CustomerEmail = coq.Application.User.Email,
-                CustomerName = coq.Application.User.Company.Name,
-                DocumentCurrency = "NGN",
-                Id = coq.Reference,
-                CustomerState = plant.State,
-                DebitNoteType = "0.5%",
-                Location = plant.State,
-                PaymentAmount = debitNote.Amount,
-                PostingDate = DateTime.UtcNow.AddHours(1).Date.ToString("yyyy-MM-dd"),
-                CustomerPhoneNumber1 = coq.Application.User.PhoneNumber,
-                Lines = new List<DebitNoteLine>
+                bankAccount = _appSetting.NMDPRAAccount,
+                directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.DSSRI),
+                customerAddress = coq.Application.User.Company.Address,
+                customerCode = $"{coq.Application.User.ElpsId}",
+                customerEmail = coq.Application.User.Email,
+                customerName = coq.Application.User.Company.Name,
+                documentCurrency = "NGN",
+                id = coq.Reference,
+                customerState = plant.State,
+                debitNoteType = "0.5%",
+                location = plant.State,
+                paymentAmount = debitNote.Amount,
+                postingDate = DateTime.UtcNow.AddHours(1).Date.ToString("yyyy-MM-dd"),
+                customerPhoneNumber1 = coq.Application.User.PhoneNumber,
+                lines = new List<DebitNoteLine>
                 {
                     new DebitNoteLine
                     {
-                        AppliedFactor = 1,
-                        MotherVesselName = coq.Application.MotherVessel,
-                        DaughterVesselName = coq.Application.Facility.Name,
-                        Depot = plant.Name,
-                        Directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.DSSRI),
-                        ProductOrServiceType = product.Product.Name,
-                        RevenueDescription = debitNote.Description,
-                        ShoreVolume = product.Product.ProductType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.Gas)) ? coq.MT_VAC : coq.GSV,
-                        RevenueCode = Enum.GetName(typeof(AppTypes), AppTypes.DebitNote),
-                        WholeSalePrice = coq.DepotPrice
+                        appliedFactor = 1,
+                        motherVesselName = coq.Application.MotherVessel,
+                        daughterVesselName = coq.Application.Facility.Name,
+                        depot = plant.Name,
+                        directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.DSSRI),
+                        productOrServiceType = product.Product.Name,
+                        revenueDescription = debitNote.Description,
+                        shoreVolume = product.Product.ProductType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.Gas)) ? coq.MT_VAC : coq.GSV,
+                        revenueCode = Enum.GetName(typeof(AppTypes), AppTypes.DebitNote),
+                        wholeSalePrice = coq.DepotPrice
                     }
                 }
             };
@@ -328,32 +333,32 @@ namespace Bunkering.Access.Services
             var company = await _userManager.Users.Include(c => c.Company).FirstOrDefaultAsync(u => u.ElpsId.Equals(plant.CompanyElpsId));
             return new DebitNoteSAPRequestDTO
             {
-                BankAccount = _appSetting.NMDPRAAccount,
-                Directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.HPPITI),
-                CustomerAddress = company.Company.Address,
-                CustomerCode = $"{company.ElpsId}",
-                CustomerEmail = company.Email,
-                CustomerName = company.Company.Name,
-                DocumentCurrency = "NGN",
-                Id = coq.Reference,
-                CustomerState = plant.State,
-                DebitNoteType = "0.5%",
-                Location = plant.State,
-                PaymentAmount = debitNote.Amount,
-                PostingDate = DateTime.UtcNow.AddHours(1).Date.ToString("yyyy-MM-dd"),
-                CustomerPhoneNumber1 = company.PhoneNumber,
-                Lines = new List<DebitNoteLine>
+                bankAccount = _appSetting.NMDPRAAccount,
+                directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.HPPITI),
+                customerAddress = company.Company.Address,
+                customerCode = $"{company.ElpsId}",
+                customerEmail = company.Email,
+                customerName = company.Company.Name,
+                documentCurrency = "NGN",
+                id = coq.Reference,
+                customerState = plant.State,
+                debitNoteType = "0.5%",
+                location = plant.State,
+                paymentAmount = debitNote.Amount,
+                postingDate = DateTime.UtcNow.AddHours(1).Date.ToString("yyyy-MM-dd"),
+                customerPhoneNumber1 = company.PhoneNumber,
+                lines = new List<DebitNoteLine>
                 {
                     new DebitNoteLine
                     {
-                        AppliedFactor = 1,
-                        Depot = plant.Name,
-                        Directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.HPPITI),
-                        ProductOrServiceType = coq.Product.Name,
-                        RevenueDescription = debitNote.Description,
-                        ShoreVolume = coq.TotalMTVac.Value,
-                        RevenueCode = Enum.GetName(typeof(AppTypes), AppTypes.DebitNote),
-                        WholeSalePrice = coq.Price
+                        appliedFactor = 1,
+                        depot = plant.Name,
+                        directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.HPPITI),
+                        productOrServiceType = coq.Product.Name,
+                        revenueDescription = debitNote.Description,
+                        shoreVolume = coq.TotalMTVac.Value,
+                        revenueCode = Enum.GetName(typeof(AppTypes), AppTypes.DebitNote),
+                        wholeSalePrice = coq.Price
                     }
                 }
             };

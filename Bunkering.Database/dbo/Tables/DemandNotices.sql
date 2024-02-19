@@ -7,8 +7,11 @@
     [Amount]      FLOAT (53)     NOT NULL,
     [Description] NVARCHAR (MAX) NOT NULL,
     [Paid]        BIT            NOT NULL,
-    CONSTRAINT [PK_DemandNotices] PRIMARY KEY CLUSTERED ([Id] ASC)
+    CONSTRAINT [PK_DemandNotices] PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [FK_DemandNotices_Payments] FOREIGN KEY ([DebitNoteId]) REFERENCES [dbo].[Payments] ([Id])
 );
+
+
 
 
 

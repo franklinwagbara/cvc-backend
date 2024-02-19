@@ -13,5 +13,7 @@ namespace Bunkering.Core.Data
         public string AddedBy { get; set; }
         public string Description { get; set; }
         public bool Paid { get; set; }
+        [ForeignKey(nameof(DebitNoteId))]
+        public Payment DebitNote { get; set; }
     }
 }
