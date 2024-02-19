@@ -943,7 +943,7 @@ namespace Bunkering.Access.Services
                 {
                     var message = new Message
                     {
-                        ApplicationId = coq.Id,
+                        COQId = coq.Id,
                         Subject = $"COQ with reference {coq.Reference} Submitted",
                         Content = $"COQ with reference {coq.Reference} has been submitted to your desk for further processing",
                         UserId = user.Id,
