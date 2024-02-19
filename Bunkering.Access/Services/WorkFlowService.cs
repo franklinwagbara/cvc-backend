@@ -594,7 +594,7 @@ namespace Bunkering.Access.Services
             else
             {
                 // var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == appid, "User.UserRoles.Role");
-                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id.Equals(coqId)) ?? throw new Exception($"Unable to find COQ with ID={coqId}.");
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id.Equals(coqId), "Application.User.UserRoles.Role") ?? throw new Exception($"Unable to find COQ with ID={coqId}.");
 
                 if (action.Equals(Enum.GetName(typeof(AppActions), AppActions.Resubmit)) || action.Equals(Enum.GetName(typeof(AppActions), AppActions.Reject)))
                 {
@@ -622,8 +622,8 @@ namespace Bunkering.Access.Services
                 {
                     if (wkflow.TargetRole.Equals(currentUser.UserRoles.FirstOrDefault().Role.Id))
                         nextprocessingofficer = currentUser;
-                    // else if (wkflow.TargetRole.Equals(app.User.UserRoles.FirstOrDefault().Role.Name))
-                    //     nextprocessingofficer = app.User;
+                    else if (wkflow.TargetRole.Equals(coq.Application.User.UserRoles.FirstOrDefault().Role.Id))
+                        nextprocessingofficer = coq.Application.User;
                     else
                     {
                         var users = !action.Equals(Enum.GetName(typeof(AppActions), AppActions.Submit))
@@ -640,13 +640,6 @@ namespace Bunkering.Access.Services
                                 .Where(x => x.UserRoles.Any(y => y.Role.Id.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
                                 && x.IsActive).ToList();
 
-                        //foreach (var user in users)
-                        //{
-                        //    if (!user.UserRoles.Any(c => c.Role.Name == RoleConstants.COMPANY) && user.LocationId != wkflow.ToLocationId)
-                        //    {
-                        //        users.Remove(user);
-                        //    }
-                        //}
                         nextprocessingofficer = users.OrderBy(x => x.LastJobDate).FirstOrDefault();
                     }
                 }
