@@ -640,13 +640,13 @@ namespace Bunkering.Access.Services
                                 .Where(x => x.UserRoles.Any(y => y.Role.Id.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
                                 && x.IsActive).ToList();
 
-                        foreach (var user in users)
-                        {
-                            if (!user.UserRoles.Any(c => c.Role.Name == RoleConstants.COMPANY) && user.LocationId != wkflow.ToLocationId)
-                            {
-                                users.Remove(user);
-                            }
-                        }
+                        //foreach (var user in users)
+                        //{
+                        //    if (!user.UserRoles.Any(c => c.Role.Name == RoleConstants.COMPANY) && user.LocationId != wkflow.ToLocationId)
+                        //    {
+                        //        users.Remove(user);
+                        //    }
+                        //}
                         nextprocessingofficer = users.OrderBy(x => x.LastJobDate).FirstOrDefault();
                     }
                 }
