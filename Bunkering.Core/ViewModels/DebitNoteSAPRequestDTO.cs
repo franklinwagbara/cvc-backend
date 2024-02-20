@@ -8,48 +8,48 @@ namespace Bunkering.Core.ViewModels
 {
     public class DebitNoteSAPRequestDTO
     {
-        public string Id { get; set; }
-        public string Location { get; set; }
-        public string CustomerCode { get; set; }
-        public string CustomerName { get; set; }
-        public string PostingDate { get; set; }
-        public string DebitNoteType { get; set; }
-        public string Directorate { get; set; }
-        public string BankAccount { get; set; }
-        public string DocumentCurrency { get; set; }
-        public bool IsPaid { get; set; }
-        public string PaymentReference { get; set; }
-        public double PaymentAmount { get; set; }
-        public List<DebitNoteLine> Lines { get; set; }
-        public string CustomerAddress { get; set; }
-        public string CustomerEmail { get; set; }
-        public string CustomerPhoneNumber1 { get; set; }
-        public string CustomerPhoneNumber2 { get; set; }
-        public string CustomerState { get; set; }
-        public List<DebitNoteContact> Contacts { get; set; }
+        public string id { get; set; }
+        public string location { get; set; }
+        public string customerCode { get; set; }
+        public string customerName { get; set; }
+        public string postingDate { get; set; }
+        public string debitNoteType { get; set; }
+        public string directorate { get; set; }
+        public string bankAccount { get; set; }
+        public string documentCurrency { get; set; }
+        public bool isPaid { get; set; }
+        public string paymentReference { get; set; }
+        public double paymentAmount { get; set; }
+        public List<DebitNoteLine> lines { get; set; }
+        public string customerAddress { get; set; }
+        public string customerEmail { get; set; }
+        public string customerPhoneNumber1 { get; set; }
+        public string customerPhoneNumber2 { get; set; }
+        public string customerState { get; set; }
+        public List<DebitNoteContact> contacts { get; set; }
     }
 
     public class DebitNoteLine
     {
-        public string RevenueCode { get; set; }
-        public string RevenueDescription { get; set; }
+        public string revenueCode { get; set; }
+        public string revenueDescription { get; set; }
         public int quantity => 1;
-        public double ShoreVolume { get; set; }
-        public double WholeSalePrice { get; set; }
-        public double AppliedFactor { get; set; }
-        public string Directorate { get; set; }
-        public string ProductOrServiceType { get; set; }
-        public string DaughterVesselName { get; set; }
-        public string MotherVesselName { get; set; }
-        public string Supplier { get; set; }
-        public string Depot { get; set; }
+        public double shoreVolume { get; set; }
+        public double wholeSalePrice { get; set; }
+        public double appliedFactor { get; set; }
+        public string directorate { get; set; }
+        public string productOrServiceType { get; set; }
+        public string daughterVesselName { get; set; }
+        public string motherVesselName { get; set; }
+        public string dupplier { get; set; }
+        public string depot { get; set; }
     }
 
     public class DebitNoteContact
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
-        public string PhoneNumber { get; set; }
+        public string firstName { get; set; }
+        public string lastName { get; set; }
+        public string email { get; set; }
+        public string phoneNumber { get; set; }
     }
 }

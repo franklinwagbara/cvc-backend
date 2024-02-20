@@ -183,7 +183,7 @@ namespace Bunkering.Access.Services
             {
                 var isProcessingPlant = false;
                     //return (false, $"Application with Id={coq.AppId} was not found.");
-                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id.Equals(coqId), "Application.User.Company,Application.Facility.VesselType,Payments") ?? throw new Exception($"COQ with Id={coqId} was not found.");
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id.Equals(coqId), "Application.User.Company,Application.Facility.VesselType") ?? throw new Exception($"COQ with Id={coqId} was not found.");
                 if (coq is not null && coq.AppId is null)
                 {
                     isProcessingPlant = true;
@@ -195,7 +195,8 @@ namespace Bunkering.Access.Services
                 currUserId = string.IsNullOrEmpty(currUserId) ? coq.CurrentDeskId : currUserId;
                 var currentUser = _userManager.Users.Include(x => x.Company).Include(ol => ol.Office).Include(lo => lo.UserRoles).ThenInclude(r => r.Role)
                         .Include(lo => lo.Location).FirstOrDefault(x => x.Id.Equals(currUserId)) ?? throw new Exception($"User with Id={currUserId} was not found.");
-                var workFlow = (await GetWorkFlow(action, currentUser, coq.Application?.Facility?.VesselTypeId ?? 1, coq.Application.ApplicationTypeId)) ?? throw new Exception($"Work Flow for this action was not found.");
+                var apptypes = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(a => a.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.COQ)));
+                var workFlow = (await GetWorkFlow(action, currentUser, coq.Application?.Facility?.VesselTypeId ?? 1, apptypes.Id)) ?? throw new Exception($"Work Flow for this action was not found.");
                 var nextProcessingOfficer = (await GetNextStaffCOQ(coqId, action, workFlow, currentUser, delUserId)) ?? throw new Exception($"No processing staff for this action was not found.");
 
                 coq.CurrentDeskId = nextProcessingOfficer.Id;
@@ -270,9 +271,14 @@ namespace Bunkering.Access.Services
                 {
                     Content = new StringContent(debitNoteSAPPostRequest.Stringify(), Encoding.UTF8, "application/json")
                 };
-                httpRequest.Headers.Authorization = new AuthenticationHeaderValue("X-API-Key",
+                httpRequest.Headers.Add("X-API-Key",
                     _appSetting.SAPKey);
                 var notifySAP = await Utils.Send(_appSetting.SAPBaseUrl, httpRequest);
+
+                if(notifySAP.IsSuccessStatusCode)
+                {
+                    var content = await notifySAP.Content.ReadAsStringAsync();
+                }
 
                 return true;
             }
@@ -289,34 +295,34 @@ namespace Bunkering.Access.Services
 
             return new DebitNoteSAPRequestDTO
             {
-                BankAccount = _appSetting.NMDPRAAccount,
-                Directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.DSSRI),
-                CustomerAddress = coq.Application.User.Company.Address,
-                CustomerCode = $"{coq.Application.User.ElpsId}",
-                CustomerEmail = coq.Application.User.Email,
-                CustomerName = coq.Application.User.Company.Name,
-                DocumentCurrency = "NGN",
-                Id = coq.Reference,
-                CustomerState = plant.State,
-                DebitNoteType = "0.5%",
-                Location = plant.State,
-                PaymentAmount = debitNote.Amount,
-                PostingDate = DateTime.UtcNow.AddHours(1).Date.ToString("yyyy-MM-dd"),
-                CustomerPhoneNumber1 = coq.Application.User.PhoneNumber,
-                Lines = new List<DebitNoteLine>
+                bankAccount = _appSetting.NMDPRAAccount,
+                directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.DSSRI),
+                customerAddress = coq.Application.User.Company.Address,
+                customerCode = $"{coq.Application.User.ElpsId}",
+                customerEmail = coq.Application.User.Email,
+                customerName = coq.Application.User.Company.Name,
+                documentCurrency = "NGN",
+                id = coq.Reference,
+                customerState = plant.State,
+                debitNoteType = "0.5%",
+                location = plant.State,
+                paymentAmount = debitNote.Amount,
+                postingDate = DateTime.UtcNow.AddHours(1).Date.ToString("yyyy-MM-dd"),
+                customerPhoneNumber1 = coq.Application.User.PhoneNumber,
+                lines = new List<DebitNoteLine>
                 {
                     new DebitNoteLine
                     {
-                        AppliedFactor = 1,
-                        MotherVesselName = coq.Application.MotherVessel,
-                        DaughterVesselName = coq.Application.Facility.Name,
-                        Depot = plant.Name,
-                        Directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.DSSRI),
-                        ProductOrServiceType = product.Product.Name,
-                        RevenueDescription = debitNote.Description,
-                        ShoreVolume = product.Product.ProductType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.Gas)) ? coq.MT_VAC : coq.GSV,
-                        RevenueCode = Enum.GetName(typeof(AppTypes), AppTypes.DebitNote),
-                        WholeSalePrice = coq.DepotPrice
+                        appliedFactor = 1,
+                        motherVesselName = coq.Application.MotherVessel,
+                        daughterVesselName = coq.Application.Facility.Name,
+                        depot = plant.Name,
+                        directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.DSSRI),
+                        productOrServiceType = product.Product.Name,
+                        revenueDescription = debitNote.Description,
+                        shoreVolume = product.Product.ProductType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.Gas)) ? coq.MT_VAC : coq.GSV,
+                        revenueCode = Enum.GetName(typeof(AppTypes), AppTypes.DebitNote),
+                        wholeSalePrice = coq.DepotPrice
                     }
                 }
             };
@@ -327,32 +333,32 @@ namespace Bunkering.Access.Services
             var company = await _userManager.Users.Include(c => c.Company).FirstOrDefaultAsync(u => u.ElpsId.Equals(plant.CompanyElpsId));
             return new DebitNoteSAPRequestDTO
             {
-                BankAccount = _appSetting.NMDPRAAccount,
-                Directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.HPPITI),
-                CustomerAddress = company.Company.Address,
-                CustomerCode = $"{company.ElpsId}",
-                CustomerEmail = company.Email,
-                CustomerName = company.Company.Name,
-                DocumentCurrency = "NGN",
-                Id = coq.Reference,
-                CustomerState = plant.State,
-                DebitNoteType = "0.5%",
-                Location = plant.State,
-                PaymentAmount = debitNote.Amount,
-                PostingDate = DateTime.UtcNow.AddHours(1).Date.ToString("yyyy-MM-dd"),
-                CustomerPhoneNumber1 = company.PhoneNumber,
-                Lines = new List<DebitNoteLine>
+                bankAccount = _appSetting.NMDPRAAccount,
+                directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.HPPITI),
+                customerAddress = company.Company.Address,
+                customerCode = $"{company.ElpsId}",
+                customerEmail = company.Email,
+                customerName = company.Company.Name,
+                documentCurrency = "NGN",
+                id = coq.Reference,
+                customerState = plant.State,
+                debitNoteType = "0.5%",
+                location = plant.State,
+                paymentAmount = debitNote.Amount,
+                postingDate = DateTime.UtcNow.AddHours(1).Date.ToString("yyyy-MM-dd"),
+                customerPhoneNumber1 = company.PhoneNumber,
+                lines = new List<DebitNoteLine>
                 {
                     new DebitNoteLine
                     {
-                        AppliedFactor = 1,
-                        Depot = plant.Name,
-                        Directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.HPPITI),
-                        ProductOrServiceType = coq.Product.Name,
-                        RevenueDescription = debitNote.Description,
-                        ShoreVolume = coq.TotalMTVac.Value,
-                        RevenueCode = Enum.GetName(typeof(AppTypes), AppTypes.DebitNote),
-                        WholeSalePrice = coq.Price
+                        appliedFactor = 1,
+                        depot = plant.Name,
+                        directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.HPPITI),
+                        productOrServiceType = coq.Product.Name,
+                        revenueDescription = debitNote.Description,
+                        shoreVolume = coq.TotalMTVac.Value,
+                        revenueCode = Enum.GetName(typeof(AppTypes), AppTypes.DebitNote),
+                        wholeSalePrice = coq.Price
                     }
                 }
             };
@@ -593,7 +599,7 @@ namespace Bunkering.Access.Services
             else
             {
                 // var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == appid, "User.UserRoles.Role");
-                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id.Equals(coqId)) ?? throw new Exception($"Unable to find COQ with ID={coqId}.");
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id.Equals(coqId), "Application.User.UserRoles.Role") ?? throw new Exception($"Unable to find COQ with ID={coqId}.");
 
                 if (action.Equals(Enum.GetName(typeof(AppActions), AppActions.Resubmit)) || action.Equals(Enum.GetName(typeof(AppActions), AppActions.Reject)))
                 {
@@ -621,8 +627,8 @@ namespace Bunkering.Access.Services
                 {
                     if (wkflow.TargetRole.Equals(currentUser.UserRoles.FirstOrDefault().Role.Id))
                         nextprocessingofficer = currentUser;
-                    // else if (wkflow.TargetRole.Equals(app.User.UserRoles.FirstOrDefault().Role.Name))
-                    //     nextprocessingofficer = app.User;
+                    else if (wkflow.TargetRole.Equals(coq.Application.User.UserRoles.FirstOrDefault().Role.Id))
+                        nextprocessingofficer = coq.Application.User;
                     else
                     {
                         var users = !action.Equals(Enum.GetName(typeof(AppActions), AppActions.Submit))
@@ -639,13 +645,6 @@ namespace Bunkering.Access.Services
                                 .Where(x => x.UserRoles.Any(y => y.Role.Id.ToLower().Trim().Equals(wkflow.TargetRole.ToLower().Trim()))
                                 && x.IsActive).ToList();
 
-                        foreach (var user in users)
-                        {
-                            if (!user.UserRoles.Any(c => c.Role.Name == RoleConstants.COMPANY) && user.LocationId != wkflow.ToLocationId)
-                            {
-                                users.Remove(user);
-                            }
-                        }
                         nextprocessingofficer = users.OrderBy(x => x.LastJobDate).FirstOrDefault();
                     }
                 }
