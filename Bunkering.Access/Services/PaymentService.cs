@@ -233,7 +233,7 @@ namespace Bunkering.Access.Services
                             _response = new ApiResponse
                             {
                                 Message = successMsg,
-                                Data = payment.RRR,
+                                Data = {CreateDebitNoteRRR = payment.RRR },
                                 StatusCode = HttpStatusCode.OK,
                                 Success = true
                             };
@@ -675,7 +675,7 @@ namespace Bunkering.Access.Services
                                     || (!string.IsNullOrEmpty(dic.GetValue("status").ToString()) && dic.GetValue("status").ToString().Equals("00")))
                                 {
                                     payment.Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted);
-                                    payment.TransactionDate = Convert.ToDateTime(dic.GetValue("transactiontime"));
+                                    //payment.TransactionDate = Convert.ToDateTime(dic.GetValue("transactiontime"));
                                     payment.PaymentDate = Convert.ToDateTime(dic.GetValue("paymentDate"));
                                     payment.AppReceiptId = dic.GetValue("appreceiptid") != null ? dic.GetValue("appreceiptid") : "";
                                     payment.TxnMessage = dic.GetValue("message");
@@ -687,7 +687,7 @@ namespace Bunkering.Access.Services
 
                                     _response = new ApiResponse
                                     {
-                                        Data = new { id = payment.Id },
+                                        Data = new { payment.Id },
                                         Message = "Payment confirmed successfully",
                                         StatusCode = HttpStatusCode.OK,
                                         Success = true,
