@@ -8,6 +8,7 @@ using Bunkering.Core.Utils;
 using Microsoft.Extensions.Options;
 using System.Net;
 using Bunkering.Access.IContracts;
+using Azure;
 
 namespace Bunkering.Controllers.API
 {
@@ -134,8 +135,21 @@ namespace Bunkering.Controllers.API
         [Route("update-payment-status")]
         public async Task<IActionResult> UpdatePaymentStatus([FromForm] string orderId)
         {
-            var payment = await _payment.ConfirmOtherPayment(orderId);
-            return Redirect($"{_appSetting.LoginUrl}/paymentsum/{payment.Data}");
+            var response = await _payment.ConfirmOtherPayment(orderId);
+            if (response.StatusCode.Equals(HttpStatusCode.OK))
+            {
+                var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(p => p.Id.Equals(response.Data));
+
+                var coqRef = await _unitOfWork.CoQReference.FirstOrDefaultAsync(c => c.Id.Equals(payment.COQId));
+                if (coqRef != null)
+                {
+                    if (coqRef.PlantCoQId == null)
+                        return Redirect($"{_appSetting.LoginUrl}/company/approvals/{payment.ApplicationId}/debit-notes");
+                    else
+                        return Redirect($"{_appSetting.LoginUrl}/company/approvals/httpiti/debit-notes");
+                }
+            }
+            return Redirect($"{_appSetting.LoginUrl}/home");
         }
 
 
@@ -225,25 +239,6 @@ namespace Bunkering.Controllers.API
         [Produces("application/json")]
         [HttpGet]
         [Route("create-debit-note-rrr")]
-        public async Task<IActionResult> CreateDebitNoteRRRById(int id)
-        {
-            var response = await _payment.CreateDebitNoteRRR(id);
-            if (response.StatusCode.Equals(HttpStatusCode.OK))
-                return Redirect($"{_appSetting.ElpsUrl}/Payment/Pay?rrr={response.Data}");
-            else
-            {
-                var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(p => p.Id.Equals(id));
-
-                var coqRef = await _unitOfWork.CoQReference.FirstOrDefaultAsync(c => c.Id.Equals(payment.COQId));
-                if(coqRef != null)
-                {
-                    if(coqRef.PlantCoQId == null)
-                        return Redirect($"{_appSetting.LoginUrl}/company/approvals/{payment.ApplicationId}/debit-notes");
-                    else
-                        return Redirect($"{_appSetting.LoginUrl}/company/approvals/httpiti/debit-notes");
-                }
-            }
-            return Redirect($"{_appSetting.LoginUrl}/home");
-        }
+        public async Task<IActionResult> CreateDebitNoteRRRById(int id) => Response(await _payment.CreateDebitNoteRRR(id));
     }
 }
