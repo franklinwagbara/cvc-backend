@@ -601,11 +601,11 @@ namespace Bunkering.Access.DAL
                     payerName = TruncateText(companyName, 25),
                     payerEmail = companyEmail,
                     serviceCharge = Decimal.ToInt32(0).ToString(),
-                    amountDue = Decimal.ToInt32(0).ToString(),
+                    amountDue = (totalAmount * 0.5).ToString("N2"),
                     orderId = appRef,
-                    returnSuccessUrl = $"{baseUrl}/api/Payment/UpdateDebitNote?orderId={appRef}",
-                    returnFailureUrl = $"{baseUrl}/api/Payment/UpdateDebitNote?orderId= {appRef}",
-                    returnBankPaymentUrl = $"{baseUrl}/api/Payment/UpdateDebitNote?orderId= {appRef}",
+                    returnSuccessUrl = $"{baseUrl}/api/Payment/ConfirmOtherPayment?orderId={appRef}",
+                    returnFailureUrl = $"{baseUrl}/api/Payment/ConfirmOtherPayment?orderId= {appRef}",
+                    returnBankPaymentUrl = $"{baseUrl}/api/Payment/ConfirmOtherPayment?orderId= {appRef}",
                     lineItems = new List<RPartner>
                     {
                         new RPartner
@@ -614,7 +614,7 @@ namespace Bunkering.Access.DAL
                             beneficiaryName = _appSetting.NMDPRABName,
                             bankCode = _appSetting.NMDPRABankCode,
                             beneficiaryAccount = _appSetting.NMDPRAAccount,
-                            beneficiaryAmount = (totalAmount * 0.05).ToString("N2"),
+                            beneficiaryAmount = (totalAmount * 0.5).ToString("N2"),
                             deductFeeFrom = "0"
                         },
                         new RPartner
@@ -623,8 +623,8 @@ namespace Bunkering.Access.DAL
                             beneficiaryName = _appSetting.MDGIFBName,
                             bankCode = _appSetting.MDGIFBankCode,
                             beneficiaryAccount = _appSetting.MDGIFAccount,
-                            beneficiaryAmount = (totalAmount * 0.05).ToString("N2"),
-                            deductFeeFrom = "0"
+                            beneficiaryAmount = (totalAmount * 0.5).ToString("N2"),
+                            deductFeeFrom = "1"
                         }
                     },
                     customFields = new List<CustomField>
