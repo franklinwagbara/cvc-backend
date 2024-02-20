@@ -159,7 +159,93 @@ namespace Bunkering.Access.Services
         {
             try
             {
+                var user = await _userManager.FindByEmailAsync(User);
+                var debitnoteTypeId = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(a => a.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote))); 
+                var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(p => p.Id.Equals(id) && p.ApplicationTypeId.Equals(debitnoteTypeId.Id), "DemandNotices");
+                if(payment != null && string.IsNullOrEmpty(payment.RRR))
+                {
+                    var amount = payment.DemandNotices != null && payment.DemandNotices.Count() > 0 ? payment.Amount + payment.DemandNotices.Sum(x => x.Amount) : payment.Amount;
+                    var baseUrl = $"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}";
 
+                    if (amount > 0)
+                    {
+                        string orderid = string.Empty;
+                        string facName = string.Empty;
+                        string companyName = string.Empty;
+                        string companyEmail = string.Empty;
+                        int appId = 0; int compElpsId = 0; int plantElpsId = 0;
+                        var coqRef = await _unitOfWork.CoQReference.FirstOrDefaultAsync(c => c.Id.Equals(payment.COQId));
+                        if(coqRef != null)
+                        {
+                            if (coqRef.PlantCoQId == null)
+                            {
+                                var depotCoq = await _unitOfWork.CoQ.FirstOrDefaultAsync(d => d.Id.Equals(coqRef.DepotCoQId), "Application.User.Company");
+                                var plant = await _unitOfWork.Plant.FirstOrDefaultAsync(p => p.Id.Equals(depotCoq.PlantId));
+                                var prd = _context.ApplicationDepots.Include(p => p.Product).FirstOrDefault(x => x.AppId == depotCoq.AppId && x.DepotId.Equals(depotCoq.PlantId));
+                                string productType = prd.Product?.ProductType ?? string.Empty;
+
+                                orderid = depotCoq.Reference;
+                                appId = depotCoq.AppId.Value;
+                                compElpsId = depotCoq.Application.User.ElpsId;
+                                facName = plant.Name;
+                                companyName = depotCoq.Application.User.Company.Name;
+                                companyEmail = depotCoq.Application.User.Email;
+                                plantElpsId = (int)plant.ElpsPlantId.Value;
+                            }
+                            else
+                            {
+                                var ppCoq = await _unitOfWork.ProcessingPlantCoQ.FirstOrDefaultAsync(p => p.ProcessingPlantCOQId.Equals(coqRef.PlantCoQId), "Plant");
+                                orderid = ppCoq.Reference;
+                                compElpsId = (int)ppCoq.Plant.CompanyElpsId.Value;
+                                facName = ppCoq.Plant.Name;
+                                companyName = ppCoq.Plant.Company;
+                                companyEmail = ppCoq.Plant.Email;
+                                plantElpsId = (int)ppCoq.Plant.ElpsPlantId.Value;
+                            }
+                        }
+
+                        var request = await _elps.GenerateDebitNotePaymentReference($"{baseUrl}", amount, companyName, companyEmail, orderid, facName, compElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DebitNote), payment.Description);
+
+                        if (!string.IsNullOrEmpty(request.RRR))
+                        {
+                            payment.RRR = request.RRR;
+                            await _unitOfWork.Payment.Update(payment);
+                            await _unitOfWork.SaveChangesAsync(user.Id);
+
+                            _logger.LogRequest($"Payment table updated with RRR: {payment.RRR} by {User}", false, directory);
+
+                            #region Send Payment E-Mail To Company
+                            string subject = $"Generation Of Payment For Application With Ref:{orderid}";
+
+                            var emailBody = string.Format($"A Payment RRR: {payment.RRR} has been generated for your application with reference number: {orderid}" +
+                                "<br /><ul>" +
+                                "<li>Amount Generated: {0}</li>" +
+                                "<li>Remita RRR: {1}</li>" +
+                                "<li>Payment Status: {2}</li>" +
+                                "<li>Payment Description: {3}</li>" +
+                                "<li>Vessel Name: {4}</li>" +
+                                "<p>Kindly note that your application will be pending until this payment is completed. </p>",
+                                payment.Amount.ToString(), payment.RRR, payment.Status, payment.Description, $"{facName}-{plantElpsId}");
+
+                            #endregion
+
+                            string successMsg = "RRR (" + payment.RRR + ") generated successfully for company: " + companyName + "; Facility: " + $"{facName}-{plantElpsId}";
+                            _response = new ApiResponse
+                            {
+                                Message = successMsg,
+                                Data = payment.RRR,
+                                StatusCode = HttpStatusCode.OK,
+                                Success = true
+                            };
+                        }
+                        else
+                            _response = new ApiResponse
+                            {
+                                Message = "Unable to generate RRR, pls try again",
+                                StatusCode = HttpStatusCode.InternalServerError
+                            };
+                    }
+                }
             }
             catch(Exception ex) 
             { 
@@ -801,28 +887,60 @@ namespace Bunkering.Access.Services
                 if (payments == null)
                     throw new Exception("No pending payment found for this application!");
 
-                var response = new List<PaymentDTO>
+                var coqRefs = await _unitOfWork.CoQReference.FirstOrDefaultAsync(c => payments.COQId.Equals(c.Id));
+                var dic = new Dictionary<int, string>();
+                var depotCoqs = await _unitOfWork.CoQ.GetAll("Plant");
+                var plantCoqs = await _unitOfWork.ProcessingPlantCoQ.GetAll("Plant");
+                var plantName = string.Empty;
+
+                if (coqRefs != null)
                 {
-                    new PaymentDTO
+                    if (coqRefs.PlantCoQId == null)
                     {
-                        Id = payments.Id,
-                        Amount = payments.Amount,
-                        CraetedDate = payments.TransactionDate.ToString("yyyy-MM-dd hh:mm:ss"),
-                        Description = payments.Description,
-                        PaymentType = Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)
+                        var depot = depotCoqs.FirstOrDefault(d => d.Id.Equals(coqRefs.DepotCoQId));
+                        plantName = depot.Plant.Name;
                     }
+                    else
+                    {
+                        var depot = plantCoqs.FirstOrDefault(d => d.ProcessingPlantCOQId.Equals(coqRefs.PlantCoQId));
+                        plantName = depot.Plant.Name;
+                    }
+                }
+
+                var response = new PaymentDTO
+                {
+                    Id = payments.Id,
+                    OrderId = payments.OrderId,
+                    Status = payments.Status,
+                    Description = payments.Description,
+                    RRR = payments.RRR,
+                    DepotName = plantName,
+                    PaymentTypes = new List<PayType>
+                    {
+                        new PayType
+                        {
+                            Amount = payments.Amount,
+                            CreatedDate = payments.TransactionDate.ToString("yyyy-MM-dd hh:mm:ss"),
+                            PaymentType = Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)
+                        }
+                    }                    
                 };
 
                 if (payments.DemandNotices != null && payments.DemandNotices.Count() > 0)
                     foreach (var d in payments.DemandNotices)
-                        response.Add(new PaymentDTO
+                        response.PaymentTypes.Add(new PayType
                         {
-                            Id = payments.Id,
                             Amount = d.Amount,
-                            CraetedDate = d.AddedDate.ToString("yyyy-MM-dd hh:mm:ss"),
-                            Description = d.Description,
+                            CreatedDate = d.AddedDate.ToString("yyyy-MM-dd hh:mm:ss"),
                             PaymentType = Enum.GetName(typeof(AppTypes), AppTypes.DemandNotice)
                         });
+
+                response.PaymentTypes.Add(new PayType
+                {
+                    Amount = response.PaymentTypes.Sum(i => i.Amount),
+                    CreatedDate = DateTime.UtcNow.AddHours(1).ToString("yyyy-MM-dd hh:mm:ss"),
+                    PaymentType = "ToTal Amount"
+                });
 
                 return new ApiResponse
                 {

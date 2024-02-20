@@ -6,6 +6,8 @@ using Bunkering.Core.ViewModels;
 using Bunkering.Access.Services;
 using Bunkering.Core.Utils;
 using Microsoft.Extensions.Options;
+using System.Net;
+using Bunkering.Access.IContracts;
 
 namespace Bunkering.Controllers.API
 {
@@ -16,11 +18,13 @@ namespace Bunkering.Controllers.API
     {
         private readonly PaymentService _payment;
         private readonly AppSetting _appSetting;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public PaymentController(PaymentService payment, IOptions<AppSetting> appSetting)
+        public PaymentController(PaymentService payment, IOptions<AppSetting> appSetting, IUnitOfWork unitOfWork)
         {
             _payment = payment;
             _appSetting = appSetting.Value;
+            _unitOfWork = unitOfWork;
         }
 
         [ProducesResponseType(typeof(ApiResponse), 200)]
@@ -153,7 +157,7 @@ namespace Bunkering.Controllers.API
         [ProducesResponseType(typeof(ApiResponse), 404)]
         [ProducesResponseType(typeof(ApiResponse), 405)]
         [ProducesResponseType(typeof(ApiResponse), 500)]
-        [Route("get-debit-botes-by-appid")]
+        [Route("get-debit-notes-by-appid")]
         [HttpGet]
         public async Task<IActionResult> GetDebitNotes(int Id) => Response(await _payment.GetDebitNotesByAppId(Id));
 
@@ -213,5 +217,33 @@ namespace Bunkering.Controllers.API
         [Route("PaymentById")]
         public async Task<IActionResult> GetPaymentsById(int id) => Response(await _payment.GetPaymentById(id));
 
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Produces("application/json")]
+        [HttpGet]
+        [Route("create-debit-note-rrr")]
+        public async Task<IActionResult> CreateDebitNoteRRRById(int id)
+        {
+            var response = await _payment.CreateDebitNoteRRR(id);
+            if (response.StatusCode.Equals(HttpStatusCode.OK))
+                return Redirect($"{_appSetting.ElpsUrl}/Payment/Pay?rrr={response.Data}");
+            else
+            {
+                var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(p => p.Id.Equals(id));
+
+                var coqRef = await _unitOfWork.CoQReference.FirstOrDefaultAsync(c => c.Id.Equals(payment.COQId));
+                if(coqRef != null)
+                {
+                    if(coqRef.PlantCoQId == null)
+                        return Redirect($"{_appSetting.LoginUrl}/company/approvals/{payment.ApplicationId}/debit-notes");
+                    else
+                        return Redirect($"{_appSetting.LoginUrl}/company/approvals/httpiti/debit-notes");
+                }
+            }
+            return Redirect($"{_appSetting.LoginUrl}/home");
+        }
     }
 }
