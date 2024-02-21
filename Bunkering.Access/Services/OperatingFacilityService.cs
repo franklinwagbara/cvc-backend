@@ -4,10 +4,12 @@ using Bunkering.Core.Exceptions;
 using Bunkering.Core.Utils;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,27 +19,30 @@ namespace Bunkering.Access.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly UserManager<ApplicationUser> _userManager;
         ApiResponse _response;
+        private string User = string.Empty;
 
-        public OperatingFacilityService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
+        public OperatingFacilityService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
-
+            _userManager = userManager;
+            User = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
         }
 
         public async Task<ApiResponse> CreateOperatingFacility(OpearatingFacilityViewModel model)
         {
-
+            var user = await _userManager.FindByEmailAsync(User);
             try
             {
                 var opFacilityCheck = await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.CompanyEmail == model.CompanyEmail);
                 
                 if (opFacilityCheck != null)
                 {
-                    opFacilityCheck.Name = model.Name;
+                    opFacilityCheck.Name = Enum.GetName(typeof(NameType), model.Name);
                     await _unitOfWork.OperatingFacility.Update(opFacilityCheck);
-                    await _unitOfWork.SaveChangesAsync("");
+                    await _unitOfWork.SaveChangesAsync(user.Id);
 
                     return new ApiResponse
                     {
@@ -54,11 +59,9 @@ namespace Bunkering.Access.Services
                     Name = Enum.GetName(typeof(NameType), model.Name),
                 };
 
-
                 await _unitOfWork.OperatingFacility.Add(opFacility);
-                await _unitOfWork.SaveChangesAsync("");
+                await _unitOfWork.SaveChangesAsync(user.Id);
      
-
                 return new ApiResponse
                 {
                     Data = model,
@@ -74,6 +77,7 @@ namespace Bunkering.Access.Services
                 else return new ApiResponse { Message = ex.Message };
             }
         }
+
         public async Task<ApiResponse> EditOperatingFacility(OpearatingFacilityViewModel model)
         {
             try
@@ -109,6 +113,7 @@ namespace Bunkering.Access.Services
 
 
         }
+
         public async Task<ApiResponse> AllOperatingFacilities()
         {
             var allOpFacility = await _unitOfWork.OperatingFacility.GetAll();
