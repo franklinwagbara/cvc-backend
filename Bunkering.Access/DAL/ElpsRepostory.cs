@@ -597,11 +597,11 @@ namespace Bunkering.Access.DAL
                 {
                     serviceTypeId = _appSetting.ServiceTypeId,
                     categoryName = DefaultValues.AppName,
-                    totalAmount = totalAmount.ToString("N2"),
+                    totalAmount = totalAmount.ToString("###.##"),
                     payerName = TruncateText(companyName, 25),
                     payerEmail = companyEmail,
                     serviceCharge = Decimal.ToInt32(0).ToString(),
-                    amountDue = (totalAmount * 0.5).ToString("N2"),
+                    amountDue = (totalAmount * 0.5).ToString("###.##"),
                     orderId = appRef,
                     returnSuccessUrl = $"{baseUrl}/api/Payment/update-payment-status?orderId={appRef}",
                     returnFailureUrl = $"{baseUrl}/api/Payment/update-payment-status?orderId= {appRef}",
@@ -614,7 +614,7 @@ namespace Bunkering.Access.DAL
                             beneficiaryName = _appSetting.NMDPRABName,
                             bankCode = _appSetting.NMDPRABankCode,
                             beneficiaryAccount = _appSetting.NMDPRAAccount,
-                            beneficiaryAmount = (totalAmount * 0.5).ToString("N2"),
+                            beneficiaryAmount = (totalAmount * 0.5).ToString("###.##"),
                             deductFeeFrom = "0"
                         },
                         new RPartner
@@ -623,7 +623,7 @@ namespace Bunkering.Access.DAL
                             beneficiaryName = _appSetting.MDGIFBName,
                             bankCode = _appSetting.MDGIFBankCode,
                             beneficiaryAccount = _appSetting.MDGIFAccount,
-                            beneficiaryAmount = (totalAmount * 0.5).ToString("N2"),
+                            beneficiaryAmount = (totalAmount * 0.5).ToString("###.##"),
                             deductFeeFrom = "1"
                         }
                     },
