@@ -100,7 +100,6 @@ namespace Bunkering.Access.Services
 
         }
 
-
         //method to get all states
         public async Task<ApiResponse> GetAllStatesInNigeria()
         {
@@ -497,5 +496,14 @@ namespace Bunkering.Access.Services
             return response;
         }
 
-    }
+        public async Task<ApiResponse> GetOperatingNameTypes() 
+        => new ApiResponse
+            {
+                Data = EnumExtension.GetValues<NameType>(),
+                Message = "Successful",
+                StatusCode = HttpStatusCode.OK,
+                Success = true
+            };
+
+}
 }

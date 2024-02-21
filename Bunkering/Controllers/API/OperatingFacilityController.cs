@@ -16,13 +16,13 @@ namespace Bunkering.Controllers.API
     public class OperatingFacilityController : ResponseController
     {
         private readonly OperatingFacilityService _operatingFacility;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IHttpContextAccessor _contextAccessor;
-        ApiResponse _response;
+        //private readonly IUnitOfWork _unitOfWork;
+        //private readonly IHttpContextAccessor _contextAccessor;
+        //ApiResponse _response;
 
-        public OperatingFacilityController(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
+        public OperatingFacilityController(OperatingFacilityService operatingFacilityService)
         {
-            _operatingFacility = new OperatingFacilityService (unitOfWork, contextAccessor);
+            _operatingFacility = operatingFacilityService;
         }
 
 

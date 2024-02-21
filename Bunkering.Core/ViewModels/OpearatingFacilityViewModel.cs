@@ -11,6 +11,6 @@ namespace Bunkering.Core.ViewModels
     {
   
         public string CompanyEmail { get; set; }
-        public string Name { get; set; }
+        public int Name { get; set; }
     }
 }
