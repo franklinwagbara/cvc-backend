@@ -434,7 +434,7 @@ namespace Bunkering.Controllers.API
                 {
                     Model = data,
                     PageHeight = 327,
-                    PageMargins = new Rotativa.AspNetCore.Options.Margins(10, 10, 10, 10),
+                    PageMargins = new Margins(10, 10, 10, 10),
 
                     ViewName = "DebitNote"
                 };
