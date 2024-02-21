@@ -1596,7 +1596,7 @@
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
         </member>
-        <member name="M:Bunkering.Controllers.API.PaymentController.GenerateDemandNotice(System.Int32)">
+        <member name="M:Bunkering.Controllers.API.PaymentController.PayOnline(System.String)">
             <summary>
             This endpoint is used to generate Demand notice RRR for a Depot defaulter
             </summary>
@@ -1613,7 +1613,7 @@
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
         </member>
-        <member name="M:Bunkering.Controllers.API.PaymentController.UpdatePaymentStatus(System.String)">
+        <member name="M:Bunkering.Controllers.API.PaymentController.UpdatePaymentStatus(System.String,System.String,System.String,System.String,System.String)">
             <summary>
             This endpoint is used to update the status of any payment
             </summary>

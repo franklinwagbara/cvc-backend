@@ -708,31 +708,53 @@ namespace Bunkering.Access.Services
             
             if (payment is not null)
             {
-               var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id == payment.COQId, "Plant");
-                var capacity = coq.MT_VAC == 0 ? coq.GSV : coq.MT_VAC;
-                var product = new Product();
+                double capacity = 0;
+                var dateOfSTAfterDischarge = new DateTime();
+                string facName = string.Empty; string state = string.Empty; string? product = string.Empty;
+                string marketer = string.Empty; string motherVessel = string.Empty; string daughterVessel = string.Empty; 
+                string supplier = string.Empty;
+                double price = 0;
 
-                if (coq.ProductId != null)
-                    product = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(coq.ProductId));
+                var coqRef = await _unitOfWork.CoQReference.FirstOrDefaultAsync(c => c.Id.Equals(payment.COQId));
+                if (coqRef.PlantCoQId == null)
+                {
+                    var depotCoq = await _unitOfWork.CoQ.FirstOrDefaultAsync(d => d.Id.Equals(coqRef.DepotCoQId), "Application.User.Company,Application.Facility");
+
+                    var appDepot = await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.AppId.Equals(payment.ApplicationId) && x.DepotId.Equals(depotCoq.PlantId), "Depot,Product");
+                    //var depot = await _unitOfWork.Plant.FirstOrDefaultAsync(d => d.Id.Equals(depotCoq.PlantId));
+
+                    capacity = depotCoq.MT_VAC == 0 ? depotCoq.GSV : depotCoq.MT_VAC;
+                    state = appDepot.Depot.State;
+                    facName = appDepot.Depot.Name;
+                    price = depotCoq.DepotPrice;
+                    product = appDepot.Product.Name;
+                    marketer = depotCoq.Application.User.Company.Name;
+                    motherVessel = depotCoq.Application.MotherVessel;
+                    daughterVessel = depotCoq.Application.Facility.Name;
+                }
                 else
                 {
-                    var app = await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.Id.Equals(coq.AppId), "Product");
-                    if (app != null)
-                        product = app.Product;
+                    var ppCoq = await _unitOfWork.ProcessingPlantCoQ.FirstOrDefaultAsync(p => p.ProcessingPlantCOQId.Equals(coqRef.PlantCoQId), "Plant");
+                    state = ppCoq.Plant.State;
+                    price = ppCoq.Price;
+                    marketer = ppCoq.Plant.Company;
+                    facName = ppCoq.Plant.Name;
                 }
 
                 var result = new DebitNoteDTO(
-                coq.DateOfSTAfterDischarge,
+                dateOfSTAfterDischarge,
                 payment.TransactionDate.AddDays(21),
-                "",
-                coq.Plant!.Name,
-                coq.DepotPrice,
+                marketer,
+                facName,
+                price,
                 payment.Amount,
                 capacity,
-                coq.DepotPrice,
-                coq.Plant.State,
-                $"NMDPRA/{coq.Plant.State.Substring(0, 2).ToUpper()}/{payment.Id}",
-                "", "", "", product?.Name);
+                price,
+                state,
+                $"NMDPRA/{state.Substring(0, 2).ToUpper()}/{payment.Id}",
+                motherVessel,
+                daughterVessel,
+                "", product);
                 return new ApiResponse
                 {
                     Message = $"Debit note fetched successfully",
