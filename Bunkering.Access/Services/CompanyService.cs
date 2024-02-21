@@ -101,9 +101,12 @@ namespace Bunkering.Access.Services
 
 				var countries = await _unitOfWork.Country.GetAll();
 				var company = _elps.GetCompanyDetailByEmail(user.Email).Stringify().Parse<CompanyModel>();
-				var operatingFacility = await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.CompanyEmail == email);
-
-				company.OperatingFacilityId = operatingFacility.Id;
+				
+				var operatingFacility = await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.CompanyEmail.ToLower() == email.ToLower());
+                if (operatingFacility is not null) 
+				{
+                    company.OperatingFacilityId = operatingFacility.Id;
+                }
 
 				var companyAdd = new RegisteredAddress();
 				if (user.Company.AddressId > 0)
