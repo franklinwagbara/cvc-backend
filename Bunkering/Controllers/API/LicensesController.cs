@@ -160,5 +160,69 @@ namespace Bunkering.Controllers.API
 			}
 			return BadRequest();
 		}
-	}
+
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Produces("application/json")]
+        [Route("ValidateQrCode")]
+        [HttpGet]
+        public async Task<IActionResult> ValidateQrCode(int id) 
+		{
+            var license = await _unitOfWork.Permit.FirstOrDefaultAsync(x => x.ApplicationId.Equals(id), "Application.User.Company,Application.Facility.VesselType,Application.Payments");
+            if (license != null)
+            {
+                var depots = await _unitOfWork.ApplicationDepot.Find(x => x.AppId.Equals(license.ApplicationId), "Application.Histories,Depot,Product");
+                NominatedSurveyor nominatedSurveyor = null;
+                if (depots.FirstOrDefault()?.Application.SurveyorId != null)
+                {
+                    var surveyorId = depots.FirstOrDefault()?.Application.SurveyorId;
+
+                    nominatedSurveyor = await _unitOfWork.NominatedSurveyor.FirstOrDefaultAsync(x => x.Id.Equals(surveyorId));
+                }
+                var user = await _userManager.FindByIdAsync(depots?.FirstOrDefault()?
+                    .Application.Histories?
+                    .OrderByDescending(a => a.Date)
+                    .LastOrDefault()?.TargetedTo ?? string.Empty);
+
+                string jetty = null;
+
+                if (license.Application?.Jetty > 0)
+                {
+                    jetty = _unitOfWork.Jetty.Query().FirstOrDefault(x => x.Id == license.Application.Jetty)?.Name;
+                }
+
+                var viewAsPdf = new ViewAsPdf
+                {
+                    Model = new CertificareDTO
+                    {
+                        ETA = license.Application.ETA.Value,
+                        LoadPort = license.Application.LoadingPort,
+                        PermitNo = license.PermitNo,
+                        QRCode = license.QRCode,
+                        Vessel = license.Application.VesselName,
+                        Destinations = depots.Select(y => new DepotDTO
+                        {
+                            Name = y.Depot.Name,
+                            Product = y.Product.Name,
+                            Volume = y.Volume,
+                            DischargeId = y.DischargeId,
+                        }).ToList(),
+                        Jetty = jetty,
+                        Surveyor = nominatedSurveyor is not null ? nominatedSurveyor.Name : "N/A",
+                        Signature = user?.Signature ?? string.Empty,
+                        DateIssued = license.IssuedDate
+                    },
+                    PageHeight = 327,
+                    PageMargins = new Rotativa.AspNetCore.Options.Margins(10, 10, 10, 10),
+                    ViewName = "ViewLicense"
+                };
+                var pdf = await viewAsPdf.BuildFile(ControllerContext);
+                return File(new MemoryStream(pdf), "application/pdf");
+            }
+            return BadRequest();
+        }
+    }
 }
