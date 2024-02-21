@@ -6,6 +6,7 @@ using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Net;
 using System.Security.Claims;
 
@@ -39,7 +40,9 @@ namespace Bunkering.Access.Services
         {
 			try
 			{
-				var user = await _userManager.Users.Include(x => x.Location).FirstOrDefaultAsync(x => x.Email.Equals(User));
+				var user = await _userManager.Users.Include(x => x.Location)
+					.Include(ur => ur.UserRoles).ThenInclude(r => r.Role)
+					.FirstOrDefaultAsync(x => x.Email.Equals(User));
 
 				if(user.Location?.Name == LOCATION.FO)
 					return await GetDashboardFO(user);
@@ -92,11 +95,50 @@ namespace Bunkering.Access.Services
 
         private async Task<ApiResponse> GetDashboardFO(ApplicationUser? user)
         {
-			var allCoqs = await _unitOfWork.CoQ.GetAll();
-			var coqs = (await _unitOfWork.CoQ.GetAll()).Where(x => x.CurrentDeskId == user?.Id).ToList();
-			var facilities = await _unitOfWork.Facility.GetAll("VesselType");
-			var certificates = await _unitOfWork.COQCertificate.GetAll("COQ");
-			var payments = await _unitOfWork.Payment.GetAll();
+			int deskCnt = 0; int totalApps = 0; int totalCertificates = 0;
+			int totalVessels = 0; int totalProcessing = 0;
+			int totalApproved = 0; int totalRejected = 0; int totalExpiring = 0;
+            var totalAmount = await _unitOfWork.Payment.Find(p => p.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted)));
+            if (user.UserRoles.FirstOrDefault().Role.Name.Equals("Field_Officer") && user.Directorate.Equals(Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.DSSRI)))
+            {
+                var allCoqs = await _unitOfWork.CoQ.GetAll();
+                var depots = (await _unitOfWork.PlantOfficer.Find(c => c.OfficerID.Equals(user.Id))).Select(c => c.PlantID);
+
+                deskCnt = allCoqs.Count(a => a.CurrentDeskId.Equals(user.Id));
+                if (depots.Any())
+                {
+                    var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId) && !string.IsNullOrEmpty(c.DischargeId));
+                    deskCnt += appDepots.GroupBy(x => x.AppId).Select(x => x.FirstOrDefault()).Count();
+                }
+                totalApps = allCoqs.Count();
+                totalCertificates = totalApproved = allCoqs.Count(a => a.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)));
+				totalProcessing = allCoqs.Count(x => x.Status == Enum.GetName(typeof(AppStatus), AppStatus.Processing));
+				totalRejected = allCoqs.Count(x => x.Status == Enum.GetName(typeof(AppStatus), AppStatus.Rejected));
+            }
+			else if (user.UserRoles.FirstOrDefault().Role.Name.Equals("Field_Officer") && user.Directorate.Equals(Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.HPPITI)))
+			{
+                var allPPCoqs = await _unitOfWork.ProcessingPlantCoQ.GetAll();
+
+                var depots = (await _unitOfWork.PlantOfficer.Find(c => c.OfficerID.Equals(user.Id))).Select(c => c.PlantID);
+
+                deskCnt = allPPCoqs.Count(a => a.CurrentDeskId.Equals(user.Id));
+                totalApps = allPPCoqs.Count();
+                totalCertificates = totalApproved = allPPCoqs.Count(a => a.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)));
+                totalProcessing = allPPCoqs.Count(x => x.Status == Enum.GetName(typeof(AppStatus), AppStatus.Processing));
+                totalRejected = allPPCoqs.Count(x => x.Status == Enum.GetName(typeof(AppStatus), AppStatus.Rejected));
+            }
+			else
+			{
+                var allCoqs = await _unitOfWork.CoQ.GetAll();
+                var allPPCoqs = await _unitOfWork.ProcessingPlantCoQ.GetAll();
+
+				deskCnt = allCoqs.Count(d => !string.IsNullOrEmpty(d.CurrentDeskId) && d.CurrentDeskId.Equals(user.Id)) + allPPCoqs.Count(d => !string.IsNullOrEmpty(d.CurrentDeskId) && d.CurrentDeskId.Equals(user.Id));
+
+                totalApps = allCoqs.Count() + allPPCoqs.Count();
+                totalCertificates = totalApproved = allCoqs.Count(a => a.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed))) + allPPCoqs.Count(a => a.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)));
+                totalProcessing = allCoqs.Count(x => x.Status == Enum.GetName(typeof(AppStatus), AppStatus.Processing)) + allPPCoqs.Count(x => x.Status == Enum.GetName(typeof(AppStatus), AppStatus.Processing));
+                totalRejected = allCoqs.Count(x => x.Status == Enum.GetName(typeof(AppStatus), AppStatus.Rejected)) + allPPCoqs.Count(x => x.Status == Enum.GetName(typeof(AppStatus), AppStatus.Rejected));
+            }
 
 			return new ApiResponse
 			{
@@ -105,20 +147,20 @@ namespace Bunkering.Access.Services
 				Success = true,
 				Data = new
 				{
-					DeskCount = coqs.Count(),
-					TotalApps = allCoqs.Count(),
+					DeskCount = deskCnt,
+					TotalApps = totalApps,
 					TMobileFacs = 0,
 					TFixedFacs = 0,
-					TotalLicenses = certificates.Count(),
-					TLicensedfacs = facilities.Count(x => x.IsLicensed),
-					TValidLicense = certificates.Count(x => x.ExpireDate > DateTime.UtcNow.AddHours(1)),
-					TAmount = payments.Where(x => x.Status.ToLower().Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted))).Sum(x => x.Amount),
-					TProcessing = allCoqs.Count(x => x.Status == Enum.GetName(typeof(AppStatus), AppStatus.Processing)),
-					TApproved = allCoqs.Count(x => x.Status == Enum.GetName(typeof(AppStatus), AppStatus.Completed)),
-					TRejected = allCoqs.Count(x => x.Status == Enum.GetName(typeof(AppStatus), AppStatus.Rejected)),
-					TExpiring30 = await _userManager.IsInRoleAsync(user, "Company")
-					? certificates.Count(x => x.COQ.CurrentDeskId.Equals(user.Id) && x.ExpireDate.AddDays(30) >= DateTime.UtcNow.AddHours(1))
-					: certificates.Count(x => x.ExpireDate.AddDays(30) >= DateTime.UtcNow.AddHours(1))
+					TotalLicenses = totalCertificates,
+					//TLicensedfacs = facilities.Count(x => x.IsLicensed),
+					//TValidLicense = certificates.Count(x => x.ExpireDate > DateTime.UtcNow.AddHours(1)),
+					TAmount = totalAmount.Sum(t => t.Amount).ToString("N2"),
+					TProcessing = totalProcessing,
+					TApproved = totalApproved,
+					TRejected = totalRejected,
+					//TExpiring30 = await _userManager.IsInRoleAsync(user, "Company")
+					//? certificates.Count(x => x.COQ.CurrentDeskId.Equals(user.Id) && x.ExpireDate.AddDays(30) >= DateTime.UtcNow.AddHours(1))
+					//: certificates.Count(x => x.ExpireDate.AddDays(30) >= DateTime.UtcNow.AddHours(1))
 				}
 			};
         }

@@ -1559,7 +1559,7 @@ namespace Bunkering.Access.Services
                 return _response;
             }
 
-            var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId), "Application.Facility");
+            var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId) && !string.IsNullOrEmpty(c.DischargeId), "Application.Facility");
             var apps = appDepots.GroupBy(x => x.AppId).Select(x => x.FirstOrDefault()).OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application);
 
             _response = new ApiResponse
@@ -1599,7 +1599,7 @@ namespace Bunkering.Access.Services
                 return _response;
             }
 
-            var appDepots = await _unitOfWork.Application.Find(c => jettys.Contains(c.Jetty), "Facility");
+            var appDepots = await _unitOfWork.Application.Find(c => jettys.Contains(c.Jetty) && c .Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)) && !c.HasCleared);
             var apps = appDepots.OrderByDescending(x => x.CreatedDate);
 
             _response = new ApiResponse
