@@ -45,7 +45,7 @@ namespace Bunkering.Core.Utils
 
     public enum NameType
     {
-        CVC,
+        CVC = 1,
         ProcessingPlant,
         Both
     }

@@ -477,8 +477,6 @@ namespace Bunkering.Controllers.API
 
         public async Task<IActionResult> AllDepot() => Response(await _plantService.GetAllDepotsPlants());
         
-        
-
         /// <summary>
         /// This endpoint is used to get all Depot by noa id
         /// </summary>
@@ -499,10 +497,7 @@ namespace Bunkering.Controllers.API
         [ProducesResponseType(typeof(ApiResponse), 500)]
         [Route("All-Depot-By-AppId")]
         [HttpGet]
-
         public async Task<IActionResult> AllDepotByAppId(int AppId) => Response(await _depotservice.AllDepotByAppId(AppId));
-
-
 
         /// <summary>
         /// This endpoint is used to get all Nominated Surveyor
@@ -522,9 +517,9 @@ namespace Bunkering.Controllers.API
         [ProducesResponseType(typeof(ApiResponse), 404)]
         [ProducesResponseType(typeof(ApiResponse), 405)]
         [ProducesResponseType(typeof(ApiResponse), 500)]
-        [Route("All-NominatedSurveyor")]
+        [Route("get-operating-name-types")]
         [HttpGet]
 
-        public async Task<IActionResult> AllNominatedSurveyor() => Response(await _nominatedSurveyorService.AllNominatedSurveyor());
+        public async Task<IActionResult> AllNominatedSurveyor() => Response(await libraryService.GetOperatingNameTypes());
     }
 }

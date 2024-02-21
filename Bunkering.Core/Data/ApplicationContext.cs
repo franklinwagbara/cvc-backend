@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Drawing.Printing;
 using System.Reflection.Metadata.Ecma335;
 
@@ -131,7 +132,7 @@ namespace Bunkering.Core.Data
                 ChangeTracker.DetectChanges();
                 var auditEntries = new List<AuditEntry>();
 
-                var entities = ChangeTracker.Entries()
+                List<EntityEntry>? entities = ChangeTracker.Entries()
                     .Where(x => x.State != EntityState.Added
                     && x.State != EntityState.Unchanged
                     && x.State != EntityState.Detached).ToList();
