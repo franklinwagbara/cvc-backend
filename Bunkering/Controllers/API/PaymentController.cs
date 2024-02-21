@@ -133,9 +133,9 @@ namespace Bunkering.Controllers.API
         [Produces("application/json")]
         [HttpPost]
         [Route("update-payment-status")]
-        public async Task<IActionResult> UpdatePaymentStatus([FromForm] string orderId)
+        public async Task<IActionResult> UpdatePaymentStatus([FromForm] string appref, [FromForm] string status, [FromForm] string statuscode, [FromForm] string orderId, [FromForm] string RRR)
         {
-            var response = await _payment.ConfirmOtherPayment(orderId);
+            var response = await _payment.ConfirmOtherPayment(appref);
             if (response.StatusCode.Equals(HttpStatusCode.OK))
             {
                 var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(p => p.Id.Equals(response.Data));
@@ -144,7 +144,7 @@ namespace Bunkering.Controllers.API
                 if (coqRef != null)
                 {
                     if (coqRef.PlantCoQId == null)
-                        return Redirect($"{_appSetting.LoginUrl}/company/approvals/{payment.ApplicationId}/debit-notes");
+                        return Redirect($"{_appSetting.LoginUrl}/company/approvals/{payment.ApplicationId}/debit-notes/{payment.Id}");
                     else
                         return Redirect($"{_appSetting.LoginUrl}/company/approvals/httpiti/debit-notes");
                 }

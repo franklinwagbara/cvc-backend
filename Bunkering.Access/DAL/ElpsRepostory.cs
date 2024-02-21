@@ -603,9 +603,9 @@ namespace Bunkering.Access.DAL
                     serviceCharge = Decimal.ToInt32(0).ToString(),
                     amountDue = (totalAmount * 0.5).ToString("###.##"),
                     orderId = appRef,
-                    returnSuccessUrl = $"{baseUrl}/api/Payment/update-payment-status?orderId={appRef}",
-                    returnFailureUrl = $"{baseUrl}/api/Payment/update-payment-status?orderId= {appRef}",
-                    returnBankPaymentUrl = $"{baseUrl}/api/Payment/update-payment-status?orderId= {appRef}",
+                    returnSuccessUrl = $"{baseUrl}/api/Payment/update-payment-status?appref={appRef}",
+                    returnFailureUrl = $"{baseUrl}/api/Payment/update-payment-status?appref= {appRef}",
+                    returnBankPaymentUrl = $"{baseUrl}/api/Payment/update-payment-status?appref= {appRef}",
                     lineItems = new List<RPartner>
                     {
                         new RPartner
