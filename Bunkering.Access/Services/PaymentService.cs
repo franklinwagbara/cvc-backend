@@ -597,7 +597,7 @@ namespace Bunkering.Access.Services
                                         || (!string.IsNullOrEmpty(dic.GetValue("status").ToString()) && dic.GetValue("status").ToString().Equals("00")))
                                     {
                                         payment.Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted);
-                                        payment.TransactionDate = Convert.ToDateTime(dic.GetValue("transactiontime"));
+                                        //payment.TransactionDate = Convert.ToDateTime(dic.GetValue("transactiontime"));
                                         payment.PaymentDate = Convert.ToDateTime(dic.GetValue("paymentDate"));
                                         payment.AppReceiptId = dic.GetValue("appreceiptid") != null ? dic.GetValue("appreceiptid") : "";
                                         payment.TxnMessage = dic.GetValue("message");
@@ -630,13 +630,13 @@ namespace Bunkering.Access.Services
                                     StatusCode = HttpStatusCode.NotFound
                                 };
                         }
-                        else
+                        else if (!payment.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted)) && string.IsNullOrEmpty(payment.RRR))
                         {
                             _response = new ApiResponse
                             {
-                                Message = "Payment already completed",
-                                StatusCode = HttpStatusCode.OK,
-                                Success = true
+                                Message = "Invalid RRR",
+                                StatusCode = HttpStatusCode.BadRequest,
+                                Success = false
                             };
                         }
 
@@ -882,7 +882,8 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var payments = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.Id.Equals(id), "DemandNotices");
+                var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(a => a.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));   
+                var payments = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.Id.Equals(id) && x.ApplicationTypeId.Equals(appType.Id), "DemandNotices");
 
                 if (payments == null)
                     throw new Exception("No pending payment found for this application!");

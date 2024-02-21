@@ -76,14 +76,14 @@ namespace Bunkering.Controllers.API
         /// <response code="404">Returns not found </response>
         /// <response code="401">Unauthorized user </response>
         /// <response code="400">Internal server error - bad request </response>
-        [ProducesResponseType(typeof(ApiResponse), 200)]
-        [ProducesResponseType(typeof(ApiResponse), 404)]
-        [ProducesResponseType(typeof(ApiResponse), 405)]
-        [ProducesResponseType(typeof(ApiResponse), 500)]
-        [Produces("application/json")]
-        [HttpPost]
-        [Route("generate-demand-notice")]
-        public async Task<IActionResult> GenerateDemandNotice(int id) => Response(await _payment.GenerateDemandNotice(id).ConfigureAwait(false));
+        //[ProducesResponseType(typeof(ApiResponse), 200)]
+        //[ProducesResponseType(typeof(ApiResponse), 404)]
+        //[ProducesResponseType(typeof(ApiResponse), 405)]
+        //[ProducesResponseType(typeof(ApiResponse), 500)]
+        //[Produces("application/json")]
+        //[HttpPost]
+        //[Route("generate-demand-notice")]
+        //public async Task<IActionResult> GenerateDemandNotice(int id) => Response(await _payment.GenerateDemandNotice(id).ConfigureAwait(false));
 
         [AllowAnonymous]
         [ProducesResponseType(typeof(ApiResponse), 200)]
