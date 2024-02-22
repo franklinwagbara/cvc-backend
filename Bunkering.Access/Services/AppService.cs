@@ -1564,19 +1564,33 @@ namespace Bunkering.Access.Services
                 return _response;
             }
 
-            var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId) && !string.IsNullOrEmpty(c.DischargeId), "Application");
+            var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId) && !string.IsNullOrEmpty(c.DischargeId), "Application.Facility.VesselType,Application.User.Company,Application.AppJetty");
             //var apps = appDepots.Select(x => x.Application);
             var coq = (await _unitOfWork.CoQ.Find(c => appDepots.Any(ad => ad.AppId.Equals(c.AppId) && ad.DepotId.Equals(c.PlantId)))).Select(i => i.PlantId).ToList();
             var apps = appDepots.Select(a => a.Application);
             if(coq.Count > 0)
                 apps = appDepots.SkipWhile(a => coq.Exists(x => x.Equals(a.DepotId))).Select(a => a.Application);
 
+            var data = apps.GroupBy(x => x.Id).Select(x => x.FirstOrDefault()).OrderByDescending(x => x.SubmittedDate).Select(n => new
+            {
+                n.Id,
+                CompanyName = n.User.Company.Name,
+                n.VesselName,
+                VesselType = n.Facility.VesselType.Name,
+                CompanyEmail = n.User.Email,
+                n.Reference,
+                Jetty = n.AppJetty.Name,
+                n.Status,
+                CreatedDate = n.CreatedDate.ToString("yyyy-MM-dd hh:mm:ss"),
+
+            });
+
             _response = new ApiResponse
             {
                 Message = "Applications fetched successfully",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                Data = apps.GroupBy(x => x.Id).Select(x => x.FirstOrDefault()).OrderByDescending(x => x.SubmittedDate)
+                Data = data
             };
 
             return _response;
