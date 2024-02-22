@@ -147,8 +147,17 @@ namespace Bunkering.Controllers.API
 		[HttpGet]
 		public async Task<IActionResult> GetCoqs(int appId) => Response(await _coqService.GetCoQsByAppId(appId));
 
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Produces("application/json")]
+        [Route("get-coq-certs/{id}")]
+        [HttpGet]
+        public async Task<IActionResult> GetCoqCertsByAppId(int id) => Response(await _coqService.GetCoQCertsByAppId(id));
 
-		[ProducesResponseType(typeof(ApiResponse), 200)]
+
+        [ProducesResponseType(typeof(ApiResponse), 200)]
 		[ProducesResponseType(typeof(ApiResponse), 404)]
 		[ProducesResponseType(typeof(ApiResponse), 405)]
 		[ProducesResponseType(typeof(ApiResponse), 500)]
