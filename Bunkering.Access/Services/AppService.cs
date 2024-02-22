@@ -1060,7 +1060,7 @@ namespace Bunkering.Access.Services
         private async Task<ApiResponse> GetMyDeskFAD(ApplicationUser? user)
         {
             //checked 
-            var coq = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id));
+            var coq = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Plant,Application.User.Company,Application.Facility");
             //var coq = await _unitOfWork.CoQ.Find(x => x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)));
             var processingPlantCoQs = await _unitOfWork.ProcessingPlantCoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Plant,Product");
 
@@ -1085,12 +1085,17 @@ namespace Bunkering.Access.Services
                             {
                                 c.Id,
                                 c.Reference,
-                                c.Application?.User.Company.Name,
+                                CompanyName = c.Application?.User.Company.Name,
                                 DepotName = c.Plant?.Name,
+                                VesselName = c.Application?.Facility.Name,
                                 c.DepotPrice,
-                                Volume = c.GSV == 0 ? c.MT_VAC : c.GSV,
-                                DebitNote = c.GSV == 0 ? c.MT_VAC * c.DepotPrice * 0.01 : c.GSV * c.DepotPrice * 0.01,
-                            }).ToList(),
+                                DateOfArrival = c.DateOfVesselArrival.ToString("yyyy-MM-dd hh:mm:ss"),
+                                DischargeDate = c.DateOfSTAfterDischarge.ToString("yyyy-MM-dd hh:mm:ss"),
+                                SubmittedDate = c.SubmittedDate.Value.ToString("yyyy-MM-dd hh:mm:ss"),
+                                Volume = c.GSV == 0 ? c.MT_VAC.ToString("N2") : c.GSV.ToString("N2"),
+                                DebitNote = c.GSV == 0 ? (c.MT_VAC * c.DepotPrice * 0.1).ToString("N2") : (c.GSV * c.DepotPrice * 0.1).ToString("N2"),
+                                c.Status
+                            }),
 
                             ProcessingPlantCOQ = processingPlantCoQs.OrderByDescending(c => c.CreatedAt).Select(x => new
                             {
@@ -1158,7 +1163,7 @@ namespace Bunkering.Access.Services
             };
         }
 
-            private async Task<ApiResponse> GetMyDeskFO(ApplicationUser? user)
+        private async Task<ApiResponse> GetMyDeskFO(ApplicationUser? user)
             {
                 var coqs = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.IsDeleted != true, "Application.ApplicationType,Application.User.Company,Plant");
                 var processingPlantCoQs = await _unitOfWork.ProcessingPlantCoQ.Find(x => x.CurrentDeskId.Equals(user.Id), "Plant,Product");
@@ -1194,13 +1199,13 @@ namespace Bunkering.Access.Services
                                 DateOfVesselArrivalISO = x.DateOfVesselArrival.ToString("MM/dd/yyyy"),
                                 DateOfVesselUllageISO = x.DateOfVesselUllage.ToString("MM/dd/yyyy"),
                                 DateOfSTAfterDischargeISO = x.DateOfSTAfterDischarge.ToString("MM/dd/yyyy"),
-                                MT_VAC = x.MT_VAC,
-                                MT_AIR = x.MT_AIR,
-                                GOV = x.GOV,
-                                GSV = x.GSV,
-                                DepotPrice = x.DepotPrice,
-                                CreatedBy = x.CreatedBy,
-                                SubmittedDate = x.SubmittedDate,
+                                x.MT_VAC,
+                                x.MT_AIR,
+                                x.GOV,
+                                x.GSV,
+                                x.DepotPrice,
+                                x.CreatedBy,
+                                x.SubmittedDate,
                                 ApplicationType = "COQ"
                             }).ToList(),
                         ProcessingPlantCOQ = processingPlantCoQs.OrderByDescending(c => c.CreatedAt).Select(x => new
@@ -1219,8 +1224,8 @@ namespace Bunkering.Access.Services
                             //GOV = x.GOV,
                             //GSV = x.GSV,
                             x.Price,
-                            CreatedBy = x.CreatedBy,
-                            SubmittedDate = x.SubmittedDate,
+                            x.CreatedBy,
+                            x.SubmittedDate,
                             ApplicationType = "Processing Plant COQ"
                         }).ToList(),
                     }
@@ -1559,15 +1564,19 @@ namespace Bunkering.Access.Services
                 return _response;
             }
 
-            var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId) && !string.IsNullOrEmpty(c.DischargeId), "Application.Facility");
-            var apps = appDepots.GroupBy(x => x.AppId).Select(x => x.FirstOrDefault()).OrderByDescending(x => x.Application.CreatedDate).Select(x => x.Application);
+            var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId) && !string.IsNullOrEmpty(c.DischargeId), "Application");
+            //var apps = appDepots.Select(x => x.Application);
+            var coq = (await _unitOfWork.CoQ.Find(c => appDepots.Any(ad => ad.AppId.Equals(c.AppId) && ad.DepotId.Equals(c.PlantId)))).Select(i => i.PlantId).ToList();
+            var apps = appDepots.Select(a => a.Application);
+            if(coq.Count > 0)
+                apps = appDepots.SkipWhile(a => coq.Exists(x => x.Equals(a.DepotId))).Select(a => a.Application);
 
             _response = new ApiResponse
             {
                 Message = "Applications fetched successfully",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                Data = apps
+                Data = apps.GroupBy(x => x.Id).Select(x => x.FirstOrDefault()).OrderByDescending(x => x.SubmittedDate)
             };
 
             return _response;

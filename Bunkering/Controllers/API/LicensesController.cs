@@ -55,7 +55,7 @@ namespace Bunkering.Controllers.API
 					x.Application.User.Email,
 					VesselTypeType = x.Application.Facility.VesselType.Name,
 					VesselName = x.Application.Facility.Name,
-				}) : new { }
+				}).OrderByDescending(d => d.IssuedDate) : new { }
 			});
 
 		}
@@ -90,7 +90,7 @@ namespace Bunkering.Controllers.API
 					x.Application.User.Email,
 					VesselTypeType = x.Application.Facility.VesselType.Name,
 					VesselName = x.Application.Facility.Name,
-				}) : new { }
+				}).OrderByDescending(d => d.IssuedDate) : new { }
 			});
 
 		}

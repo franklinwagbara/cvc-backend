@@ -7,6 +7,7 @@ namespace Bunkering.Core.Data
 		public int VesselTypeId { get; set; }
 		public int? FromLocationId { get; set; }
 		public int? ToLocationId { get; set; }
+		public string? Directorate { get; set; }
 		public int? OfficeId { get; set; }
 		public int? ApplicationTypeId { get; set; }
 		public string TriggeredByRole { get; set; }

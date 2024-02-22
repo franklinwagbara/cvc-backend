@@ -2121,6 +2121,22 @@
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
         </member>
+        <member name="M:Bunkering.Controllers.API.VesselDischargeClearanceController.DisAllowVesselDischargeClearance(Bunkering.Core.ViewModels.VesselDischargeCleareanceViewModel)">
+            <summary>
+            This endpoint is used to disallow vessel discharge clearance 
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/email/create-vessel-discharge-clearance
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
         <member name="M:Bunkering.Controllers.API.VesselDischargeClearanceController.GetAllVesselDischargeClearance">
             <summary>
             This endpoint is used to fetch vessel discharge clearance by id

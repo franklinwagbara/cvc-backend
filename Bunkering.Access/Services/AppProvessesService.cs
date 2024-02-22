@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Bunkering.Access.IContracts;
 using Bunkering.Core.Data;
+using Bunkering.Core.Utils;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -45,6 +46,7 @@ namespace Bunkering.Access.Services
 				var apptyeps = await _unitOfWork.ApplicationType.GetAll();
 				var vesselType = await _unitOfWork.VesselType.GetAll();
 				var location = await _unitOfWork.Location.GetAll();
+				//var directorates = EnumExtension.GetValues<DirectorateEnum>();
 
 				processes.ForEach(r =>
 				{
@@ -120,6 +122,7 @@ namespace Bunkering.Access.Services
 					flow.VesselTypeId = (int)model.VesselTypeId;
 					flow.FromLocationId = model.FromLocationId;
 					flow.ToLocationId = model.ToLocationId;
+					flow.Directorate = model.Directorate;
 
 					await _unitOfWork.Workflow.Update(flow);
 					await _unitOfWork.SaveChangesAsync(user.Id);
