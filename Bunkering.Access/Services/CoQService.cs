@@ -133,6 +133,50 @@ namespace Bunkering.Access.Services
             }
         }
 
+        public async Task<ApiResponse> GetCoQCertsByAppId(int id)
+        {
+            try
+            {
+                var foundCOQ = await _unitOfWork.COQCertificate.Find(x => x.COQ.AppId.Equals(id), "COQ.Application.User.Company,COQ.Application.Facility.VesselType,COQ.Plant");
+                //return new ApiResponse
+                //{
+                //    Data = foundCOQ,
+                //    Message = "Successful",
+                //    StatusCode = HttpStatusCode.OK,
+                //    Success = true
+                //};
+                int count = foundCOQ.Count();
+                return new ApiResponse
+                {
+                    //using if statements here ?: to check conditions for the permit
+                    Message = count > 0 ? "Success, Permit Found" : "Permit Not Found",
+                    StatusCode = count > 0 ? HttpStatusCode.OK : HttpStatusCode.BadRequest,
+                    Success = count > 0 ? true : false,
+                    Data = count > 0 ? foundCOQ.Select(x => new
+                    {
+                        x.Id,
+                        x.COQ.AppId,
+                        DepotName = $"{x.COQ.Plant.Name}({x.COQ.Plant.State})",
+                        CompanyName = x.COQ.Application.User.Company.Name,
+                        LicenseNo = x.CertifcateNo,
+                        IssuedDate = x.IssuedDate.ToString("MMM dd, yyyy HH:mm:ss"),
+                        ExpiryDate = x.ExpireDate.ToString("MMM dd, yyyy HH:mm:ss"),
+                        x.COQ.Application.User.Email,
+                        VesselTypeType = x.COQ.Application.Facility.VesselType.Name,
+                        VesselName = x.COQ.Application.Facility.Name,
+                    }).OrderByDescending(d => d.IssuedDate) : new { }
+                };
+            }
+            catch (Exception e)
+            {
+                return _apiReponse = new ApiResponse
+                {
+                    Message = $"{e.Message} +++ {e.StackTrace} ~~~ {e.InnerException?.ToString()}\n",
+                    StatusCode = HttpStatusCode.InternalServerError
+                };
+            }
+        }
+
         public async Task<ApiResponse> GetCoQsByDepotId(int depotId)
         {
             try
@@ -1549,13 +1593,30 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var certList = await _unitOfWork.COQCertificate.GetAll();
-
-                _apiReponse = new ApiResponse 
-                { 
-                    Success = true,
-                    StatusCode = HttpStatusCode.OK,
-                    Data = certList
+                var certList = await _unitOfWork.COQCertificate.GetAll("COQ.Application.User.Company,COQ.Application.Facility.VesselType,COQ.Application.Facility,COQ.Plant");
+                int count = certList.Count();
+                _apiReponse = new ApiResponse
+                {
+                    Message = count > 0 ? "Success, Permit Found" : "Permit Not Found",
+                    StatusCode = count > 0 ? HttpStatusCode.OK : HttpStatusCode.BadRequest,
+                    Success = count > 0 ? true : false,
+                    Data = new
+                    {
+                        DepotCOQList = certList.OrderByDescending(d => d.IssuedDate).Select(x => new
+                        {
+                            x.Id,
+                            x.COQ.AppId,
+                            DepotName = $"{x.COQ.Plant.Name}({x.COQ.Plant.State})",
+                            CompanyName = x.COQ.Application.User.Company.Name,
+                            LicenseNo = x.CertifcateNo,
+                            IssuedDate = x.IssuedDate.ToString("MMM dd, yyyy HH:mm:ss"),
+                            ExpiryDate = x.ExpireDate.ToString("MMM dd, yyyy HH:mm:ss"),
+                            x.COQ.Application.User.Email,
+                            VesselTypeType = x.COQ.Application.Facility.VesselType.Name,
+                            VesselName = x.COQ.Application.Facility.Name,
+                        }),
+                        PPCoQList = (string)null
+                    }
                 };
             }
             catch (Exception e)
