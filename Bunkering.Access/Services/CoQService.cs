@@ -1551,13 +1551,16 @@ namespace Bunkering.Access.Services
             {
                 var certList = await _unitOfWork.COQCertificate.GetAll();
 
-                _apiReponse = new ApiResponse { Success = true, StatusCode = HttpStatusCode.OK, Data = certList };
+                _apiReponse = new ApiResponse 
+                { 
+                    Success = true,
+                    StatusCode = HttpStatusCode.OK,
+                    Data = certList
+                };
             }
             catch (Exception e)
             {
-
-                _apiReponse = new ApiResponse { Success = false, StatusCode = HttpStatusCode.InternalServerError, Message = e.Message };
-                
+                _apiReponse = new ApiResponse { Success = false, StatusCode = HttpStatusCode.InternalServerError, Message = e.Message };                
             }
 
             return _apiReponse;
