@@ -13,6 +13,7 @@ namespace Bunkering.Core.ViewModels
 		public int? VesselTypeId { get; set; }
 		public string? ApplicationType { get; set; }
 		public int? ApplicationTypeId { get; set; }
+        public string? Directorate { get; set; }
         public string? FromLocation { get; set; }
         public int? FromLocationId { get; set; }
         public string? ToLocation { get; set; }

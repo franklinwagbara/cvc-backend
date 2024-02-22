@@ -36,6 +36,8 @@ namespace Bunkering.Core.Data
 
         [ForeignKey("UserId")]
         public ApplicationUser User { get; set; }
+        [ForeignKey(nameof(Jetty))]
+        public Jetty AppJetty { get; set; }
         [ForeignKey("FacilityId")]
         public Facility Facility { get; set; }
         [ForeignKey(nameof(ApplicationTypeId))]

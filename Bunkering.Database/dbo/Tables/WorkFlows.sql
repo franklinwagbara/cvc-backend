@@ -11,8 +11,11 @@
     [Rate]              NVARCHAR (MAX) NOT NULL,
     [Status]            NVARCHAR (MAX) NOT NULL,
     [IsArchived]        BIT            NOT NULL,
+    [Directorate]       VARCHAR (50)   NULL,
     CONSTRAINT [PK_WorkFlows] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
 
 

@@ -164,8 +164,8 @@ namespace Bunkering.Access.Services
             try
             {
                 var user = _contextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.PrimarySid)?.Value;
-                var coq = (await _unitOfWork.CoQ.Find(c =>  c.AppId == AppId)).Select(c => c.Id).ToList();
-                var depotOffices = (await _unitOfWork.PlantOfficer.Find(c => c.OfficerID.Equals(user) && !c.IsDeleted)).ToList();
+                var coq = (await _unitOfWork.CoQ.Find(c =>  c.AppId == AppId)).Select(c => c.PlantId).ToList();
+                var depotOffices = (await _unitOfWork.PlantOfficer.Find(c => c.OfficerID.Equals(user) && !c.IsDeleted));
 
                 if(!depotOffices.Any() )
                 {
@@ -177,12 +177,13 @@ namespace Bunkering.Access.Services
                     };
                 }
 
-                var appDepots = (await _unitOfWork.ApplicationDepot.Find(x => x.AppId == AppId, "Depot")) ?? throw new Exception("No Depot was applied for this NOA application.");
-                var depots = appDepots.Where(x => depotOffices
-                .Exists(a => a.PlantID == x.DepotId)).Select(x => x.Depot)
-                .ToList() ?? throw new Exception("Could find these depot(s)");
+                var appDepots = (await _unitOfWork.ApplicationDepot.Find(x => x.AppId == AppId && depotOffices.Any(d => d.PlantID.Equals(x.DepotId)), "Depot")) ?? throw new Exception("No Depot was applied for this NOA application.");
+                //var depots = appDepots.Where(x => depotOffices.Exists(a => a.PlantID == x.DepotId)).Select(x => x.Depot).ToList() 
+                //    ?? throw new Exception("Could find these depot(s)");
+                var depots = appDepots.Select(d => d.Depot);
+                if (coq.Count > 0)
+                    depots = appDepots.SkipWhile(a => coq.Exists(c => c.Equals(a.DepotId))).Select(d => d.Depot);
 
-                depots = depots.SkipWhile(d => coq.Exists(c => c == d.Id)).ToList();
                 return new ApiResponse
                 {
                     Data = depots,
