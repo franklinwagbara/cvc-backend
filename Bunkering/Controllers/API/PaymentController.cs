@@ -206,7 +206,7 @@ namespace Bunkering.Controllers.API
         [Produces("application/json")]
         [HttpGet]
         [Route("confirm-payment")]
-        public async Task<IActionResult> ConfirmPayment(int Id, string OrderId) => Response(await _payment.ConfirmPayment(Id, OrderId));
+        public async Task<IActionResult> ConfirmPayment(int Id) => Response(await _payment.ConfirmPayment(Id));
 
 
         [AllowAnonymous]
