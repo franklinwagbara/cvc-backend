@@ -1556,7 +1556,7 @@ namespace Bunkering.Access.Services
                 };
                 return _response;
             }
-            var depots = (await _unitOfWork.PlantOfficer.Find(c => c.OfficerID.Equals(user.Id))).Select(c => c.PlantID);
+            var depots = (await _unitOfWork.PlantOfficer.Find(c => c.OfficerID.Equals(user.Id) && !c.IsDeleted)).Select(c => c.PlantID);
             if (!depots.Any())
             {
                 _response = new ApiResponse
@@ -1570,10 +1570,13 @@ namespace Bunkering.Access.Services
 
             var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId) && !string.IsNullOrEmpty(c.DischargeId), "Application.Facility.VesselType,Application.User.Company,Application.AppJetty");
             //var apps = appDepots.Select(x => x.Application);
-            var coq = (await _unitOfWork.CoQ.Find(c => appDepots.Any(ad => ad.AppId.Equals(c.AppId) && ad.DepotId.Equals(c.PlantId)))).Select(i => i.PlantId).ToList();
+            var coq = (await _unitOfWork.CoQ.Find(c => appDepots.Any(ad => ad.AppId.Equals(c.AppId) && ad.DepotId.Equals(c.PlantId)))).Select(i => new {i.AppId, i.PlantId}).ToList();
             var apps = appDepots.Select(a => a.Application);
             if(coq.Count > 0)
-                apps = appDepots.SkipWhile(a => coq.Exists(x => x.Equals(a.DepotId))).Select(a => a.Application);
+            {
+                appDepots = appDepots.Where(a => !coq.Any(x => x.PlantId.Equals(a.DepotId) && x.AppId.Equals(a.AppId)));
+                apps = appDepots.Select(a => a.Application);
+            }
 
             var data = apps.GroupBy(x => x.Id).Select(x => x.FirstOrDefault()).OrderByDescending(x => x.SubmittedDate).Select(n => new
             {
@@ -1615,20 +1618,30 @@ namespace Bunkering.Access.Services
                 };
                 return _response;
             }
-            var jettys = (await _unitOfWork.JettyOfficer.Find(c => c.OfficerID == user.Id,"Jetty")).Select(c => c.JettyId).ToList();
+            var jettys = (await _unitOfWork.JettyOfficer.Find(c => c.OfficerID == user.Id,"Jetty")).Select(c => c.JettyId);
             if (!jettys.Any())
-            {
-                _response = new ApiResponse
+                return new ApiResponse
                 {
                     Message = "User not assigned to a Jetty",
                     StatusCode = HttpStatusCode.OK,
                     Success = false
                 };
-                return _response;
-            }
 
-            var appDepots = await _unitOfWork.Application.Find(c => jettys.Contains(c.Jetty) && c .Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)) && !c.HasCleared);
-            var apps = appDepots.OrderByDescending(x => x.CreatedDate);
+            var apps = await _unitOfWork.Application.Find(c => jettys.Contains(c.Jetty) && c.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)) && !c.HasCleared);
+            var data = apps.GroupBy(x => x.Id).Select(x => x.FirstOrDefault()).OrderByDescending(x => x.SubmittedDate).Select(n => new
+            {
+                n.Id,
+                CompanyName = n.User.Company.Name,
+                n.VesselName,
+                VesselType = n.Facility.VesselType.Name,
+                CompanyEmail = n.User.Email,
+                n.Reference,
+                Jetty = n.AppJetty.Name,
+                n.Status,
+                n.HasCleared,
+                CreatedDate = n.CreatedDate.ToString("yyyy-MM-dd hh:mm:ss"),
+
+            });
 
             _response = new ApiResponse
             {
