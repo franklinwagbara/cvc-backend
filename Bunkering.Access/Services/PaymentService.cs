@@ -576,74 +576,71 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id), "Payments");
-                if (app != null)
+                var user = await _userManager.FindByEmailAsync(User);
+                var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.ApplicationId == id && x.OrderId.Equals(orderId));
+                if (payment != null)
                 {
-                    var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.ApplicationId == id && x.OrderId.Equals(orderId));
-                    if (payment != null)
+                    if (!payment.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted)) && !string.IsNullOrEmpty(payment.RRR))
                     {
-                        if (!payment.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted)) && !string.IsNullOrEmpty(payment.RRR))
-                        {
-                            //confirm payment status on remita via ELPS
-                            var http = await Utils.Send(_appSetting.ElpsUrl, new HttpRequestMessage(HttpMethod.Get, $"/Payment/checkifpaid?id=r{payment.RRR}"));
+                        //confirm payment status on remita via ELPS
+                        var http = await Utils.Send(_appSetting.ElpsUrl, new HttpRequestMessage(HttpMethod.Get, $"/Payment/checkifpaid?id=r{payment.RRR}"));
 
-                            if (http.IsSuccessStatusCode)
+                        if (http.IsSuccessStatusCode)
+                        {
+                            var content = http.Content.ReadAsStringAsync().Result;
+                            if (content != null)
                             {
-                                var content = http.Content.ReadAsStringAsync().Result;
-                                if (content != null)
+                                var dic = content.Parse<Dictionary<string, string>>();
+                                if ((!string.IsNullOrEmpty(dic.GetValue("message").ToString()) && dic.GetValue("message").ToString().Equals("Successful"))
+                                    || (!string.IsNullOrEmpty(dic.GetValue("status").ToString()) && dic.GetValue("status").ToString().Equals("00")))
                                 {
-                                    var dic = content.Parse<Dictionary<string, string>>();
-                                    if ((!string.IsNullOrEmpty(dic.GetValue("message").ToString()) && dic.GetValue("message").ToString().Equals("Successful"))
-                                        || (!string.IsNullOrEmpty(dic.GetValue("status").ToString()) && dic.GetValue("status").ToString().Equals("00")))
+                                    payment.Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted);
+                                    //payment.TransactionDate = Convert.ToDateTime(dic.GetValue("transactiontime"));
+                                    payment.PaymentDate = Convert.ToDateTime(dic.GetValue("paymentDate"));
+                                    payment.AppReceiptId = dic.GetValue("appreceiptid") != null ? dic.GetValue("appreceiptid") : "";
+                                    payment.TxnMessage = dic.GetValue("message");
+                                    //payment.tx = Convert.ToDecimal(dic.GetValue("amount"));
+                                    //payment.Application.Status = Enum.GetName(typeof(AppStatus), 2);
+
+
+                                    await _unitOfWork.Payment.Update(payment);
+                                    await _unitOfWork.SaveChangesAsync(user.Id);
+
+                                    _response = new ApiResponse
                                     {
-                                        payment.Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted);
-                                        //payment.TransactionDate = Convert.ToDateTime(dic.GetValue("transactiontime"));
-                                        payment.PaymentDate = Convert.ToDateTime(dic.GetValue("paymentDate"));
-                                        payment.AppReceiptId = dic.GetValue("appreceiptid") != null ? dic.GetValue("appreceiptid") : "";
-                                        payment.TxnMessage = dic.GetValue("message");
-                                        //payment.tx = Convert.ToDecimal(dic.GetValue("amount"));
-                                        //payment.Application.Status = Enum.GetName(typeof(AppStatus), 2);
-
-                                        
-                                        await _unitOfWork.Payment.Update(payment);
-                                        await _unitOfWork.SaveChangesAsync(app.UserId);
-
-                                        _response = new ApiResponse
-                                        {
-                                            Message = "Payment confirmed successfully",
-                                            StatusCode = HttpStatusCode.OK,
-                                            Success = true,
-                                        };
-                                    }
-                                    else
-                                        _response = new ApiResponse
-                                        {
-                                            Message = "Not Successful",
-                                            StatusCode = HttpStatusCode.BadRequest
-                                        };
+                                        Message = "Payment confirmed successfully",
+                                        StatusCode = HttpStatusCode.OK,
+                                        Success = true,
+                                    };
                                 }
+                                else
+                                    _response = new ApiResponse
+                                    {
+                                        Message = "Not Successful",
+                                        StatusCode = HttpStatusCode.BadRequest
+                                    };
                             }
-                            else
-                                _response = new ApiResponse
-                                {
-                                    Message = "Failed",
-                                    StatusCode = HttpStatusCode.NotFound
-                                };
                         }
-                        else if (!payment.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted)) && string.IsNullOrEmpty(payment.RRR))
-                        {
+                        else
                             _response = new ApiResponse
                             {
-                                Message = "Invalid RRR",
-                                StatusCode = HttpStatusCode.BadRequest,
-                                Success = false
+                                Message = "Failed",
+                                StatusCode = HttpStatusCode.NotFound
                             };
-                        }
-
+                    }
+                    else if (!payment.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted)) && string.IsNullOrEmpty(payment.RRR))
+                    {
+                        _response = new ApiResponse
+                        {
+                            Message = "Invalid RRR",
+                            StatusCode = HttpStatusCode.BadRequest,
+                            Success = false
+                        };
                     }
 
-                    _logger.LogRequest($"\"Getting payment for company application -:{app.Reference}{" by"}{_contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email)} {" - "}{DateTime.Now}", false, directory);
                 }
+
+                _logger.LogRequest($"\"Getting payment for company application -:{payment.OrderId}{" by"}{_contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email)} {" - "}{DateTime.Now}", false, directory);
             }
             catch (Exception ex)
             {

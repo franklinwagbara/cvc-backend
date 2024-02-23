@@ -49,7 +49,7 @@ namespace Bunkering.Access.Services
                 if (create != null)
                     return new ApiResponse
                     {
-                        Message = "Vessel Discharge Clearance Already Exist",
+                        Message = "Vessel Discharge Clearance already exist",
                         StatusCode = HttpStatusCode.Conflict,
                         Success = false
                     };
@@ -123,12 +123,12 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
-        public async Task<ApiResponse> DisAllowVesselDischargeClearance(VesselDischargeCleareanceViewModel model)
+        public async Task<ApiResponse> DisAllowVesselDischargeClearance(int id, string comment)
         {
             try
             {
                 var user = _userManager.Users.Include(ur => ur.UserRoles).ThenInclude(r => r.Role).FirstOrDefault(x => x.Email.Equals(User));
-                var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id == model.AppId && !x.HasCleared);
+                var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id) && !x.HasCleared);
 
                 if (app == null)
                     return new ApiResponse
@@ -145,7 +145,7 @@ namespace Bunkering.Access.Services
                 {
                     Action = "DisALlow",
                     ApplicationId = app.Id,
-                    Comment = model.Comment,
+                    Comment = comment,
                     Date = DateTime.UtcNow.AddHours(1),
                     TargetedTo = supervisor.Id,
                     TargetRole = supervisor.UserRoles.FirstOrDefault().Role.Id,
@@ -157,14 +157,13 @@ namespace Bunkering.Access.Services
                 {
                     //send notification to supervisor
                     var template = Utils.ReadTextFile(_env.WebRootPath, "GeneralTemplate.cshtml");
-                    var body = string.Format(template, model.Comment, DateTime.Now.Year, "https://celps.nmdpra.gov.ng/content/images/mainlogo.png");
+                    var body = string.Format(template, comment, DateTime.Now.Year, "https://celps.nmdpra.gov.ng/content/images/mainlogo.png");
 
                     Utils.SendMail(_mailSettings.Stringify().Parse<Dictionary<string, string>>(), supervisor.Email, "Vessel Clearance Discharge", body);
                 }
 
                 _response = new ApiResponse
                 {
-                    Data = model,
                     Message = "Vessel Discharge Clearance Created",
                     StatusCode = HttpStatusCode.OK,
                     Success = true,

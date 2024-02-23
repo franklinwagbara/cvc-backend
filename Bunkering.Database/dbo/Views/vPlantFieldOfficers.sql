@@ -1,7 +1,7 @@
 ﻿CREATE VIEW dbo.vPlantFieldOfficers
 AS
-SELECT dbo.PlantFieldOfficers.ID, dbo.AspNetUsers.FirstName, dbo.AspNetUsers.LastName, dbo.AspNetUsers.IsActive, dbo.AspNetUsers.IsDeleted, dbo.AspNetUsers.Email, dbo.AspNetUsers.PhoneNumber, dbo.Plants.Name AS DepotName, 
-                  dbo.Plants.Id AS PlantID, dbo.AspNetUsers.Id AS OfficerID
+SELECT dbo.PlantFieldOfficers.ID, dbo.AspNetUsers.FirstName, dbo.AspNetUsers.LastName, dbo.AspNetUsers.IsActive, dbo.PlantFieldOfficers.IsDeleted, dbo.AspNetUsers.Email, dbo.AspNetUsers.PhoneNumber, 
+                  dbo.Plants.Name AS DepotName, dbo.Plants.Id AS PlantID, dbo.AspNetUsers.Id AS OfficerID
 FROM     dbo.Plants INNER JOIN
                   dbo.PlantFieldOfficers ON dbo.Plants.Id = dbo.PlantFieldOfficers.PlantID INNER JOIN
                   dbo.AspNetUsers ON dbo.PlantFieldOfficers.OfficerID = dbo.AspNetUsers.Id
@@ -81,31 +81,31 @@ Begin DesignProperties =
          Left = 0
       End
       Begin Tables = 
-         Begin Table = "Plants"
-            Begin Extent = 
-               Top = 7
-               Left = 598
-               Bottom = 170
-               Right = 796
-            End
-            DisplayFlags = 280
-            TopColumn = 0
-         End
-         Begin Table = "PlantFieldOfficers"
-            Begin Extent = 
-               Top = 7
-               Left = 356
-               Bottom = 170
-               Right = 550
-            End
-            DisplayFlags = 280
-            TopColumn = 0
-         End
-         Begin Table = "AspNetUsers"
+         Begin Table = "Plants (dbo)"
             Begin Extent = 
                Top = 7
                Left = 48
                Bottom = 170
+               Right = 246
+            End
+            DisplayFlags = 280
+            TopColumn = 0
+         End
+         Begin Table = "PlantFieldOfficers (dbo)"
+            Begin Extent = 
+               Top = 175
+               Left = 48
+               Bottom = 338
+               Right = 242
+            End
+            DisplayFlags = 280
+            TopColumn = 0
+         End
+         Begin Table = "AspNetUsers (dbo)"
+            Begin Extent = 
+               Top = 343
+               Left = 48
+               Bottom = 506
                Right = 308
             End
             DisplayFlags = 280
@@ -138,4 +138,6 @@ Begin DesignProperties =
    End
 End
 ', @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'VIEW', @level1name = N'vPlantFieldOfficers';
+
+
 
