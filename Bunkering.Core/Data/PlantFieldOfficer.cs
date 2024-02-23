@@ -12,7 +12,7 @@ namespace Bunkering.Core.Data
         public int ID { get; set; }
         public int PlantID { get; set; }
         public string OfficerID { get; set; }
-        public bool IsDeleted { get; set; } = false;
+        public bool IsDeleted { get; set; }
 
         [ForeignKey(nameof(PlantID))]
         public Plant? Plant { get; set; }

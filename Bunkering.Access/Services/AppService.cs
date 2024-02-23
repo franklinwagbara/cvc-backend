@@ -953,7 +953,8 @@ namespace Bunkering.Access.Services
                         x.Status,
                         PaymnetStatus = x.Payments.Count > 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted))
                         ? "Payment confirmed" : x.Payments.Count > 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentRejected)) ? "Payment rejected" : "Payment pending",
-                        RRR = x.Payments.FirstOrDefault()?.RRR,
+                        x.Payments.FirstOrDefault()?.RRR,
+                        PaymentId = x.Payments.FirstOrDefault().Id,
                         CreatedDate = x.CreatedDate.ToString("MMMM dd, yyyy HH:mm:ss")
                     })
                 };
@@ -996,6 +997,8 @@ namespace Bunkering.Access.Services
             try
             {
                 var user = await _userManager.Users.Include(x => x.Location).Include(ur => ur.UserRoles).ThenInclude(u => u.Role).FirstOrDefaultAsync(x => x.Email.Equals(User));
+                if (user.UserRoles.FirstOrDefault().Role.Name.Equals("Company"))
+                    return await GetMyDeskOthers(user);
                 if (user.Location?.Name == LOCATION.FO && !user.UserRoles.FirstOrDefault().Role.Name.Equals("FAD"))
                     return await GetMyDeskFO(user);
                 else if (user.UserRoles.FirstOrDefault().Role.Name.Equals("FAD"))
@@ -1050,7 +1053,8 @@ namespace Bunkering.Access.Services
                     x.Status,
                     PaymentStatus = x.Payments.Count != 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted))
                         ? "Payment confirmed" : x.Payments.Count != 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentRejected)) ? "Payment rejected" : "Payment pending",
-                    RRR = x.Payments.FirstOrDefault()?.RRR,
+                    x.Payments.FirstOrDefault()?.RRR,
+                    PaymentId = x.Payments.FirstOrDefault().Id,
                     CreatedDate = x.CreatedDate.ToString("MMMM dd, yyyy HH:mm:ss"),
                     ApplicationType = x.ApplicationType.Name
                 }).ToList(),
@@ -1581,6 +1585,7 @@ namespace Bunkering.Access.Services
                 n.Reference,
                 Jetty = n.AppJetty.Name,
                 n.Status,
+                n.HasCleared,
                 CreatedDate = n.CreatedDate.ToString("yyyy-MM-dd hh:mm:ss"),
 
             });

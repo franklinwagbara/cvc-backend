@@ -221,7 +221,7 @@ namespace Bunkering.Access.Services
                 }
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 _response = new ApiResponse
                 {
