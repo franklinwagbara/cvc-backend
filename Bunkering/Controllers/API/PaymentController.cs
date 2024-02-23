@@ -106,7 +106,7 @@ namespace Bunkering.Controllers.API
         [Route("remita")]
         public async Task<IActionResult> Remita(int id, [FromForm] string status, [FromForm] string statuscode, [FromForm] string orderId, [FromForm] string RRR)
         {
-            var payment = await _payment.ConfirmPayment(id, orderId);
+            var payment = await _payment.ConfirmPayment(id);
             return Redirect($"{_appSetting.LoginUrl}/company/paymentsum/{id}");
         }
 
