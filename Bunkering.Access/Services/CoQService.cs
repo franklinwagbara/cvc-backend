@@ -1593,7 +1593,7 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var certList = await _unitOfWork.COQCertificate.GetAll("COQ.Application.User.Company,COQ.Application.Facility.VesselType,COQ.Application.Facility,COQ.Plant");
+                var certList = await _unitOfWork.COQCertificate.GetAll("COQ.Application.User.Company,COQ.Application.Facility.VesselType,COQ,COQ.Plant");
                 int count = certList.Count();
                 _apiReponse = new ApiResponse
                 {
@@ -1605,6 +1605,7 @@ namespace Bunkering.Access.Services
                         DepotCOQList = certList.OrderByDescending(d => d.IssuedDate).Select(x => new
                         {
                             x.Id,
+                            x.COQId,
                             x.COQ.AppId,
                             DepotName = $"{x.COQ.Plant.Name}({x.COQ.Plant.State})",
                             CompanyName = x.COQ.Application.User.Company.Name,
