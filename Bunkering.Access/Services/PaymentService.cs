@@ -572,12 +572,12 @@ namespace Bunkering.Access.Services
             return _response;
         }
       
-        public async Task<ApiResponse> ConfirmPayment(int id, string orderId)
+        public async Task<ApiResponse> ConfirmPayment(int id)
         {
             try
             {
                 var user = await _userManager.FindByEmailAsync(User);
-                var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.ApplicationId == id && x.OrderId.Equals(orderId));
+                var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.Id.Equals(id));
                 if (payment != null)
                 {
                     if (!payment.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted)) && !string.IsNullOrEmpty(payment.RRR))
