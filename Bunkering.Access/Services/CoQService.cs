@@ -156,6 +156,7 @@ namespace Bunkering.Access.Services
                     {
                         x.Id,
                         x.COQ.AppId,
+                        x.COQId,
                         DepotName = $"{x.COQ.Plant.Name}({x.COQ.Plant.State})",
                         CompanyName = x.COQ.Application.User.Company.Name,
                         LicenseNo = x.CertifcateNo,
