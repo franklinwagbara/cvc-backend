@@ -1054,7 +1054,7 @@ namespace Bunkering.Access.Services
                     PaymentStatus = x.Payments.Count != 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted))
                         ? "Payment confirmed" : x.Payments.Count != 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentRejected)) ? "Payment rejected" : "Payment pending",
                     x.Payments.FirstOrDefault()?.RRR,
-                    PaymentId = x.Payments.FirstOrDefault().Id,
+                    PaymentId = x.Payments?.FirstOrDefault()?.Id,
                     CreatedDate = x.CreatedDate.ToString("MMMM dd, yyyy HH:mm:ss"),
                     ApplicationType = x.ApplicationType.Name
                 }).ToList(),
