@@ -999,10 +999,12 @@ namespace Bunkering.Access.Services
                 var user = await _userManager.Users.Include(x => x.Location).Include(ur => ur.UserRoles).ThenInclude(u => u.Role).FirstOrDefaultAsync(x => x.Email.Equals(User));
                 if (user.UserRoles.FirstOrDefault().Role.Name.Equals("Company"))
                     return await GetMyDeskOthers(user);
-                if (user.Location?.Name == LOCATION.FO && !user.UserRoles.FirstOrDefault().Role.Name.Equals("FAD"))
-                    return await GetMyDeskFO(user);
-                else if (user.UserRoles.FirstOrDefault().Role.Name.Equals("FAD"))
+                else if(user.Location?.Name == LOCATION.FO)
                     return await GetMyDeskFAD(user);
+                //if (user.Location?.Name == LOCATION.FO && !user.UserRoles.FirstOrDefault().Role.Name.Equals("FAD"))
+                //    return await GetMyDeskFO(user);
+                //else if (user.UserRoles.FirstOrDefault().Role.Name.Equals("FAD"))
+                //    return await GetMyDeskFAD(user);
                 else
                     return await GetMyDeskOthers(user);
             }
@@ -1054,7 +1056,7 @@ namespace Bunkering.Access.Services
                     PaymentStatus = x.Payments.Count != 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted))
                         ? "Payment confirmed" : x.Payments.Count != 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentRejected)) ? "Payment rejected" : "Payment pending",
                     x.Payments.FirstOrDefault()?.RRR,
-                    PaymentId = x.Payments.FirstOrDefault().Id,
+                    PaymentId = x.Payments?.FirstOrDefault()?.Id,
                     CreatedDate = x.CreatedDate.ToString("MMMM dd, yyyy HH:mm:ss"),
                     ApplicationType = x.ApplicationType.Name
                 }).ToList(),
@@ -1189,10 +1191,10 @@ namespace Bunkering.Access.Services
                         CoQ = coqs.OrderByDescending(c => c.DateCreated).Select(x => new
                             {
                                 x.Id,
-                                AppId = x.AppId,
+                                x.AppId,
                                 CompanyEmail = x.Application?.User.Email,
-                                ImportName = x.Application?.User.Company.Name,
-                                VesselName = x.Application?.VesselName,
+                                CompanyName = x.Application?.User.Company.Name,
+                                x.Application?.VesselName,
                                 x.Reference,
                                 x.Status,
                                 DepotName = x.Plant?.Name,
