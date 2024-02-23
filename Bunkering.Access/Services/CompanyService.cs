@@ -104,7 +104,11 @@ namespace Bunkering.Access.Services
 				
 				var operatingFacility = await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.CompanyEmail.ToLower() == email.ToLower());
                 if (operatingFacility is not null)
-                    company.OperatingFacilityId = operatingFacility.Id;
+				{
+					var opId = EnumExtension.GetValues<NameType>().FirstOrDefault(e => e.Name.Equals(operatingFacility.Name));
+					if(opId is not null)
+						company.OperatingFacilityId = opId.Value;
+                }
 
                 var companyAdd = new RegisteredAddress();
 				if (user.Company.AddressId > 0)
