@@ -1115,7 +1115,7 @@ namespace Bunkering.Access.Services
                             WaterVolume = b.WaterVolume,
                             FloatRoofCorr = b.FloatRoofCorr,
                             GOV = b.GOV,
-                            Tempearture = b.Tempearture,
+                            Tempearture = b.Temperature,
                             Density = b.Density,
                             VCF = b.VCF,
                         };
@@ -1130,7 +1130,7 @@ namespace Bunkering.Access.Services
                             WaterVolume = a.WaterVolume,
                             FloatRoofCorr = a.FloatRoofCorr,
                             GOV = a.GOV,
-                            Tempearture = a.Tempearture,
+                            Tempearture = a.Temperature,
                             Density = a.Density,
                             VCF = a.VCF,
                         };
@@ -1410,7 +1410,7 @@ namespace Bunkering.Access.Services
                                                          FloatRoofCorr = m.FloatRoofCorr,
                                                          GOV = m.GOV,
                                                          MeasurementType = m.MeasurementType,
-                                                         Tempearture = m.Tempearture,
+                                                         Temperature = m.Tempearture,
                                                          TOV = m.TOV,
                                                          VCF = m.VCF,
                                                          WaterDIP = m.WaterDIP,
