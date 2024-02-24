@@ -1249,7 +1249,7 @@ namespace Bunkering.Access.Services
                     var appDepot = await _unitOfWork.ApplicationDepot.GetDepotsAsync(id);
                     if (app != null)
                     {
-                        var users = _userManager.Users.Include(c => c.Company).Include(ur => ur.UserRoles).ThenInclude(r => r.Role).ToList();
+                        var users = _userManager.Users.Include(c => c.Company).Include(ur => ur.UserRoles).ThenInclude(r => r.Role);
                         var histories = app.Histories.ToList();
                         histories.ForEach(h =>
                         {
