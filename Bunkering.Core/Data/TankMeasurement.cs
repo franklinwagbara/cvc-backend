@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,7 +35,8 @@ namespace Bunkering.Core.Data
         public double VapourPressure { get; set; } = 0;
         public double MolecularWeight { get; set; } = 0;
         public double VapourFactor { get; set; } = 0;
-        //public double LiquidTemperature { get; set; }
+        [NotMapped]
+        public decimal LiquidTemperature { get; set; }
 
         public double LiquidDensityAir { get => LiquidDensityVac * 0.0011; set { } }
         public double CorrectedLiquidLevel { get => ObservedSounding + TapeCorrection; set { } }

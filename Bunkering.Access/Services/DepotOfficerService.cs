@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 
 namespace Bunkering.Access.Services
@@ -64,61 +65,52 @@ namespace Bunkering.Access.Services
         {
             try
             {
+                var user = await _userManager.FindByEmailAsync(User);
                 var userExists = await _userManager.Users.AnyAsync(c => c.Id == newDepotOfficer.UserID);
                 var depotExists = await _unitOfWork.Plant.FirstOrDefaultAsync(c => c.Id ==  newDepotOfficer.DepotID) is not null;
 
 
                 if (!depotExists)
-                {
                     _response = new ApiResponse
                     {
                         Message = "Facility not found",
                         StatusCode = HttpStatusCode.NotFound,
-                        Success = false
                     };
-                    
-                }
-
                 else if(!userExists)
-                {
                     _response = new ApiResponse
                     {
                         Message = "Officer not found",
                         StatusCode = HttpStatusCode.NotFound,
-                        Success = false
                     };
-                    
-                }
-
-
-                var depotOfficerExist = await _unitOfWork.PlantOfficer.FirstOrDefaultAsync(j => j.PlantID.Equals(newDepotOfficer.DepotID));
-
-
-                if (depotOfficerExist != null)
+                else
                 {
-                    return new ApiResponse
+
+                    var depotOfficerExist = await _unitOfWork.PlantOfficer.FirstOrDefaultAsync(j => j.PlantID.Equals(newDepotOfficer.DepotID) && j.OfficerID.Equals(newDepotOfficer.UserID));
+
+                    if (depotOfficerExist != null && depotOfficerExist.IsDeleted)
                     {
-                        Message = "Depot already assigned to an officer!",
-                        StatusCode = HttpStatusCode.Conflict,
-                        Success = false
+                        depotOfficerExist.IsDeleted = false;
+
+                        await _unitOfWork.PlantOfficer.Update(depotOfficerExist);
+                        await _unitOfWork.SaveChangesAsync(user.Id);
+                    }
+                    else if(depotOfficerExist is null)
+                    {
+                        var map = new PlantFieldOfficer
+                        {
+                            PlantID = newDepotOfficer.DepotID,
+                            OfficerID = newDepotOfficer.UserID
+                        };
+                        await _unitOfWork.PlantOfficer.Add(map);
+                        await _unitOfWork.SaveChangesAsync(user.Id);
+                    }
+                    _response = new ApiResponse
+                    {
+                        Message = "Depot Officer mapping was added successfully.",
+                        StatusCode = HttpStatusCode.OK,
+                        Success = true,
                     };
                 }
-                var map = new PlantFieldOfficer
-                {
-                    PlantID = newDepotOfficer.DepotID,
-                    OfficerID = newDepotOfficer.UserID
-                };
-                await _unitOfWork.PlantOfficer.Add(map);
-                await _unitOfWork.SaveChangesAsync("");
-
-                return new ApiResponse
-                {
-                    Message = "Depot Officer mapping was added successfully.",
-                    StatusCode = HttpStatusCode.OK,
-                    Success = true,
-                };
-
-
             }
             catch (Exception ex)
             {

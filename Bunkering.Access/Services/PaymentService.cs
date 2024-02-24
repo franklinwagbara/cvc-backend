@@ -846,7 +846,7 @@ namespace Bunkering.Access.Services
                 {
                     Data = debitnotes.Select(x => new
                     {
-                        x.Id,
+                        PaymentId = x.Id,
                         x.COQId,
                         x.OrderId,
                         AddedDate = x.TransactionDate.ToString("yyyy-MM-dd hh:mm:ss"),

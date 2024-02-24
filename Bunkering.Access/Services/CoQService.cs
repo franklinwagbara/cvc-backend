@@ -1339,21 +1339,21 @@ namespace Bunkering.Access.Services
                 var coq = await _context.CoQs.FirstOrDefaultAsync(c => c.Id == id);
                 var gastankList = new List<GasTankReadingsPerCoQ>();
                 var liqtankList = new List<LiquidTankReadingsPerCoQ>();
-                var product = new Product();
+                var product = (await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.AppId.Equals(coq.AppId) && x.DepotId.Equals(coq.PlantId), "Product")).Product;
 
                 if (coq is null)
                     return new() { StatusCode = HttpStatusCode.NotFound, Success = false };
 
                 var docs = await _context.SubmittedDocuments.FirstOrDefaultAsync(c => c.ApplicationId == coq.Id);
 
-                if (coq.ProductId != null)
-                    product = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(coq.ProductId));
-                else
-                {
-                    var app = await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.Id.Equals(coq.AppId), "Product");
-                    if (app != null)
-                        product = app.Product;
-                }
+                //if (coq.ProductId != null)
+                //    product = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(coq.ProductId));
+                //else
+                //{
+                //    var app = await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.Id.Equals(coq.AppId), "Product");
+                //    if (app != null)
+                //        product = app.Product;
+                //}
                 if (product != null)
                 {
                     switch (product.ProductType.ToLower())
@@ -1373,6 +1373,7 @@ namespace Bunkering.Access.Services
                                                         MolecularWeight = m.MolecularWeight,
                                                         ObservedLiquidVolume = m.ObservedLiquidVolume,
                                                         ObservedSounding = m.ObservedSounding,
+                                                        LiquidTemperature = (double)m.Tempearture,
                                                         ShrinkageFactorLiquid = m.ShrinkageFactorLiquid,
                                                         ShrinkageFactorVapour = m.ShrinkageFactorVapour,
                                                         TapeCorrection = m.TapeCorrection,
@@ -1414,6 +1415,7 @@ namespace Bunkering.Access.Services
                 var dictionary = coq.Stringify().Parse<Dictionary<string, object>>();
                 var coqData = new CoQsDataDTO()
                 {
+                    Id = coq.Id,
                     Vessel = new(),
                     DateOfSTAfterDischarge = coq.DateOfSTAfterDischarge,
                     DateOfVesselArrival = coq.DateOfVesselArrival,
@@ -1428,7 +1430,6 @@ namespace Bunkering.Access.Services
                     AppId = coq.AppId,
                     Reference = coq.Reference,
                     QuauntityReflectedOnBill = coq.QuauntityReflectedOnBill
-
                 };
                 if (coq.AppId != null || coq.Reference != null)
                 {
