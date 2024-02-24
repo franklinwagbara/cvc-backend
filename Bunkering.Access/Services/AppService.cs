@@ -954,7 +954,7 @@ namespace Bunkering.Access.Services
                         PaymnetStatus = x.Payments.Count > 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted))
                         ? "Payment confirmed" : x.Payments.Count > 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentRejected)) ? "Payment rejected" : "Payment pending",
                         x.Payments.FirstOrDefault()?.RRR,
-                        PaymentId = x.Payments.FirstOrDefault().Id,
+                        PaymentId = x.Payments?.FirstOrDefault()?.Id,
                         CreatedDate = x.CreatedDate.ToString("MMMM dd, yyyy HH:mm:ss")
                     })
                 };
@@ -1077,7 +1077,7 @@ namespace Bunkering.Access.Services
 
             if (payment.Count() > 0)
             {
-                var pendingCoqs = coq.ToList().Where(c => payment.ToList().Any(p => !p.COQId.Equals(c.Id)));
+                var pendingCoqs = coq.Where(c => payment.ToList().Any(p => !p.COQId.Equals(c.Id)));
 
                 if (coq != null)
                     return new ApiResponse

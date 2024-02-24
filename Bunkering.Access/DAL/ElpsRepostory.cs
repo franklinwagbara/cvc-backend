@@ -517,9 +517,9 @@ namespace Bunkering.Access.DAL
 					serviceCharge = Decimal.ToInt32(fee.SerciveCharge).ToString(),
 					amountDue = Decimal.ToInt32(amountdue).ToString(),
 					orderId = application.Reference,
-					returnSuccessUrl = $"{baseUrl}/api/Payment/Remita?id={application.Id}",
-					returnFailureUrl = $"{baseUrl}/api/Payment/Remita?id={application.Id}",
-					returnBankPaymentUrl = $"{baseUrl}/api/Payment/Remita?id={application.Id}",
+					returnSuccessUrl = $"{baseUrl}/api/Payment/Remita?id={application.Payments.FirstOrDefault().Id}",
+					returnFailureUrl = $"{baseUrl}/api/Payment/Remita?id={application.Payments.FirstOrDefault().Id}",
+					returnBankPaymentUrl = $"{baseUrl}/api/Payment/Remita?id={application.Payments.FirstOrDefault().Id}",
 					lineItems = new List<RPartner>
 					{
 						new RPartner
