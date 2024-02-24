@@ -21,7 +21,7 @@ namespace Bunkering.Core.ViewModels
 			{
 				opt.PreCondition(pr => (pr.LiquidTemperature > 0));
 				opt.MapFrom(src => src.LiquidTemperature);
-            }) ;
+            });
 			CreateMap<CreateCoQLiquidDto, TankMeasurement>().ReverseMap();
 		}
 	}
