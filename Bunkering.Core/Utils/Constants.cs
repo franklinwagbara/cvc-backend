@@ -14,6 +14,7 @@
         public const string SUPER_ADMIN = "SuperAdmin";
         public const string Field_Officer = "Field_Officer";
         public const string COORDINATOR = "Coordinator";
+        public const string FAD = "FAD";
     }
 
     public static class LOCATION
