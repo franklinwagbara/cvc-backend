@@ -1346,14 +1346,22 @@ namespace Bunkering.Access.Services
 
                 var docs = await _context.SubmittedDocuments.FirstOrDefaultAsync(c => c.ApplicationId == coq.Id);
 
-                //if (coq.ProductId != null)
-                //    product = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(coq.ProductId));
-                //else
-                //{
-                //    var app = await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.Id.Equals(coq.AppId), "Product");
-                //    if (app != null)
-                //        product = app.Product;
-                //}
+                var appHistories = await _unitOfWork.COQHistory.Find(h => h.COQId.Equals(coq.Id));
+                if(appHistories.Count() > 0)
+                {
+                    var users = _userManager.Users.Include(c => c.Company).Include(ur => ur.UserRoles).ThenInclude(r => r.Role);
+                    appHistories.ToList().ForEach(h =>
+                    {
+
+                        var t = users.FirstOrDefault(x => x.Id.Equals(h.TriggeredBy));
+                        var r = users.FirstOrDefault(x => x.Id.Equals(h.TargetedTo));
+                        h.TriggeredBy = t.Email;
+                        h.TriggeredByRole = t.UserRoles.FirstOrDefault().Role.Name;
+                        h.TargetedTo = r.Email;
+                        h.TargetRole = r.UserRoles.FirstOrDefault().Role.Name;
+                    });
+                }
+
                 if (product != null)
                 {
                     switch (product.ProductType.ToLower())
@@ -1381,6 +1389,7 @@ namespace Bunkering.Access.Services
                                                         VapourPressure = m.VapourPressure,
                                                         VapourTemperature = m.VapourTemperature,
                                                         TankVolume = m.TankVolume,
+                                                        VCF = m.VCF,
                                                         MeasurementType = m.MeasurementType
                                                     }).ToList()
                                                 }).ToListAsync();
@@ -1416,7 +1425,7 @@ namespace Bunkering.Access.Services
                 var coqData = new CoQsDataDTO()
                 {
                     Id = coq.Id,
-                    Vessel = new(),
+                    Vessel = new Vessel(),
                     DateOfSTAfterDischarge = coq.DateOfSTAfterDischarge,
                     DateOfVesselArrival = coq.DateOfVesselArrival,
                     DateOfVesselUllage = coq.DateOfVesselUllage,
@@ -1433,7 +1442,7 @@ namespace Bunkering.Access.Services
                 };
                 if (coq.AppId != null || coq.Reference != null)
                 {
-                    var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(coq.AppId) || x.Reference == coq.Reference, "Facility");
+                    var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(coq.AppId) || x.Reference == coq.Reference, "Facility.VesselType");
                     var jetty = _unitOfWork.Jetty.Query().FirstOrDefault(x => x.Id == app.Jetty)?.Name;
                     if (app != null)
                     {
@@ -1447,7 +1456,7 @@ namespace Bunkering.Access.Services
                         coqData.NominatedSurveyor = (await _unitOfWork.NominatedSurveyor.FirstOrDefaultAsync(c => c.Id == app.SurveyorId)).Name;
                         coqData.AppId = app.Id;
                         coqData.ApplicationTypeId = app.ApplicationTypeId;
-                        coqData.ApplicationType = (await _unitOfWork.ApplicationType.FirstOrDefaultAsync(c => c.Id == app.ApplicationTypeId)).Name;
+                        coqData.ApplicationType = Enum.GetName(typeof(AppTypes), AppTypes.COQ);
                     }
                 }
                 coqData.ProductType = product.ProductType;
@@ -1462,7 +1471,8 @@ namespace Bunkering.Access.Services
                         {
                             coq = coqData,
                             tankList = gastankList,
-                            docs
+                            docs,
+                            appHistories
                         }
                     };
                 else
@@ -1474,13 +1484,13 @@ namespace Bunkering.Access.Services
                         {
                             coq = coqData,
                             tankList = liqtankList,
-                            docs
+                            docs,
+                            appHistories
                         }
                     };
             }
             catch (Exception ex)
             {
-
                 throw;
             }
         }
