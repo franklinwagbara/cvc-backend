@@ -2,6 +2,7 @@
 using Bunkering.Access.IContracts;
 using Bunkering.Access.Services;
 using Bunkering.Core.Data;
+using Bunkering.Core.Utils;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -252,40 +253,30 @@ namespace Bunkering.Controllers.API
             {
                 var license = await _coqService.ViewCoQCertificate(id);
 
-                var coqData = license.Data as COQGASCertificateDTO;
+                var coqData = license.Data as COQNonGasCertificateDTO;
+                var viewAsPdf = new ViewAsPdf();
 
-                if (coqData != null && coqData.ProductType == "Gas")
-                {
-                    //return View("ViewGasCertificate", license.Data);
-                    var viewAsPdf =  new ViewAsPdf("ViewGasCertificate", license.Data)
+                if (coqData != null && coqData.ProductType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.Gas)))
+                    viewAsPdf = new ViewAsPdf("ViewGasCertificate", license.Data)
                     {
                         PageSize = Size.A4,
                         //PageHeight = 327,
                         PageOrientation = Orientation.Landscape,
                         FileName = $"CoQ Certificate_{DateTime.Now.Day}-{DateTime.Now.Month}-{DateTime.Now.Year}.pdf",
-
                     };
-                    var pdf = await viewAsPdf.BuildFile(ControllerContext);
-                    return File(new MemoryStream(pdf), "application/pdf");
-                }
                 else
-                {
-                    var viewAsPdf = new ViewAsPdf("ViewCertificate", license.Data)
+                    viewAsPdf = new ViewAsPdf("ViewCertificate", license.Data)
                     {
                         PageSize = Size.A4,
                         //PageHeight = 327,
                         PageOrientation = Orientation.Landscape,
                         FileName = $"CoQ Certificate_{DateTime.Now.Day}-{DateTime.Now.Month}-{DateTime.Now.Year}.pdf",
-
                     };
-                    var pdf = await viewAsPdf.BuildFile(ControllerContext);
-                    return File(new MemoryStream(pdf), "application/pdf");
-                }              
-                
+                var pdf = await viewAsPdf.BuildFile(ControllerContext);
+                return File(new MemoryStream(pdf), "application/pdf"); 
             }
             catch (Exception ex)
             {
-
                 throw;
             }
         }
