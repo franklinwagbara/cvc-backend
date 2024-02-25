@@ -1572,14 +1572,18 @@ namespace Bunkering.Access.Services
 
             var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId) && !string.IsNullOrEmpty(c.DischargeId), "Application.Facility.VesselType,Application.User.Company,Application.AppJetty");
             //var apps = appDepots.Select(x => x.Application);
-            var coq = (await _unitOfWork.CoQ.Find(c => appDepots.Any(ad => ad.AppId.Equals(c.AppId) && ad.DepotId.Equals(c.PlantId)))).Select(i => new {i.AppId, i.PlantId}).ToList();
+            IEnumerable<CoQ>? alldepotcoqs = await _unitOfWork.CoQ.Find(c => appDepots.Any(ad => ad.AppId.Equals(c.AppId) && ad.DepotId.Equals(c.PlantId)));
+            var coq = (alldepotcoqs.Where(c => appDepots.Any(ad => ad.AppId.Equals(c.AppId) && ad.DepotId.Equals(c.PlantId)))).Select(i => new {i.AppId, i.PlantId}).ToList();
             var apps = appDepots.Select(a => a.Application);
             if(coq.Count > 0)
             {
                 appDepots = appDepots.Where(a => !coq.Any(x => x.PlantId.Equals(a.DepotId) && x.AppId.Equals(a.AppId)));
-                apps = appDepots.Select(a => a.Application);
+                apps = appDepots.GroupBy(x => x.AppId).Select(a => a.FirstOrDefault().Application);
             }
+            var rejectedApps = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Rejected)));
 
+            if (rejectedApps.Count() > 0)
+                apps = apps.Concat(rejectedApps.Select(a => a.Application));
             var data = apps.GroupBy(x => x.Id).Select(x => x.FirstOrDefault()).OrderByDescending(x => x.SubmittedDate).Select(n => new
             {
                 n.Id,
@@ -1629,7 +1633,7 @@ namespace Bunkering.Access.Services
                     Success = false
                 };
 
-            var apps = await _unitOfWork.Application.Find(c => jettys.Contains(c.Jetty) && c.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)) && !c.HasCleared);
+            var apps = await _unitOfWork.Application.Find(c => jettys.Contains(c.Jetty) && c.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)) && !c.HasCleared, "User.Company,Facility.VesselType,AppJetty");
             var data = apps.GroupBy(x => x.Id).Select(x => x.FirstOrDefault()).OrderByDescending(x => x.SubmittedDate).Select(n => new
             {
                 n.Id,
@@ -1650,7 +1654,7 @@ namespace Bunkering.Access.Services
                 Message = "Applications fetched successfully",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                Data = apps
+                Data = data
             };
 
             return _response;

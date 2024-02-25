@@ -1425,6 +1425,7 @@ namespace Bunkering.Access.Services
                 var coqData = new CoQsDataDTO()
                 {
                     Id = coq.Id,
+                    PlantId = coq.PlantId,
                     Vessel = new Vessel(),
                     DateOfSTAfterDischarge = coq.DateOfSTAfterDischarge,
                     DateOfVesselArrival = coq.DateOfVesselArrival,
@@ -1438,6 +1439,8 @@ namespace Bunkering.Access.Services
                     Status = coq.Status,
                     AppId = coq.AppId,
                     Reference = coq.Reference,
+                    NameConsignee = coq.NameConsignee,
+                    DischargeShipFigure = coq.DischargeShipFigure,
                     QuauntityReflectedOnBill = coq.QuauntityReflectedOnBill
                 };
                 if (coq.AppId != null || coq.Reference != null)
