@@ -576,7 +576,7 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var user = await _userManager.FindByEmailAsync(User);
+                //var user = await _userManager.FindByEmailAsync(User);
                 var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.Id.Equals(id));
                 if (payment != null)
                 {
@@ -592,19 +592,14 @@ namespace Bunkering.Access.Services
                             {
                                 var dic = content.Parse<Dictionary<string, string>>();
                                 if ((!string.IsNullOrEmpty(dic.GetValue("message").ToString()) && dic.GetValue("message").ToString().Equals("Successful"))
-                                    || (!string.IsNullOrEmpty(dic.GetValue("status").ToString()) && dic.GetValue("status").ToString().Equals("00")))
+                                    || (!string.IsNullOrEmpty(dic.GetValue("status").ToString()) && (dic.GetValue("status").ToString().Equals("00") || dic.GetValue("status").ToString().Equals("01"))))
                                 {
                                     payment.Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted);
-                                    //payment.TransactionDate = Convert.ToDateTime(dic.GetValue("transactiontime"));
                                     payment.PaymentDate = Convert.ToDateTime(dic.GetValue("paymentDate"));
                                     payment.AppReceiptId = dic.GetValue("appreceiptid") != null ? dic.GetValue("appreceiptid") : "";
                                     payment.TxnMessage = dic.GetValue("message");
-                                    //payment.tx = Convert.ToDecimal(dic.GetValue("amount"));
-                                    //payment.Application.Status = Enum.GetName(typeof(AppStatus), 2);
-
-
                                     await _unitOfWork.Payment.Update(payment);
-                                    await _unitOfWork.SaveChangesAsync(user.Id);
+                                    await _unitOfWork.SaveChangesAsync("system");
 
                                     _response = new ApiResponse
                                     {
