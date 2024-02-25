@@ -108,7 +108,10 @@ namespace Bunkering.Access.Services
                 if (depots.Any())
                 {
                     var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId) && !string.IsNullOrEmpty(c.DischargeId));
-                    deskCnt += appDepots.GroupBy(x => x.AppId).Select(x => x.FirstOrDefault()).Count();
+
+					var appsWithCoq = allCoqs.Where(c => appDepots.Any(ad => ad.AppId.Equals(c.AppId) && ad.DepotId.Equals(c.PlantId))).Select(i => new { i.AppId, i.PlantId }).ToList();
+
+                    deskCnt += appDepots.Where(a => !appsWithCoq.Any(x => x.AppId.Equals(a.AppId) && x.PlantId.Equals(a.DepotId))).GroupBy(x => x.AppId).Count();
                 }
                 totalApps = allCoqs.Count();
                 totalCertificates = totalApproved = allCoqs.Count(a => a.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)));
