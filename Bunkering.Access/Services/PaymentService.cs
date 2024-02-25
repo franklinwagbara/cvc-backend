@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Options;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -599,7 +600,7 @@ namespace Bunkering.Access.Services
                                     payment.AppReceiptId = dic.GetValue("appreceiptid") != null ? dic.GetValue("appreceiptid") : "";
                                     payment.TxnMessage = dic.GetValue("message");
                                     await _unitOfWork.Payment.Update(payment);
-                                    await _unitOfWork.SaveChangesAsync("system");
+                                    _unitOfWork.Save();
 
                                     _response = new ApiResponse
                                     {
