@@ -110,7 +110,7 @@ namespace Bunkering.Controllers.API
             if (response.Success)
             {
                 var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.Id == id);
-                id = payment.ApplicationId.Value;
+                id = payment.ApplicationId != null ? payment.ApplicationId.Value : id;
             }
             return Redirect($"{_appSetting.LoginUrl}/company/paymentsum/{id}");
         }
