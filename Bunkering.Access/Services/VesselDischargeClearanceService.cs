@@ -43,7 +43,7 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var user = await _userManager.FindByEmailAsync(User);
+                var user = _userManager.Users.Include(ur => ur.UserRoles).ThenInclude(r => r.Role).FirstOrDefault(i => i.Email.Equals(User));
                 var create = await _unitOfWork.VesselDischargeClearance.FirstOrDefaultAsync(x => x.AppId == model.AppId);
 
                 if (create != null)
@@ -139,7 +139,7 @@ namespace Bunkering.Access.Services
                     };
 
                 //Fetch Office Supervisor
-                var supervisor = _userManager.Users.FirstOrDefault(u => u.UserRoles.FirstOrDefault().Role.Name.Equals("Supervisor") && u.IsActive && u.LocationId.Equals(user.LocationId));
+                var supervisor = _userManager.Users.Include(ur => ur.UserRoles).ThenInclude(r => r.Role).FirstOrDefault(u => u.UserRoles.FirstOrDefault().Role.Name.Equals("Supervisor") && u.IsActive && u.LocationId.Equals(user.LocationId));
 
                 await _unitOfWork.ApplicationHistory.Add(new ApplicationHistory
                 {

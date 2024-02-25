@@ -92,6 +92,8 @@ namespace Bunkering.Access.Services
 			var user = await _userManager.FindByEmailAsync(User);
 
 			var wk = _mapper.Map<WorkFlow>(model);
+			wk.TargetRole = model.TargetRoleId;
+			wk.TriggeredByRole = model.TriggeredByRoleId;
 			//wk.TriggeredByRole = (await _role.Roles.FirstOrDefaultAsync(x => x.Id == model.TriggeredByRoleId))?.Name;
 			//wk.TargetRole = (await _role.Roles.FirstOrDefaultAsync(x => x.Id == model.TargetRoleId))?.Name;
 

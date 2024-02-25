@@ -15,8 +15,10 @@ namespace Bunkering.Core.ViewModels
 			CreateMap<ApplictionViewModel, Application>().ReverseMap();
 			CreateMap<AppDepotViewModel, ApplicationDepot>().ReverseMap();
 			CreateMap<TankViewModel, Tank>().ReverseMap();
-			CreateMap<WorkflowviewModel, WorkFlow>().ReverseMap();
-			CreateMap<FacilitySourceDto, FacilitySource>().ReverseMap();
+			CreateMap<WorkflowviewModel, WorkFlow>()
+				.ForMember(w => w.TriggeredByRole, opt => opt.MapFrom(src => src.TriggeredByRoleId))
+                .ForMember(w => w.TargetRole, opt => opt.MapFrom(src => src.TargetRoleId)).ReverseMap();
+            CreateMap<FacilitySourceDto, FacilitySource>().ReverseMap();
 			CreateMap<TankMeasurement, CreateCoQGasTankDTO>().ReverseMap()
 				.ForMember(t => t.Tempearture, opt =>
 			{
