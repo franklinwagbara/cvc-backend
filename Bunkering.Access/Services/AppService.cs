@@ -1580,10 +1580,23 @@ namespace Bunkering.Access.Services
                 appDepots = appDepots.Where(a => !coq.Any(x => x.PlantId.Equals(a.DepotId) && x.AppId.Equals(a.AppId)));
                 apps = appDepots.GroupBy(x => x.AppId).Select(a => a.FirstOrDefault().Application);
             }
-            var rejectedApps = await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Rejected)));
+            var rejectedCoQs = (await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Rejected)), "Application.User.Company,Application.Facility.VesselType,Application.AppJetty")).Select(n => new
+            {
+                n.Id,
+                CompanyName = n.Application.User.Company.Name,
+                n.Application.VesselName,
+                VesselType = n.Application.Facility.VesselType.Name,
+                CompanyEmail = n.Application.User.Email,
+                n.Reference,
+                Jetty = n.Application.AppJetty.Name,
+                n.Status,
+                n.Application.HasCleared,
+                CreatedDate = n.DateCreated.ToString("yyyy-MM-dd hh:mm:ss"),
+                SubmittewdDate = n.SubmittedDate.Value.ToString("yyyy-MM-dd hh:mm:ss"),
+            }); ;
 
-            if (rejectedApps.Count() > 0)
-                apps = apps.Concat(rejectedApps.Select(a => a.Application));
+            //if (rejectedApps.Count() > 0)
+            //    apps = apps.Concat(rejectedApps.Select(a => a.Application));
             var data = apps.GroupBy(x => x.Id).Select(x => x.FirstOrDefault()).OrderByDescending(x => x.SubmittedDate).Select(n => new
             {
                 n.Id,
@@ -1596,7 +1609,6 @@ namespace Bunkering.Access.Services
                 n.Status,
                 n.HasCleared,
                 CreatedDate = n.CreatedDate.ToString("yyyy-MM-dd hh:mm:ss"),
-
             });
 
             _response = new ApiResponse
@@ -1604,7 +1616,11 @@ namespace Bunkering.Access.Services
                 Message = "Applications fetched successfully",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                Data = data
+                Data = new
+                {
+                    clearedNOAs = data,
+                    rejectedCoQs
+                }
             };
 
             return _response;
