@@ -41,7 +41,7 @@ namespace Bunkering.Core.ViewModels
         public string productOrServiceType { get; set; }
         public string daughterVesselName { get; set; }
         public string motherVesselName { get; set; }
-        public string dupplier { get; set; }
+        public string supplier { get; set; }
         public string depot { get; set; }
     }
 
