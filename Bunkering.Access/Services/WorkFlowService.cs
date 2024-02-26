@@ -271,8 +271,7 @@ namespace Bunkering.Access.Services
                 {
                     Content = new StringContent(debitNoteSAPPostRequest.Stringify(), Encoding.UTF8, "application/json")
                 };
-                httpRequest.Headers.Add("X-API-Key",
-                    _appSetting.SAPKey);
+                httpRequest.Headers.Add("X-API-Key", _appSetting.SAPKey);
                 var notifySAP = await Utils.Send(_appSetting.SAPBaseUrl, httpRequest);
 
                 if(notifySAP.IsSuccessStatusCode)
@@ -324,6 +323,15 @@ namespace Bunkering.Access.Services
                         revenueCode = Enum.GetName(typeof(AppTypes), AppTypes.DebitNote),
                         wholeSalePrice = coq.DepotPrice
                     }
+                },
+                contacts = new List<DebitNoteContact> 
+                { 
+                    new DebitNoteContact
+                    {
+                        firstName = coq.Application.User.FirstName,
+                        lastName = coq.Application.User.LastName,
+                        phoneNumber = coq.Application.User.PhoneNumber
+                    } 
                 }
             };
         }

@@ -390,7 +390,7 @@ namespace Bunkering.Access.Services
 					countryName = user.Company.Name,
                 };
 
-                var addList = new List<RegisteredAddress>();
+                var addList = new List<RegisteredAddress> {  add };
 
                 if (user.Company.AddressId > 0)
                 {
@@ -400,8 +400,12 @@ namespace Bunkering.Access.Services
                 }
                 else
                 {
-                    var req = _elps.AddCompanyRegAddress(addList, user.ElpsId).Stringify().Parse<List<RegisteredAddress>>().FirstOrDefault();
-                    user.Company.AddressId = req.id;
+					var response = _elps.AddCompanyRegAddress(addList, user.ElpsId);
+					if(response != null)
+                    {
+                        var req = response.Stringify().Parse<List<RegisteredAddress>>().FirstOrDefault();
+                        user.Company.AddressId = req.id;
+                    }
                 }
 
                 user.Company.Address = model.address_1;
