@@ -738,7 +738,7 @@ namespace Bunkering.Access.Services
             {
                 var year = DateTime.Now.Year.ToString();
                 var pno = $"NMDPRA/DSSRI/CVC/{app.ApplicationType.Name.Substring(0, 1).ToUpper()}/{year.Substring(2)}/{app.Id}";
-                var qrcode = Utils.GenerateQrCode($"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/api/Licenses/ValidateQrCode/{id}");
+                var qrcode = Utils.GenerateQrCode($"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/api/Licenses/ValidateQrCode?id={id}");
                 //license.QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length);
                 //save permit to elps and portal
                 var permit = new Permit
