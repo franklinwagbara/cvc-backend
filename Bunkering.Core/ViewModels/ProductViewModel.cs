@@ -11,5 +11,7 @@ namespace Bunkering.Core.ViewModels
         public int Id { get; set; }
         public string Name { get; set; }
         public string ProductType { get; set; }
+        public string? RevenueCode { get; set; }
+        public string? RevenueCodeDescription { get; set; }
     }
 }

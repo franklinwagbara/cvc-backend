@@ -33,12 +33,12 @@ namespace Bunkering.Core.ViewModels
     {
         public string revenueCode { get; set; }
         public string revenueDescription { get; set; }
-        public int quantity => 1;
+        public double quantity => 0.005;
         public double shoreVolume { get; set; }
         public double wholeSalePrice { get; set; }
         public double appliedFactor { get; set; }
         public string directorate { get; set; }
-        public string productOrServiceType { get; set; }
+        public string productOrServiceType => "AdmCharg";
         public string daughterVesselName { get; set; }
         public string motherVesselName { get; set; }
         public string supplier { get; set; }
