@@ -256,8 +256,8 @@ namespace Bunkering.Controllers.API
                 var coqData = license.Data as COQNonGasCertificateDTO;
                 var viewAsPdf = new ViewAsPdf();
 
-                if (coqData != null && coqData.ProductType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.Gas)))
-                    viewAsPdf = new ViewAsPdf("ViewGasCertificate", license.Data)
+                if (coqData != null && coqData.ProductType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.NonGas)))
+                    viewAsPdf = new ViewAsPdf("ViewCertificate", license.Data)
                     {
                         PageSize = Size.A4,
                         //PageHeight = 327,
@@ -265,7 +265,7 @@ namespace Bunkering.Controllers.API
                         FileName = $"CoQ Certificate_{DateTime.Now.Day}-{DateTime.Now.Month}-{DateTime.Now.Year}.pdf",
                     };
                 else
-                    viewAsPdf = new ViewAsPdf("ViewCertificate", license.Data)
+                    viewAsPdf = new ViewAsPdf("ViewGasCertificate", license.Data)
                     {
                         PageSize = Size.A4,
                         //PageHeight = 327,

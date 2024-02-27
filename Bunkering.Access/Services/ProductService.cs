@@ -4,14 +4,7 @@ using Bunkering.Core.Data;
 using Bunkering.Core.Utils;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Http;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Formats.Asn1;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Bunkering.Access.Services
 {
@@ -25,15 +18,13 @@ namespace Bunkering.Access.Services
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
-           // _response = new ApiResponse();
         }
 
         public async Task<ApiResponse> AllProducts()
         {
             try
             {
-                var allProducts = await _unitOfWork.Product.GetAll();
-                var allProduct = allProducts.Where(x => x.IsDeleted == false).ToList();
+                var allProducts = await _unitOfWork.Product.Find(x => !x.IsDeleted);
                 return new ApiResponse
                 {
                     Data = allProducts,
@@ -44,10 +35,10 @@ namespace Bunkering.Access.Services
             }
             catch (Exception ex)
             {
-                return new ApiResponse { Data = ex };
+                return new ApiResponse { Message = ex.Message };
             }
-
         }
+
         public async Task<ApiResponse> GetProductsById(int id)
         {
             var getById = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(id));
@@ -74,6 +65,7 @@ namespace Bunkering.Access.Services
             }
             return _response;
         }
+
         public async Task<ApiResponse> CreateProduct(ProductViewModel model)
         {
             var createProduct = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Name.ToLower() == model.Name.ToLower());
@@ -91,7 +83,9 @@ namespace Bunkering.Access.Services
             var product = new Product
             {
                 Name = model.Name,
-                ProductType = model.ProductType
+                ProductType = model.ProductType,
+                RevenueCode = model.RevenueCode,
+                RevenueCodeDescription = model.RevenueCodeDescription,
             };
 
             await _unitOfWork.Product.Add(product);
@@ -108,6 +102,7 @@ namespace Bunkering.Access.Services
 
             return _response;
         }
+
         public async Task<ApiResponse> EditProduct(ProductViewModel model)
         {
             var editProduct =  await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id == model.Id);
@@ -115,6 +110,8 @@ namespace Bunkering.Access.Services
             {
                 editProduct.Name = model.Name;
                 editProduct.ProductType = model.ProductType;
+                editProduct.RevenueCodeDescription = model.RevenueCodeDescription;
+                editProduct.RevenueCode = model.RevenueCode;
 
                 await _unitOfWork.Product.Update(editProduct);
                  _unitOfWork.Save();
@@ -138,6 +135,7 @@ namespace Bunkering.Access.Services
             }
             return _response;
         }
+
         public async Task<ApiResponse> DeleteProduct(int id)
         {
             var delProduct = await _unitOfWork.Product.FirstOrDefaultAsync(x => x.Id.Equals(id));
@@ -166,8 +164,6 @@ namespace Bunkering.Access.Services
                         Success = true,
                     };
                 }
-
-
             }
             else
             {
@@ -180,6 +176,5 @@ namespace Bunkering.Access.Services
             }
             return _response;
         }
-
     }
 }
