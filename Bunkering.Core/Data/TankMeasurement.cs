@@ -22,7 +22,7 @@ namespace Bunkering.Core.Data
         public double Density { get; set; } = 0;
         public double VCF { get; set; } = 0;
 
-        public double GSV { get; set; } = 0;
+        public double GSV  => GOV * VCF;
         public double MTVAC { get; set; } = 0;
         public double LiquidDensityVac { get; set; } = 0;
         public double ObservedSounding { get; set; } = 0;
