@@ -1837,8 +1837,6 @@ namespace Bunkering.Access.Services
             var tankList = new List<CoQTanksDTO>();
             foreach (var item in coQTanks)
             {
-                //var  tanks = new List<CoQTanksDTO>
-
                 var tr = new CoQTanksDTO
                 {
                     AfterTankMeasurement = item.TankMeasurement.Where(t => t.MeasurementType == ReadingType.After)
@@ -1861,6 +1859,9 @@ namespace Bunkering.Access.Services
                             WaterVolume = tt.WaterVolume,
                             LiquidDensityVac = tt.LiquidDensityVac,
                             MolecularWeight = tt.MolecularWeight,
+                            ShrinkageFactorVapour = tt.ShrinkageFactorVapour,
+                            LiquidTemperature = (double)tt.LiquidTemperature,
+                            VapourTemperature = (double)tt.VapourTemperature,
                             ObservedLiquidVolume = tt.ObservedLiquidVolume,
                             ObservedSounding = tt.ObservedSounding,
                             ShrinkageFactorLiquid = tt.ShrinkageFactorLiquid,
@@ -1892,6 +1893,9 @@ namespace Bunkering.Access.Services
                             LiquidDensityVac = tt.LiquidDensityVac,
                             //LiquidTemperature = tt.LiquidTemperature
                             MolecularWeight = tt.MolecularWeight,
+                            ShrinkageFactorVapour = tt.ShrinkageFactorVapour,
+                            LiquidTemperature = (double)tt.LiquidTemperature,
+                            VapourTemperature = (double)tt.VapourTemperature,
                             ObservedLiquidVolume = tt.ObservedLiquidVolume,
                             ObservedSounding = tt.ObservedSounding,
                             ShrinkageFactorLiquid = tt.ShrinkageFactorLiquid,
