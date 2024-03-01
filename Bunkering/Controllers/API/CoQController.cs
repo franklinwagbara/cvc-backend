@@ -469,6 +469,30 @@ namespace Bunkering.Controllers.API
         public async Task<IActionResult> CreateCOQForLiquid(CreateCoQLiquidDto model) => Response(await _coqService.CreateCOQForLiquid(model));
 
         /// <summary>
+        /// This endpoint is used to edit coq
+        /// </summary>
+        /// <returns>Returns a message after editing </returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// POST: api/coq/edi-coq/xxxx
+        /// 
+        /// </remarks>
+        /// <param name="model">model for editing coq</param>
+        /// <response code="200">Returns a success message </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("edit-coq-liquid")]
+        [HttpPost]
+        public async Task<IActionResult> EditCOQForLiquid(int id, CreateCoQLiquidDto model) => Response(await _coqService.EditCOQForLiquid(id, model));
+
+
+        /// <summary>
         /// This endpoint is used to add coq gas tanks
         /// </summary>
         /// <returns>Returns a message after adding </returns>

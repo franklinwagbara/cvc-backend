@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Dynamic;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Security.AccessControl;
 using System.Security.Claims;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -1045,6 +1046,185 @@ namespace Bunkering.Access.Services
             }
             catch (Exception ex)
             { 
+                transaction.Rollback();
+
+                return new ApiResponse
+                {
+                    Message = $"An error occur, COQ not created: {ex.Message}",
+                    Success = false,
+                    StatusCode = HttpStatusCode.InternalServerError
+                };
+            }
+        }
+
+        public async Task<ApiResponse> EditCOQForLiquid(int id, CreateCoQLiquidDto model)
+        {
+            var user = await _userManager.FindByEmailAsync(LoginUserEmail) ?? throw new Exception("Unathorise, this action is restricted to only authorise users");
+
+            using var transaction = _context.Database.BeginTransaction();
+            try
+            {
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id == id);
+                if(coq != null)
+                {
+                    coq.DateOfSTAfterDischarge = model.DateOfSTAfterDischarge;
+                    coq.DateOfVesselArrival = model.DateOfVesselArrival;
+                    coq.DateOfVesselUllage = model.DateOfVesselUllage;
+                    coq.DepotPrice = model.DepotPrice;
+                    coq.ProductId = model.ProductId;
+                    coq.Status = Enum.GetName(typeof(AppStatus), AppStatus.Processing);
+                    coq.DateModified = DateTime.UtcNow.AddHours(1);
+                    _context.CoQs.Update(coq);
+
+                    var coqTanks = await _unitOfWork.CoQTank.Find(t => t.CoQId.Equals(id), "TankMeasurement");
+
+                    if(coqTanks != null )
+                    {
+                        await _unitOfWork.CoQTank.RemoveRange(coqTanks);
+                        _context.SaveChanges();
+
+                        #region Create COQ Tank
+                        var coqTankList = new List<COQTank>();
+
+                        foreach (var before in model.TankBeforeReadings)
+                        {
+                            var newCoqTank = new COQTank
+                            {
+                                CoQId = coq.Id,
+                                TankId = before.TankId
+                            };
+
+                            var after = model.TankAfterReadings.FirstOrDefault(x => x.TankId == before.TankId);
+
+                            if (after != null && before.coQTankDTO != null)
+                            {
+                                var b = before.coQTankDTO;
+                                var a = after.coQTankDTO;
+
+                                //var newBTankM = _mapper.Map<TankMeasurement>(b);
+                                var newBTankM = new TankMeasurement
+                                {
+                                    DIP = b.DIP,
+                                    WaterDIP = b.DIP,
+                                    TOV = b.TOV,
+                                    WaterVolume = b.WaterVolume,
+                                    FloatRoofCorr = b.FloatRoofCorr,
+                                    GOV = b.GOV,
+                                    Tempearture = b.Temperature,
+                                    Density = b.Density,
+                                    VCF = b.VCF,
+                                };
+                                newBTankM.MeasurementType = ReadingType.Before;
+
+                                //var newATankM = _mapper.Map<TankMeasurement>(a);
+                                var newATankM = new TankMeasurement
+                                {
+                                    DIP = a.DIP,
+                                    WaterDIP = a.DIP,
+                                    TOV = a.TOV,
+                                    WaterVolume = a.WaterVolume,
+                                    FloatRoofCorr = a.FloatRoofCorr,
+                                    GOV = a.GOV,
+                                    Tempearture = a.Temperature,
+                                    Density = a.Density,
+                                    VCF = a.VCF,
+                                };
+                                newATankM.MeasurementType = ReadingType.After;
+
+                                var newTankMeasurement = new List<TankMeasurement>
+                                {
+                                    newBTankM, newATankM
+                                };
+
+                                newCoqTank.TankMeasurement = newTankMeasurement;
+
+                                coqTankList.Add(newCoqTank);
+                            }
+                        }
+
+                        _context.COQTanks.AddRange(coqTankList);
+                        #endregion
+
+                        coq.GSV = coqTankList.SelectMany(x => x.TankMeasurement).Where(x => x.MeasurementType == ReadingType.After).Sum(t => t.GSV) - coqTankList.SelectMany(x => x.TankMeasurement).Where(x => x.MeasurementType == ReadingType.Before).Sum(t => t.GSV);
+
+                        coq.GOV = coqTankList.SelectMany(x => x.TankMeasurement).Where(x => x.MeasurementType == ReadingType.After).Sum(t => t.GOV) - coqTankList.SelectMany(x => x.TankMeasurement).Where(x => x.MeasurementType == ReadingType.Before).Sum(t => t.GOV);
+
+                        coq.MT_VAC = coqTankList.SelectMany(x => x.TankMeasurement).Where(x => x.MeasurementType == ReadingType.After).Sum(t => t.MTVAC) - coqTankList.SelectMany(x => x.TankMeasurement).Where(x => x.MeasurementType == ReadingType.Before).Sum(t => t.MTVAC);
+
+                        _context.CoQs.Update(coq);
+
+                        #region Document Submission
+
+                        //SubmitDocumentDto sDoc = model.SubmitDocuments.FirstOrDefault();
+                        //var sDocument = _mapper.Map<SubmittedDocument>(sDoc);
+
+                        var sDocumentList = new List<SubmittedDocument>();
+
+                        model.SubmitDocuments.ForEach(x =>
+                        {
+                            var newSDoc = new SubmittedDocument
+                            {
+                                DocId = x.DocId,
+                                FileId = x.FileId,
+                                DocName = x.DocName,
+                                DocSource = x.DocSource,
+                                DocType = x.DocType,
+                                ApplicationId = coq.Id,
+                            };
+
+                            sDocumentList.Add(newSDoc);
+                        });
+
+                        _context.SubmittedDocuments.AddRange(sDocumentList);
+                        #endregion
+
+                        _context.SaveChanges();
+
+                        var submit = await _flow.CoqWorkFlow(coq.Id, Enum.GetName(typeof(AppActions), AppActions.Resubmit), "COQ Submitted", user.Id);
+                        if (submit.Item1)
+                        {
+                            var message = new Message
+                            {
+                                COQId = coq.Id,
+                                Subject = $"COQ with reference {coq.Reference} re-submitted",
+                                Content = $"COQ with reference {coq.Reference} has been re-submitted to your desk for further processing",
+                                UserId = user.Id,
+                                Date = DateTime.UtcNow.AddHours(1),
+                            };
+
+                            _context.Messages.Add(message);
+                            _context.SaveChanges();
+
+                            transaction.Commit();
+
+                            return new ApiResponse
+                            {
+                                Message = submit.Item2,
+                                StatusCode = HttpStatusCode.OK,
+                                Success = true
+                            };
+                        }
+                        else
+                        {
+                            transaction.Rollback();
+                            return new ApiResponse
+                            {
+                                Message = submit.Item2,
+                                StatusCode = HttpStatusCode.NotAcceptable,
+                                Success = false
+                            };
+                        }
+                    }
+                }
+                return new ApiResponse
+                {
+                    Message = $"Invalid COQ",
+                    Success = false,
+                    StatusCode = HttpStatusCode.InternalServerError
+                };
+            }
+            catch (Exception ex)
+            {
                 transaction.Rollback();
 
                 return new ApiResponse
