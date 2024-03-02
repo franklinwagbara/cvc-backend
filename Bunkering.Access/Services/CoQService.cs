@@ -352,7 +352,6 @@ namespace Bunkering.Access.Services
 
         public async Task<object?> GetCoqRequiredDocuments(Application appp)
         {
-
             var docList = new List<SubmittedDocument>();
             var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(c => c.Name == Utils.COQ);
             if (appType == null || appp == null)
@@ -892,6 +891,181 @@ namespace Bunkering.Access.Services
         //    return _apiReponse;
         //}
 
+        public async Task<ApiResponse> EditCOQForGas(int id, CreateGasProductCoQDto model)
+        {
+            var user = await _userManager.FindByEmailAsync(LoginUserEmail) ?? throw new Exception("Unathorise, this action is restricted to only authorise users");
+            var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name == Utils.COQ) ?? throw new Exception("Application type of COQ is not configured yet, please contact support");
+
+            var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(x => x.Id.Equals(id));
+            if(coq != null)
+            {
+                using var transaction = _context.Database.BeginTransaction();
+                try
+                {
+                    #region Create Coq
+                    coq.DateOfSTAfterDischarge = model.DateOfSTAfterDischarge;
+                    coq.DateOfVesselArrival = model.DateOfVesselArrival;
+                    coq.DateOfVesselUllage = model.DateOfVesselUllage;
+                    coq.DepotPrice = model.DepotPrice;
+                    coq.ProductId = model.ProductId;
+                    coq.ArrivalShipFigure = model.ArrivalShipFigure;
+                    coq.QuauntityReflectedOnBill = model.QuauntityReflectedOnBill;
+                    coq.DischargeShipFigure = model.DischargeShipFigure;
+                    coq.Status = Enum.GetName(typeof(AppStatus), AppStatus.Processing);
+                    coq.NameConsignee = model.NameConsignee;
+
+                    _context.CoQs.Update(coq);
+                    _context.SaveChanges();
+                    #endregion
+
+                    //remove existing tank readings
+                    var coqTanks = await _unitOfWork.CoQTank.Find(x => x.CoQId.Equals(id), "TankMeasurement");
+                    if(coqTanks != null)
+                    {
+                        await _unitOfWork.CoQTank.RemoveRange(coqTanks);
+                        await _unitOfWork.SaveChangesAsync(user.Id);
+                    }
+
+                    #region Create COQ Tank
+                    var coqTankList = new List<COQTank>();
+
+                    foreach (var before in model.TankBeforeReadings)
+                    {
+                        var newCoqTank = new COQTank
+                        {
+                            CoQId = coq.Id,
+                            TankId = before.TankId
+                        };
+
+                        var after = model.TankAfterReadings.FirstOrDefault(x => x.TankId == before.TankId);
+
+                        if (after != null && before.coQGasTankDTO != null)
+                        {
+                            var b = before.coQGasTankDTO;
+                            var a = after.coQGasTankDTO;
+
+                            var newBTankM = _mapper.Map<TankMeasurement>(b);
+                            newBTankM.MeasurementType = ReadingType.Before;
+
+                            var newATankM = _mapper.Map<TankMeasurement>(a);
+                            newATankM.MeasurementType = ReadingType.After;
+
+                            var newTankMeasurement = new List<TankMeasurement>
+                        {
+                            newBTankM, newATankM
+                        };
+
+                            newCoqTank.TankMeasurement = newTankMeasurement;
+
+                            coqTankList.Add(newCoqTank);
+                        }
+                    }
+
+                    _context.COQTanks.AddRange(coqTankList);
+                    #endregion
+
+                    var totalBeforeWeightAir = coqTankList.SelectMany(x => x.TankMeasurement).Where(x => x.MeasurementType == ReadingType.Before).Sum(t => t.TotalGasWeightAir);
+                    var totalAfterWeightAir = coqTankList.SelectMany(x => x.TankMeasurement).Where(x => x.MeasurementType == ReadingType.After).Sum(t => t.TotalGasWeightAir);
+
+                    var totalBeforeWeightVac = coqTankList.SelectMany(x => x.TankMeasurement).Where(x => x.MeasurementType == ReadingType.Before).Sum(t => t.TotalGasWeightVAC);
+                    var totalAfterWeightVac = coqTankList.SelectMany(x => x.TankMeasurement).Where(x => x.MeasurementType == ReadingType.After).Sum(t => t.TotalGasWeightVAC);
+
+                    coq.MT_VAC = totalAfterWeightVac - totalBeforeWeightVac;
+                    coq.MT_AIR = (double)(totalAfterWeightAir - totalBeforeWeightAir);
+
+                    _context.CoQs.Update(coq);
+
+                    #region Document Submission
+
+                    var sDocumentList = new List<SubmittedDocument>();
+
+                    //remove existing documents
+                    var exisitngDocs = await _unitOfWork.SubmittedDocument.Find(s => s.Id.Equals(coq.Id));
+                    if (exisitngDocs != null)
+                    {
+                        await _unitOfWork.SubmittedDocument.RemoveRange(exisitngDocs);
+                        await _unitOfWork.SaveChangesAsync(user.Id);
+                    }
+
+                    model.SubmitDocuments.ForEach(x =>
+                    {
+                        var newSDoc = new SubmittedDocument
+                        {
+                            DocId = x.DocId,
+                            FileId = x.FileId,
+                            DocName = x.DocName,
+                            DocSource = x.DocSource,
+                            DocType = x.DocType,
+                            ApplicationId = coq.Id,
+                            ApplicationTypeId = appType.Id,
+                        };
+
+                        sDocumentList.Add(newSDoc);
+                    });
+
+                    _context.SubmittedDocuments.AddRange(sDocumentList);
+                    #endregion
+
+                    _context.SaveChanges();
+
+                    var submit = await _flow.CoqWorkFlow(coq.Id, Enum.GetName(typeof(AppActions), AppActions.Submit), "COQ Submitted", user.Id);
+                    if (submit.Item1)
+                    {
+                        var message = new Message
+                        {
+                            COQId = coq.Id,
+                            Subject = $"COQ with reference {coq.Reference} Submitted",
+                            Content = $"COQ with reference {coq.Reference} has been submitted to your desk for further processing",
+                            UserId = user.Id,
+                            Date = DateTime.Now.AddHours(1),
+                        };
+
+                        _context.Messages.Add(message);
+                        _context.SaveChanges();
+                        //_messageService.CreateMessageAsync(message);
+
+                        transaction.Commit();
+
+                        return new ApiResponse
+                        {
+                            Message = submit.Item2,
+                            StatusCode = HttpStatusCode.OK,
+                            Success = true
+                        };
+                    }
+                    else
+                    {
+                        transaction.Rollback();
+                        return new ApiResponse
+                        {
+                            Message = submit.Item2,
+                            StatusCode = HttpStatusCode.NotAcceptable,
+                            Success = false
+                        };
+
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+
+                    return new ApiResponse
+                    {
+                        Message = $"An error occur, COQ not created: {ex.Message}",
+                        Success = false,
+                        StatusCode = HttpStatusCode.InternalServerError
+                    };
+                }
+            }
+            return new ApiResponse
+            {
+                Message = $"Coq not found",
+                Success = false,
+                StatusCode = HttpStatusCode.BadRequest
+            };
+        }
+
         public async Task<ApiResponse> CreateCOQForGas(CreateGasProductCoQDto model)
         {
             var user = await _userManager.FindByEmailAsync(LoginUserEmail) ?? throw new Exception("Unathorise, this action is restricted to only authorise users");
@@ -1060,7 +1234,7 @@ namespace Bunkering.Access.Services
         public async Task<ApiResponse> EditCOQForLiquid(int id, CreateCoQLiquidDto model)
         {
             var user = await _userManager.FindByEmailAsync(LoginUserEmail) ?? throw new Exception("Unathorise, this action is restricted to only authorise users");
-
+            var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(x => x.Name == Utils.COQ) ?? throw new Exception("Application type of COQ is not configured yet, please contact support");
             using var transaction = _context.Database.BeginTransaction();
             try
             {
@@ -1160,6 +1334,14 @@ namespace Bunkering.Access.Services
 
                         var sDocumentList = new List<SubmittedDocument>();
 
+                        //remove existing documents
+                        var exisitngDocs = await _unitOfWork.SubmittedDocument.Find(s => s.Id.Equals(coq.Id));
+                        if(exisitngDocs != null)
+                        {
+                            await _unitOfWork.SubmittedDocument.RemoveRange(exisitngDocs);
+                            await _unitOfWork.SaveChangesAsync(user.Id);
+                        }
+
                         model.SubmitDocuments.ForEach(x =>
                         {
                             var newSDoc = new SubmittedDocument
@@ -1170,6 +1352,7 @@ namespace Bunkering.Access.Services
                                 DocSource = x.DocSource,
                                 DocType = x.DocType,
                                 ApplicationId = coq.Id,
+                                ApplicationTypeId = appType.Id
                             };
 
                             sDocumentList.Add(newSDoc);
@@ -1252,7 +1435,6 @@ namespace Bunkering.Access.Services
                     PlantId = model.PlantId,
                     ProductId = model.ProductId,
                     Reference = Utils.GenerateCoQRefrenceCode(),
-                   // DepotId = model.PlantId,
                     DateOfSTAfterDischarge = model.DateOfSTAfterDischarge,
                     DateOfVesselArrival = model.DateOfVesselArrival,
                     DateOfVesselUllage = model.DateOfVesselUllage,
@@ -1260,8 +1442,6 @@ namespace Bunkering.Access.Services
                     CreatedBy = user.Id,
                     Status = Enum.GetName(typeof(AppStatus), AppStatus.Processing),
                     DateCreated = DateTime.UtcNow.AddHours(1),
-                    //NameConsignee = model.NameConsignee,
-                    //SubmittedDate = DateTime.UtcNow.AddHours(1),
                 };
 
                 _context.CoQs.Add(coq);
@@ -1516,7 +1696,7 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var coq = await _context.CoQs.FirstOrDefaultAsync(c => c.Id == id);
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(c => c.Id == id, "Application");
                 var gastankList = new List<GasTankReadingsPerCoQ>();
                 var liqtankList = new List<LiquidTankReadingsPerCoQ>();
                 var product = (await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.AppId.Equals(coq.AppId) && x.DepotId.Equals(coq.PlantId), "Product")).Product;
@@ -1524,13 +1704,13 @@ namespace Bunkering.Access.Services
                 if (coq is null)
                     return new() { StatusCode = HttpStatusCode.NotFound, Success = false };
 
-                var docs = await _context.SubmittedDocuments.FirstOrDefaultAsync(c => c.ApplicationId == coq.Id);
+                var docData = (await GetCoqRequiredDocuments(coq.Application) as dynamic)?.Data;
 
                 var appHistories = await _unitOfWork.COQHistory.Find(h => h.COQId.Equals(coq.Id));
                 if(appHistories.Count() > 0)
                 {
                     var users = _userManager.Users.Include(c => c.Company).Include(ur => ur.UserRoles).ThenInclude(r => r.Role);
-                    appHistories.ToList().ForEach(h =>
+                    appHistories.OrderByDescending(x => x.Id).ToList().ForEach(h =>
                     {
 
                         var t = users.FirstOrDefault(x => x.Id.Equals(h.TriggeredBy));
@@ -1654,7 +1834,8 @@ namespace Bunkering.Access.Services
                         {
                             coq = coqData,
                             tankList = gastankList,
-                            docs,
+                            docs = docData.docs as List<SubmittedDocument>,
+                            docData.ApiData,
                             appHistories
                         }
                     };
@@ -1667,7 +1848,8 @@ namespace Bunkering.Access.Services
                         {
                             coq = coqData,
                             tankList = liqtankList,
-                            docs,
+                            docs = docData.docs as List<SubmittedDocument>,
+                            docData.ApiData,
                             appHistories
                         }
                     };
@@ -1932,7 +2114,7 @@ namespace Bunkering.Access.Services
                 QuauntityReflectedOnBill = plist.QuauntityReflectedOnBill
 
             };
-            return cd;
+            return cd ;
         }
 
         private async Task<dynamic> GetCoQCertificate(int coqId)

@@ -1329,7 +1329,7 @@ namespace Bunkering.Access.Services
                                 PaymentDescription = app.Payments.FirstOrDefault()?.Description,
                                 PaymnetDate = app.Payments.FirstOrDefault()?.TransactionDate.ToString("MMM dd, yyyy HH:mm:ss"),
                                 CurrentDesk = _userManager.Users.FirstOrDefault(x => x.Id.Equals(app.CurrentDeskId))?.Email,
-                                AppHistories = histories,
+                                AppHistories = histories.OrderByDescending(x => x.Id),
                                 Schedules = sch,
                                 Documents = appDocs,
                                 app.MarketerName,

@@ -475,9 +475,10 @@ namespace Bunkering.Controllers.API
         /// <remarks>
         /// 
         /// Sample Request
-        /// POST: api/coq/edi-coq/xxxx
+        /// POST: api/coq/edit-coq/xxxx
         /// 
         /// </remarks>
+        /// <param name="id">id for editing coq</param>
         /// <param name="model">model for editing coq</param>
         /// <response code="200">Returns a success message </response>
         /// <response code="404">Returns not found </response>
@@ -490,7 +491,6 @@ namespace Bunkering.Controllers.API
         [Route("edit-coq-liquid")]
         [HttpPost]
         public async Task<IActionResult> EditCOQForLiquid(int id, CreateCoQLiquidDto model) => Response(await _coqService.EditCOQForLiquid(id, model));
-
 
         /// <summary>
         /// This endpoint is used to add coq gas tanks
@@ -514,6 +514,30 @@ namespace Bunkering.Controllers.API
         [Route("create-coq-gas")]
         [HttpPost]
         public async Task<IActionResult> CreateCOQForGas(CreateGasProductCoQDto model) => Response(await _coqService.CreateCOQForGas(model));
+
+        /// <summary>
+        /// This endpoint is used to edit coq gas
+        /// </summary>
+        /// <returns>Returns a message after adding </returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// POST: api/coq/edit-coq-gas/xxxx
+        /// 
+        /// </remarks>
+        /// <param name="id">id for editing coq</param>
+        /// <param name="model">model for editing coq</param>
+        /// <response code="200">Returns a success message </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("edit-coq-gas")]
+        [HttpPost]
+        public async Task<IActionResult> EditCOQForGas(int id, CreateGasProductCoQDto model) => Response(await _coqService.EditCOQForGas(id, model));
 
         //[ProducesResponseType(typeof(ApiResponse), 200)]
         //[ProducesResponseType(typeof(ApiResponse), 404)]
