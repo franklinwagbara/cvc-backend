@@ -798,9 +798,10 @@
             <remarks>
             
             Sample Request
-            POST: api/coq/edi-coq/xxxx
+            POST: api/coq/edit-coq/xxxx
             
             </remarks>
+            <param name="id">id for editing coq</param>
             <param name="model">model for editing coq</param>
             <response code="200">Returns a success message </response>
             <response code="404">Returns not found </response>
@@ -819,6 +820,24 @@
             
             </remarks>
             <param name="model">model for adding tank to coq</param>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.CoQController.EditCOQForGas(System.Int32,Bunkering.Core.ViewModels.CreateGasProductCoQDto)">
+            <summary>
+            This endpoint is used to edit coq gas
+            </summary>
+            <returns>Returns a message after adding </returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/coq/edit-coq-gas/xxxx
+            
+            </remarks>
+            <param name="id">id for editing coq</param>
+            <param name="model">model for editing coq</param>
             <response code="200">Returns a success message </response>
             <response code="404">Returns not found </response>
             <response code="401">Unauthorized user </response>
