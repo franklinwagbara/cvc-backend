@@ -143,7 +143,7 @@ namespace Bunkering.Access.Services
 
                 await _unitOfWork.ApplicationHistory.Add(new ApplicationHistory
                 {
-                    Action = "DisALlow",
+                    Action = "DisAllow",
                     ApplicationId = app.Id,
                     Comment = comment,
                     Date = DateTime.UtcNow.AddHours(1),
@@ -156,7 +156,7 @@ namespace Bunkering.Access.Services
                 if(supervisor != null)
                 {
                     //send notification to supervisor
-                    var template = Utils.ReadTextFile(_env.WebRootPath, "GeneralTemplate.cshtml");
+                    var template = Utils.ReadTextFile($"{_env.ContentRootPath}\\wwwroot", "GeneralTemplate.cshtml");
                     var body = string.Format(template, comment, DateTime.Now.Year, "https://celps.nmdpra.gov.ng/content/images/mainlogo.png");
 
                     Utils.SendMail(_mailSettings.Stringify().Parse<Dictionary<string, string>>(), supervisor.Email, "Vessel Clearance Discharge", body);
