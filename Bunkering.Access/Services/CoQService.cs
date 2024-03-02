@@ -1696,15 +1696,13 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(c => c.Id == id, "Application");
+                var coq = await _unitOfWork.CoQ.FirstOrDefaultAsync(c => c.Id == id, "Application.Facility,Application.User");
                 var gastankList = new List<GasTankReadingsPerCoQ>();
                 var liqtankList = new List<LiquidTankReadingsPerCoQ>();
                 var product = (await _unitOfWork.ApplicationDepot.FirstOrDefaultAsync(x => x.AppId.Equals(coq.AppId) && x.DepotId.Equals(coq.PlantId), "Product")).Product;
 
                 if (coq is null)
                     return new() { StatusCode = HttpStatusCode.NotFound, Success = false };
-
-                var docData = (await GetCoqRequiredDocuments(coq.Application) as dynamic)?.Data;
 
                 var appHistories = await _unitOfWork.COQHistory.Find(h => h.COQId.Equals(coq.Id));
                 if(appHistories.Count() > 0)
@@ -1825,6 +1823,8 @@ namespace Bunkering.Access.Services
                 coqData.ProductType = product.ProductType;
                 coqData.CurrentDesk = _userManager.Users.FirstOrDefault(u => u.Id.Equals(coq.CurrentDeskId)).Email;
                 coqData.Plant = _context.Plants.FirstOrDefault(p => p.Id.Equals(coq.PlantId)).Name;
+                var docData = (await GetCoqRequiredDocuments(coq.Application) as dynamic)?.Data;
+
                 if (product.ProductType != null && product.ProductType.ToLower().Equals("gas"))
                     return new()
                     {
@@ -1834,7 +1834,7 @@ namespace Bunkering.Access.Services
                         {
                             coq = coqData,
                             tankList = gastankList,
-                            docs = docData.docs as List<SubmittedDocument>,
+                            docs = docData.Docs as List<SubmittedDocument>,
                             docData.ApiData,
                             appHistories
                         }
@@ -1848,7 +1848,7 @@ namespace Bunkering.Access.Services
                         {
                             coq = coqData,
                             tankList = liqtankList,
-                            docs = docData.docs as List<SubmittedDocument>,
+                            docs = docData.Docs as List<SubmittedDocument>,
                             docData.ApiData,
                             appHistories
                         }
