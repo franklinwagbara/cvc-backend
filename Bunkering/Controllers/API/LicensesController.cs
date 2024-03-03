@@ -45,7 +45,7 @@ namespace Bunkering.Controllers.API
 				Message = permits.Count() > 0 ? "Success, Permit Found" : "Permit Not Found",
 				StatusCode = permits.Count() > 0 ? HttpStatusCode.OK : HttpStatusCode.BadRequest,
 				Success = permits.Count() > 0 ? true : false,
-				Data = permits.Count() > 0 ? permits.Select(x => new
+				Data = permits.Count() > 0 ? permits.OrderByDescending(d => d.IssuedDate).Select(x => new
 				{
 					x.Id,
 					CompanyName = x.Application.User.Company.Name,
@@ -55,7 +55,7 @@ namespace Bunkering.Controllers.API
 					x.Application.User.Email,
 					VesselTypeType = x.Application.Facility.VesselType.Name,
 					VesselName = x.Application.Facility.Name,
-				}).OrderByDescending(d => d.IssuedDate) : new { }
+				}) : new { }
 			});
 
 		}
@@ -79,7 +79,7 @@ namespace Bunkering.Controllers.API
 				Message = permits.Count() > 0 ? "Success, Permit Found" : "Permit Not Found",
 				StatusCode = permits.Count() > 0 ? HttpStatusCode.OK : HttpStatusCode.BadRequest,
 				Success = permits.Count() > 0 ? true : false,
-				Data = permits.Count() > 0 ? permits.Select(x => new
+				Data = permits.Count() > 0 ? permits.OrderByDescending(d => d.IssuedDate).Select(x => new
 				{
 					x.Id,
 					x.ApplicationId,
@@ -90,7 +90,7 @@ namespace Bunkering.Controllers.API
 					x.Application.User.Email,
 					VesselTypeType = x.Application.Facility.VesselType.Name,
 					VesselName = x.Application.Facility.Name,
-				}).OrderByDescending(d => d.IssuedDate) : new { }
+				}) : new { }
 			});
 
 		}

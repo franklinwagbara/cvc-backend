@@ -98,7 +98,7 @@ namespace Bunkering.Core.ViewModels
         public decimal Tempearture { get; set; }
         public double Density { get; set; } 
         //public double VCF { get; set; }  
-        public double GSV { get; set; } 
+        public double GSV  => GSV == 0 ? Vcf * GOV : GSV;
         public double MTVAC { get; set; } 
 
         public double LiquidDensityVac { get; set; }

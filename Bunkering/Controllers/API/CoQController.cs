@@ -2,6 +2,7 @@
 using Bunkering.Access.IContracts;
 using Bunkering.Access.Services;
 using Bunkering.Core.Data;
+using Bunkering.Core.Utils;
 using Bunkering.Core.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -252,86 +253,76 @@ namespace Bunkering.Controllers.API
             {
                 var license = await _coqService.ViewCoQCertificate(id);
 
-                var coqData = license.Data as COQGASCertificateDTO;
+                var coqData = license.Data as COQNonGasCertificateDTO;
+                var viewAsPdf = new ViewAsPdf();
 
-                if (coqData != null && coqData.ProductType == "Gas")
-                {
-                    //return View("ViewGasCertificate", license.Data);
-                    var viewAsPdf =  new ViewAsPdf("ViewGasCertificate", license.Data)
+                if (coqData != null && coqData.ProductType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.NonGas)))
+                    viewAsPdf = new ViewAsPdf("ViewCertificate", license.Data)
                     {
                         PageSize = Size.A4,
                         //PageHeight = 327,
                         PageOrientation = Orientation.Landscape,
                         FileName = $"CoQ Certificate_{DateTime.Now.Day}-{DateTime.Now.Month}-{DateTime.Now.Year}.pdf",
-
                     };
-                    var pdf = await viewAsPdf.BuildFile(ControllerContext);
-                    return File(new MemoryStream(pdf), "application/pdf");
-                }
                 else
-                {
-                    var viewAsPdf = new ViewAsPdf("ViewCertificate", license.Data)
+                    viewAsPdf = new ViewAsPdf("ViewGasCertificate", license.Data)
                     {
                         PageSize = Size.A4,
                         //PageHeight = 327,
                         PageOrientation = Orientation.Landscape,
                         FileName = $"CoQ Certificate_{DateTime.Now.Day}-{DateTime.Now.Month}-{DateTime.Now.Year}.pdf",
-
                     };
-                    var pdf = await viewAsPdf.BuildFile(ControllerContext);
-                    return File(new MemoryStream(pdf), "application/pdf");
-                }              
-                
+                var pdf = await viewAsPdf.BuildFile(ControllerContext);
+                return File(new MemoryStream(pdf), "application/pdf"); 
             }
             catch (Exception ex)
             {
-
                 throw;
             }
         }
 
-        [AllowAnonymous]
-        [ProducesResponseType(typeof(ApiResponse), 200)]
-        [ProducesResponseType(typeof(ApiResponse), 404)]
-        [ProducesResponseType(typeof(ApiResponse), 405)]
-        [ProducesResponseType(typeof(ApiResponse), 500)]
-        [Produces("application/json")]
-        [Route("view_gas-cert")]
-        [HttpGet]
-        public async Task<IActionResult> ViewGasCertificate(int id)
-        {
-            try
-            {
-                var license = await _coqService.ViewCoQGasCertificate(id);
-                return View("ViewGasCertificate", license.Data);
-                //if (license != null)
-                //{
-                //    /* var qrcode = Utils.GenerateQrCode($"{Request.Scheme}://{Request.Host}/License/ValidateQrCode/{license.ApplicationId}");
-                //     license.QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length);*/
-                //    //var viewAsPdf = new ViewAsPdf
-                //    //{
-                //    //    Model = license.Data,
-                //    //    PageHeight = 327,
-                //    //    ViewName = "ViewCertificate"
-                //    //};
-                //    //var pdf = await viewAsPdf.BuildFile(ControllerContext);
-                //    return new ViewAsPdf("ViewGasCertificate", license.Data)
-                //    {
-                //        PageSize = Size.A4,
-                //        PageHeight = 327,
-                //        PageOrientation = Orientation.Landscape,
-                //        FileName = $"CoQ Certificate_{DateTime.Now.Day}-{DateTime.Now.Month}-{DateTime.Now.Year}.pdf",
+        //[AllowAnonymous]
+        //[ProducesResponseType(typeof(ApiResponse), 200)]
+        //[ProducesResponseType(typeof(ApiResponse), 404)]
+        //[ProducesResponseType(typeof(ApiResponse), 405)]
+        //[ProducesResponseType(typeof(ApiResponse), 500)]
+        //[Produces("application/json")]
+        //[Route("view_gas-cert")]
+        //[HttpGet]
+        //public async Task<IActionResult> ViewGasCertificate(int id)
+        //{
+        //    try
+        //    {
+        //        var license = await _coqService.ViewCoQGasCertificate(id);
+        //        return View("ViewGasCertificate", license.Data);
+        //        //if (license != null)
+        //        //{
+        //        //    /* var qrcode = Utils.GenerateQrCode($"{Request.Scheme}://{Request.Host}/License/ValidateQrCode/{license.ApplicationId}");
+        //        //     license.QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length);*/
+        //        //    //var viewAsPdf = new ViewAsPdf
+        //        //    //{
+        //        //    //    Model = license.Data,
+        //        //    //    PageHeight = 327,
+        //        //    //    ViewName = "ViewCertificate"
+        //        //    //};
+        //        //    //var pdf = await viewAsPdf.BuildFile(ControllerContext);
+        //        //    return new ViewAsPdf("ViewGasCertificate", license.Data)
+        //        //    {
+        //        //        PageSize = Size.A4,
+        //        //        PageHeight = 327,
+        //        //        PageOrientation = Orientation.Landscape,
+        //        //        FileName = $"CoQ Certificate_{DateTime.Now.Day}-{DateTime.Now.Month}-{DateTime.Now.Year}.pdf",
 
-                //    };
-                //}
-                //return BadRequest();
-            }
-            catch (Exception ex)
-            {
+        //        //    };
+        //        //}
+        //        //return BadRequest();
+        //    }
+        //    catch (Exception ex)
+        //    {
 
-                throw;
-            }
-        }
+        //        throw;
+        //    }
+        //}
 
         /// <summary>
         /// This endpoint is used to fetch documents required for a coq application
@@ -478,6 +469,30 @@ namespace Bunkering.Controllers.API
         public async Task<IActionResult> CreateCOQForLiquid(CreateCoQLiquidDto model) => Response(await _coqService.CreateCOQForLiquid(model));
 
         /// <summary>
+        /// This endpoint is used to edit coq
+        /// </summary>
+        /// <returns>Returns a message after editing </returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// POST: api/coq/edit-coq/xxxx
+        /// 
+        /// </remarks>
+        /// <param name="id">id for editing coq</param>
+        /// <param name="model">model for editing coq</param>
+        /// <response code="200">Returns a success message </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("edit-coq-liquid")]
+        [HttpPost]
+        public async Task<IActionResult> EditCOQForLiquid(int id, CreateCoQLiquidDto model) => Response(await _coqService.EditCOQForLiquid(id, model));
+
+        /// <summary>
         /// This endpoint is used to add coq gas tanks
         /// </summary>
         /// <returns>Returns a message after adding </returns>
@@ -499,6 +514,30 @@ namespace Bunkering.Controllers.API
         [Route("create-coq-gas")]
         [HttpPost]
         public async Task<IActionResult> CreateCOQForGas(CreateGasProductCoQDto model) => Response(await _coqService.CreateCOQForGas(model));
+
+        /// <summary>
+        /// This endpoint is used to edit coq gas
+        /// </summary>
+        /// <returns>Returns a message after adding </returns>
+        /// <remarks>
+        /// 
+        /// Sample Request
+        /// POST: api/coq/edit-coq-gas/xxxx
+        /// 
+        /// </remarks>
+        /// <param name="id">id for editing coq</param>
+        /// <param name="model">model for editing coq</param>
+        /// <response code="200">Returns a success message </response>
+        /// <response code="404">Returns not found </response>
+        /// <response code="401">Unauthorized user </response>
+        /// <response code="400">Internal server error - bad request </response>
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Route("edit-coq-gas")]
+        [HttpPost]
+        public async Task<IActionResult> EditCOQForGas(int id, CreateGasProductCoQDto model) => Response(await _coqService.EditCOQForGas(id, model));
 
         //[ProducesResponseType(typeof(ApiResponse), 200)]
         //[ProducesResponseType(typeof(ApiResponse), 404)]

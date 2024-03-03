@@ -40,7 +40,9 @@ namespace Bunkering.Access
 					RoleConstants.REVIEWER,
 					RoleConstants.SUPER_ADMIN,
 					RoleConstants.SUPERVISOR,
-					RoleConstants.COORDINATOR
+					RoleConstants.COORDINATOR,
+					RoleConstants.Field_Officer,
+					RoleConstants.FAD
 				};
 			foreach (var role in roles)
 			{

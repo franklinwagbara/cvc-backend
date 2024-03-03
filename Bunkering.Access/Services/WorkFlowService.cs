@@ -271,14 +271,13 @@ namespace Bunkering.Access.Services
                 {
                     Content = new StringContent(debitNoteSAPPostRequest.Stringify(), Encoding.UTF8, "application/json")
                 };
-                httpRequest.Headers.Add("X-API-Key",
-                    _appSetting.SAPKey);
+                httpRequest.Headers.Add("X-API-Key", _appSetting.SAPKey);
                 var notifySAP = await Utils.Send(_appSetting.SAPBaseUrl, httpRequest);
 
-                if(notifySAP.IsSuccessStatusCode)
-                {
+                //if(notifySAP.IsSuccessStatusCode)
+                //{
                     var content = await notifySAP.Content.ReadAsStringAsync();
-                }
+                //}
 
                 return true;
             }
@@ -306,7 +305,7 @@ namespace Bunkering.Access.Services
                 customerState = plant.State,
                 debitNoteType = "0.5%",
                 location = plant.State,
-                paymentAmount = debitNote.Amount,
+                paymentAmount = double.Parse(debitNote.Amount.ToString("###.##")),
                 postingDate = DateTime.UtcNow.AddHours(1).Date.ToString("yyyy-MM-dd"),
                 customerPhoneNumber1 = coq.Application.User.PhoneNumber,
                 lines = new List<DebitNoteLine>
@@ -318,12 +317,20 @@ namespace Bunkering.Access.Services
                         daughterVesselName = coq.Application.Facility.Name,
                         depot = plant.Name,
                         directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.DSSRI),
-                        productOrServiceType = product.Product.Name,
                         revenueDescription = debitNote.Description,
                         shoreVolume = product.Product.ProductType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.Gas)) ? coq.MT_VAC : coq.GSV,
-                        revenueCode = Enum.GetName(typeof(AppTypes), AppTypes.DebitNote),
+                        revenueCode = product.Product.RevenueCode,
                         wholeSalePrice = coq.DepotPrice
                     }
+                },
+                contacts = new List<DebitNoteContact> 
+                {
+                    new DebitNoteContact
+                    {
+                        firstName = coq.Application.User.FirstName,
+                        lastName = coq.Application.User.LastName,
+                        phoneNumber = coq.Application.User.PhoneNumber
+                    } 
                 }
             };
         }
@@ -344,7 +351,7 @@ namespace Bunkering.Access.Services
                 customerState = plant.State,
                 debitNoteType = "0.5%",
                 location = plant.State,
-                paymentAmount = debitNote.Amount,
+                paymentAmount = double.Parse(debitNote.Amount.ToString("###.##")),
                 postingDate = DateTime.UtcNow.AddHours(1).Date.ToString("yyyy-MM-dd"),
                 customerPhoneNumber1 = company.PhoneNumber,
                 lines = new List<DebitNoteLine>
@@ -354,10 +361,9 @@ namespace Bunkering.Access.Services
                         appliedFactor = 1,
                         depot = plant.Name,
                         directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.HPPITI),
-                        productOrServiceType = coq.Product.Name,
                         revenueDescription = debitNote.Description,
                         shoreVolume = coq.TotalMTVac.Value,
-                        revenueCode = Enum.GetName(typeof(AppTypes), AppTypes.DebitNote),
+                        revenueCode = coq.Product.RevenueCode,
                         wholeSalePrice = coq.Price
                     }
                 }
@@ -370,7 +376,7 @@ namespace Bunkering.Access.Services
             {
                 var isProcessingPlant = false;
                 //return (false, $"Application with Id={coq.AppId} was not found.");
-                var coq = await _unitOfWork.ProcessingPlantCoQ.FirstOrDefaultAsync(x => x.ProcessingPlantCOQId.Equals(coqId)) ?? throw new Exception($"Processing COQ with Id={coqId} was not found.");
+                var coq = await _unitOfWork.ProcessingPlantCoQ.FirstOrDefaultAsync(x => x.ProcessingPlantCOQId.Equals(coqId), "Product") ?? throw new Exception($"Processing COQ with Id={coqId} was not found.");
 
                 var message = string.Empty;
 
@@ -732,7 +738,7 @@ namespace Bunkering.Access.Services
             {
                 var year = DateTime.Now.Year.ToString();
                 var pno = $"NMDPRA/DSSRI/CVC/{app.ApplicationType.Name.Substring(0, 1).ToUpper()}/{year.Substring(2)}/{app.Id}";
-                var qrcode = Utils.GenerateQrCode($"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/api/License/ValidateQrCode/{id}");
+                var qrcode = Utils.GenerateQrCode($"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/api/Licenses/ValidateQrCode?id={id}");
                 //license.QRCode = Convert.ToBase64String(qrcode, 0, qrcode.Length);
                 //save permit to elps and portal
                 var permit = new Permit

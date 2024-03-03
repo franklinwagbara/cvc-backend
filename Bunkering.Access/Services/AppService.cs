@@ -953,7 +953,8 @@ namespace Bunkering.Access.Services
                         x.Status,
                         PaymnetStatus = x.Payments.Count > 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted))
                         ? "Payment confirmed" : x.Payments.Count > 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentRejected)) ? "Payment rejected" : "Payment pending",
-                        RRR = x.Payments.FirstOrDefault()?.RRR,
+                        x.Payments.FirstOrDefault()?.RRR,
+                        PaymentId = x.Payments?.FirstOrDefault()?.Id,
                         CreatedDate = x.CreatedDate.ToString("MMMM dd, yyyy HH:mm:ss")
                     })
                 };
@@ -996,10 +997,14 @@ namespace Bunkering.Access.Services
             try
             {
                 var user = await _userManager.Users.Include(x => x.Location).Include(ur => ur.UserRoles).ThenInclude(u => u.Role).FirstOrDefaultAsync(x => x.Email.Equals(User));
-                if (user.Location?.Name == LOCATION.FO && !user.UserRoles.FirstOrDefault().Role.Name.Equals("FAD"))
-                    return await GetMyDeskFO(user);
-                else if (user.UserRoles.FirstOrDefault().Role.Name.Equals("FAD"))
+                if (user.UserRoles.FirstOrDefault().Role.Name.Equals("Company"))
+                    return await GetMyDeskOthers(user);
+                else if(user.Location?.Name == LOCATION.FO)
                     return await GetMyDeskFAD(user);
+                //if (user.Location?.Name == LOCATION.FO && !user.UserRoles.FirstOrDefault().Role.Name.Equals("FAD"))
+                //    return await GetMyDeskFO(user);
+                //else if (user.UserRoles.FirstOrDefault().Role.Name.Equals("FAD"))
+                //    return await GetMyDeskFAD(user);
                 else
                     return await GetMyDeskOthers(user);
             }
@@ -1050,7 +1055,8 @@ namespace Bunkering.Access.Services
                     x.Status,
                     PaymentStatus = x.Payments.Count != 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted))
                         ? "Payment confirmed" : x.Payments.Count != 0 && x.Payments.FirstOrDefault().Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentRejected)) ? "Payment rejected" : "Payment pending",
-                    RRR = x.Payments.FirstOrDefault()?.RRR,
+                    x.Payments.FirstOrDefault()?.RRR,
+                    PaymentId = x.Payments?.FirstOrDefault()?.Id,
                     CreatedDate = x.CreatedDate.ToString("MMMM dd, yyyy HH:mm:ss"),
                     ApplicationType = x.ApplicationType.Name
                 }).ToList(),
@@ -1071,7 +1077,7 @@ namespace Bunkering.Access.Services
 
             if (payment.Count() > 0)
             {
-                var pendingCoqs = coq.ToList().Where(c => payment.ToList().Any(p => !p.COQId.Equals(c.Id)));
+                var pendingCoqs = coq.Where(c => payment.ToList().Any(p => !p.COQId.Equals(c.Id)));
 
                 if (coq != null)
                     return new ApiResponse
@@ -1185,10 +1191,10 @@ namespace Bunkering.Access.Services
                         CoQ = coqs.OrderByDescending(c => c.DateCreated).Select(x => new
                             {
                                 x.Id,
-                                AppId = x.AppId,
+                                x.AppId,
                                 CompanyEmail = x.Application?.User.Email,
-                                ImportName = x.Application?.User.Company.Name,
-                                VesselName = x.Application?.VesselName,
+                                CompanyName = x.Application?.User.Company.Name,
+                                x.Application?.VesselName,
                                 x.Reference,
                                 x.Status,
                                 DepotName = x.Plant?.Name,
@@ -1243,7 +1249,7 @@ namespace Bunkering.Access.Services
                     var appDepot = await _unitOfWork.ApplicationDepot.GetDepotsAsync(id);
                     if (app != null)
                     {
-                        var users = _userManager.Users.Include(c => c.Company).Include(ur => ur.UserRoles).ThenInclude(r => r.Role).ToList();
+                        var users = _userManager.Users.Include(c => c.Company).Include(ur => ur.UserRoles).ThenInclude(r => r.Role);
                         var histories = app.Histories.ToList();
                         histories.ForEach(h =>
                         {
@@ -1323,7 +1329,7 @@ namespace Bunkering.Access.Services
                                 PaymentDescription = app.Payments.FirstOrDefault()?.Description,
                                 PaymnetDate = app.Payments.FirstOrDefault()?.TransactionDate.ToString("MMM dd, yyyy HH:mm:ss"),
                                 CurrentDesk = _userManager.Users.FirstOrDefault(x => x.Id.Equals(app.CurrentDeskId))?.Email,
-                                AppHistories = histories,
+                                AppHistories = histories.OrderByDescending(x => x.Id),
                                 Schedules = sch,
                                 Documents = appDocs,
                                 app.MarketerName,
@@ -1552,7 +1558,7 @@ namespace Bunkering.Access.Services
                 };
                 return _response;
             }
-            var depots = (await _unitOfWork.PlantOfficer.Find(c => c.OfficerID.Equals(user.Id))).Select(c => c.PlantID);
+            var depots = (await _unitOfWork.PlantOfficer.Find(c => c.OfficerID.Equals(user.Id) && !c.IsDeleted)).Select(c => c.PlantID);
             if (!depots.Any())
             {
                 _response = new ApiResponse
@@ -1566,11 +1572,31 @@ namespace Bunkering.Access.Services
 
             var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId) && !string.IsNullOrEmpty(c.DischargeId), "Application.Facility.VesselType,Application.User.Company,Application.AppJetty");
             //var apps = appDepots.Select(x => x.Application);
-            var coq = (await _unitOfWork.CoQ.Find(c => appDepots.Any(ad => ad.AppId.Equals(c.AppId) && ad.DepotId.Equals(c.PlantId)))).Select(i => i.PlantId).ToList();
+            IEnumerable<CoQ>? alldepotcoqs = await _unitOfWork.CoQ.Find(c => appDepots.Any(ad => ad.AppId.Equals(c.AppId) && ad.DepotId.Equals(c.PlantId)));
+            var coq = (alldepotcoqs.Where(c => appDepots.Any(ad => ad.AppId.Equals(c.AppId) && ad.DepotId.Equals(c.PlantId)))).Select(i => new {i.AppId, i.PlantId}).ToList();
             var apps = appDepots.Select(a => a.Application);
             if(coq.Count > 0)
-                apps = appDepots.SkipWhile(a => coq.Exists(x => x.Equals(a.DepotId))).Select(a => a.Application);
+            {
+                appDepots = appDepots.Where(a => !coq.Any(x => x.PlantId.Equals(a.DepotId) && x.AppId.Equals(a.AppId)));
+                apps = appDepots.GroupBy(x => x.AppId).Select(a => a.FirstOrDefault().Application);
+            }
+            var rejectedCoQs = (await _unitOfWork.CoQ.Find(x => x.CurrentDeskId.Equals(user.Id) && x.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Rejected)), "Application.User.Company,Application.Facility.VesselType,Application.AppJetty")).Select(n => new
+            {
+                n.Id,
+                CompanyName = n.Application.User.Company.Name,
+                n.Application.VesselName,
+                VesselType = n.Application.Facility.VesselType.Name,
+                CompanyEmail = n.Application.User.Email,
+                n.Reference,
+                Jetty = n.Application.AppJetty.Name,
+                n.Status,
+                n.Application.HasCleared,
+                CreatedDate = n.DateCreated.ToString("yyyy-MM-dd hh:mm:ss"),
+                SubmittewdDate = n.SubmittedDate.Value.ToString("yyyy-MM-dd hh:mm:ss"),
+            }); ;
 
+            //if (rejectedApps.Count() > 0)
+            //    apps = apps.Concat(rejectedApps.Select(a => a.Application));
             var data = apps.GroupBy(x => x.Id).Select(x => x.FirstOrDefault()).OrderByDescending(x => x.SubmittedDate).Select(n => new
             {
                 n.Id,
@@ -1581,8 +1607,8 @@ namespace Bunkering.Access.Services
                 n.Reference,
                 Jetty = n.AppJetty.Name,
                 n.Status,
+                n.HasCleared,
                 CreatedDate = n.CreatedDate.ToString("yyyy-MM-dd hh:mm:ss"),
-
             });
 
             _response = new ApiResponse
@@ -1590,7 +1616,11 @@ namespace Bunkering.Access.Services
                 Message = "Applications fetched successfully",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                Data = data
+                Data = new
+                {
+                    clearedNOAs = data,
+                    rejectedCoQs
+                }
             };
 
             return _response;
@@ -1610,27 +1640,37 @@ namespace Bunkering.Access.Services
                 };
                 return _response;
             }
-            var jettys = (await _unitOfWork.JettyOfficer.Find(c => c.OfficerID == user.Id,"Jetty")).Select(c => c.JettyId).ToList();
+            var jettys = (await _unitOfWork.JettyOfficer.Find(c => c.OfficerID == user.Id,"Jetty")).Select(c => c.JettyId);
             if (!jettys.Any())
-            {
-                _response = new ApiResponse
+                return new ApiResponse
                 {
                     Message = "User not assigned to a Jetty",
                     StatusCode = HttpStatusCode.OK,
                     Success = false
                 };
-                return _response;
-            }
 
-            var appDepots = await _unitOfWork.Application.Find(c => jettys.Contains(c.Jetty) && c .Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)) && !c.HasCleared);
-            var apps = appDepots.OrderByDescending(x => x.CreatedDate);
+            var apps = await _unitOfWork.Application.Find(c => jettys.Contains(c.Jetty) && c.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)) && !c.HasCleared, "User.Company,Facility.VesselType,AppJetty");
+            var data = apps.GroupBy(x => x.Id).Select(x => x.FirstOrDefault()).OrderByDescending(x => x.SubmittedDate).Select(n => new
+            {
+                n.Id,
+                CompanyName = n.User.Company.Name,
+                n.VesselName,
+                VesselType = n.Facility.VesselType.Name,
+                CompanyEmail = n.User.Email,
+                n.Reference,
+                Jetty = n.AppJetty.Name,
+                n.Status,
+                n.HasCleared,
+                CreatedDate = n.CreatedDate.ToString("yyyy-MM-dd hh:mm:ss"),
+
+            });
 
             _response = new ApiResponse
             {
                 Message = "Applications fetched successfully",
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
-                Data = apps
+                Data = data
             };
 
             return _response;

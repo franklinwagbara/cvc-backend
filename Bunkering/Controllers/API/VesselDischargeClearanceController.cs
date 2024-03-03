@@ -64,8 +64,8 @@ namespace Bunkering.Controllers.API
         [Route("disallow-vessel-discharge-clearance")]
         [HttpPost]
 
-        public async Task<IActionResult> DisAllowVesselDischargeClearance(VesselDischargeCleareanceViewModel model)
-            => Response(await _vesselDischargeClearanceService.DisAllowVesselDischargeClearance(model));
+        public async Task<IActionResult> DisAllowVesselDischargeClearance(int id, string comment)
+            => Response(await _vesselDischargeClearanceService.DisAllowVesselDischargeClearance(id, comment));
 
         /// <summary>
         /// This endpoint is used to fetch vessel discharge clearance by id

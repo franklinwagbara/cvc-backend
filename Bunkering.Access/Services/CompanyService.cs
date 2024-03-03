@@ -104,7 +104,11 @@ namespace Bunkering.Access.Services
 				
 				var operatingFacility = await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.CompanyEmail.ToLower() == email.ToLower());
                 if (operatingFacility is not null)
-                    company.OperatingFacilityId = operatingFacility.Id;
+				{
+					var opId = EnumExtension.GetValues<NameType>().FirstOrDefault(e => e.Name.Equals(operatingFacility.Name));
+					if(opId is not null)
+						company.OperatingFacilityId = opId.Value;
+                }
 
                 var companyAdd = new RegisteredAddress();
 				if (user.Company.AddressId > 0)
@@ -386,7 +390,7 @@ namespace Bunkering.Access.Services
 					countryName = user.Company.Name,
                 };
 
-                var addList = new List<RegisteredAddress>();
+                var addList = new List<RegisteredAddress> {  add };
 
                 if (user.Company.AddressId > 0)
                 {
@@ -396,8 +400,12 @@ namespace Bunkering.Access.Services
                 }
                 else
                 {
-                    var req = _elps.AddCompanyRegAddress(addList, user.ElpsId).Stringify().Parse<List<RegisteredAddress>>().FirstOrDefault();
-                    user.Company.AddressId = req.id;
+					var response = _elps.AddCompanyRegAddress(addList, user.ElpsId);
+					if(response != null)
+                    {
+                        var req = response.Stringify().Parse<List<RegisteredAddress>>().FirstOrDefault();
+                        user.Company.AddressId = req.id;
+                    }
                 }
 
                 user.Company.Address = model.address_1;

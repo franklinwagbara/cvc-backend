@@ -102,20 +102,23 @@ namespace Bunkering.Access.Services
             if (user.UserRoles.FirstOrDefault().Role.Name.Equals("Field_Officer") && user.Directorate.Equals(Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.DSSRI)))
             {
                 var allCoqs = await _unitOfWork.CoQ.GetAll();
-                var depots = (await _unitOfWork.PlantOfficer.Find(c => c.OfficerID.Equals(user.Id))).Select(c => c.PlantID);
+                var depots = (await _unitOfWork.PlantOfficer.Find(c => c.OfficerID.Equals(user.Id) && !c.IsDeleted)).Select(c => c.PlantID);
 
                 deskCnt = allCoqs.Count(a => a.CurrentDeskId.Equals(user.Id));
                 if (depots.Any())
                 {
                     var appDepots = await _unitOfWork.ApplicationDepot.Find(c => depots.Contains(c.DepotId) && !string.IsNullOrEmpty(c.DischargeId));
-                    deskCnt += appDepots.GroupBy(x => x.AppId).Select(x => x.FirstOrDefault()).Count();
+
+					var appsWithCoq = allCoqs.Where(c => appDepots.Any(ad => ad.AppId.Equals(c.AppId) && ad.DepotId.Equals(c.PlantId))).Select(i => new { i.AppId, i.PlantId }).ToList();
+
+                    deskCnt += appDepots.Where(a => !appsWithCoq.Any(x => x.AppId.Equals(a.AppId) && x.PlantId.Equals(a.DepotId))).GroupBy(x => x.AppId).Count();
                 }
                 totalApps = allCoqs.Count();
                 totalCertificates = totalApproved = allCoqs.Count(a => a.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.Completed)));
 				totalProcessing = allCoqs.Count(x => x.Status == Enum.GetName(typeof(AppStatus), AppStatus.Processing));
 				totalRejected = allCoqs.Count(x => x.Status == Enum.GetName(typeof(AppStatus), AppStatus.Rejected));
             }
-			else if (user.UserRoles.FirstOrDefault().Role.Name.Equals("Field_Officer") && user.Directorate.Equals(Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.HPPITI)))
+			else if (user.UserRoles.FirstOrDefault().Role.Name.Equals(RoleConstants.Field_Officer) && user.Directorate.Equals(Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.HPPITI)))
 			{
                 var allPPCoqs = await _unitOfWork.ProcessingPlantCoQ.GetAll();
 
