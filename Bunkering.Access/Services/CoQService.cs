@@ -18,6 +18,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Security.AccessControl;
 using System.Security.Claims;
+using System.Xml.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Bunkering.Access.Services
@@ -1779,7 +1780,6 @@ namespace Bunkering.Access.Services
                             break;
                     }
                 }
-                var dictionary = coq.Stringify().Parse<Dictionary<string, object>>();
                 var coqData = new CoQsDataDTO()
                 {
                     Id = coq.Id,
@@ -1856,7 +1856,11 @@ namespace Bunkering.Access.Services
             }
             catch (Exception ex)
             {
-                throw;
+                return new()
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Message = ex.Message
+                };
             }
         }
 
