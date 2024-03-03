@@ -20,26 +20,9 @@
             position: relative;
         }
         table {
-            /*     border-collapse: collapse;
-                        width: 100%;
-                    }
-
-
-
-                    th {
-                        position: sticky;
-                        top: 0;
-                        background-color: #f2f2f2;
-                    }
-
-                    thead {
-                        display: table-header-group;
-                    } */
             th, td
 
         {
-            /* border: 1px solid #dddddd;
-                    text-align: left; */
             padding: 0px;
         }
 
@@ -66,8 +49,8 @@
                 <div style="text-align: center; margin-top: -0.5em; font-size: 1em;">
                 <h5>Plot 1012 Cadastral Zone A00, Sani Abacha Way, Central Business District, Abuja, FCT, Nigeria.</h5>
             </div>
-            <div style="text-align: center; margin-top: -0.5em; font-size: 1em;color: lightsteelblue;">
-                <h2>Certificate of Quantity</h2>
+            <div style="text-align: center; margin-top: -0.5em; font-size: 0.7em;color: lightsteelblue;">
+                <h3>Certificate of Quantity</h3>
             </div>
            @*  <div style="color: forestgreen; text-align: center; margin-top: -1em;">
                 <h1>CIRTIFICATE OF QUANTITY</h1>
@@ -77,42 +60,42 @@
         <table class="table">
             <tr>
                 
-                <td>Marketer/PDT Owner: @Model.CompanyName</td>
-                <td>
+                <td style="border: none;">Marketer/PDT Owner: @Model.CompanyName</td>
+                <td style="border: none;">
                     MOTHER VESSEL: @(string.IsNullOrEmpty(Model.MotherVessel) ? "N/A" : Model.MotherVessel) 
                    
                 </td>
-                <td>DATE OF VESSEL ARRIVAL: @Model.DateOfVesselArrival.ToString("dd/MM/yyyy")</td>
+                <td style="border: none;">DATE OF VESSEL ARRIVAL: @Model.DateOfVesselArrival.ToString("dd/MM/yyyy")</td>
             </tr>
             <tr>
-                <td>PRODUCT: @Model.Product</td>
-                <td>JETTY: @(string.IsNullOrEmpty(Model.Jetty) ? "N/A" : Model.Jetty) </td>
-                <td>DATE OF VESSEL ULLAGE: @Model.DateOfVessselUllage.ToString("dd/MM/yyyy")</td>
+                <td style="border: none;">PRODUCT: @Model.Product</td>
+                <td style="border: none;">JETTY: @(string.IsNullOrEmpty(Model.Jetty) ? "N/A" : Model.Jetty) </td>
+                <td style="border: none;">DATE OF VESSEL ULLAGE: @Model.DateOfVessselUllage.ToString("dd/MM/yyyy")</td>
             </tr>
             <tr>
-                <td>VESSEL NAME: @(string.IsNullOrEmpty(Model.VesselName) ? "N/A" : Model.VesselName) </td>
-                <td>RECEIVING TERMINAL: @Model.ReceivingTerminal</td>
-                <td>DATE OF SHORE-TANK AFTER DISCHARGE: @Model.DateAfterDischarge.ToString("dd/MM/yyyy")</td>
+                <td style="border: none;">VESSEL NAME: @(string.IsNullOrEmpty(Model.VesselName) ? "N/A" : Model.VesselName) </td>
+                <td style="border: none;">RECEIVING TERMINAL: @Model.ReceivingTerminal</td>
+                <td style="border: none;">DATE OF SHORE-TANK AFTER DISCHARGE: @Model.DateAfterDischarge.ToString("dd/MM/yyyy")</td>
             </tr>
         </table>
        
        
-        <table style="width: 100%; font-size: 1em !important;" class="table table-bordered">
+        <table style="width: 100%;" class="table table-bordered text-center">
             <thead>
                 <tr>
-                    <th>TANK</th>
-                    <th>STATUS</th>
-                    <th>DIP(m)</th>
-                    <th>WATER DIP</th>
-                    <th>TOV(m<sup>3</sup>)</th>
-                    <th>Water Volume</th>
-                    <th>FLOAT ROOF CORR(m<sup>3</sup>)</th>
-                    <th>GOV(m<sup>3</sup>)</th>
-                    <th>TEMP(<sup>O</sup>C)</th>
-                    <th>DENSITY</th>
-                    <th>VCF</th>
-                    <th>GSV(m<sup>3</sup>)</th>
-                    <th>MT(VAC)</th>
+                    <th class=" text-center">TANK</th>
+                    <th class=" text-center">STATUS</th>
+                    <th class=" text-center">DIP(m)</th>
+                    <th class=" text-center">WATER DIP</th>
+                    <th class=" text-center">TOV(m<sup>3</sup>)</th>
+                    <th class=" text-center">Water Volume</th>
+                    <th class=" text-center">FLOAT ROOF CORR(m<sup>3</sup>)</th>
+                    <th class=" text-center">GOV(m<sup>3</sup>)</th>
+                    <th class=" text-center">TEMP(<sup>O</sup>C)</th>
+                    <th class=" text-center">DENSITY</th>
+                    <th class=" text-center">VCF</th>
+                    <th class=" text-center">GSV(m<sup>3</sup>)</th>
+                    <th class=" text-center">MT(VAC)</th>
                 </tr>
             </thead>
             <tbody>
@@ -190,7 +173,6 @@
                 
             </tbody>
         </table>
-        <br />
         <hr />
         <div>
             <b>
