@@ -1134,7 +1134,7 @@ namespace Bunkering.Access.Services
                 Success = true,
                 Data = new
                 {
-                    CoQ = coq.Select(c => new
+                    CoQ = coq.OrderByDescending(c => c.DateCreated).Select(c => new
                     {
                         c.Reference,
                         c.Application?.User.Company.Name,
@@ -1143,7 +1143,7 @@ namespace Bunkering.Access.Services
                         c.GSV,
                         DebitNote = (c.GSV * c.DepotPrice * 0.01),
 
-                    }).ToList(),
+                    }),
                     ProcessingPlantCOQ = processingPlantCoQs.OrderByDescending(c => c.CreatedAt).Select(x => new
                     {
                         x.ProcessingPlantCOQId,
@@ -1163,7 +1163,7 @@ namespace Bunkering.Access.Services
                         CreatedBy = x.CreatedBy,
                         SubmittedDate = x.SubmittedDate,
                         ApplicationType = "Processing Plant COQ"
-                    }).ToList(),
+                    }),
                 }
 
             };
