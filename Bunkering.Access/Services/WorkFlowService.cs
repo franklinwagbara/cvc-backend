@@ -318,7 +318,7 @@ namespace Bunkering.Access.Services
                         daughterVesselName = coq.Application.Facility.Name,
                         depot = plant.Name,
                         directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.DSSRI),
-                        revenueDescription = debitNote.Description,
+                        revenueDescription = debitNote?.Description,
                         shoreVolume = product.Product.ProductType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.Gas)) ? coq.MT_VAC : coq.GSV,
                         revenueCode = product.Product.RevenueCode,
                         wholeSalePrice = coq.DepotPrice
