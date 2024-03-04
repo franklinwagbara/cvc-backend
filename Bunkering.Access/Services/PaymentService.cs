@@ -206,7 +206,7 @@ namespace Bunkering.Access.Services
                             }
                         }
 
-                        var request = await _elps.GenerateDebitNotePaymentReference($"{baseUrl}", amount, companyName, companyEmail, orderid, facName, compElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DebitNote), payment.Description);
+                        var request = await _elps.GenerateDebitNotePaymentReference($"{baseUrl}", amount, companyName, companyEmail, orderid, facName, compElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DebitNote), payment.Description, payment.Id);
 
                         if (!string.IsNullOrEmpty(request.RRR))
                         {
@@ -261,8 +261,6 @@ namespace Bunkering.Access.Services
         {
             if(id > 0)
             {
-                var baseUrl = $"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}";
-
                 try
                 {
                     double total = 0;
@@ -437,7 +435,7 @@ namespace Bunkering.Access.Services
                             }
                             description = $"Payment for non-payment of Debit note generated for {coqRef.ProcessingPlantCOQ.Plant.Name} after 21 days as regulated";
 
-                            var request = await _elps.GenerateDebitNotePaymentReference($"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}", total, companyName, companyEmail, orderid, facName, compElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DemandNotice), description);
+                            var request = await _elps.GenerateDebitNotePaymentReference($"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}", total, companyName, companyEmail, orderid, facName, compElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DemandNotice), description, payment.Id);
                             _logger.LogRequest($"Creation of Demand notice payment for application with reference: {reference}for ({companyName}) as specified in the Authority regulations", false, directory);
 
                             if (request == null)
@@ -596,11 +594,11 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
-        public async Task<ApiResponse> ConfirmOtherPayment(string orderId)
+        public async Task<ApiResponse> ConfirmOtherPayment(int id)
         {
             try
             {
-                var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.OrderId.Equals(orderId));
+                var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.Id.Equals(id));
                 if (payment != null)
                 {
                     if (!payment.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted)) && !string.IsNullOrEmpty(payment.RRR))
