@@ -277,7 +277,9 @@ namespace Bunkering.Access.Services
                 if (notifySAP.IsSuccessStatusCode)
                 {
                     var content = await notifySAP.Content.ReadAsStringAsync();
+                    var response = content.Parse<SAPCreateDNoteResponse>();
                     debitNote.SAPNotifyResponse = content;
+                    debitNote.SAPDocumentNo = $"{response.sapDocNum}";
                 }
 
                 return (true, debitNote);
