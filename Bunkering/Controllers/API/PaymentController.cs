@@ -138,9 +138,9 @@ namespace Bunkering.Controllers.API
         [Produces("application/json")]
         [HttpPost]
         [Route("update-payment-status")]
-        public async Task<IActionResult> UpdatePaymentStatus([FromForm] string appref, [FromForm] string status, [FromForm] string statuscode, [FromForm] string orderId, [FromForm] string RRR)
+        public async Task<IActionResult> UpdatePaymentStatus([FromForm] int id, [FromForm] string status, [FromForm] string statuscode, [FromForm] string orderId, [FromForm] string RRR)
         {
-            var response = await _payment.ConfirmOtherPayment(appref);
+            var response = await _payment.ConfirmOtherPayment(id);
             if (response.StatusCode.Equals(HttpStatusCode.OK))
             {
                 var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(p => p.Id.Equals(response.Data));
