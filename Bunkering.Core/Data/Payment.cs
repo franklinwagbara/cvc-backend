@@ -29,6 +29,8 @@ namespace Bunkering.Core.Data
 		public double? LateRenewalPenalty { get; set; }
 		public double? NonRenewalPenalty { get; set; }
 		public string Status { get; set; }
+        public string? SAPDocumentNo { get; set; }
+        public string? SAPNotifyResponse { get; set; }
         public ICollection<DemandNotice>? DemandNotices { get; set; }
         //[NotMapped]
 
