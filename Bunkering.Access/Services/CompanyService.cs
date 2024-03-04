@@ -21,7 +21,6 @@ namespace Bunkering.Access.Services
 		ApiResponse _response;
 		private readonly IElps _elps;
 		private readonly WorkFlowService _flow;
-		//nsbdsbs
 
 		public CompanyService(
 			IUnitOfWork unitOfWork,
