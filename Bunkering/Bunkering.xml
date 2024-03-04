@@ -1649,7 +1649,7 @@
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
         </member>
-        <member name="M:Bunkering.Controllers.API.PaymentController.UpdatePaymentStatus(System.String,System.String,System.String,System.String,System.String)">
+        <member name="M:Bunkering.Controllers.API.PaymentController.UpdatePaymentStatus(System.Int32,System.String,System.String,System.String,System.String)">
             <summary>
             This endpoint is used to update the status of any payment
             </summary>

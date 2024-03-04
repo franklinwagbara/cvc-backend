@@ -26,7 +26,7 @@ namespace Bunkering.Access.IContracts
         //string PostReferenceToIGR(string baseUrl, string reqeustUri, object payload);
         //Task<RemitaResponse> GeneratePaymentReference(string baseUrl, Application application, decimal totalAmount, decimal serviceCharge);
         Task<RemitaResponse> GeneratePaymentReference(string baseUrl, Application application, AppFee fee, int depots);
-        Task<RemitaResponse> GenerateDebitNotePaymentReference(string baseUrl, double totalAmount, string companyName, string companyEmail, string appRef, string depotName, int compElpsId, string paymentType, string paymentDescription);
+        Task<RemitaResponse> GenerateDebitNotePaymentReference(string baseUrl, double totalAmount, string companyName, string companyEmail, string appRef, string depotName, int compElpsId, string paymentType, string paymentDescription, int pamentId);
         Task<Payment> GenerateExtraPaymentReference(string baseUrl, Application application, Payment payment, decimal totalAmount, decimal serviceCharge);
         List<Staff> GetAllStaff();
         Staff GetStaff(string email);
