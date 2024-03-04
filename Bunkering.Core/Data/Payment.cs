@@ -16,7 +16,8 @@ namespace Bunkering.Core.Data
 		public DateTime? PaymentDate { get; set; }
 		public string? TransactionId { get; set; }
 		public string? RRR { get; set; }
-		public string Description { get; set; }
+        public double? DebitNoteAmount { get; set; }
+        public string Description { get; set; }
 		public string? AppReceiptId { get; set; }
 		public double Amount { get; set; }
 		public double? Arrears { get; set; }
