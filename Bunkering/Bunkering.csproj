@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <DocumentationFile>C:\Users\suppo\Documents\Visual Studio 2022\Projects\nmdpra-coq\Bunkering\Bunkering.xml</DocumentationFile>
-    <DocumentationFile>C:\Users\anyan\Documents\Visual Studio 2022\CVC\CVCBackEnd\Bunkering\Bunkering.xml</DocumentationFile>
+    <DocumentationFile>C:\Users\suppo\Documents\Visual Studio 2022\Projects\nmdpra-coq\Bunkering\Bunkering.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -87,5 +87,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Bunkering.Access\Bunkering.Access.csproj" />
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1development_1json__JsonSchema="https://alec016.github.io/Custom-Machinery/Json%20Schema/src/main/resources/schemas/custom_machinery_machine.json" /></VisualStudio></ProjectExtensions>
 
 </Project>

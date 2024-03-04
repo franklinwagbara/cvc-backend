@@ -8,7 +8,7 @@ namespace Bunkering.Core.Utils
 {
     public enum DirectorateEnum
     {
-        DSSRI,
+        DSSRI = 1,
         HPPITI
     }
 }

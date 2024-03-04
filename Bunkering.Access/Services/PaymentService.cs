@@ -9,12 +9,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Options;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Transactions;
 
 namespace Bunkering.Access.Services
@@ -159,7 +161,94 @@ namespace Bunkering.Access.Services
         {
             try
             {
+                var user = await _userManager.FindByEmailAsync(User);
+                var debitnoteTypeId = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(a => a.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote))); 
+                var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(p => p.Id.Equals(id) && p.ApplicationTypeId.Equals(debitnoteTypeId.Id), "DemandNotices");
+                if(payment != null && string.IsNullOrEmpty(payment.RRR))
+                {
+                    var amount = payment.DemandNotices != null && payment.DemandNotices.Count() > 0 ? payment.Amount + payment.DemandNotices.Sum(x => x.Amount) : payment.Amount;
+                    var baseUrl = $"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}";
 
+                    if (amount > 0)
+                    {
+                        string orderid = string.Empty;
+                        string facName = string.Empty;
+                        string companyName = string.Empty;
+                        string companyEmail = string.Empty;
+                        int appId = 0; int compElpsId = 0; int plantElpsId = 0;
+                        var coqRef = await _unitOfWork.CoQReference.FirstOrDefaultAsync(c => c.Id.Equals(payment.COQId));
+                        if(coqRef != null)
+                        {
+                            if (coqRef.PlantCoQId == null)
+                            {
+                                var depotCoq = await _unitOfWork.CoQ.FirstOrDefaultAsync(d => d.Id.Equals(coqRef.DepotCoQId), "Application.User.Company");
+                                var plant = await _unitOfWork.Plant.FirstOrDefaultAsync(p => p.Id.Equals(depotCoq.PlantId));
+                                var prd = _context.ApplicationDepots.Include(p => p.Product).FirstOrDefault(x => x.AppId == depotCoq.AppId && x.DepotId.Equals(depotCoq.PlantId));
+                                string productType = prd.Product?.ProductType ?? string.Empty;
+
+                                orderid = depotCoq.Reference;
+                                appId = depotCoq.AppId.Value;
+                                compElpsId = depotCoq.Application.User.ElpsId;
+                                facName = plant.Name;
+                                companyName = depotCoq.Application.User.Company.Name;
+                                companyEmail = depotCoq.Application.User.Email;
+                                plantElpsId = (int)plant.ElpsPlantId.Value;
+                            }
+                            else
+                            {
+                                var ppCoq = await _unitOfWork.ProcessingPlantCoQ.FirstOrDefaultAsync(p => p.ProcessingPlantCOQId.Equals(coqRef.PlantCoQId), "Plant");
+                                orderid = ppCoq.Reference;
+                                compElpsId = (int)ppCoq.Plant.CompanyElpsId.Value;
+                                facName = ppCoq.Plant.Name;
+                                companyName = ppCoq.Plant.Company;
+                                companyEmail = ppCoq.Plant.Email;
+                                plantElpsId = (int)ppCoq.Plant.ElpsPlantId.Value;
+                            }
+                        }
+
+                        var request = await _elps.GenerateDebitNotePaymentReference($"{baseUrl}", amount, companyName, companyEmail, orderid, facName, compElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DebitNote), payment.Description);
+
+                        if (!string.IsNullOrEmpty(request.RRR))
+                        {
+                            payment.RRR = request.RRR;
+                            payment.DebitNoteAmount = amount;
+                            await _unitOfWork.Payment.Update(payment);
+                            await _unitOfWork.SaveChangesAsync(user.Id);
+
+                            _logger.LogRequest($"Payment table updated with RRR: {payment.RRR} by {User}", false, directory);
+
+                            #region Send Payment E-Mail To Company
+                            string subject = $"Generation Of Payment For Application With Ref:{orderid}";
+
+                            var emailBody = string.Format($"A Payment RRR: {payment.RRR} has been generated for your application with reference number: {orderid}" +
+                                "<br /><ul>" +
+                                "<li>Amount Generated: {0}</li>" +
+                                "<li>Remita RRR: {1}</li>" +
+                                "<li>Payment Status: {2}</li>" +
+                                "<li>Payment Description: {3}</li>" +
+                                "<li>Vessel Name: {4}</li>" +
+                                "<p>Kindly note that your application will be pending until this payment is completed. </p>",
+                                payment.Amount.ToString(), payment.RRR, payment.Status, payment.Description, $"{facName}-{plantElpsId}");
+
+                            #endregion
+
+                            string successMsg = "RRR (" + payment.RRR + ") generated successfully for company: " + companyName + "; Facility: " + $"{facName}-{plantElpsId}";
+                            _response = new ApiResponse
+                            {
+                                Message = successMsg,
+                                Data = new { rrr = payment.RRR },
+                                StatusCode = HttpStatusCode.OK,
+                                Success = true
+                            };
+                        }
+                        else
+                            _response = new ApiResponse
+                            {
+                                Message = "Unable to generate RRR, pls try again",
+                                StatusCode = HttpStatusCode.InternalServerError
+                            };
+                    }
+                }
             }
             catch(Exception ex) 
             { 
@@ -276,58 +365,6 @@ namespace Bunkering.Access.Services
                                 payment.Amount.ToString(), payment.Status, payment.Description, $"{facName}");
 
                             #endregion
-
-                            //string successMsg = $"Debit Note RRR ({payment.RRR}) generated successfully for {coqRef.CoQ.Plant.Name}";
-                            //_response = new ApiResponse
-                            //{
-                            //    Message = successMsg,
-                            //    StatusCode = HttpStatusCode.OK,
-                            //    Success = true
-                            //};
-
-                            //var request = await _elps.GenerateDebitNotePaymentReference($"{baseUrl}", total, companyName, coqRef.DepotCoQ.Application.User.Email, orderid, facName, compElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DebitNote), description);
-                            //_logger.LogRequest("Creation of payment split for application with reference:" + orderid + "(" + companyName + ") by " + User, false, directory);
-
-                            //if (request == null)
-                            //{
-                            //    _logger.LogRequest($"Payment output from Remita:: {request.Stringify()} by {User}", true, directory);
-                            //    _response = new ApiResponse { Message = "An error occured while generating this payment RRR. Please try again or contact support.", StatusCode = HttpStatusCode.InternalServerError };
-                            //}
-                            //else
-                            //{
-                            //    if (!string.IsNullOrEmpty(request.RRR))
-                            //    {
-                            //        #region Send Payment E-Mail To Company
-                            //        subject = $"Generation of Debit Note For COQ with reference: {orderid}";
-
-                            //        var emailBody = string.Format($"A Payment RRR: {payment.RRR} has been generated for your COQ with reference number: {orderid}" +
-                            //            "<br /><ul>" +
-                            //            "<li>Amount Generated: {0}</li>" +
-                            //            "<li>Remita RRR: {1}</li>" +
-                            //            "<li>Payment Status: {2}</li>" +
-                            //            "<li>Payment Description: {3}</li>" +
-                            //            "<li>Vessel Name: {4}</li>" +
-                            //            "<p>Kindly note that your application will be pending until this payment is completed. </p>",
-                            //            payment.Amount.ToString(), payment.RRR, payment.Status, description, $"{facName}");
-
-                            //        #endregion
-
-                            //        var successMsg = $"Debit Note RRR ({payment.RRR}) generated successfully for {facName}";
-                            //        _response = new ApiResponse
-                            //        {
-                            //            Message = successMsg,
-                            //            Data = new { rrr = payment.RRR },
-                            //            StatusCode = HttpStatusCode.OK,
-                            //            Success = true
-                            //        };
-                            //    }
-                            //    else
-                            //        _response = new ApiResponse
-                            //        {
-                            //            Message = "Unable to generate RRR, pls try again",
-                            //            StatusCode = HttpStatusCode.InternalServerError
-                            //        };
-                            //}
                         }
                     }
                 }
@@ -486,78 +523,70 @@ namespace Bunkering.Access.Services
             return _response;
         }
       
-        public async Task<ApiResponse> ConfirmPayment(int id, string orderId)
+        public async Task<ApiResponse> ConfirmPayment(int id)
         {
             try
             {
-                var app = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id), "Payments");
-                if (app != null)
+                //var user = await _userManager.FindByEmailAsync(User);
+                var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.Id.Equals(id));
+                if (payment != null)
                 {
-                    var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.ApplicationId == id && x.OrderId.Equals(orderId));
-                    if (payment != null)
+                    if (!payment.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted)) && !string.IsNullOrEmpty(payment.RRR))
                     {
-                        if (!payment.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted)) && !string.IsNullOrEmpty(payment.RRR))
+                        //confirm payment status on remita via ELPS
+                        var http = await Utils.Send(_appSetting.ElpsUrl, new HttpRequestMessage(HttpMethod.Get, $"/Payment/checkifpaid?id=r{payment.RRR}"));
+
+                        if (http.IsSuccessStatusCode)
                         {
-                            //confirm payment status on remita via ELPS
-                            var http = await Utils.Send(_appSetting.ElpsUrl, new HttpRequestMessage(HttpMethod.Get, $"/Payment/checkifpaid?id=r{payment.RRR}"));
-
-                            if (http.IsSuccessStatusCode)
+                            var content = http.Content.ReadAsStringAsync().Result;
+                            if (content != null)
                             {
-                                var content = http.Content.ReadAsStringAsync().Result;
-                                if (content != null)
+                                var dic = content.Parse<Dictionary<string, string>>();
+                                if ((!string.IsNullOrEmpty(dic.GetValue("message").ToString()) && dic.GetValue("message").ToString().Equals("Successful"))
+                                    || (!string.IsNullOrEmpty(dic.GetValue("status").ToString()) && (dic.GetValue("status").ToString().Equals("00") || dic.GetValue("status").ToString().Equals("01"))))
                                 {
-                                    var dic = content.Parse<Dictionary<string, string>>();
-                                    if ((!string.IsNullOrEmpty(dic.GetValue("message").ToString()) && dic.GetValue("message").ToString().Equals("Successful"))
-                                        || (!string.IsNullOrEmpty(dic.GetValue("status").ToString()) && dic.GetValue("status").ToString().Equals("00")))
+                                    payment.Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted);
+                                    payment.PaymentDate = Convert.ToDateTime(dic.GetValue("paymentDate"));
+                                    payment.AppReceiptId = dic.GetValue("appreceiptid") != null ? dic.GetValue("appreceiptid") : "";
+                                    payment.TxnMessage = dic.GetValue("message");
+                                    await _unitOfWork.Payment.Update(payment);
+                                    _unitOfWork.Save();
+
+                                    _response = new ApiResponse
                                     {
-                                        payment.Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted);
-                                        payment.TransactionDate = Convert.ToDateTime(dic.GetValue("transactiontime"));
-                                        payment.PaymentDate = Convert.ToDateTime(dic.GetValue("paymentDate"));
-                                        payment.AppReceiptId = dic.GetValue("appreceiptid") != null ? dic.GetValue("appreceiptid") : "";
-                                        payment.TxnMessage = dic.GetValue("message");
-                                        //payment.tx = Convert.ToDecimal(dic.GetValue("amount"));
-                                        //payment.Application.Status = Enum.GetName(typeof(AppStatus), 2);
-
-                                        
-                                        await _unitOfWork.Payment.Update(payment);
-                                        await _unitOfWork.SaveChangesAsync(app.UserId);
-
-                                        _response = new ApiResponse
-                                        {
-                                            Message = "Payment confirmed successfully",
-                                            StatusCode = HttpStatusCode.OK,
-                                            Success = true,
-                                        };
-                                    }
-                                    else
-                                        _response = new ApiResponse
-                                        {
-                                            Message = "Not Successful",
-                                            StatusCode = HttpStatusCode.BadRequest
-                                        };
+                                        Message = "Payment confirmed successfully",
+                                        StatusCode = HttpStatusCode.OK,
+                                        Success = true,
+                                    };
                                 }
+                                else
+                                    _response = new ApiResponse
+                                    {
+                                        Message = "Not Successful",
+                                        StatusCode = HttpStatusCode.BadRequest
+                                    };
                             }
-                            else
-                                _response = new ApiResponse
-                                {
-                                    Message = "Failed",
-                                    StatusCode = HttpStatusCode.NotFound
-                                };
                         }
                         else
-                        {
                             _response = new ApiResponse
                             {
-                                Message = "Payment already completed",
-                                StatusCode = HttpStatusCode.OK,
-                                Success = true
+                                Message = "Failed",
+                                StatusCode = HttpStatusCode.NotFound
                             };
-                        }
-
+                    }
+                    else if (!payment.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted)) && string.IsNullOrEmpty(payment.RRR))
+                    {
+                        _response = new ApiResponse
+                        {
+                            Message = "Invalid RRR",
+                            StatusCode = HttpStatusCode.BadRequest,
+                            Success = false
+                        };
                     }
 
-                    _logger.LogRequest($"\"Getting payment for company application -:{app.Reference}{" by"}{_contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email)} {" - "}{DateTime.Now}", false, directory);
                 }
+
+                _logger.LogRequest($"\"Getting payment for company application -:{payment.OrderId}{" by"}{_contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email)} {" - "}{DateTime.Now}", false, directory);
             }
             catch (Exception ex)
             {
@@ -589,19 +618,30 @@ namespace Bunkering.Access.Services
                                     || (!string.IsNullOrEmpty(dic.GetValue("status").ToString()) && dic.GetValue("status").ToString().Equals("00")))
                                 {
                                     payment.Status = Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted);
-                                    payment.TransactionDate = Convert.ToDateTime(dic.GetValue("transactiontime"));
+                                    //payment.TransactionDate = Convert.ToDateTime(dic.GetValue("transactiontime"));
                                     payment.PaymentDate = Convert.ToDateTime(dic.GetValue("paymentDate"));
                                     payment.AppReceiptId = dic.GetValue("appreceiptid") != null ? dic.GetValue("appreceiptid") : "";
                                     payment.TxnMessage = dic.GetValue("message");
-                                    //payment.tx = Convert.ToDecimal(dic.GetValue("amount"));
-                                    //payment.Application.Status = Enum.GetName(typeof(AppStatus), 2);
-
+                                    
                                     await _unitOfWork.Payment.Update(payment);
+
+                                    //update SAP if payment type is Debitnote
+                                    var apptype = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(a => a.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));
+                                    if (payment.ApplicationTypeId.Equals(apptype.Id))
+                                    {
+                                        var sapUpdate = await SAPPaymentUpdate(payment);
+                                        if (sapUpdate)
+                                        {
+                                            //update defaulter to cleared payment
+
+                                        }
+                                    }
+
                                     await _unitOfWork.SaveChangesAsync(User);
 
                                     _response = new ApiResponse
                                     {
-                                        Data = new { id = payment.Id },
+                                        Data = new { payment.Id },
                                         Message = "Payment confirmed successfully",
                                         StatusCode = HttpStatusCode.OK,
                                         Success = true,
@@ -642,6 +682,31 @@ namespace Bunkering.Access.Services
                 _logger.LogRequest($"{ex.Message} \n {ex.InnerException} \n {ex.StackTrace}", true, directory);
             }
             return _response;
+        }
+
+        private async Task<bool> SAPPaymentUpdate(Payment payment)
+        {
+            var notifyObj = new
+            {
+                portalId = "",
+                paymentReference = payment.RRR,
+                paymentDate = payment.PaymentDate.Value.ToString("yyyy-MM-dd HH:mm:ss"),
+                paymentAmount = payment.DebitNoteAmount.ToString()
+            };
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "/DebitNote/CreateDebitNote")
+            {
+                Content = new StringContent(notifyObj.Stringify(), Encoding.UTF8, "application/json")
+            };
+            httpRequest.Headers.Add("X-API-Key", _appSetting.SAPKey);
+            var notifySAP = await Utils.Send(_appSetting.SAPBaseUrl, httpRequest);
+
+            if (notifySAP.IsSuccessStatusCode)
+            {
+                var content = await notifySAP.Content.ReadAsStringAsync();
+                payment.SAPNotifyResponse += $"|{content}";
+                return true;
+            }
+            return false;
         }
 
         public async Task<ApiResponse> PaymentReport(PaymentReportViewModel model)
@@ -763,7 +828,7 @@ namespace Bunkering.Access.Services
                 {
                     Data = debitnotes.Select(x => new
                     {
-                        x.Id,
+                        PaymentId = x.Id,
                         x.COQId,
                         x.OrderId,
                         AddedDate = x.TransactionDate.ToString("yyyy-MM-dd hh:mm:ss"),
@@ -796,33 +861,66 @@ namespace Bunkering.Access.Services
         {
             try
             {
-                var payments = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.Id.Equals(id), "DemandNotices");
+                var appType = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(a => a.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));   
+                var payments = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.Id.Equals(id) && x.ApplicationTypeId.Equals(appType.Id), "DemandNotices");
 
                 if (payments == null)
                     throw new Exception("No pending payment found for this application!");
 
-                var response = new List<PaymentDTO>
+                var coqRefs = await _unitOfWork.CoQReference.FirstOrDefaultAsync(c => payments.COQId.Equals(c.Id));
+                var dic = new Dictionary<int, string>();
+                var depotCoqs = await _unitOfWork.CoQ.GetAll("Plant");
+                var plantCoqs = await _unitOfWork.ProcessingPlantCoQ.GetAll("Plant");
+                var plantName = string.Empty;
+
+                if (coqRefs != null)
                 {
-                    new PaymentDTO
+                    if (coqRefs.PlantCoQId == null)
                     {
-                        Id = payments.Id,
-                        Amount = payments.Amount,
-                        CraetedDate = payments.TransactionDate.ToString("yyyy-MM-dd hh:mm:ss"),
-                        Description = payments.Description,
-                        PaymentType = Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)
+                        var depot = depotCoqs.FirstOrDefault(d => d.Id.Equals(coqRefs.DepotCoQId));
+                        plantName = depot.Plant.Name;
                     }
+                    else
+                    {
+                        var depot = plantCoqs.FirstOrDefault(d => d.ProcessingPlantCOQId.Equals(coqRefs.PlantCoQId));
+                        plantName = depot.Plant.Name;
+                    }
+                }
+
+                var response = new PaymentDTO
+                {
+                    Id = payments.Id,
+                    OrderId = payments.OrderId,
+                    Status = payments.Status,
+                    Description = payments.Description,
+                    RRR = payments.RRR,
+                    DepotName = plantName,
+                    PaymentTypes = new List<PayType>
+                    {
+                        new PayType
+                        {
+                            Amount = payments.Amount,
+                            CreatedDate = payments.TransactionDate.ToString("yyyy-MM-dd hh:mm:ss"),
+                            PaymentType = Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)
+                        }
+                    }                    
                 };
 
                 if (payments.DemandNotices != null && payments.DemandNotices.Count() > 0)
                     foreach (var d in payments.DemandNotices)
-                        response.Add(new PaymentDTO
+                        response.PaymentTypes.Add(new PayType
                         {
-                            Id = payments.Id,
                             Amount = d.Amount,
-                            CraetedDate = d.AddedDate.ToString("yyyy-MM-dd hh:mm:ss"),
-                            Description = d.Description,
+                            CreatedDate = d.AddedDate.ToString("yyyy-MM-dd hh:mm:ss"),
                             PaymentType = Enum.GetName(typeof(AppTypes), AppTypes.DemandNotice)
                         });
+
+                response.PaymentTypes.Add(new PayType
+                {
+                    Amount = response.PaymentTypes.Sum(i => i.Amount),
+                    CreatedDate = DateTime.UtcNow.AddHours(1).ToString("yyyy-MM-dd hh:mm:ss"),
+                    PaymentType = "ToTal Amount"
+                });
 
                 return new ApiResponse
                 {
@@ -842,5 +940,6 @@ namespace Bunkering.Access.Services
                 };
             }
         }
+
     }
 }

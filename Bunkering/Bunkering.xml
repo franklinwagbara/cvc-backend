@@ -790,6 +790,24 @@
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
         </member>
+        <member name="M:Bunkering.Controllers.API.CoQController.EditCOQForLiquid(System.Int32,Bunkering.Core.ViewModels.CreateCoQLiquidDto)">
+            <summary>
+            This endpoint is used to edit coq
+            </summary>
+            <returns>Returns a message after editing </returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/coq/edit-coq/xxxx
+            
+            </remarks>
+            <param name="id">id for editing coq</param>
+            <param name="model">model for editing coq</param>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
         <member name="M:Bunkering.Controllers.API.CoQController.CreateCOQForGas(Bunkering.Core.ViewModels.CreateGasProductCoQDto)">
             <summary>
             This endpoint is used to add coq gas tanks
@@ -802,6 +820,24 @@
             
             </remarks>
             <param name="model">model for adding tank to coq</param>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.CoQController.EditCOQForGas(System.Int32,Bunkering.Core.ViewModels.CreateGasProductCoQDto)">
+            <summary>
+            This endpoint is used to edit coq gas
+            </summary>
+            <returns>Returns a message after adding </returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/coq/edit-coq-gas/xxxx
+            
+            </remarks>
+            <param name="id">id for editing coq</param>
+            <param name="model">model for editing coq</param>
             <response code="200">Returns a success message </response>
             <response code="404">Returns not found </response>
             <response code="401">Unauthorized user </response>
@@ -1596,7 +1632,7 @@
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
         </member>
-        <member name="M:Bunkering.Controllers.API.PaymentController.GenerateDemandNotice(System.Int32)">
+        <member name="M:Bunkering.Controllers.API.PaymentController.PayOnline(System.String)">
             <summary>
             This endpoint is used to generate Demand notice RRR for a Depot defaulter
             </summary>
@@ -1613,7 +1649,7 @@
             <response code="401">Unauthorized user </response>
             <response code="400">Internal server error - bad request </response>
         </member>
-        <member name="M:Bunkering.Controllers.API.PaymentController.UpdatePaymentStatus(System.String)">
+        <member name="M:Bunkering.Controllers.API.PaymentController.UpdatePaymentStatus(System.String,System.String,System.String,System.String,System.String)">
             <summary>
             This endpoint is used to update the status of any payment
             </summary>
@@ -2108,6 +2144,22 @@
         <member name="M:Bunkering.Controllers.API.VesselDischargeClearanceController.CreateVesselDischargeClearance(Bunkering.Core.ViewModels.VesselDischargeCleareanceViewModel)">
             <summary>
             This endpoint is used to create vessel discharge clearance 
+            </summary>
+            <returns>Returns a success message</returns>
+            <remarks>
+            
+            Sample Request
+            POST: api/email/create-vessel-discharge-clearance
+            
+            </remarks>
+            <response code="200">Returns a success message </response>
+            <response code="404">Returns not found </response>
+            <response code="401">Unauthorized user </response>
+            <response code="400">Internal server error - bad request </response>
+        </member>
+        <member name="M:Bunkering.Controllers.API.VesselDischargeClearanceController.DisAllowVesselDischargeClearance(System.Int32,System.String)">
+            <summary>
+            This endpoint is used to disallow vessel discharge clearance 
             </summary>
             <returns>Returns a success message</returns>
             <remarks>

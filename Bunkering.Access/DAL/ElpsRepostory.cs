@@ -494,20 +494,10 @@ namespace Bunkering.Access.DAL
 		{
 			try
 			{
-				//var docs = await _unitOfWork.FacilityTypeDocuments.Find(x => x.ApplicationType.Equals(application.ApplicationType.Name));
-				// var pay = _context.PaymentLogs.FirstOrDefault(x => x.ApplicationId == application.Id);
-				// if (pay != null && !string.IsNullOrEmpty(pay.RRR))
-				// {
-				//     exist = true;
-				//     return pay.RRR;
-				// }
-
-				//Charge for IGR payments
-
-				//var type = application.Facility.FacilityType;
 				var totalAmount = fee.NOAFee + (fee.COQFee * depots) + fee.ApplicationFee + fee.SerciveCharge;
 				var amountdue = fee.NOAFee;
-				var remitaObject = new
+				var paymentId = application.Payments.FirstOrDefault().Id;
+                var remitaObject = new
 				{
 					serviceTypeId = _appSetting.ServiceTypeId,
 					categoryName = DefaultValues.AppName,
@@ -517,9 +507,9 @@ namespace Bunkering.Access.DAL
 					serviceCharge = Decimal.ToInt32(fee.SerciveCharge).ToString(),
 					amountDue = Decimal.ToInt32(amountdue).ToString(),
 					orderId = application.Reference,
-					returnSuccessUrl = $"{baseUrl}/api/Payment/Remita?id={application.Id}",
-					returnFailureUrl = $"{baseUrl}/api/Payment/Remita?id={application.Id}",
-					returnBankPaymentUrl = $"{baseUrl}/api/Payment/Remita?id={application.Id}",
+					returnSuccessUrl = $"{baseUrl}/api/Payment/Remita?id={paymentId}",
+					returnFailureUrl = $"{baseUrl}/api/Payment/Remita?id={paymentId}",
+					returnBankPaymentUrl = $"{baseUrl}/api/Payment/Remita?id={paymentId}",
 					lineItems = new List<RPartner>
 					{
 						new RPartner
@@ -597,15 +587,15 @@ namespace Bunkering.Access.DAL
                 {
                     serviceTypeId = _appSetting.ServiceTypeId,
                     categoryName = DefaultValues.AppName,
-                    totalAmount = totalAmount.ToString("N2"),
+                    totalAmount = totalAmount.ToString("###.##"),
                     payerName = TruncateText(companyName, 25),
                     payerEmail = companyEmail,
                     serviceCharge = Decimal.ToInt32(0).ToString(),
-                    amountDue = Decimal.ToInt32(0).ToString(),
+                    amountDue = (totalAmount * 0.5).ToString("###.##"),
                     orderId = appRef,
-                    returnSuccessUrl = $"{baseUrl}/api/Payment/UpdateDebitNote?orderId={appRef}",
-                    returnFailureUrl = $"{baseUrl}/api/Payment/UpdateDebitNote?orderId= {appRef}",
-                    returnBankPaymentUrl = $"{baseUrl}/api/Payment/UpdateDebitNote?orderId= {appRef}",
+                    returnSuccessUrl = $"{baseUrl}/api/Payment/update-payment-status?appref={appRef}",
+                    returnFailureUrl = $"{baseUrl}/api/Payment/update-payment-status?appref= {appRef}",
+                    returnBankPaymentUrl = $"{baseUrl}/api/Payment/update-payment-status?appref= {appRef}",
                     lineItems = new List<RPartner>
                     {
                         new RPartner
@@ -614,7 +604,7 @@ namespace Bunkering.Access.DAL
                             beneficiaryName = _appSetting.NMDPRABName,
                             bankCode = _appSetting.NMDPRABankCode,
                             beneficiaryAccount = _appSetting.NMDPRAAccount,
-                            beneficiaryAmount = (totalAmount * 0.05).ToString("N2"),
+                            beneficiaryAmount = (totalAmount * 0.5).ToString("###.##"),
                             deductFeeFrom = "0"
                         },
                         new RPartner
@@ -623,8 +613,8 @@ namespace Bunkering.Access.DAL
                             beneficiaryName = _appSetting.MDGIFBName,
                             bankCode = _appSetting.MDGIFBankCode,
                             beneficiaryAccount = _appSetting.MDGIFAccount,
-                            beneficiaryAmount = (totalAmount * 0.05).ToString("N2"),
-                            deductFeeFrom = "0"
+                            beneficiaryAmount = (totalAmount * 0.5).ToString("###.##"),
+                            deductFeeFrom = "1"
                         }
                     },
                     customFields = new List<CustomField>

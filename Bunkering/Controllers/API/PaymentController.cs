@@ -6,6 +6,9 @@ using Bunkering.Core.ViewModels;
 using Bunkering.Access.Services;
 using Bunkering.Core.Utils;
 using Microsoft.Extensions.Options;
+using System.Net;
+using Bunkering.Access.IContracts;
+using Azure;
 
 namespace Bunkering.Controllers.API
 {
@@ -16,11 +19,13 @@ namespace Bunkering.Controllers.API
     {
         private readonly PaymentService _payment;
         private readonly AppSetting _appSetting;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public PaymentController(PaymentService payment, IOptions<AppSetting> appSetting)
+        public PaymentController(PaymentService payment, IOptions<AppSetting> appSetting, IUnitOfWork unitOfWork)
         {
             _payment = payment;
             _appSetting = appSetting.Value;
+            _unitOfWork = unitOfWork;
         }
 
         [ProducesResponseType(typeof(ApiResponse), 200)]
@@ -71,14 +76,14 @@ namespace Bunkering.Controllers.API
         /// <response code="404">Returns not found </response>
         /// <response code="401">Unauthorized user </response>
         /// <response code="400">Internal server error - bad request </response>
-        [ProducesResponseType(typeof(ApiResponse), 200)]
-        [ProducesResponseType(typeof(ApiResponse), 404)]
-        [ProducesResponseType(typeof(ApiResponse), 405)]
-        [ProducesResponseType(typeof(ApiResponse), 500)]
-        [Produces("application/json")]
-        [HttpPost]
-        [Route("generate-demand-notice")]
-        public async Task<IActionResult> GenerateDemandNotice(int id) => Response(await _payment.GenerateDemandNotice(id).ConfigureAwait(false));
+        //[ProducesResponseType(typeof(ApiResponse), 200)]
+        //[ProducesResponseType(typeof(ApiResponse), 404)]
+        //[ProducesResponseType(typeof(ApiResponse), 405)]
+        //[ProducesResponseType(typeof(ApiResponse), 500)]
+        //[Produces("application/json")]
+        //[HttpPost]
+        //[Route("generate-demand-notice")]
+        //public async Task<IActionResult> GenerateDemandNotice(int id) => Response(await _payment.GenerateDemandNotice(id).ConfigureAwait(false));
 
         [AllowAnonymous]
         [ProducesResponseType(typeof(ApiResponse), 200)]
@@ -101,7 +106,12 @@ namespace Bunkering.Controllers.API
         [Route("remita")]
         public async Task<IActionResult> Remita(int id, [FromForm] string status, [FromForm] string statuscode, [FromForm] string orderId, [FromForm] string RRR)
         {
-            var payment = await _payment.ConfirmPayment(id, orderId);
+            var response = await _payment.ConfirmPayment(id);
+            if (response.Success)
+            {
+                var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.Id == id);
+                id = payment.ApplicationId != null ? payment.ApplicationId.Value : id;
+            }
             return Redirect($"{_appSetting.LoginUrl}/company/paymentsum/{id}");
         }
 
@@ -128,10 +138,23 @@ namespace Bunkering.Controllers.API
         [Produces("application/json")]
         [HttpPost]
         [Route("update-payment-status")]
-        public async Task<IActionResult> UpdatePaymentStatus([FromForm] string orderId)
+        public async Task<IActionResult> UpdatePaymentStatus([FromForm] string appref, [FromForm] string status, [FromForm] string statuscode, [FromForm] string orderId, [FromForm] string RRR)
         {
-            var payment = await _payment.ConfirmOtherPayment(orderId);
-            return Redirect($"{_appSetting.LoginUrl}/paymentsum/{payment.Data}");
+            var response = await _payment.ConfirmOtherPayment(appref);
+            if (response.StatusCode.Equals(HttpStatusCode.OK))
+            {
+                var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(p => p.Id.Equals(response.Data));
+
+                var coqRef = await _unitOfWork.CoQReference.FirstOrDefaultAsync(c => c.Id.Equals(payment.COQId));
+                if (coqRef != null)
+                {
+                    if (coqRef.PlantCoQId == null)
+                        return Redirect($"{_appSetting.LoginUrl}/company/approvals/{payment.ApplicationId}/debit-notes/{payment.Id}");
+                    else
+                        return Redirect($"{_appSetting.LoginUrl}/company/approvals/httpiti/debit-notes");
+                }
+            }
+            return Redirect($"{_appSetting.LoginUrl}/home");
         }
 
 
@@ -153,7 +176,7 @@ namespace Bunkering.Controllers.API
         [ProducesResponseType(typeof(ApiResponse), 404)]
         [ProducesResponseType(typeof(ApiResponse), 405)]
         [ProducesResponseType(typeof(ApiResponse), 500)]
-        [Route("get-debit-botes-by-appid")]
+        [Route("get-debit-notes-by-appid")]
         [HttpGet]
         public async Task<IActionResult> GetDebitNotes(int Id) => Response(await _payment.GetDebitNotesByAppId(Id));
 
@@ -188,8 +211,7 @@ namespace Bunkering.Controllers.API
         [Produces("application/json")]
         [HttpGet]
         [Route("confirm-payment")]
-
-        public async Task<IActionResult> ConfirmPayment(int Id, string OrderId) => Response(await _payment.ConfirmPayment(Id, OrderId));
+        public async Task<IActionResult> ConfirmPayment(int Id) => Response(await _payment.ConfirmPayment(Id));
 
 
         [AllowAnonymous]
@@ -200,7 +222,6 @@ namespace Bunkering.Controllers.API
         [Produces("application/json")]
         [HttpGet]
         [Route("All-payment")]
-
         public async Task<IActionResult> GetAllPayments() => Response(await _payment.GetAllPayments());
 
         [AllowAnonymous]
@@ -213,5 +234,14 @@ namespace Bunkering.Controllers.API
         [Route("PaymentById")]
         public async Task<IActionResult> GetPaymentsById(int id) => Response(await _payment.GetPaymentById(id));
 
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ApiResponse), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
+        [ProducesResponseType(typeof(ApiResponse), 405)]
+        [ProducesResponseType(typeof(ApiResponse), 500)]
+        [Produces("application/json")]
+        [HttpGet]
+        [Route("create-debit-note-rrr")]
+        public async Task<IActionResult> CreateDebitNoteRRRById(int id) => Response(await _payment.CreateDebitNoteRRR(id));
     }
 }
