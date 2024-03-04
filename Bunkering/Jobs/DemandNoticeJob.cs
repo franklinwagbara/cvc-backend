@@ -67,7 +67,9 @@ public class DemandNoticeJob : IHostedService, IDisposable
             var coqRef = unitOfWork.CoQReference.FirstOrDefaultAsync(x => x.Id.Equals(id) && x.IsDeleted == false, "DepotCoQ.Application.User.Company,DepotCoQ.Plant,ProcessingPlantCOQ.Plant").Result;
 
             var plant = coqRef.PlantCoQId == null ? coqRef.DepotCoQ.Plant : coqRef.ProcessingPlantCOQ.Plant;
-            var user = userManager.Users.FirstOrDefault(u => u.ElpsId.Equals(plant.CompanyElpsId));
+            var user = coqRef.PlantCoQId != null 
+                ? userManager.Users.FirstOrDefault(u => u.ElpsId.Equals(plant.CompanyElpsId))
+                : coqRef.DepotCoQ.Application.User;
 
             if (coqRef == null)
                 return;
@@ -81,27 +83,27 @@ public class DemandNoticeJob : IHostedService, IDisposable
                 else
                 {
                     double amount = 0;
-                    if (payment.DemandNotices is not null && payment.DemandNotices.LastOrDefault().AddedDate.AddDays(21) > DateTime.UtcNow.AddHours(1))
+                    if (payment.DemandNotices.Count > 0 && payment.DemandNotices.LastOrDefault().AddedDate.AddDays(21) < DateTime.UtcNow.AddHours(1))
                         amount = (payment.Amount + payment.DemandNotices.Sum(a => a.Amount)) * 0.10;
-                    else
+                    else if(payment.DemandNotices.Count == 0)
                         amount = payment.Amount * 0.10;
 
                     if(amount > 0)
                     {
-                        var description = $"Demand notice for non-payment of Debit note generated for {coqRef.ProcessingPlantCOQ.Plant.Name} after 21 days as regulated";
+                        var description = $"Demand notice for non-payment of Debit note generated after 21 days as regulated";
 
                         unitOfWork.DemandNotice.Add(new DemandNotice
                         {
                             Amount = amount,
                             AddedBy = "system",
                             AddedDate = DateTime.UtcNow.AddHours(1),
-                            DebitNoteId = coqRef.Id,
+                            DebitNoteId = payment.Id,
                             Description = description,
                             Reference = ""
                         }).Wait();
 
                         //set company as a defaulter
-                        if (!user.IsDefaulter)
+                        if (user != null && !user.IsDefaulter)
                         {
                             user.IsDefaulter = true;
                             user.IsCleared = false;
@@ -115,7 +117,7 @@ public class DemandNoticeJob : IHostedService, IDisposable
                             plant.IsCleared = false;
                             unitOfWork.Plant.Update(plant).Wait();
                         }
-                        unitOfWork.SaveChangesAsync("system").Wait();
+                        unitOfWork.Save();
                     }                    
                 }
             }

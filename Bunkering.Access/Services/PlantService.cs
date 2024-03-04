@@ -54,8 +54,8 @@ namespace Bunkering.Access.Services
 
         public async Task<ApiResponse> GetAllDepotsPlants()
         {
-            var plants = GetAllDepotswithTanks();
-            var filteredPlants = plants.Where(x => x.IsDeleted == false).OrderBy(x => x.Name).ToList();
+            var plants = await GetAllDepotswithTanks();
+            var filteredPlants = plants.Where(x => x.IsDeleted == false).OrderBy(x => x.Name);
             return new ApiResponse
             {
                 Message = "All Fees found",
@@ -648,10 +648,10 @@ namespace Bunkering.Access.Services
             return plist;
         }
 
-        private List<Plant> GetAllDepotswithTanks()
+        private async Task<IEnumerable<Plant>> GetAllDepotswithTanks()
         {
 
-            var plist = _unitOfWork.Plant.Query()
+            var plist = (await _unitOfWork.Plant.Find(x => x.PlantType == (int)PlantType.Depot && (!x.IsDefaulter || (x.IsDefaulter && x.IsCleared)), "Tanks"))
                         .Select(x => new Plant
                         {
                             Name = x.Name,
@@ -664,9 +664,7 @@ namespace Bunkering.Access.Services
                             State = x.State,
                             IsDeleted = x.IsDeleted,
                             Tanks = x.Tanks.Where(u => !u.IsDeleted).ToList()
-                        })
-                        .Where(x => x.PlantType == (int)PlantType.Depot)
-                        .ToList();
+                        });
             return plist;
         }
 
