@@ -160,7 +160,7 @@ namespace Bunkering.Access.Services
                                
                             }
                             //send and save notification
-                            //await SendNotification(app, action, nextprocessingofficer, processingMsg);
+                            await SendNotification(app, action, nextprocessingofficer, processingMsg);
                         }
                         else
                         {
@@ -247,7 +247,7 @@ namespace Bunkering.Access.Services
                         message = $"COQ Application has been approved and certificate {certificate.Item2} has been generated successfully.";
                 }
                 //send and save notification
-                //await SendCOQNotification(coq, action, nextProcessingOfficer, message);
+                await SendCOQNotification(coq, action, nextProcessingOfficer, message);
                 return (true, message);
                 
             }
