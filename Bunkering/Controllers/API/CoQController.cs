@@ -434,15 +434,14 @@ namespace Bunkering.Controllers.API
                 {
                     Model = data,
                     PageHeight = 327,
-                    PageMargins = new Margins(10, 10, 10, 10),
-
+                    //PageMargins = new Margins(10, 10, 10, 10),
+                    PageOrientation = Orientation.Landscape,
                     ViewName = "DebitNote"
                 };
                 var pdf = await viewAsPdf.BuildFile(ControllerContext);
                 return File(new MemoryStream(pdf), "application/pdf");
             }
             return BadRequest(note);
-
         }
 
         /// <summary>

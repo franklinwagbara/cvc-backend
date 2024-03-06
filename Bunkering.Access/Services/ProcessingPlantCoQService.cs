@@ -940,7 +940,7 @@ namespace Bunkering.Access.Services
                     _context.ProcessingPlantCOQs.Add(coq);
                     _context.SaveChanges();
                     //var dynamic = dto.Dynamic;
-                    var staticCoq = await CreateCondensateStatic(coq, dto.Static, userId, refNo);
+                    var staticCoq = await CreateCondensateStatic(coq, dto.Static, userId);
 
                     if (!staticCoq.Success)
                     {
@@ -951,7 +951,7 @@ namespace Bunkering.Access.Services
                         return _apiReponse;
                     }
 
-                    var dynamicCoq = await CreateCondensateDynamic(coq, dto.Dynamic, userId, refNo);
+                    var dynamicCoq = await CreateCondensateDynamic(coq, dto.Dynamic, userId);
 
                     if (!dynamicCoq.Success)
                     {
@@ -1371,7 +1371,7 @@ namespace Bunkering.Access.Services
 
         }
            
-        private async Task<ApiResponse> CreateCondensateStatic(ProcessingPlantCOQ coq, UpsertPPlantCOQCondensateStaticDto dto, string userId, string refNo)
+        private async Task<ApiResponse> CreateCondensateStatic(ProcessingPlantCOQ coq, UpsertPPlantCOQCondensateStaticDto dto, string userId)
         {
             try
             {
@@ -1492,7 +1492,7 @@ namespace Bunkering.Access.Services
             return _apiReponse;
         }
 
-        private async Task<ApiResponse> CreateCondensateDynamic(ProcessingPlantCOQ coq, UpsertPPlantCOQCondensateDynamicDto dto, string userId, string refNo)
+        private async Task<ApiResponse> CreateCondensateDynamic(ProcessingPlantCOQ coq, UpsertPPlantCOQCondensateDynamicDto dto, string userId)
         {
             try
             {
