@@ -1404,26 +1404,9 @@ namespace Bunkering.Access.Services
                     _response = new ApiResponse();
                     if (app != null && user != null)
                     {
-
-                        //var flow = await _userManager.IsInRoleAsync(user, "FAD")
-                        //	? await _flow.AppWorkFlow(id, act, comment, app.FADStaffId)
-                        //	: await _flow.AppWorkFlow(id, act, comment);
                         var flow = await _flow.AppWorkFlow(id, act, comment);
                         if (flow.Item1)
                         {
-                            //var appStatusCheck = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id)).Result.Status;
-                            //{
-                            //    var s = await PostDischargeId(app.Id, user.Id);
-                            //    if(s is false)
-                            //    {
-                            //        return new ApiResponse
-                            //        {
-                            //            StatusCode = HttpStatusCode.BadRequest,
-                            //            Message = "Discharge Id not generated",
-                            //            Success = false,
-                            //        };
-                            //    }
-                            //}
                             _response.StatusCode = HttpStatusCode.OK;
                             _response.Success = true;
                             _response.Message = "Application has been pushed";
