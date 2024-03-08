@@ -72,7 +72,8 @@
                 </tr>
                 <tr>
                         <td colspan="3">
-                        @Model.DepotName
+                        @* @Model.DepotName *@
+                            @Model.Marketer
                     </td>
                     <td colspan="4" style="text-align: right;">
                             Location: @Model.Location
@@ -251,8 +252,9 @@
         background-position: center;
         background-size: contain;
         font-family: Candara;
-        border: 5px solid;
-        padding: 0.5em 0.5em 0 0.5em;
+        /* border: 1px solid; */
+        margin: 1em;
+        padding: 1em;
         /*  justify-content: center; */
         position: relative;
     }
@@ -264,7 +266,7 @@
 
     td, th {
         /* text-align: center; */
-        width: 160px;
+        /* width: 160px; */
         padding: 3px;
     }
 </style>
