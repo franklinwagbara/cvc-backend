@@ -433,8 +433,8 @@ namespace Bunkering.Controllers.API
                 var viewAsPdf = new ViewAsPdf
                 {
                     Model = data,
-                    PageHeight = 327,
-                    //PageMargins = new Margins(10, 10, 10, 10),
+                    //PageHeight = 327,
+                    PageMargins = new Margins(0, 0, 0, 0),
                     PageOrientation = Orientation.Landscape,
                     ViewName = "DebitNote"
                 };
