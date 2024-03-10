@@ -86,7 +86,7 @@ namespace Bunkering.Access.DAL
 		{
 			try
 			{
-				var content = CallElps($"/api/Address/{_appSetting.AppEmail}/{HttpHash()}", HttpMethod.Put, model);
+				var content = CallElps($"/api/Address/", HttpMethod.Put, model);
 				if (!string.IsNullOrEmpty(content))
 					return true;
 			}
