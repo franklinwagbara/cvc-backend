@@ -395,8 +395,7 @@ namespace Bunkering.Access.Services
 
                 if (user.Company.AddressId > 0)
                 {
-					add.id = user.Company.AddressId.Value;
-                    addList.Add(add);
+                    addList.FirstOrDefault().id = user.Company.AddressId.Value;                    
                     var resp = _elps.UpdateCompanyRegAddress(addList);
                 }
                 else
