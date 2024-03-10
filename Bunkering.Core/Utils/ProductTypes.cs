@@ -9,6 +9,8 @@ namespace Bunkering.Core.Utils
     public enum ProductTypes
     {
         Gas,
+        Liquid,
+        Condensate,
         NonGas,
     }
 }
