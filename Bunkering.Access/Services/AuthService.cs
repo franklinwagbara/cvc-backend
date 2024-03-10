@@ -187,7 +187,7 @@ namespace Bunkering.Access.Services
 				{
 					string plantTypeName = null;
 					if(user.Company != null)
-                        plantTypeName = (await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.CompanyEmail == user.Email)).Name;
+                        plantTypeName = (await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.CompanyEmail == user.Email))?.Name;
 
                     _response = new ApiResponse
 					{
