@@ -16,6 +16,7 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Transactions;
 
 namespace Bunkering.Access.Services
@@ -205,11 +206,12 @@ namespace Bunkering.Access.Services
                             }
                         }
 
-                        var request = await _elps.GenerateDebitNotePaymentReference($"{baseUrl}", amount, companyName, companyEmail, orderid, facName, compElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DebitNote), payment.Description);
+                        var request = await _elps.GenerateDebitNotePaymentReference($"{baseUrl}", amount, companyName, companyEmail, orderid, facName, compElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DebitNote), payment.Description, payment.Id);
 
                         if (!string.IsNullOrEmpty(request.RRR))
                         {
                             payment.RRR = request.RRR;
+                            payment.DebitNoteAmount = amount;
                             await _unitOfWork.Payment.Update(payment);
                             await _unitOfWork.SaveChangesAsync(user.Id);
 
@@ -259,8 +261,6 @@ namespace Bunkering.Access.Services
         {
             if(id > 0)
             {
-                var baseUrl = $"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}";
-
                 try
                 {
                     double total = 0;
@@ -363,58 +363,6 @@ namespace Bunkering.Access.Services
                                 payment.Amount.ToString(), payment.Status, payment.Description, $"{facName}");
 
                             #endregion
-
-                            //string successMsg = $"Debit Note RRR ({payment.RRR}) generated successfully for {coqRef.CoQ.Plant.Name}";
-                            //_response = new ApiResponse
-                            //{
-                            //    Message = successMsg,
-                            //    StatusCode = HttpStatusCode.OK,
-                            //    Success = true
-                            //};
-
-                            //var request = await _elps.GenerateDebitNotePaymentReference($"{baseUrl}", total, companyName, coqRef.DepotCoQ.Application.User.Email, orderid, facName, compElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DebitNote), description);
-                            //_logger.LogRequest("Creation of payment split for application with reference:" + orderid + "(" + companyName + ") by " + User, false, directory);
-
-                            //if (request == null)
-                            //{
-                            //    _logger.LogRequest($"Payment output from Remita:: {request.Stringify()} by {User}", true, directory);
-                            //    _response = new ApiResponse { Message = "An error occured while generating this payment RRR. Please try again or contact support.", StatusCode = HttpStatusCode.InternalServerError };
-                            //}
-                            //else
-                            //{
-                            //    if (!string.IsNullOrEmpty(request.RRR))
-                            //    {
-                            //        #region Send Payment E-Mail To Company
-                            //        subject = $"Generation of Debit Note For COQ with reference: {orderid}";
-
-                            //        var emailBody = string.Format($"A Payment RRR: {payment.RRR} has been generated for your COQ with reference number: {orderid}" +
-                            //            "<br /><ul>" +
-                            //            "<li>Amount Generated: {0}</li>" +
-                            //            "<li>Remita RRR: {1}</li>" +
-                            //            "<li>Payment Status: {2}</li>" +
-                            //            "<li>Payment Description: {3}</li>" +
-                            //            "<li>Vessel Name: {4}</li>" +
-                            //            "<p>Kindly note that your application will be pending until this payment is completed. </p>",
-                            //            payment.Amount.ToString(), payment.RRR, payment.Status, description, $"{facName}");
-
-                            //        #endregion
-
-                            //        var successMsg = $"Debit Note RRR ({payment.RRR}) generated successfully for {facName}";
-                            //        _response = new ApiResponse
-                            //        {
-                            //            Message = successMsg,
-                            //            Data = new { rrr = payment.RRR },
-                            //            StatusCode = HttpStatusCode.OK,
-                            //            Success = true
-                            //        };
-                            //    }
-                            //    else
-                            //        _response = new ApiResponse
-                            //        {
-                            //            Message = "Unable to generate RRR, pls try again",
-                            //            StatusCode = HttpStatusCode.InternalServerError
-                            //        };
-                            //}
                         }
                     }
                 }
@@ -487,7 +435,7 @@ namespace Bunkering.Access.Services
                             }
                             description = $"Payment for non-payment of Debit note generated for {coqRef.ProcessingPlantCOQ.Plant.Name} after 21 days as regulated";
 
-                            var request = await _elps.GenerateDebitNotePaymentReference($"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}", total, companyName, companyEmail, orderid, facName, compElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DemandNotice), description);
+                            var request = await _elps.GenerateDebitNotePaymentReference($"{_contextAccessor.HttpContext.Request.Scheme}://{_contextAccessor.HttpContext.Request.Host}", total, companyName, companyEmail, orderid, facName, compElpsId, Enum.GetName(typeof(AppTypes), AppTypes.DemandNotice), description, payment.Id);
                             _logger.LogRequest($"Creation of Demand notice payment for application with reference: {reference}for ({companyName}) as specified in the Authority regulations", false, directory);
 
                             if (request == null)
@@ -646,11 +594,11 @@ namespace Bunkering.Access.Services
             return _response;
         }
 
-        public async Task<ApiResponse> ConfirmOtherPayment(string orderId)
+        public async Task<ApiResponse> ConfirmOtherPayment(int id)
         {
             try
             {
-                var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.OrderId.Equals(orderId));
+                var payment = await _unitOfWork.Payment.FirstOrDefaultAsync(x => x.Id.Equals(id));
                 if (payment != null)
                 {
                     if (!payment.Status.Equals(Enum.GetName(typeof(AppStatus), AppStatus.PaymentCompleted)) && !string.IsNullOrEmpty(payment.RRR))
@@ -672,10 +620,21 @@ namespace Bunkering.Access.Services
                                     payment.PaymentDate = Convert.ToDateTime(dic.GetValue("paymentDate"));
                                     payment.AppReceiptId = dic.GetValue("appreceiptid") != null ? dic.GetValue("appreceiptid") : "";
                                     payment.TxnMessage = dic.GetValue("message");
-                                    //payment.tx = Convert.ToDecimal(dic.GetValue("amount"));
-                                    //payment.Application.Status = Enum.GetName(typeof(AppStatus), 2);
-
+                                    
                                     await _unitOfWork.Payment.Update(payment);
+
+                                    //update SAP if payment type is Debitnote
+                                    var apptype = await _unitOfWork.ApplicationType.FirstOrDefaultAsync(a => a.Name.Equals(Enum.GetName(typeof(AppTypes), AppTypes.DebitNote)));
+                                    if (payment.ApplicationTypeId.Equals(apptype.Id))
+                                    {
+                                        var sapUpdate = await SAPPaymentUpdate(payment);
+                                        if (sapUpdate)
+                                        {
+                                            //update defaulter to cleared payment
+
+                                        }
+                                    }
+
                                     await _unitOfWork.SaveChangesAsync(User);
 
                                     _response = new ApiResponse
@@ -721,6 +680,31 @@ namespace Bunkering.Access.Services
                 _logger.LogRequest($"{ex.Message} \n {ex.InnerException} \n {ex.StackTrace}", true, directory);
             }
             return _response;
+        }
+
+        private async Task<bool> SAPPaymentUpdate(Payment payment)
+        {
+            var notifyObj = new
+            {
+                portalId = "",
+                paymentReference = payment.RRR,
+                paymentDate = payment.PaymentDate.Value.ToString("yyyy-MM-dd HH:mm:ss"),
+                paymentAmount = payment.DebitNoteAmount.ToString()
+            };
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "/DebitNote/CreateDebitNote")
+            {
+                Content = new StringContent(notifyObj.Stringify(), Encoding.UTF8, "application/json")
+            };
+            httpRequest.Headers.Add("X-API-Key", _appSetting.SAPKey);
+            var notifySAP = await Utils.Send(_appSetting.SAPBaseUrl, httpRequest);
+
+            if (notifySAP.IsSuccessStatusCode)
+            {
+                var content = await notifySAP.Content.ReadAsStringAsync();
+                payment.SAPNotifyResponse += $"|{content}";
+                return true;
+            }
+            return false;
         }
 
         public async Task<ApiResponse> PaymentReport(PaymentReportViewModel model)
@@ -954,5 +938,6 @@ namespace Bunkering.Access.Services
                 };
             }
         }
+
     }
 }

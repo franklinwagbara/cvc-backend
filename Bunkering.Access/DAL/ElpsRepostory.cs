@@ -86,7 +86,7 @@ namespace Bunkering.Access.DAL
 		{
 			try
 			{
-				var content = CallElps($"/api/Address/{_appSetting.AppEmail}/{HttpHash()}", HttpMethod.Put, model);
+				var content = CallElps($"/api/Address/", HttpMethod.Put, model);
 				if (!string.IsNullOrEmpty(content))
 					return true;
 			}
@@ -262,9 +262,7 @@ namespace Bunkering.Access.DAL
 			}
 			return docs;
 
-		}
-
-		
+		}		
 
 		private string CallElps(string requestUri, HttpMethod method, object body = null)
 		{
@@ -579,7 +577,7 @@ namespace Bunkering.Access.DAL
 			return null;
 		}
 
-        public async Task<RemitaResponse> GenerateDebitNotePaymentReference(string baseUrl, double totalAmount, string companyName, string companyEmail, string appRef, string depotName, int compElpsId, string paymentType, string paymentDescription)
+        public async Task<RemitaResponse> GenerateDebitNotePaymentReference(string baseUrl, double totalAmount, string companyName, string companyEmail, string appRef, string depotName, int compElpsId, string paymentType, string paymentDescription, int paymentId)
         {
             try
             {
@@ -593,9 +591,9 @@ namespace Bunkering.Access.DAL
                     serviceCharge = Decimal.ToInt32(0).ToString(),
                     amountDue = (totalAmount * 0.5).ToString("###.##"),
                     orderId = appRef,
-                    returnSuccessUrl = $"{baseUrl}/api/Payment/update-payment-status?appref={appRef}",
-                    returnFailureUrl = $"{baseUrl}/api/Payment/update-payment-status?appref= {appRef}",
-                    returnBankPaymentUrl = $"{baseUrl}/api/Payment/update-payment-status?appref= {appRef}",
+                    returnSuccessUrl = $"{baseUrl}/api/Payment/update-payment-status?id={paymentId}",
+                    returnFailureUrl = $"{baseUrl}/api/Payment/update-payment-status?id={paymentId}",
+                    returnBankPaymentUrl = $"{baseUrl}/api/Payment/update-payment-status?id={paymentId}",
                     lineItems = new List<RPartner>
                     {
                         new RPartner

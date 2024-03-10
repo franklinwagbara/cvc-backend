@@ -61,7 +61,7 @@ namespace Bunkering.Core.Data
         #region specific to condensate
         public string? Location { get; set; }
         public double? ApiGravity { get; set; }
-        public double? AverageSgAt60 { get; set; }
+        public double? AverageSgAt60 { get => 141.5/(131.5 + ApiGravity); set { } }
         public double? AverageBsw { get; set; }
         public double? TotalGrossUsBarrelsAtTankTemp { get; set; }
         public double? TotalGrossBarrelsAt60 { get; set; }

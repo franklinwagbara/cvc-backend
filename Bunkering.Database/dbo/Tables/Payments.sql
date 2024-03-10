@@ -23,8 +23,15 @@
     [LateRenewalPenalty] FLOAT (53)     NULL,
     [NonRenewalPenalty]  FLOAT (53)     NULL,
     [Status]             NVARCHAR (MAX) NOT NULL,
+    [SAPDocumentNo]      NVARCHAR (MAX) NULL,
+    [SAPNotifyResponse]  NVARCHAR (MAX) NULL,
+    [DebitNoteAmount]    FLOAT (53)     NULL,
     CONSTRAINT [PK_Payments] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
+
+
 
 
 

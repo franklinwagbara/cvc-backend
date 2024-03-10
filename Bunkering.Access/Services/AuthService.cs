@@ -187,7 +187,7 @@ namespace Bunkering.Access.Services
 				{
 					string plantTypeName = null;
 					if(user.Company != null)
-                        plantTypeName = (await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.CompanyEmail == user.Email)).Name;
+                        plantTypeName = (await _unitOfWork.OperatingFacility.FirstOrDefaultAsync(x => x.CompanyEmail == user.Email))?.Name;
 
                     _response = new ApiResponse
 					{
@@ -210,7 +210,7 @@ namespace Bunkering.Access.Services
 							Office = user.Office?.Name,
 							user.Directorate,
 							operationFacility = plantTypeName,
-
+							HasPendingPayment = user.IsDefaulter && !user.IsCleared ? true : false,
                             Token = GenerateToken(user, user.UserRoles.FirstOrDefault(x => x.Role?.Name?.Equals("Staff") is false)?.Role?.Name, plantTypeName)
 						},
 					};

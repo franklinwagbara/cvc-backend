@@ -160,7 +160,7 @@ namespace Bunkering.Access.Services
                                
                             }
                             //send and save notification
-                            //await SendNotification(app, action, nextprocessingofficer, processingMsg);
+                            await SendNotification(app, action, nextprocessingofficer, processingMsg);
                         }
                         else
                         {
@@ -247,7 +247,7 @@ namespace Bunkering.Access.Services
                         message = $"COQ Application has been approved and certificate {certificate.Item2} has been generated successfully.";
                 }
                 //send and save notification
-                //await SendCOQNotification(coq, action, nextProcessingOfficer, message);
+                await SendCOQNotification(coq, action, nextProcessingOfficer, message);
                 return (true, message);
                 
             }
@@ -257,7 +257,7 @@ namespace Bunkering.Access.Services
             }
         }
 
-        private async Task<bool> SendDebitNoteToSAP(Payment debitNote, Plant plant, CoQ coq = null, ProcessingPlantCOQ plantCoQ = null)
+        private async Task<(bool, Payment)> SendDebitNoteToSAP(Payment debitNote, Plant plant, CoQ coq = null, ProcessingPlantCOQ plantCoQ = null)
         {
             try
             {
@@ -274,18 +274,21 @@ namespace Bunkering.Access.Services
                 httpRequest.Headers.Add("X-API-Key", _appSetting.SAPKey);
                 var notifySAP = await Utils.Send(_appSetting.SAPBaseUrl, httpRequest);
 
-                //if(notifySAP.IsSuccessStatusCode)
-                //{
+                if (notifySAP.IsSuccessStatusCode)
+                {
                     var content = await notifySAP.Content.ReadAsStringAsync();
-                //}
+                    var response = content.Parse<SAPCreateDNoteResponse>();
+                    debitNote.SAPNotifyResponse = content;
+                    debitNote.SAPDocumentNo = $"{response.sapDocNum}";
+                }
 
-                return true;
+                return (true, debitNote);
             }
             catch(Exception ex)
             {
 
             }
-            return false;
+            return (false, debitNote);
         }
 
         internal async Task<DebitNoteSAPRequestDTO> SAPRequestDTO(Payment debitNote, Plant plant, CoQ coq)
@@ -317,7 +320,7 @@ namespace Bunkering.Access.Services
                         daughterVesselName = coq.Application.Facility.Name,
                         depot = plant.Name,
                         directorate = Enum.GetName(typeof(DirectorateEnum), DirectorateEnum.DSSRI),
-                        revenueDescription = debitNote.Description,
+                        revenueDescription = debitNote?.Description,
                         shoreVolume = product.Product.ProductType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.Gas)) ? coq.MT_VAC : coq.GSV,
                         revenueCode = product.Product.RevenueCode,
                         wholeSalePrice = coq.DepotPrice
@@ -443,6 +446,13 @@ namespace Bunkering.Access.Services
 
                     if (certificate.Item1)
                         message = $"COQ Application has been approved and certificate {certificate.Item2} has been generated successfully.";
+
+                    if (notifySAP.Item1)
+                    {
+                        message += "Debitnote has been generated and SAP notified accordingly.";
+                        await _unitOfWork.Payment.Update(notifySAP.Item2);
+                        await _unitOfWork.SaveChangesAsync(currentUser.Id);
+                    }
                 }
                 //send and save notification
                 //await SendCOQNotification(coq, action, nextProcessingOfficer, message);

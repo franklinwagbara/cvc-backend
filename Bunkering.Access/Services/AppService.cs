@@ -1134,7 +1134,7 @@ namespace Bunkering.Access.Services
                 Success = true,
                 Data = new
                 {
-                    CoQ = coq.Select(c => new
+                    CoQ = coq.OrderByDescending(c => c.DateCreated).Select(c => new
                     {
                         c.Reference,
                         c.Application?.User.Company.Name,
@@ -1143,7 +1143,7 @@ namespace Bunkering.Access.Services
                         c.GSV,
                         DebitNote = (c.GSV * c.DepotPrice * 0.01),
 
-                    }).ToList(),
+                    }),
                     ProcessingPlantCOQ = processingPlantCoQs.OrderByDescending(c => c.CreatedAt).Select(x => new
                     {
                         x.ProcessingPlantCOQId,
@@ -1163,7 +1163,7 @@ namespace Bunkering.Access.Services
                         CreatedBy = x.CreatedBy,
                         SubmittedDate = x.SubmittedDate,
                         ApplicationType = "Processing Plant COQ"
-                    }).ToList(),
+                    }),
                 }
 
             };
@@ -1404,26 +1404,9 @@ namespace Bunkering.Access.Services
                     _response = new ApiResponse();
                     if (app != null && user != null)
                     {
-
-                        //var flow = await _userManager.IsInRoleAsync(user, "FAD")
-                        //	? await _flow.AppWorkFlow(id, act, comment, app.FADStaffId)
-                        //	: await _flow.AppWorkFlow(id, act, comment);
                         var flow = await _flow.AppWorkFlow(id, act, comment);
                         if (flow.Item1)
                         {
-                            //var appStatusCheck = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id)).Result.Status;
-                            //{
-                            //    var s = await PostDischargeId(app.Id, user.Id);
-                            //    if(s is false)
-                            //    {
-                            //        return new ApiResponse
-                            //        {
-                            //            StatusCode = HttpStatusCode.BadRequest,
-                            //            Message = "Discharge Id not generated",
-                            //            Success = false,
-                            //        };
-                            //    }
-                            //}
                             _response.StatusCode = HttpStatusCode.OK;
                             _response.Success = true;
                             _response.Message = "Application has been pushed";
