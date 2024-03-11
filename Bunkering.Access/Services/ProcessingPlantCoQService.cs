@@ -1431,7 +1431,7 @@ namespace Bunkering.Access.Services
 
                             var newCoqTank = new ProcessingPlantCOQCondensateSBatchTank
                             {
-                                ProcessingPlantCOQCondensateSBatchTankId = before.TankId,
+                                TankId = before.TankId,
                             };
 
                             newCoqTank.ProcessingPlantCOQCondensateTankReadings = newTankReadings;
