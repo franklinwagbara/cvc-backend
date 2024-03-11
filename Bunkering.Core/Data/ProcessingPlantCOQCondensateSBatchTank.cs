@@ -11,7 +11,7 @@ namespace Bunkering.Core.Data
     {
         [Key]
         public int ProcessingPlantCOQCondensateSBatchTankId { get; set; }
-        //public int ProcessingPlantCOQCondensateSBatchId { get; set; }
+        public int ProcessingPlantCOQCondensateSBatchId { get; set; }
         public int TankId { get; set; }
         public double? DiffGrossUsBarrelsAtTankTemp { get; set; }
         public double? DiffGrossBarrelsAt60 { get; set; }
