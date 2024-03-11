@@ -1421,6 +1421,7 @@ namespace Bunkering.Access.Services
                                 LtBblFactor = b.LtBblFactor,
                                 ApiAt60 = b.ApiAt60,
                                 Bsw = b.Bsw,
+                                
                             };
 
                             var newTankReadings = new List<ProcessingPlantCOQCondensateTankReading>
