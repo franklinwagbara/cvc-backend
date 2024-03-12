@@ -59,6 +59,11 @@ namespace Bunkering.Controllers.API
         [Route("create-condensate-coq")]
         [HttpPost]
         public async Task<IActionResult> CreateCondensateCOQ(CondensateCOQPostDto dto) => Response(await _processingPlantCoQService.CreateCondensateCOQ(dto));
+
+        [Route("create-gas-coq")]
+        [HttpPost]
+        public async Task<IActionResult> CreateGasCOQ(CoQGasTank dto) => Response(await _processingPlantCoQService.CreateGasCOQ(dto));
+
         [ProducesResponseType(typeof(ApiResponse), 200)]
         [ProducesResponseType(typeof(ApiResponse), 404)]
         [ProducesResponseType(typeof(ApiResponse), 405)]

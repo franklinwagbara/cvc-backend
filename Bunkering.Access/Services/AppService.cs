@@ -1250,7 +1250,9 @@ namespace Bunkering.Access.Services
                     if (app != null)
                     {
                         var users = _userManager.Users.Include(c => c.Company).Include(ur => ur.UserRoles).ThenInclude(r => r.Role);
-                        var histories = app.Histories.ToList();
+
+                        var user = users.FirstOrDefault(x => x.Email.Equals(User));
+                        var histories = await _userManager.IsInRoleAsync(user, "Company") ? new List<ApplicationHistory>() : app.Histories.ToList();
                         histories.ForEach(h =>
                         {
 
