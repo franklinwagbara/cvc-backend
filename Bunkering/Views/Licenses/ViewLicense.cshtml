@@ -15,7 +15,7 @@
             <div>
                 <img src="~/assets/nmdpraLogo.png" alt="Logo" style="height: 250px; display: block; margin: 0 auto;" />
             </div>
-            <div style="text-align: center;font-size: 2.5em; color: forestgreen;">
+            <div style="text-align: center;font-size: 1.7em; color: forestgreen;">
                 <b>
                     NIGERIAN MIDSTREAM AND DOWNSTREAM PETROLEUM REGULATORY AUTHORITY
                 </b>
@@ -28,15 +28,14 @@
             <h2><span>Clearance No:</span> <span style="padding: 0 50px 0 10px; font-weight: bold;">@Model.PermitNo</span></h2>
             <h2><span>Clearance Date:</span> <span style="padding: 0 50px 0 10px; font-weight: bold;">@Model.DateIssued.ToString("MMM dd, yyyy HH:mm:ss")</span></h2>
         </div>
-        <div style="width: 100%; text-align: center; position: absolute; top: 50%; margin-top: -400px;">
+        <div style="width: 100%; text-align: center; position: absolute; top: 20%;">
             <img src="~/assets/coat-of-arm.jpg" style="width: 920px; opacity: 0.1; margin-left: -5em;;" />
         </div>
-        <br /> <br />
-        <br /> <br />
-        <p>
+        <br /><br /><br />
+        <div style="margin-top: 2em;">
             As approved by the ACE, please find below details of the vessel clearance for your kind attention:
-        </p>
-        <p>
+        </div>
+        <div>
             <table style="width: 100%; font-size: 1em !important; border: 1px solid gray; padding: 5px;">
                 <thead>
                     <tr>
@@ -71,10 +70,11 @@
                     }
                 </tbody>
             </table>
-        </p>
-        <p>
-            Please allow the vessel to discharge/loading and ensure complete recertification.
-        </p>
+        </div>
+        <br />
+        <div>
+            Please allow vessel(s) to discharge / load and ensure complete recertification.
+        </div>
         <div style="margin-top: 2em;">
             <div style="float: left !important;">
                 <img src="data:imaage/png;base64,@Model.QRCode" width="170" height="170" />
