@@ -152,7 +152,6 @@ namespace Bunkering.Controllers.API
 						DateIssued = license.IssuedDate
                     },
 					PageHeight = 327,
-					PageMargins = new Rotativa.AspNetCore.Options.Margins(10, 10, 10, 10),					
                     ViewName = "ViewLicense",
 					PageOrientation = Rotativa.AspNetCore.Options.Orientation.Landscape
 				};
