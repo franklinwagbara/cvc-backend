@@ -1370,7 +1370,136 @@ namespace Bunkering.Access.Services
             };
 
         }
-           
+
+        public async Task<ApiResponse> CreateGasCOQ(CoQGasTank dto)
+        {
+            var userId = _httpCxtAccessor.HttpContext.User.FindFirstValue(ClaimTypes.PrimarySid);
+
+            if (userId == null)
+            {
+                _apiReponse.Message = "Unauthorized, this action is restricted to only authorize users";
+                _apiReponse.StatusCode = HttpStatusCode.BadRequest;
+                return _apiReponse;
+            }
+            else
+            {
+                string refNo = Utils.GenerateCoQRefrenceCode();
+
+                using var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    //#region Create Coq  
+                    //var coq = new ProcessingPlantCOQ
+                    //{
+                    //    PlantId = dto.PlantId,
+                    //    ProductId = dto.ProductId,
+                    //    Reference = refNo,
+                    //    MeasurementSystem = dto.MeasurementSystem,
+                    //    CreatedBy = userId,
+                    //    Status = Enum.GetName(typeof(AppStatus), AppStatus.Processing),
+                    //    CreatedAt = DateTime.UtcNow.AddHours(1),
+                    //    DipMethodId = dto.DipMethodId,
+                    //    StartTime = dto.StartTime,
+                    //    EndTime = dto.EndTime,
+                    //    Consignee = dto.Consignee,
+                    //    ConsignorName = dto.ConsignorName,
+                    //    Terminal = dto.Terminal,
+                    //    Destination = dto.Destination,
+                    //    ShipFigure = dto.ShipFigure,
+                    //    ShipmentNo = dto.ShipmentNo,
+                    //    Price = dto.Price,
+                    //    ApiGravity = dto.ApiGravity,
+                    //};
+
+                    //_context.ProcessingPlantCOQs.Add(coq);
+                    //_context.SaveChanges();
+                    ////var dynamic = dto.Dynamic;
+                    //var staticCoq = await CreateCondensateStatic(coq, dto.Static, userId);
+
+                    //if (!staticCoq.Success)
+                    //{
+                    //    _apiReponse.Message = "Error: static coq not created";
+                    //    _apiReponse.StatusCode = HttpStatusCode.BadRequest;
+                    //    _apiReponse.Success = false;
+
+                    //    return _apiReponse;
+                    //}
+
+                    //var dynamicCoq = await CreateCondensateDynamic(coq, dto.Dynamic, userId);
+
+                    //if (!dynamicCoq.Success)
+                    //{
+                    //    _apiReponse.Message = "Error: dynamic coq not created";
+                    //    _apiReponse.StatusCode = HttpStatusCode.BadRequest;
+                    //    _apiReponse.Success = false;
+
+                    //    return _apiReponse;
+                    //}
+                    //#endregion
+                    ////save subitted docs
+                    //#region Document Submission
+
+                    //SubmitDocumentDto sDoc = dto.SubmitDocuments.FirstOrDefault() ?? throw new Exception("No documents passed");
+                    //var sDocumentList = _mapper.Map<List<PPCOQSubmittedDocument>>(dto.SubmitDocuments);
+
+                    //_context.PPCOQSubmittedDocuments.AddRange(sDocumentList);
+                    //#endregion
+
+                    //_context.SaveChanges();
+
+                    ////var coq = (ProcessingPlantCOQ)staticCoq.Data;
+
+                    //var submit = await _flow.PPCoqWorkFlow(coq.ProcessingPlantCOQId, Enum.GetName(typeof(AppActions), AppActions.Submit), "COQ Submitted", userId);
+                    //if (submit.Item1)
+                    //{
+                    //    var message = new Message
+                    //    {
+                    //        IsCOQ = false,
+                    //        IsPPCOQ = true,
+                    //        ProcessingCOQId = coq.ProcessingPlantCOQId,
+                    //        Subject = $"COQ with reference {coq.Reference} Submitted",
+                    //        Content = $"COQ with reference {coq.Reference} has been submitted to your desk for further processing",
+                    //        UserId = userId,
+                    //        Date = DateTime.Now.AddHours(1),
+                    //    };
+
+                    //    _context.Messages.Add(message);
+                    //    _context.SaveChanges();
+
+                    //    transaction.Commit();
+
+                    //    return new ApiResponse
+                    //    {
+                    //        Message = submit.Item2,
+                    //        StatusCode = HttpStatusCode.OK,
+                    //        Success = true
+                    //    };
+                    //}
+                    //else
+                    //{
+                    //    transaction.Rollback();
+                    //    return new ApiResponse
+                    //    {
+                    //        Message = submit.Item2,
+                    //        StatusCode = HttpStatusCode.NotAcceptable,
+                    //        Success = false
+                    //    };
+                    //}
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    return new ApiResponse
+                    {
+                        Message = $"An error occur, COQ not created: {ex.Message}",
+                        Success = false,
+                        StatusCode = HttpStatusCode.InternalServerError
+                    };
+                }
+                return _apiReponse;
+            }
+        }
+
         private async Task<ApiResponse> CreateCondensateStatic(ProcessingPlantCOQ coq, UpsertPPlantCOQCondensateStaticDto dto, string userId)
         {
             try

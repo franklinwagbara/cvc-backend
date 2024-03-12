@@ -17,5 +17,7 @@ namespace Bunkering.Core.Utils
         public bool WFile { get; set; }
         public int ServerPort { get; set; }
         public string npowr { get; set; }
+        public string EQSBaseUrl { get; set; }
+        public string EQSRelativeUrl { get; set; }
     }
 }
