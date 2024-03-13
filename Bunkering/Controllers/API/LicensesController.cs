@@ -141,7 +141,7 @@ namespace Bunkering.Controllers.API
 						Vessel = license.Application.VesselName,
 						Destinations = depots.Select(y => new DepotDTO
 						{
-							Name = y.Depot.Name,
+							Name = $"{y.Depot.Name} ({y.Depot.State})",
 							Product = y.Product.Name,
 							Volume = y.Volume,
 							DischargeId = y.DischargeId,
@@ -152,8 +152,8 @@ namespace Bunkering.Controllers.API
 						DateIssued = license.IssuedDate
                     },
 					PageHeight = 327,
-					PageMargins = new Rotativa.AspNetCore.Options.Margins(10, 10, 10, 10),					
-                    ViewName = "ViewLicense"
+                    ViewName = "ViewLicense",
+					PageOrientation = Rotativa.AspNetCore.Options.Orientation.Landscape
 				};
 				var pdf = await viewAsPdf.BuildFile(ControllerContext);
 				return File(new MemoryStream(pdf), "application/pdf");
