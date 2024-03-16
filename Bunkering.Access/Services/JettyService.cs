@@ -48,6 +48,8 @@ namespace Bunkering.Access.Services
                 var jetty = new Jetty
                 {
                     Name = model.Name,
+                    StateId = model.StateId,
+                    Location = model.Location
                 };
 
                 await _unitOfWork.Jetty.Add(jetty);
@@ -75,6 +77,8 @@ namespace Bunkering.Access.Services
             if (editJetty != null)
             {
                 editJetty.Name = model.Name;
+                editJetty.StateId = model.StateId;
+                editJetty.Location = model.Location;
 
                 await _unitOfWork.Jetty.Update(editJetty);
                 _unitOfWork.Save();
@@ -147,12 +151,16 @@ namespace Bunkering.Access.Services
         public async Task<ApiResponse> AllJetty()
         {
             var allJetty = await _unitOfWork.Jetty.GetAll();
-            allJetty = allJetty.Where(x => x.IsDeleted == false).ToList();
+            var list = allJetty.Where(x => x.IsDeleted == false).GroupBy(s => s.State).Select(x => new
+            {
+                GroupName = x.Key.Name,
+                Jetties = x.Select(y => new { y.Id, y.Name})
+            }).ToList();
 
             _response = new ApiResponse
             {
                 Message = "Successful",
-                Data = allJetty,
+                Data = list,
                 StatusCode = HttpStatusCode.OK,
                 Success = true,
             };
