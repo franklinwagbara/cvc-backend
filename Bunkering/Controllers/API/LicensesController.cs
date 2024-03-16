@@ -139,6 +139,7 @@ namespace Bunkering.Controllers.API
 						PermitNo = license.PermitNo,
 						QRCode = license.QRCode,
 						Vessel = license.Application.VesselName,
+						Company = license.Application.User.Company.Name,
 						Destinations = depots.Select(y => new DepotDTO
 						{
 							Name = $"{y.Depot.Name} ({y.Depot.State})",
@@ -203,6 +204,7 @@ namespace Bunkering.Controllers.API
                         PermitNo = license.PermitNo,
                         QRCode = license.QRCode,
                         Vessel = license.Application.VesselName,
+						Company = license.Application.User.Company.Name,
                         Destinations = depots.Select(y => new DepotDTO
                         {
                             Name = y.Depot.Name,
