@@ -921,7 +921,7 @@ namespace Bunkering.Access.Services
             }
             //send and save notification
 
-            var body = Utils.ReadTextFile(_env.WebRootPath, "GeneralTemplate.cshtml");
+            var body = Utils.ReadTextFile(_env.WebRootPath, "GeneralTemplate.txt");
             var url = _httpContextAccessor.HttpContext.Request.Scheme + "://" + _httpContextAccessor.HttpContext.Request.Host + "/assets/nmdpraLogo.png";
             body = string.Format(body, content, DateTime.Now.Year, url);
             Utils.SendMail(_mailSetting.Stringify().Parse<Dictionary<string, string>>(), user.Email, subject, body);
@@ -955,7 +955,7 @@ namespace Bunkering.Access.Services
             }
             //send and save notification
 
-            var body = Utils.ReadTextFile(_env.WebRootPath, "GeneralTemplate.cshtml");
+            var body = Utils.ReadTextFile(_env.WebRootPath, "GeneralTemplate.txt");
             var url = _httpContextAccessor.HttpContext.Request.Scheme + "://" + _httpContextAccessor.HttpContext.Request.Host + "/assets/nmdpraLogo.png";
             body = string.Format(body, content, DateTime.Now.Year, url);
             Utils.SendMail(_mailSetting.Stringify().Parse<Dictionary<string, string>>(), user.Email, subject, body);
