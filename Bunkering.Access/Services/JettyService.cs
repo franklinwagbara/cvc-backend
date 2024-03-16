@@ -150,11 +150,11 @@ namespace Bunkering.Access.Services
         }
         public async Task<ApiResponse> AllJetty()
         {
-            var allJetty = await _unitOfWork.Jetty.GetAll();
+            var allJetty = await _unitOfWork.Jetty.GetAll("State");
             var list = allJetty.Where(x => x.IsDeleted == false).GroupBy(s => s.State).Select(x => new
             {
                 GroupName = x.Key.Name,
-                Jetties = x.Select(y => new { y.Id, y.Name})
+                Jetties = x.Select(y => new { y.Id, Name = $"{y.Name} ({y.Location})"})
             }).ToList();
 
             _response = new ApiResponse
