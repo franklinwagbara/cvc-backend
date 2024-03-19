@@ -133,7 +133,7 @@ namespace Bunkering.Access.Services
                 if (app == null)
                     return new ApiResponse
                     {
-                        Message = "NOA dosen't exist",
+                        Message = "NOA doesn't exist",
                         StatusCode = HttpStatusCode.Conflict,
                         Success = false
                     };
