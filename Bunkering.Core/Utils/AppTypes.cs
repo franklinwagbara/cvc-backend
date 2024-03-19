@@ -10,7 +10,9 @@ namespace Bunkering.Core.Utils
     {
         NOA,
         COQ,
+        STS,
         DebitNote,
         DemandNotice
+        
     }
 }
