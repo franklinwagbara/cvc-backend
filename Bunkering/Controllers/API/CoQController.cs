@@ -256,7 +256,7 @@ namespace Bunkering.Controllers.API
                 var coqData = license.Data as COQNonGasCertificateDTO;
                 var viewAsPdf = new ViewAsPdf();
 
-                if (coqData != null && coqData.ProductType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.NonGas)))
+                if (coqData != null && !coqData.ProductType.Equals(Enum.GetName(typeof(ProductTypes), ProductTypes.Gas)))
                     viewAsPdf = new ViewAsPdf("ViewCertificate", license.Data)
                     {
                         PageSize = Size.A4,
@@ -433,16 +433,15 @@ namespace Bunkering.Controllers.API
                 var viewAsPdf = new ViewAsPdf
                 {
                     Model = data,
-                    PageHeight = 327,
-                    PageMargins = new Margins(10, 10, 10, 10),
-
+                    //PageHeight = 327,
+                    PageMargins = new Margins(0, 0, 0, 0),
+                    PageOrientation = Orientation.Landscape,
                     ViewName = "DebitNote"
                 };
                 var pdf = await viewAsPdf.BuildFile(ControllerContext);
                 return File(new MemoryStream(pdf), "application/pdf");
             }
             return BadRequest(note);
-
         }
 
         /// <summary>

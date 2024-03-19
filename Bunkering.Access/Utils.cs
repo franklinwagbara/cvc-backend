@@ -10,6 +10,7 @@ using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 using Bunkering.Core.Utils;
 using Microsoft.Extensions.Configuration;
 using Bunkering.Core.Data;
+using static System.Net.WebRequestMethods;
 
 namespace Bunkering.Access
 {
@@ -82,31 +83,44 @@ namespace Bunkering.Access
 
         public static void SendMail(Dictionary<string, string> mailsettings, string toEmail, string subject, string body, string bcc = null)
         {
-            var credentials = new NetworkCredential(mailsettings.GetValue("UserName"), mailsettings.GetValue("mailPass"));
-            var smtp = new SmtpClient(mailsettings.GetValue("mailHost"), int.Parse(mailsettings.GetValue("ServerPort")))
+            //var credentials = new NetworkCredential(mailsettings.GetValue("UserName"), mailsettings.GetValue("mailPass"));
+            //var smtp = new SmtpClient(mailsettings.GetValue("mailHost"), int.Parse(mailsettings.GetValue("ServerPort")))
+            //{
+            //    EnableSsl = bool.Parse(mailsettings.GetValue("UseSsl")),
+            //    DeliveryMethod = SmtpDeliveryMethod.Network,
+            //    UseDefaultCredentials = false,
+            //    Credentials = credentials
+            //};
+
+
+            //var mail = new MailMessage {From = new MailAddress(mailsettings.GetValue("mailSender"))};
+            //mail.To.Add(new MailAddress(toEmail));
+
+            //if (!string.IsNullOrEmpty(bcc))
+            //{
+            //    var copies = bcc.Split(',');
+            //    foreach (var email in copies)
+            //        mail.Bcc.Add(new MailAddress(email));
+            //}
+
+            //mail.Subject = subject;
+            //mail.Body = body;
+            //mail.IsBodyHtml = true;
+
+            //smtp.Send(mail);
+            var request = new HttpRequestMessage(HttpMethod.Post, mailsettings.GetValue("eqsrelativeurl"))
             {
-                EnableSsl = bool.Parse(mailsettings.GetValue("UseSsl")),
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                UseDefaultCredentials = false,
-                Credentials = credentials
+                Content = new StringContent(new
+                {
+                    receipient = toEmail,
+                    subject = subject,
+                    body = body
+                }.Stringify(), Encoding.UTF8, "application/json")
             };
+            request.Headers.Add("Celps-Key", mailsettings.GetValue("eqskey"));
 
+            var response = Send(mailsettings.GetValue("eqsbaseurl"), request).Result;
 
-            var mail = new MailMessage {From = new MailAddress(mailsettings.GetValue("mailSender"))};
-            mail.To.Add(new MailAddress(toEmail));
-
-            if (!string.IsNullOrEmpty(bcc))
-            {
-                var copies = bcc.Split(',');
-                foreach (var email in copies)
-                    mail.Bcc.Add(new MailAddress(email));
-            }
-            
-            mail.Subject = subject;
-            mail.Body = body;
-            mail.IsBodyHtml = true;
-
-            smtp.Send(mail);
         }
 
         public static void SendMail(Dictionary<string, string> mailsettings, string[] toEmails, string subject, string body, string bcc = null)

@@ -11,6 +11,7 @@ namespace Bunkering.Core.ViewModels
         public string PermitNo { get; set; }
         public string Vessel { get; set; }
         public DateTime ETA { get; set; }
+        public string Company { get; set; }
         public string LoadPort { get; set; }
         public string Jetty { get; set; }
         public string Surveyor { get; set; }

@@ -1250,7 +1250,9 @@ namespace Bunkering.Access.Services
                     if (app != null)
                     {
                         var users = _userManager.Users.Include(c => c.Company).Include(ur => ur.UserRoles).ThenInclude(r => r.Role);
-                        var histories = app.Histories.ToList();
+
+                        var user = users.FirstOrDefault(x => x.Email.Equals(User));
+                        var histories = await _userManager.IsInRoleAsync(user, "Company") ? new List<ApplicationHistory>() : app.Histories.ToList();
                         histories.ForEach(h =>
                         {
 
@@ -1404,26 +1406,9 @@ namespace Bunkering.Access.Services
                     _response = new ApiResponse();
                     if (app != null && user != null)
                     {
-
-                        //var flow = await _userManager.IsInRoleAsync(user, "FAD")
-                        //	? await _flow.AppWorkFlow(id, act, comment, app.FADStaffId)
-                        //	: await _flow.AppWorkFlow(id, act, comment);
                         var flow = await _flow.AppWorkFlow(id, act, comment);
                         if (flow.Item1)
                         {
-                            //var appStatusCheck = await _unitOfWork.Application.FirstOrDefaultAsync(x => x.Id.Equals(id)).Result.Status;
-                            //{
-                            //    var s = await PostDischargeId(app.Id, user.Id);
-                            //    if(s is false)
-                            //    {
-                            //        return new ApiResponse
-                            //        {
-                            //            StatusCode = HttpStatusCode.BadRequest,
-                            //            Message = "Discharge Id not generated",
-                            //            Success = false,
-                            //        };
-                            //    }
-                            //}
                             _response.StatusCode = HttpStatusCode.OK;
                             _response.Success = true;
                             _response.Message = "Application has been pushed";

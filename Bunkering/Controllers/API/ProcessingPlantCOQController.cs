@@ -31,21 +31,21 @@ namespace Bunkering.Controllers.API
         public async Task<IActionResult> Index() => Response(await _processingPlantCoQService.GetAllCoQ());
 
 
-        [Route("create-liquid-static-coq")]
-        [HttpPost]
-        public async Task<IActionResult> CreateLiquidStaticCOQ(UpsertPPlantCOQLiquidStaticDto dto)
-        {
-            var result = await _processingPlantCoQService.CreateLiquidStaticCOQ(dto);
-            return Response(result);
-        }
+        //[Route("create-liquid-static-coq")]
+        //[HttpPost]
+        //public async Task<IActionResult> CreateLiquidStaticCOQ(UpsertPPlantCOQLiquidStaticDto dto)
+        //{
+        //    var result = await _processingPlantCoQService.CreateLiquidStaticCOQ(dto);
+        //    return Response(result);
+        //}
 
-        [Route("create-liquid-dynamic-coq")]
-        [HttpPost]
-        public async Task<IActionResult> CreateLiquidDynamicCOQ(UpsertPPlantCOQLiquidDynamicDto dto)
-        {
-            var result = await _processingPlantCoQService.CreateLiquidDynamicCOQ(dto);
-            return Response(result);
-        }
+        //[Route("create-liquid-dynamic-coq")]
+        //[HttpPost]
+        //public async Task<IActionResult> CreateLiquidDynamicCOQ(UpsertPPlantCOQLiquidDynamicDto dto)
+        //{
+        //    var result = await _processingPlantCoQService.CreateLiquidDynamicCOQ(dto);
+        //    return Response(result);
+        //}
 
         [Route("create-liquid-coq")]
         [HttpPost]
@@ -58,11 +58,12 @@ namespace Bunkering.Controllers.API
 
         [Route("create-condensate-coq")]
         [HttpPost]
-        public async Task<IActionResult> CreateCondensateCOQ(CondensateCOQPostDto dto)
-        {
-            //var result = await _processingPlantCoQService.CreateLiquidCOQ(dto);
-            return Ok("Coming soon");
-        }
+        public async Task<IActionResult> CreateCondensateCOQ(CondensateCOQPostDto dto) => Response(await _processingPlantCoQService.CreateCondensateCOQ(dto));
+
+        [Route("create-gas-coq")]
+        [HttpPost]
+        public async Task<IActionResult> CreateGasCOQ(CoQGasTank dto) => Response(await _processingPlantCoQService.CreateGasCOQ(dto));
+
         [ProducesResponseType(typeof(ApiResponse), 200)]
         [ProducesResponseType(typeof(ApiResponse), 404)]
         [ProducesResponseType(typeof(ApiResponse), 405)]

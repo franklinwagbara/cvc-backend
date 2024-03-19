@@ -160,7 +160,7 @@ namespace Bunkering.Access.Services
                                
                             }
                             //send and save notification
-                            //await SendNotification(app, action, nextprocessingofficer, processingMsg);
+                            await SendNotification(app, action, nextprocessingofficer, processingMsg);
                         }
                         else
                         {
@@ -247,7 +247,7 @@ namespace Bunkering.Access.Services
                         message = $"COQ Application has been approved and certificate {certificate.Item2} has been generated successfully.";
                 }
                 //send and save notification
-                //await SendCOQNotification(coq, action, nextProcessingOfficer, message);
+                await SendCOQNotification(coq, action, nextProcessingOfficer, message);
                 return (true, message);
                 
             }
@@ -921,7 +921,7 @@ namespace Bunkering.Access.Services
             }
             //send and save notification
 
-            var body = Utils.ReadTextFile(_env.WebRootPath, "GeneralTemplate.cshtml");
+            var body = Utils.ReadTextFile(_env.WebRootPath, "GeneralTemplate.txt");
             var url = _httpContextAccessor.HttpContext.Request.Scheme + "://" + _httpContextAccessor.HttpContext.Request.Host + "/assets/nmdpraLogo.png";
             body = string.Format(body, content, DateTime.Now.Year, url);
             Utils.SendMail(_mailSetting.Stringify().Parse<Dictionary<string, string>>(), user.Email, subject, body);
@@ -955,7 +955,7 @@ namespace Bunkering.Access.Services
             }
             //send and save notification
 
-            var body = Utils.ReadTextFile(_env.WebRootPath, "GeneralTemplate.cshtml");
+            var body = Utils.ReadTextFile(_env.WebRootPath, "GeneralTemplate.txt");
             var url = _httpContextAccessor.HttpContext.Request.Scheme + "://" + _httpContextAccessor.HttpContext.Request.Host + "/assets/nmdpraLogo.png";
             body = string.Format(body, content, DateTime.Now.Year, url);
             Utils.SendMail(_mailSetting.Stringify().Parse<Dictionary<string, string>>(), user.Email, subject, body);

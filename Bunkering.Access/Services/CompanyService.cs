@@ -388,14 +388,14 @@ namespace Bunkering.Access.Services
 					address_2 = model.address_2,
 					postal_code = model.postal_code,
 					countryName = user.Company.Name,
+					type = "registered"
                 };
 
                 var addList = new List<RegisteredAddress> {  add };
 
                 if (user.Company.AddressId > 0)
                 {
-					add.id = user.Company.AddressId.Value;
-                    addList.Add(add);
+                    addList.FirstOrDefault().id = user.Company.AddressId.Value;                    
                     var resp = _elps.UpdateCompanyRegAddress(addList);
                 }
                 else
