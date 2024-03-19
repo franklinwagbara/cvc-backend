@@ -17,5 +17,6 @@ namespace Bunkering.Core.Data
         public CoQ? DepotCoQ { get; set; }
         [ForeignKey(nameof(PlantCoQId))]
         public ProcessingPlantCOQ? ProcessingPlantCOQ { get; set; }
+       
     }
 }
