@@ -154,7 +154,13 @@ namespace Bunkering.Access.Services
             var list = allJetty.Where(x => x.IsDeleted == false).GroupBy(s => s.State).Select(x => new
             {
                 GroupName = x.Key.Name,
-                Jetties = x.Select(y => new { y.Id, Name = $"{y.Name} ({y.Location})"})
+                Jetties = x.Select(y => new 
+                { 
+                    y.Id, 
+                    Name = y.Name,
+                    nameLocation = $"{y.Name} ({y.Location})",
+                    location = y.Location
+                })
             }).ToList();
 
             _response = new ApiResponse
