@@ -4,6 +4,13 @@
     [IsDeleted] BIT            NOT NULL,
     [DeletedAt] DATETIME2 (7)  NULL,
     [DeletedBy] NVARCHAR (MAX) NULL,
-    CONSTRAINT [PK_Jetties] PRIMARY KEY CLUSTERED ([Id] ASC)
+    [StateId]   INT            NULL,
+    [Location]  NVARCHAR (MAX) NULL,
+    CONSTRAINT [PK_Jetties] PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [FK_Jetties_States_Stateid] FOREIGN KEY ([StateId]) REFERENCES [dbo].[States] ([Id])
 );
+
+
+
+
 

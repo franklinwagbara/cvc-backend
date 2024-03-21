@@ -32,5 +32,13 @@ namespace Bunkering.Controllers.API
         [HttpPost]
         public async Task<IActionResult> AddRecord(DestinationVesselDTO tr) => Response(await _shipToShipService.AddRecord(tr));
 
+        //[Route("add-documents")]
+        //[HttpPost]
+        //public async Task<IActionResult> AddDocuments(int id) => Response(await _shipToShipService.AddDocuments(id));
+
+        [AllowAnonymous]
+        [Route("get-STS-documents")]
+        [HttpGet]
+        public async Task<IActionResult> GetSTSDocuments(int id) => Response(await _shipToShipService.GetSTSDocuments(id));
     }
 }

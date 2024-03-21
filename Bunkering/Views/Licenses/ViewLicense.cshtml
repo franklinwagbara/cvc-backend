@@ -11,10 +11,10 @@
 </head>
 <body>
     <div style="font-size: 1.2em !important;">
-
+@* 
         <div style="width: 100%; text-align: center; position: absolute; top: 20%;">
             <img src="~/assets/coat-of-arm.jpg" style="width: 920px; opacity: 0.1; margin-left: -5em;;" />
-        </div>
+        </div> *@
         <div class="text-center">
             <div>
                 <img src="~/assets/nmdpraLogo.png" alt="Logo" style="height: 150px; display: block; margin: 0 auto;" />
@@ -30,10 +30,10 @@
         </div>
         <div style="float: right; position: relative; margin-top: 1em; margin-bottom: 1em;">
             <h3><span>Clearance No:</span> <span style="padding: 0 25px 0 10px; font-weight: bold;">@Model.PermitNo</span></h3>
-            <h><span>Clearance Date:</span> <span style="padding: 0 25px 0 10px; font-weight: bold;">@Model.DateIssued.ToString("MMM dd, yyyy HH:mm:ss")</span></h>
+            <h><span>Clearance Date:</span> <span style="padding: 0 25px 0 10px; font-weight: bold;">@Model.DateIssued.ToString("dd")<sup>@DateSub(Model.DateIssued.Day)</sup> @Model.DateIssued.ToString("MMMM, yyyy")</span></h>
         </div>
         <br /><br /><br />
-        <div style="margin-top: 2em;">
+        <div style="margin-top: 2em; margin-bottom: 1em;">
             As approved by the ACE, please find below details of the vessel clearance for your kind attention:
         </div>
         <div>
@@ -50,6 +50,8 @@
                         <th>DESTINATION</th>
                         <th>JETTY</th>
                         <th>NOMINATED <br />SURVEYOR</th>
+                        <th>
+COMPANY ACCOUNT</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -62,11 +64,12 @@
                             <td>@Model.Vessel</td>
                             <td>@item.Product</td>
                             <td>@item.Volume.ToString("N2")</td>
-                            <td>@Model.ETA.ToString("dd MMM yyyy hh:mm:ss")</td>
+                            <td>@Model.ETA.ToString("dd")<sup>@DateSub(Model.ETA.Day)</sup> @Model.ETA.ToString("MMMM, yyyy HH:mm:ss")</td>
                             <td>@Model.LoadPort</td>
                             <td>@item.Name</td>
                             <td>@Model.Jetty</td>
                             <td>@Model.Surveyor</td>
+                            <td>@Model.Company</td>
                         </tr>
                     }
                 </tbody>
@@ -74,7 +77,8 @@
         </div>
         <br />
         <div>
-            Please allow the vessel to discharge/loading and ensure complete recertification.
+            please allow vessel(s) to discharge / load and ensure complete recertification.
+
         </div>
         <div style="margin-top: 2em;">
             <div style="float: left !important;">

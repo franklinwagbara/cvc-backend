@@ -133,7 +133,7 @@ namespace Bunkering.Access.Services
                 if (app == null)
                     return new ApiResponse
                     {
-                        Message = "NOA dosen't exist",
+                        Message = "NOA doesn't exist",
                         StatusCode = HttpStatusCode.Conflict,
                         Success = false
                     };
@@ -156,7 +156,7 @@ namespace Bunkering.Access.Services
                 if(supervisor != null)
                 {
                     //send notification to supervisor
-                    var template = Utils.ReadTextFile(_env.WebRootPath, "GeneralTemplate.cshtml");
+                    var template = Utils.ReadTextFile(_env.WebRootPath, "GeneralTemplate.txt");
                     var body = string.Format(template, comment, DateTime.Now.Year, "https://celps.nmdpra.gov.ng/content/images/mainlogo.png");
 
                     Utils.SendMail(_mailSettings.Stringify().Parse<Dictionary<string, string>>(), supervisor.Email, "Vessel Clearance Discharge", body);
